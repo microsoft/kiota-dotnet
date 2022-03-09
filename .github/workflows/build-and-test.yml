@@ -1,0 +1,32 @@
+name: Build and Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ 'main', 'dev', 'feature/*' ]
+  pull_request:
+    branches: [ 'main', 'dev' ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      solutionName: Microsoft.Kiota.Abstractions.sln
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1.9.0
+        with:
+          dotnet-version: 6.0.x
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: csharp
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.solutionName }}
+      - name: Build
+        run: dotnet build ${{ env.solutionName }} --no-restore -c Release /p:UseSharedCompilation=false
+      - name: Test
+        run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal -c Release /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=opencover
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
