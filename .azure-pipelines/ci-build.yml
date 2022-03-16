@@ -1,0 +1,294 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+name: $(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+
+trigger:
+  branches:
+    include:
+      - main
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  name: Azure Pipelines
+  vmImage: windows-latest
+
+variables:
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  ProductBinPath: '$(Build.SourcesDirectory)\src\bin\$(BuildConfiguration)'
+
+
+stages:
+
+- stage: build
+  jobs:
+    - job: build
+      steps:
+
+      - task: UseDotNet@2
+        displayName: 'Use .NET 6'
+        inputs:
+          version: 6.x
+
+      - task: PoliCheck@1
+        displayName: 'Run PoliCheck "/src"'
+        inputs:
+          inputType: CmdLine
+          cmdLineArgs: '/F:$(Build.SourcesDirectory)/src /T:9 /Sev:"1|2" /PE:2 /O:poli_result_src.xml'
+
+      - task: PoliCheck@1
+        displayName: 'Run PoliCheck "/Microsoft.Kiota.Abstractions.Tests"'
+        inputs:
+          inputType: CmdLine
+          cmdLineArgs: '/F:$(Build.SourcesDirectory)/Microsoft.Kiota.Abstractions.Tests /T:9 /Sev:"1|2" /PE:2 /O:poli_result_test.xml'
+          
+      # Install the nuget tool.
+      - task: NuGetToolInstaller@1
+        displayName: 'Install Nuget dependency manager'
+        inputs:
+          versionSpec: '>=5.2.0'
+          checkLatest: true
+
+      - task: PowerShell@2
+        displayName: 'Enable signing'
+        inputs:
+          targetType: filePath
+          filePath: 'scripts\EnableSigning.ps1'
+          arguments: '-projectPath "$(Build.SourcesDirectory)/src/Microsoft.Kiota.Abstractions.csproj"'
+          pwsh: true
+        enabled: true
+
+      # Build the Product project
+      - task: DotNetCoreCLI@2
+        displayName: 'Build Microsoft.Kiota.Abstractions'
+        inputs:
+          projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.Abstractions.sln'
+          arguments: '--configuration $(BuildConfiguration) --no-incremental'
+
+      # Run the Unit test
+      - task: DotNetCoreCLI@2
+        displayName: 'Test Microsoft.Kiota.Abstractions'
+        inputs:
+          command: test
+          projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.Abstractions.sln'
+          arguments: '--configuration $(BuildConfiguration) --no-build'
+
+      # CredScan
+      - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
+        displayName: 'Run CredScan - Src'
+        inputs:
+          toolMajorVersion: 'V2'
+          scanFolder: '$(Build.SourcesDirectory)\src'
+          debugMode: false
+
+      - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
+        displayName: 'Run CredScan - Test'
+        inputs:
+          toolMajorVersion: 'V2'
+          scanFolder: '$(Build.SourcesDirectory)\Microsoft.Kiota.Abstractions.Tests'
+          debugMode: false
+
+      - task: AntiMalware@3
+        displayName: 'Run MpCmdRun.exe - ProductBinPath'
+        inputs:
+          FileDirPath: '$(ProductBinPath)'
+        enabled: false
+
+      - task: BinSkim@3
+        displayName: 'Run BinSkim - Product Binaries'
+        inputs:
+          InputType: Basic
+          AnalyzeTarget: '$(ProductBinPath)\**\Microsoft.Kiota.Abstractions.dll'
+          AnalyzeSymPath: '$(ProductBinPath)'
+          AnalyzeVerbose: true
+          AnalyzeHashes: true
+          AnalyzeEnvironment: true
+
+      - task: PublishSecurityAnalysisLogs@2
+        displayName: 'Publish Security Analysis Logs'
+        inputs:
+          ArtifactName: SecurityLogs
+
+      - task: PostAnalysis@1
+        displayName: 'Post Analysis'
+        inputs:
+          BinSkim: true
+          CredScan: true
+          PoliCheck: true
+
+      - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+        displayName: 'ESRP DLL Strong Name'
+        inputs:
+          ConnectedServiceName: 'microsoftgraph ESRP CodeSign DLL and NuGet (AKV)'
+          FolderPath: $(ProductBinPath)
+          Pattern: Microsoft.Kiota.Abstractions.dll
+          signConfigType: inlineSignParams
+          inlineOperation: |
+            [
+                {
+                    "keyCode": "CP-233863-SN",
+                    "operationSetCode": "StrongNameSign",
+                    "parameters": [],
+                    "toolName": "sign",
+                    "toolVersion": "1.0"
+                },
+                {
+                    "keyCode": "CP-233863-SN",
+                    "operationSetCode": "StrongNameVerify",
+                    "parameters": [],
+                    "toolName": "sign",
+                    "toolVersion": "1.0"
+                }
+            ]
+          SessionTimeout: 20
+
+      - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+        displayName: 'ESRP DLL CodeSigning'
+        inputs:
+          ConnectedServiceName: 'microsoftgraph ESRP CodeSign DLL and NuGet (AKV)'
+          FolderPath: src
+          signConfigType: inlineSignParams
+          inlineOperation: |
+            [
+                {
+                    "keyCode": "CP-230012",
+                    "operationSetCode": "SigntoolSign",
+                    "parameters": [
+                    {
+                        "parameterName": "OpusName",
+                        "parameterValue": "Microsoft"
+                    },
+                    {
+                        "parameterName": "OpusInfo",
+                        "parameterValue": "http://www.microsoft.com"
+                    },
+                    {
+                        "parameterName": "FileDigest",
+                        "parameterValue": "/fd \"SHA256\""
+                    },
+                    {
+                        "parameterName": "PageHash",
+                        "parameterValue": "/NPH"
+                    },
+                    {
+                        "parameterName": "TimeStamp",
+                        "parameterValue": "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
+                    }
+                    ],
+                    "toolName": "sign",
+                    "toolVersion": "1.0"
+                },
+                {
+                    "keyCode": "CP-230012",
+                    "operationSetCode": "SigntoolVerify",
+                    "parameters": [ ],
+                    "toolName": "sign",
+                    "toolVersion": "1.0"
+                }
+            ]
+          SessionTimeout: 20
+
+      # arguments are not parsed in DotNetCoreCLI@2 task for `pack` command, that's why we have a custom pack command here
+      - pwsh: dotnet pack $env:BUILD_SOURCESDIRECTORY/src/Microsoft.Kiota.Abstractions.csproj /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg --no-build --output $env:BUILD_ARTIFACTSTAGINGDIRECTORY --configuration $env:BUILD_CONFIGURATION
+        env:
+          BUILD_CONFIGURATION: $(BuildConfiguration)
+        displayName: Dotnet pack
+
+      - task: PowerShell@2
+        displayName: 'Validate project version has been incremented'
+        condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
+        inputs:
+          targetType: 'filePath'
+          filePath: $(System.DefaultWorkingDirectory)\scripts\ValidateProjectVersionUpdated.ps1
+          arguments: '-projectPath "$(Build.SourcesDirectory)/src/Microsoft.Kiota.Abstractions.csproj" -packageName "Microsoft.Kiota.Abstractions"'
+          pwsh: true
+
+      - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+        displayName: 'ESRP CodeSigning Nuget Packages'
+        inputs:
+          ConnectedServiceName: 'microsoftgraph ESRP CodeSign DLL and NuGet (AKV)'
+          FolderPath: '$(Build.ArtifactStagingDirectory)'
+          Pattern: '*.nupkg'
+          signConfigType: inlineSignParams
+          inlineOperation: |
+            [
+                {
+                    "keyCode": "CP-401405",
+                    "operationSetCode": "NuGetSign",
+                    "parameters": [ ],
+                    "toolName": "sign",
+                    "toolVersion": "1.0"
+                },
+                {
+                    "keyCode": "CP-401405",
+                    "operationSetCode": "NuGetVerify",
+                    "parameters": [ ],
+                    "toolName": "sign",
+                    "toolVersion": "1.0"
+                }
+            ]
+          SessionTimeout: 20
+          
+      - task: CopyFiles@2
+        displayName: 'Copy release scripts to artifact staging directory'
+        condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
+        inputs:
+          SourceFolder: '$(Build.SourcesDirectory)'
+          Contents: 'scripts\**'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+      - task: PublishPipelineArtifact@1
+        displayName: 'Upload Artifact: Nugets'
+        inputs:
+          artifactName: Nugets
+          targetPath: $(Build.ArtifactStagingDirectory)
+
+- stage: deploy
+  condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
+  dependsOn: build
+  jobs:
+    - deployment: deploy_dotnet_abstractions
+      dependsOn: []
+      environment: nuget-org
+      strategy:
+        runOnce:
+          deploy:
+            pool:
+              vmImage: ubuntu-latest
+            steps:
+            - task: DownloadPipelineArtifact@2
+              displayName: Download nupkg from artifacts
+              inputs:
+                artifact: Nugets
+                source: current
+            - task: PowerShell@2
+              displayName: 'Extract release information to pipeline'
+              inputs:
+                targetType: 'filePath'
+                filePath: $(Pipeline.Workspace)\Nugets\scripts\GetNugetPackageVersion.ps1
+                pwsh: true
+                arguments: '-packageDirPath "$(Pipeline.Workspace)/Nugets/"'
+            - task: NuGetCommand@2
+              displayName: 'NuGet push'
+              inputs:
+                command: push
+                packagesToPush: '$(Pipeline.Workspace)/Nugets/Microsoft.Kiota.Abstractions.*.nupkg'
+                nuGetFeedType: external
+                publishFeedCredentials: 'microsoftgraph NuGet connection'
+            - task: GitHubRelease@1
+              displayName: 'GitHub release (create)'
+              inputs:
+                gitHubConnection: 'Kiota_Release'
+                target: $(Build.SourceVersion)
+                tagSource: userSpecifiedTag
+                tag: 'v$(VERSION_STRING)'
+                title: '$(VERSION_STRING)'
+                releaseNotesSource: inline
+                assets: '!**/**'
+                changeLogType: issueBased
+                isPreRelease : '$(IS_PRE_RELEASE)'
+                addChangeLog : true 
