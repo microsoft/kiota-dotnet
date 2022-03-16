@@ -278,7 +278,7 @@ stages:
                 command: push
                 packagesToPush: '$(Pipeline.Workspace)/Nugets/Microsoft.Kiota.Abstractions.*.nupkg'
                 nuGetFeedType: external
-                publishFeedCredentials: 'OpenAPI Nuget Connection'
+                publishFeedCredentials: 'Kiota Nuget Connection'
             - task: GitHubRelease@1
               displayName: 'GitHub release (create)'
               inputs:
