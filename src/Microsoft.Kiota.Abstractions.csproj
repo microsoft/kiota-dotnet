@@ -10,6 +10,7 @@
     <LangVersion>latest</LangVersion>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <RepositoryUrl>https://github.com/microsoft/kiota-abstractions-dotnet</RepositoryUrl>
+    <ProjectUrl>https://microsoft.github.io/kiota/</ProjectUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <Deterministic>true</Deterministic>
     <VersionPrefix>1.0.0</VersionPrefix>
