@@ -11,7 +11,7 @@ Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README
 ## Using the Abstractions Library
 
 ```shell
-dotnet add package Microsoft.Kiota.Abstractions
+dotnet add package Microsoft.Kiota.Abstractions --prerelease
 ```
 
 ## Debugging
