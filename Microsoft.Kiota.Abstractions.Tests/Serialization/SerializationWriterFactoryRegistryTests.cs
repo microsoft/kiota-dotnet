@@ -38,6 +38,21 @@ namespace Microsoft.Kiota.Abstractions.Tests.Serialization
             Assert.NotNull(serializationWriter);
             Assert.Equal(mockSerializationWriter.Object, serializationWriter);
         }
+        [Fact]
+        public void ReturnsExpectedSerializationWriterForVendorSpecificContentTyp()
+        {
+            // Arrange
+            var applicationJsonContentType = "application/json";
+            var mockSerializationWriterFactory = new Mock<ISerializationWriterFactory>();
+            var mockSerializationWriter = new Mock<ISerializationWriter>();
+            mockSerializationWriterFactory.Setup(serializationWriterFactory => serializationWriterFactory.GetSerializationWriter(applicationJsonContentType)).Returns(mockSerializationWriter.Object);
+            _serializationWriterFactoryRegistry.ContentTypeAssociatedFactories.Add(applicationJsonContentType, mockSerializationWriterFactory.Object);
+            // Act
+            var serializationWriter = _serializationWriterFactoryRegistry.GetSerializationWriter("application/vnd+json");
+            // Assert
+            Assert.NotNull(serializationWriter);
+            Assert.Equal(mockSerializationWriter.Object, serializationWriter);
+        }
 
         [Fact]
         public void ThrowsInvalidOperationExceptionForUnregisteredContentType()

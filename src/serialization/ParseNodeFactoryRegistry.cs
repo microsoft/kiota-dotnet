@@ -5,6 +5,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Microsoft.Kiota.Abstractions.Serialization
 {
@@ -24,13 +26,14 @@ namespace Microsoft.Kiota.Abstractions.Serialization
             }
         }
         /// <summary>
-        /// Default singleton instance of the registry to be used when registring new factories that should be available by default.
+        /// Default singleton instance of the registry to be used when registering new factories that should be available by default.
         /// </summary>
         public static readonly ParseNodeFactoryRegistry DefaultInstance = new();
         /// <summary>
         /// List of factories that are registered by content type.
         /// </summary>
         public Dictionary<string, IParseNodeFactory> ContentTypeAssociatedFactories { get; set; } = new Dictionary<string, IParseNodeFactory>();
+        internal static readonly Regex contentTypeVendorCleanupRegex = new(@"[^/]+\+", RegexOptions.Compiled);
         /// <summary>
         /// Get the <see cref="IParseNode"/> instance that is the root of the content
         /// </summary>
@@ -43,10 +46,15 @@ namespace Microsoft.Kiota.Abstractions.Serialization
                 throw new ArgumentNullException(nameof(contentType));
             _ = content ?? throw new ArgumentNullException(nameof(content));
 
-            if(ContentTypeAssociatedFactories.ContainsKey(contentType))
-                return ContentTypeAssociatedFactories[contentType].GetRootParseNode(contentType, content);
-            else
-                throw new InvalidOperationException($"Content type {contentType} does not have a factory registered to be parsed");
+            var vendorSpecificContentType = contentType.Split(";", StringSplitOptions.RemoveEmptyEntries).First();
+            if(ContentTypeAssociatedFactories.ContainsKey(vendorSpecificContentType))
+                return ContentTypeAssociatedFactories[vendorSpecificContentType].GetRootParseNode(vendorSpecificContentType, content);
+
+            var cleanedContentType = contentTypeVendorCleanupRegex.Replace(vendorSpecificContentType, string.Empty);
+            if(ContentTypeAssociatedFactories.ContainsKey(cleanedContentType))
+                return ContentTypeAssociatedFactories[cleanedContentType].GetRootParseNode(cleanedContentType, content);
+            
+            throw new InvalidOperationException($"Content type {cleanedContentType} does not have a factory registered to be parsed");
         }
     }
 }

@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Microsoft.Kiota.Abstractions.Serialization
 {
@@ -23,7 +24,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
             }
         }
         /// <summary>
-        /// Default singleton instance of the registry to be used when registring new factories that should be available by default.
+        /// Default singleton instance of the registry to be used when registering new factories that should be available by default.
         /// </summary>
         public static readonly SerializationWriterFactoryRegistry DefaultInstance = new();
         /// <summary>
@@ -40,10 +41,15 @@ namespace Microsoft.Kiota.Abstractions.Serialization
             if(string.IsNullOrEmpty(contentType))
                 throw new ArgumentNullException(nameof(contentType));
 
-            if(ContentTypeAssociatedFactories.ContainsKey(contentType))
-                return ContentTypeAssociatedFactories[contentType].GetSerializationWriter(contentType);
-            else
-                throw new InvalidOperationException($"Content type {contentType} does not have a factory registered to be parsed");
+            var vendorSpecificContentType = contentType.Split(";", StringSplitOptions.RemoveEmptyEntries).First();
+            if(ContentTypeAssociatedFactories.ContainsKey(vendorSpecificContentType))
+                return ContentTypeAssociatedFactories[vendorSpecificContentType].GetSerializationWriter(vendorSpecificContentType);
+            
+            var cleanedContentType = ParseNodeFactoryRegistry.contentTypeVendorCleanupRegex.Replace(vendorSpecificContentType, string.Empty);
+            if(ContentTypeAssociatedFactories.ContainsKey(cleanedContentType))
+                return ContentTypeAssociatedFactories[cleanedContentType].GetSerializationWriter(cleanedContentType);
+
+            throw new InvalidOperationException($"Content type {cleanedContentType} does not have a factory registered to be parsed");
         }
 
     }
