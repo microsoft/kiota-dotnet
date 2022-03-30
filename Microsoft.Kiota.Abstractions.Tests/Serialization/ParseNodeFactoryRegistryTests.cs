@@ -39,6 +39,22 @@ namespace Microsoft.Kiota.Abstractions.Tests.Serialization
             Assert.NotNull(rootParseNode);
             Assert.Equal(mockParseNode.Object, rootParseNode);
         }
+        [Fact]
+        public void ReturnsExpectedRootNodeForVendorSpecificContentType()
+        {
+            // Arrange
+            var applicationJsonContentType = "application/json";
+            using var testStream = new MemoryStream(Encoding.UTF8.GetBytes("{\"test\": \"input\"}"));
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
+            var mockParseNode = new Mock<IParseNode>();
+            mockParseNodeFactory.Setup(parseNodeFactory => parseNodeFactory.GetRootParseNode(applicationJsonContentType, It.IsAny<Stream>())).Returns(mockParseNode.Object);
+            _parseNodeFactoryRegistry.ContentTypeAssociatedFactories.Add(applicationJsonContentType, mockParseNodeFactory.Object);
+            // Act
+            var rootParseNode = _parseNodeFactoryRegistry.GetRootParseNode("application/vnd+json", testStream);
+            // Assert
+            Assert.NotNull(rootParseNode);
+            Assert.Equal(mockParseNode.Object, rootParseNode);
+        }
 
         [Fact]
         public void ThrowsInvalidOperationExceptionForUnregisteredContentType()
