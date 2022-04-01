@@ -40,7 +40,7 @@ $currentProjectVersion = [System.Management.Automation.SemanticVersion]"$version
 
 # API is case-sensitive
 $packageName = $packageName.ToLower()
-$url = "https://api.nuget.org/v3/registration3/$packageName/index.json"
+$url = "https://api.nuget.org/v3/registration5-gz-semver2/$packageName/index.json"
 
 # Call the NuGet API for the package and get the current published version.
 Try {
