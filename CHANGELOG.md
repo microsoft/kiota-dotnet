@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+## [1.0.0-preview.3] - 2022-04-04
+
+### Changed
+
+- Breaking: simplifies the field deserializers.
+
 ## [1.0.0-preview.2] - 2022-03-29
 
 ### Added

@@ -16,7 +16,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         ///   Gets the deserialization information for this object.
         /// </summary>
         /// <returns>The deserialization information for this object where each entry is a property key with its deserialization callback.</returns>
-        IDictionary<string, Action<T, IParseNode>> GetFieldDeserializers<T>();
+        IDictionary<string, Action<IParseNode>> GetFieldDeserializers();
         /// <summary>
         ///  Writes the objects properties to the current writer.
         /// </summary>
