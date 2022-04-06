@@ -24,7 +24,10 @@ namespace Microsoft.Kiota.Abstractions
                                         .GetProperties()
                                         .Where(x => !target.ContainsKey(x.Name)))
             {
-                target.Add(property.Name.ToFirstCharacterLowerCase(), property.GetValue(this));
+                var attribute = property.GetCustomAttributes(false)
+                                        .OfType<QueryParameterAttribute>()
+                                        .FirstOrDefault();
+                target.Add(attribute?.TemplateName ?? property.Name.ToFirstCharacterLowerCase(), property.GetValue(this));
             }
         }
     }

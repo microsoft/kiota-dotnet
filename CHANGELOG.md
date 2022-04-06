@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+## [1.0.0-preview.4] - 2022-04-06
+
+### Added
+
+- Adds the ability to get the query parameter name from attribute.
+
 ## [1.0.0-preview.3] - 2022-04-04
 
 ### Changed
