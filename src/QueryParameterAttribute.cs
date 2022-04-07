@@ -11,7 +11,7 @@ namespace Microsoft.Kiota.Abstractions;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
 public sealed class QueryParameterAttribute : Attribute
 {
-    readonly string templateName;
+    private readonly string templateName;
     
     ///<summary>
     /// Creates a new instance of the attribute

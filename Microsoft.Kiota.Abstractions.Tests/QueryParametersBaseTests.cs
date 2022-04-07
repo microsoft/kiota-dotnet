@@ -13,7 +13,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             var requestInfo = new RequestInformation
             {
                 HttpMethod = Method.GET,
-                UrlTemplate = "http://localhost/me?select={%24select}"
+                UrlTemplate = "http://localhost/me{?%24select}"
             };
             Action<GetQueryParameters> q = x => x.Select = new[] { "id", "displayName" };
             var qParams = new GetQueryParameters();
