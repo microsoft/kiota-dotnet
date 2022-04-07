@@ -22,12 +22,17 @@ namespace Microsoft.Kiota.Abstractions
             if(target == null) throw new ArgumentNullException(nameof(target));
             foreach(var property in this.GetType()
                                         .GetProperties()
-                                        .Where(x => !target.ContainsKey(x.Name)))
+                                        .Select(
+                                            x => (
+                                                Name: x.GetCustomAttributes(false)
+                                                    .OfType<QueryParameterAttribute>()
+                                                    .FirstOrDefault()?.TemplateName ?? x.Name.ToFirstCharacterLowerCase(),
+                                                Value: x.GetValue(this)
+                                            )
+                                        )
+                                        .Where(x => x.Value != null && !target.ContainsKey(x.Name)))
             {
-                var attribute = property.GetCustomAttributes(false)
-                                        .OfType<QueryParameterAttribute>()
-                                        .FirstOrDefault();
-                target.Add(attribute?.TemplateName ?? property.Name.ToFirstCharacterLowerCase(), property.GetValue(this));
+                target.Add(property.Name, property.Value);
             }
         }
     }
