@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq;
+using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
 using Microsoft.Kiota.Abstractions.Store;
 
