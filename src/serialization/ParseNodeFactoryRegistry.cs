@@ -46,7 +46,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
                 throw new ArgumentNullException(nameof(contentType));
             _ = content ?? throw new ArgumentNullException(nameof(content));
 
-            var vendorSpecificContentType = contentType.Split(";", StringSplitOptions.RemoveEmptyEntries).First();
+            var vendorSpecificContentType = contentType.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).First();
             if(ContentTypeAssociatedFactories.ContainsKey(vendorSpecificContentType))
                 return ContentTypeAssociatedFactories[vendorSpecificContentType].GetRootParseNode(vendorSpecificContentType, content);
 

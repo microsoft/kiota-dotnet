@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Kiota.Abstractions.Extensions;
 
 namespace Microsoft.Kiota.Abstractions.Store
 {

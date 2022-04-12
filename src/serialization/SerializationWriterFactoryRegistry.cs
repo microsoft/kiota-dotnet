@@ -41,7 +41,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
             if(string.IsNullOrEmpty(contentType))
                 throw new ArgumentNullException(nameof(contentType));
 
-            var vendorSpecificContentType = contentType.Split(";", StringSplitOptions.RemoveEmptyEntries).First();
+            var vendorSpecificContentType = contentType.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).First();
             if(ContentTypeAssociatedFactories.ContainsKey(vendorSpecificContentType))
                 return ContentTypeAssociatedFactories[vendorSpecificContentType].GetSerializationWriter(vendorSpecificContentType);
             
