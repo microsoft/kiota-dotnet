@@ -93,7 +93,7 @@ namespace Microsoft.Kiota.Abstractions
                                         )
                                         .Where(x => x.Value != null && !QueryParameters.ContainsKey(x.Name)))
             {
-                QueryParameters.Add(property.Name, property.Value);
+                QueryParameters.AddOrReplace(property.Name, property.Value);
             }
         }
         /// <summary>
@@ -108,7 +108,7 @@ namespace Microsoft.Kiota.Abstractions
         {
             if(source == null) return;
             foreach(var header in source)
-                Headers.Add(header.Key, header.Value);
+                Headers.AddOrReplace(header.Key, header.Value);
         }
         /// <summary>
         /// The Request Body.
@@ -127,8 +127,7 @@ namespace Microsoft.Kiota.Abstractions
         {
             if(options == null) return;
             foreach(var option in options.Where(x => x != null))
-                if(!_requestOptions.TryAdd(option.GetType().FullName, option))
-                    _requestOptions[option.GetType().FullName] = option;
+                _requestOptions.AddOrReplace(option.GetType().FullName, option);
         }
         /// <summary>
         /// Removes given options from the current request.
