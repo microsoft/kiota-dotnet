@@ -11,7 +11,7 @@ namespace Microsoft.Kiota.Abstractions.Extensions
     /// <summary>
     /// Extension methods for the <see cref="IDictionary"/>
     /// </summary>
-    internal static class IDictionaryExtensions
+    public static class IDictionaryExtensions
     {
         /// <summary>
         /// Try to add the element to the <see cref="IDictionary"/> instance.
