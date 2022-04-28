@@ -14,7 +14,7 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <Deterministic>true</Deterministic>
     <VersionPrefix>1.0.0</VersionPrefix>
-    <VersionSuffix>preview.5</VersionSuffix>
+    <VersionSuffix>preview.6</VersionSuffix>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>false</SignAssembly>
     <DelaySign>false</DelaySign>
@@ -23,7 +23,7 @@
     <!-- Enable this line once we go live to prevent breaking changes -->
     <!-- <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion> -->
     <PackageReleaseNotes>
-        - [Breaking] Change target runtime to netstandard 2.0
+        - Adds support for api surface revamp for query parameters
     </PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>

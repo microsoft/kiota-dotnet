@@ -75,9 +75,41 @@ namespace Microsoft.Kiota.Abstractions
         /// </summary>
         public IDictionary<string, object> QueryParameters { get; set; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
         /// <summary>
+        /// Vanity method to add the query parameters to the request query parameters dictionary.
+        /// </summary>
+        /// <param name="source">The query parameters to add.</param>
+        public void AddQueryParameters(object source)
+        {
+            if(source == null) return;
+            foreach(var property in source.GetType()
+                                        .GetProperties()
+                                        .Select(
+                                            x => (
+                                                Name: x.GetCustomAttributes(false)
+                                                    .OfType<QueryParameterAttribute>()
+                                                    .FirstOrDefault()?.TemplateName ?? x.Name.ToFirstCharacterLowerCase(),
+                                                Value: x.GetValue(source)
+                                            )
+                                        )
+                                        .Where(x => x.Value != null && !QueryParameters.ContainsKey(x.Name)))
+            {
+                QueryParameters.AddOrReplace(property.Name, property.Value);
+            }
+        }
+        /// <summary>
         /// The Request Headers.
         /// </summary>
         public IDictionary<string, string> Headers { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        /// <summary>
+        /// Adds request headers to the request.
+        /// </summary>
+        /// <param name="source">The request headers to add.</param>
+        public void AddHeaders(IDictionary<string, string> source)
+        {
+            if(source == null) return;
+            foreach(var header in source)
+                Headers.AddOrReplace(header.Key, header.Value);
+        }
         /// <summary>
         /// The Request Body.
         /// </summary>
@@ -91,12 +123,11 @@ namespace Microsoft.Kiota.Abstractions
         /// Adds an option to the request.
         /// </summary>
         /// <param name="options">The option to add.</param>
-        public void AddRequestOptions(params IRequestOption[] options)
+        public void AddRequestOptions(IEnumerable<IRequestOption> options)
         {
-            if(!(options?.Any() ?? false)) return; // it's a no-op if there are no options and this avoid having to check in the code gen.
+            if(options == null) return;
             foreach(var option in options.Where(x => x != null))
-                if(!_requestOptions.TryAdd(option.GetType().FullName, option))
-                    _requestOptions[option.GetType().FullName] = option;
+                _requestOptions.AddOrReplace(option.GetType().FullName, option);
         }
         /// <summary>
         /// Removes given options from the current request.
