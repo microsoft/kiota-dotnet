@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+## [1.0.0-preview.7] - 2022-05-11
+
+### Added
+
+- Adds a method to support scalar request bodies
+
 ## [1.0.0-preview.6] - 2022-04-22
 
 ### Added
