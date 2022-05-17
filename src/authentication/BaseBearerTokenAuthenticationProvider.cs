@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,18 +27,13 @@ public class BaseBearerTokenAuthenticationProvider : IAuthenticationProvider
     public IAccessTokenProvider AccessTokenProvider {get; private set;}
     private const string AuthorizationHeaderKey = "Authorization";
 
-    /// <summary>
-    /// Authenticates the <see cref="RequestInformation"/> instance
-    /// </summary>
-    /// <param name="request">The request to authenticate</param>
-    /// <param name="cancellationToken">The cancellation token for the task</param>
-    /// <returns></returns>
-    public async Task AuthenticateRequestAsync(RequestInformation request, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public async Task AuthenticateRequestAsync(RequestInformation request, Dictionary<string, object> additionalAuthenticationContext = default, CancellationToken cancellationToken = default)
     {
         if(request == null) throw new ArgumentNullException(nameof(request));
         if(!request.Headers.ContainsKey(AuthorizationHeaderKey))
         {
-            var token = await AccessTokenProvider.GetAuthorizationTokenAsync(request.URI, cancellationToken);
+            var token = await AccessTokenProvider.GetAuthorizationTokenAsync(request.URI, additionalAuthenticationContext, cancellationToken);
             if(!string.IsNullOrEmpty(token))
                 request.Headers.Add(AuthorizationHeaderKey, $"Bearer {token}");
         }
