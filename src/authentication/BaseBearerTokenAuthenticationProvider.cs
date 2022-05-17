@@ -26,11 +26,17 @@ public class BaseBearerTokenAuthenticationProvider : IAuthenticationProvider
     /// </summary>
     public IAccessTokenProvider AccessTokenProvider {get; private set;}
     private const string AuthorizationHeaderKey = "Authorization";
+    private const string ClaimsKey = "claims";
 
     /// <inheritdoc />
     public async Task AuthenticateRequestAsync(RequestInformation request, Dictionary<string, object> additionalAuthenticationContext = default, CancellationToken cancellationToken = default)
     {
         if(request == null) throw new ArgumentNullException(nameof(request));
+        if(additionalAuthenticationContext != null &&
+            additionalAuthenticationContext.ContainsKey(ClaimsKey) &&
+            request.Headers.ContainsKey(AuthorizationHeaderKey))
+            request.Headers.Remove(AuthorizationHeaderKey);
+
         if(!request.Headers.ContainsKey(AuthorizationHeaderKey))
         {
             var token = await AccessTokenProvider.GetAuthorizationTokenAsync(request.URI, additionalAuthenticationContext, cancellationToken);
