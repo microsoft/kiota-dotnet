@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+## [1.0.0-preview.8] - 2022-05-11
+
+### Added
+
+- Breaking: added an additional parameter to authentication methods to carry contextual information.
+
 ## [1.0.0-preview.7] - 2022-05-11
 
 ### Added

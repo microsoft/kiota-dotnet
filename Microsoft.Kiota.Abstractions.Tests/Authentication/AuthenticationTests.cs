@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,7 +36,7 @@ public class AuthenticationTests
         // Arrange
         var expectedToken = "token";
         var mockAccessTokenProvider = new Mock<IAccessTokenProvider>();
-        mockAccessTokenProvider.Setup(authProvider => authProvider.GetAuthorizationTokenAsync(It.IsAny<Uri>(),It.IsAny<CancellationToken>())).Returns(Task.FromResult(expectedToken));
+        mockAccessTokenProvider.Setup(authProvider => authProvider.GetAuthorizationTokenAsync(It.IsAny<Uri>(), It.IsAny<Dictionary<string, object>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(expectedToken));
         var testAuthProvider = new BaseBearerTokenAuthenticationProvider(mockAccessTokenProvider.Object);
         var testRequest = new RequestInformation()
         {
