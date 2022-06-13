@@ -128,8 +128,8 @@ namespace Microsoft.Kiota.Abstractions.Store
             set
             {
                 isInitializationComplete = value;
-                foreach(var entry in store)
-                    store[entry.Key] = new(!value, entry.Value.Item2);
+                foreach(var key in store.Keys)
+                    store[key] = new(!value, store[key].Item2);
             }
         }
     }

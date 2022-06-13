@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+## [1.0.0-preview.9] - 2022-06-13
+
+### Changed
+
+- Fixes a bug where the backing store would fail to be set in clients running .Net framework.
+
 ## [1.0.0-preview.8] - 2022-05-11
 
 ### Added

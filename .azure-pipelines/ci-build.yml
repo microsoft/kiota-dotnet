@@ -75,7 +75,7 @@ stages:
         inputs:
           command: test
           projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.Abstractions.sln'
-          arguments: '--configuration $(BuildConfiguration) --no-build'
+          arguments: '--configuration $(BuildConfiguration) --no-build --framework net6.0'
 
       # CredScan
       - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
