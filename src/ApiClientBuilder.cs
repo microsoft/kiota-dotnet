@@ -72,7 +72,8 @@ namespace Microsoft.Kiota.Abstractions
             foreach(var entry in registry
                                     .ContentTypeAssociatedFactories
                                     .Where(x => !(x.Value is BackingStoreParseNodeFactory ||
-                                                    x.Value is ParseNodeFactoryRegistry)))
+                                                    x.Value is ParseNodeFactoryRegistry))
+                                    .ToList()) // earlier versions of .NET do not allow direct modification of dictionary values while iterating
             {
                 registry.ContentTypeAssociatedFactories[entry.Key] = new BackingStoreParseNodeFactory(entry.Value);
             }
@@ -82,7 +83,8 @@ namespace Microsoft.Kiota.Abstractions
             foreach(var entry in registry
                                     .ContentTypeAssociatedFactories
                                     .Where(x => !(x.Value is BackingStoreSerializationWriterProxyFactory ||
-                                                    x.Value is SerializationWriterFactoryRegistry)))
+                                                    x.Value is SerializationWriterFactoryRegistry))
+                                    .ToList()) // earlier versions of .NET do not allow direct modification of dictionary values while iterating
             {
                 registry.ContentTypeAssociatedFactories[entry.Key] = new BackingStoreSerializationWriterProxyFactory(entry.Value);
             }
