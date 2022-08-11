@@ -39,25 +39,38 @@ namespace Microsoft.Kiota.Abstractions
                 }
                 else
                 {
+                    if(UrlTemplate.IndexOf("{+baseurl}", StringComparison.OrdinalIgnoreCase) >= 0 && !PathParameters.ContainsKey("baseurl"))
+                        throw new InvalidOperationException($"{nameof(PathParameters)} must contain a value for \"baseurl\" for the url to be built.");
+
                     var parsedUrlTemplate = new UriTemplate(UrlTemplate);
                     foreach(var urlTemplateParameter in PathParameters)
                     {
-                        // if the value is boolean, lets pass in a lowercase string as the final url will be uppercase due to the way ToString() works for booleans
-                        var sanitizedValue = (urlTemplateParameter.Value is bool boolValue) ? boolValue.ToString().ToLower() : urlTemplateParameter.Value;
-                        parsedUrlTemplate.SetParameter(urlTemplateParameter.Key, sanitizedValue);
+                        parsedUrlTemplate.SetParameter(urlTemplateParameter.Key, GetSanitizedValue(urlTemplateParameter.Value));
                     }
 
                     foreach(var queryStringParameter in QueryParameters)
                         if(queryStringParameter.Value != null)
                         {
-                            // if the value is boolean, lets pass in a lowercase string as the final url will be uppercase due to the way ToString() works for booleans
-                            var sanitizedValue = (queryStringParameter.Value is bool boolValue) ? boolValue.ToString().ToLower() : queryStringParameter.Value;
-                            parsedUrlTemplate.SetParameter(queryStringParameter.Key, sanitizedValue);
+                            parsedUrlTemplate.SetParameter(queryStringParameter.Key, GetSanitizedValue(queryStringParameter.Value));
                         }
                     return new Uri(parsedUrlTemplate.Resolve());
                 }
             }
         }
+
+        /// <summary>
+        /// Sanitizes objects in order to appear appropiately in the URL
+        /// </summary>
+        /// <param name="value">Object to be sanitized</param>
+        /// <returns>Sanitized object</returns>
+        private object GetSanitizedValue(object value) => value switch
+        {
+            bool boolean => boolean.ToString().ToLower(),// pass in a lowercase string as the final url will be uppercase due to the way ToString() works for booleans
+            DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("o"),// Default to ISO 8601 for datetimeoffsets in the url.
+            DateTime dateTime => dateTime.ToString("o"),// Default to ISO 8601 for datetimes in the url.
+            _ => value,//return object as is as the ToString method is good enough.
+        };
+
         /// <summary>
         /// The Url template for the current request.
         /// </summary>

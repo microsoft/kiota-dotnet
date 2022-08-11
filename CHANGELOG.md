@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+## [1.0.0-preview.10] - 2022-08-11
+
+### Changed
+
+- DateTime instances added to the url paths to default to ISO 8601
+- Adds excplicit error message if the url template expects URI when accessing the URI from RequestInformation
+
 ## [1.0.0-preview.9] - 2022-06-13
 
 ### Changed
