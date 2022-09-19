@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.Kiota.Abstractions.Extensions;
@@ -160,9 +161,12 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="content">The binary stream to set as a body.</param>
         public void SetStreamContent(Stream content)
         {
+            using var activity = _activitySource?.StartActivity(nameof(SetStreamContent));
+            setRequestType(content, activity);
             Content = content;
             Headers.Add(ContentTypeHeader, BinaryContentType);
         }
+        private static ActivitySource _activitySource = new(typeof(RequestInformation).Namespace);
         /// <summary>
         /// Sets the request body from a model with the specified content type.
         /// </summary>
@@ -172,13 +176,23 @@ namespace Microsoft.Kiota.Abstractions
         /// <typeparam name="T">The model type to serialize.</typeparam>
         public void SetContentFromParsable<T>(IRequestAdapter requestAdapter, string contentType, params T[] items) where T : IParsable
         {
+            using var activity = _activitySource?.StartActivity(nameof(SetContentFromParsable));
             using var writer = getSerializationWriter(requestAdapter, contentType, items);
-            if(items.Count() == 1)
+            if(items.Count() == 1) {
+                setRequestType(items[0], activity);
                 writer.WriteObjectValue(null, items[0]);
-            else
+            } else {
+                if (items.Count() > 0)
+                    setRequestType(items[0], activity);
                 writer.WriteCollectionOfObjectValues(null, items);
+            }
             Headers.Add(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
+        }
+        private void setRequestType(object result, Activity activity) {
+            if (activity == null) return;
+            if (result == null) return;
+            activity.SetTag("com.microsoft.kiota.request.type", result.GetType().FullName);
         }
         private ISerializationWriter getSerializationWriter<T>(IRequestAdapter requestAdapter, string contentType, params T[] items)
         {
@@ -196,8 +210,11 @@ namespace Microsoft.Kiota.Abstractions
         /// <typeparam name="T">The model type to serialize.</typeparam>
         public void SetContentFromScalar<T>(IRequestAdapter requestAdapter, string contentType, params T[] items)
         {
+            using var activity = _activitySource?.StartActivity(nameof(SetContentFromScalar));
             using var writer = getSerializationWriter(requestAdapter, contentType, items);
             if(items.Count() == 1)
+            {
+                setRequestType(items[0], activity);
                 switch(items[0])
                 {
                     case string s:
@@ -245,8 +262,11 @@ namespace Microsoft.Kiota.Abstractions
                     default:
                         throw new InvalidOperationException($"error serialization data value with unknown type {items[0]?.GetType()}");
                 }
-            else
+            } else {
+                if (items.Count() > 0)
+                    setRequestType(items[0], activity);
                 writer.WriteCollectionOfPrimitiveValues(null, items);
+            }
             Headers.Add(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
         }
