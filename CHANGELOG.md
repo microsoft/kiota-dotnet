@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+## [1.0.0-preview12] - 2022-09-19
+
+### Added
+
+- Added tracing support for request information content type.
+
 ## [1.0.0-preview11] - 2022-09-06
 
 ### Added
