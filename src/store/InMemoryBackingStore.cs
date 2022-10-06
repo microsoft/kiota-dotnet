@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Kiota.Abstractions.Extensions;
@@ -33,9 +34,17 @@ namespace Microsoft.Kiota.Abstractions.Store
                 throw new ArgumentNullException(nameof(key));
 
             if(store.TryGetValue(key, out var result))
-                return ReturnOnlyChangedValues && result.Item1 || !ReturnOnlyChangedValues ? (T)result.Item2 : default;
-            else
-                return default;
+            {
+                var resultObject = result.Item2;
+                if(resultObject is Tuple<ICollection, int> collectionTuple)
+                {
+                    EnsureCollectionPropertyIsConsistent(key, collectionTuple);
+                    resultObject = collectionTuple.Item1;// return the actual collection
+                }
+
+                return ReturnOnlyChangedValues && store[key].Item1 || !ReturnOnlyChangedValues ? (T)resultObject : default;
+            }
+            return default;
         }
 
         /// <summary>
@@ -49,12 +58,21 @@ namespace Microsoft.Kiota.Abstractions.Store
                 throw new ArgumentNullException(nameof(key));
 
             var valueToAdd = new Tuple<bool, object>(InitializationCompleted, value);
+            //If we are adding a collection, keep track of the size incase its modified with a call to Add or Remove
+            if(value is ICollection collection)
+                valueToAdd = new Tuple<bool, object>(InitializationCompleted, new Tuple<ICollection, int>(collection, collection.Count));
+
             Tuple<bool, object> oldValue = null;
             if(!store.TryAdd(key, valueToAdd))
             {
                 oldValue = store[key];
                 store[key] = valueToAdd;
             }
+            else if(value is IBackedModel backedModel)
+            {// if its the first time adding a IBackedModel property to the store, subscribe to its BackingStore and use the events to flag the property is "dirty"
+                backedModel.BackingStore?.Subscribe((keyString, oldObject, newObject) => Set(key, value));
+            }
+
             foreach(var sub in subscriptions.Values)
                 sub.Invoke(key, oldValue?.Item2, value);
         }
@@ -65,7 +83,10 @@ namespace Microsoft.Kiota.Abstractions.Store
         /// <returns>A collection of changed values or the whole store based on the <see cref="ReturnOnlyChangedValues"/> configuration value.</returns>
         public IEnumerable<KeyValuePair<string, object>> Enumerate()
         {
-            return (ReturnOnlyChangedValues ? store.Where(x => !x.Value.Item1) : store)
+            if(ReturnOnlyChangedValues)// refresh the state of collection properties if they've changed in size.
+                store.ToList().ForEach(x => EnsureCollectionPropertyIsConsistent(x.Key,x.Value.Item2)); 
+
+            return (ReturnOnlyChangedValues ? store.Where(x => x.Value.Item1) : store)
                 .Select(x => new KeyValuePair<string, object>(x.Key, x.Value.Item2));
         }
 
@@ -110,7 +131,7 @@ namespace Microsoft.Kiota.Abstractions.Store
         /// <param name="subscriptionId">The id of the subscription to de-register </param>
         public void Unsubscribe(string subscriptionId)
         {
-            store.Remove(subscriptionId);
+            subscriptions.Remove(subscriptionId);
         }
         /// <summary>
         /// Clears the store
@@ -128,8 +149,20 @@ namespace Microsoft.Kiota.Abstractions.Store
             set
             {
                 isInitializationComplete = value;
-                foreach(var key in store.Keys)
+                foreach(var key in store.Keys.ToList())
+                {
+                    EnsureCollectionPropertyIsConsistent(key, store[key].Item2);
                     store[key] = new(!value, store[key].Item2);
+                }
+            }
+        }
+
+        private void EnsureCollectionPropertyIsConsistent(string key, object storeItem)
+        {
+            if(storeItem is Tuple<ICollection, int> collectionTuple  // check if we put in a collection annotated with the size
+            && collectionTuple.Item2 != collectionTuple.Item1.Count) // and the size has changed since we last updated
+            {
+                Set(key, collectionTuple.Item1); //ensure the store is notified the collection property is "dirty"
             }
         }
     }

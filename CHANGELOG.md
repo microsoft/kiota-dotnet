@@ -11,13 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-## [1.0.0-preview12] - 2022-09-19
+## [1.0.0-preview.13] - 2022-10-05
+
+### Changed
+
+- Fixes a bug in the InMemoryBackingstore that would not detect changes in nested complex types and collections
+
+## [1.0.0-preview.12] - 2022-09-19
 
 ### Added
 
 - Added tracing support for request information content type.
 
-## [1.0.0-preview11] - 2022-09-06
+## [1.0.0-preview.11] - 2022-09-06
 
 ### Added
 
