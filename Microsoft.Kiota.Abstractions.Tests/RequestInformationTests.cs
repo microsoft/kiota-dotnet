@@ -169,6 +169,31 @@ namespace Microsoft.Kiota.Abstractions.Tests
             // Assert we can build urls based on a Proxy based base url
             Assert.Equal("https://proxy.apisandbox.msdn.microsoft.com/svc?url=https://graph.microsoft.com/beta/users?%24count=true", requestInfo.URI.OriginalString);
         }
+
+        [Fact]
+        public void GetsAndSetsResponseHandlerByType()
+        {
+            // Arrange as the request builders would
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "{+baseurl}/users{?%24count}"
+            };
+
+            // Assert we have NO option
+            Assert.Null(requestInfo.GetRequestOption<ResponseHandlerOption>());
+
+            // Act
+            requestInfo.PathParameters = new Dictionary<string, object>()
+            {
+                { "baseurl", "http://localhost" },
+                { "%24count", true }
+            };
+            requestInfo.SetResponseHandler(new NativeResponseHandler());
+
+            // Assert we now have an option
+            Assert.NotNull(requestInfo.GetRequestOption<ResponseHandlerOption>());
+        }
     }
 
     /// <summary>The messages in a mailbox or folder. Read-only. Nullable.</summary>
