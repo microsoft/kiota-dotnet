@@ -153,6 +153,27 @@ namespace Microsoft.Kiota.Abstractions
             foreach(var optionName in options.Where(x => x != null).Select(x => x.GetType().FullName))
                 _requestOptions.Remove(optionName);
         }
+
+        /// <summary>
+        /// Gets a <see cref="IRequestOption"/> instance of the matching type.
+        /// </summary>
+        public T GetRequestOption<T>() => _requestOptions.TryGetValue(typeof(T).FullName, out var requestOption) ? (T)requestOption : default;
+
+        /// <summary>
+        /// Adds a <see cref="IResponseHandler"/> as a <see cref="IRequestOption"/> for the request.
+        /// </summary>
+        public void SetResponseHandler(IResponseHandler responseHandler)
+        {
+            if(responseHandler == null)
+                throw new ArgumentNullException(nameof(responseHandler));
+
+            var responseHandlerOption = new ResponseHandlerOption
+            {
+                ResponseHandler = responseHandler
+            };
+            AddRequestOptions(new[] { responseHandlerOption });
+        }
+
         private const string BinaryContentType = "application/octet-stream";
         private const string ContentTypeHeader = "Content-Type";
         /// <summary>
