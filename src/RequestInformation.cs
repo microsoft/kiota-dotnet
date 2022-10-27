@@ -195,18 +195,28 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="items">The models to serialize.</param>
         /// <param name="contentType">The content type to set.</param>
         /// <typeparam name="T">The model type to serialize.</typeparam>
-        public void SetContentFromParsable<T>(IRequestAdapter requestAdapter, string contentType, params T[] items) where T : IParsable
+        public void SetContentFromParsable<T>(IRequestAdapter requestAdapter, string contentType, IEnumerable<T> items) where T : IParsable
         {
             using var activity = _activitySource?.StartActivity(nameof(SetContentFromParsable));
             using var writer = getSerializationWriter(requestAdapter, contentType, items);
-            if(items.Count() == 1) {
-                setRequestType(items[0], activity);
-                writer.WriteObjectValue(null, items[0]);
-            } else {
-                if (items.Count() > 0)
-                    setRequestType(items[0], activity);
-                writer.WriteCollectionOfObjectValues(null, items);
-            }
+            setRequestType(items.FirstOrDefault(static x => x != null), activity);
+            writer.WriteCollectionOfObjectValues(null, items);
+            Headers.Add(ContentTypeHeader, contentType);
+            Content = writer.GetSerializedContent();
+        }
+        /// <summary>
+        /// Sets the request body from a model with the specified content type.
+        /// </summary>
+        /// <param name="requestAdapter">The core service to get the serialization writer from.</param>
+        /// <param name="item">The model to serialize.</param>
+        /// <param name="contentType">The content type to set.</param>
+        /// <typeparam name="T">The model type to serialize.</typeparam>
+        public void SetContentFromParsable<T>(IRequestAdapter requestAdapter, string contentType, T item) where T : IParsable
+        {
+            using var activity = _activitySource?.StartActivity(nameof(SetContentFromParsable));
+            using var writer = getSerializationWriter(requestAdapter, contentType, item);
+            setRequestType(item, activity);
+            writer.WriteObjectValue(null, item);
             Headers.Add(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
         }
@@ -215,11 +225,11 @@ namespace Microsoft.Kiota.Abstractions
             if (result == null) return;
             activity.SetTag("com.microsoft.kiota.request.type", result.GetType().FullName);
         }
-        private ISerializationWriter getSerializationWriter<T>(IRequestAdapter requestAdapter, string contentType, params T[] items)
+        private ISerializationWriter getSerializationWriter<T>(IRequestAdapter requestAdapter, string contentType, T item)
         {
             if(string.IsNullOrEmpty(contentType)) throw new ArgumentNullException(nameof(contentType));
             if(requestAdapter == null) throw new ArgumentNullException(nameof(requestAdapter));
-            if(items == null || !items.Any()) throw new InvalidOperationException($"{nameof(items)} cannot be null or empty");
+            if(item == null) throw new InvalidOperationException($"{nameof(item)} cannot be null");
             return requestAdapter.SerializationWriterFactory.GetSerializationWriter(contentType);
         }
         /// <summary>
@@ -229,64 +239,73 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="items">The scalar values to serialize.</param>
         /// <param name="contentType">The content type to set.</param>
         /// <typeparam name="T">The model type to serialize.</typeparam>
-        public void SetContentFromScalar<T>(IRequestAdapter requestAdapter, string contentType, params T[] items)
+        public void SetContentCollectionFromScalar<T>(IRequestAdapter requestAdapter, string contentType, IEnumerable<T> items)
+        {
+            using var activity = _activitySource?.StartActivity(nameof(SetContentCollectionFromScalar));
+            using var writer = getSerializationWriter(requestAdapter, contentType, items);
+            setRequestType(items.FirstOrDefault(static x => x != null), activity);
+            writer.WriteCollectionOfPrimitiveValues(null, items);
+            Headers.Add(ContentTypeHeader, contentType);
+            Content = writer.GetSerializedContent();
+        }
+        /// <summary>
+        /// Sets the request body from a scalar value with the specified content type.
+        /// </summary>
+        /// <param name="requestAdapter">The core service to get the serialization writer from.</param>
+        /// <param name="item">The scalar value to serialize.</param>
+        /// <param name="contentType">The content type to set.</param>
+        /// <typeparam name="T">The model type to serialize.</typeparam>
+        public void SetContentFromScalar<T>(IRequestAdapter requestAdapter, string contentType, T item)
         {
             using var activity = _activitySource?.StartActivity(nameof(SetContentFromScalar));
-            using var writer = getSerializationWriter(requestAdapter, contentType, items);
-            if(items.Count() == 1)
+            using var writer = getSerializationWriter(requestAdapter, contentType, item);
+            setRequestType(item, activity);
+            switch(item)
             {
-                setRequestType(items[0], activity);
-                switch(items[0])
-                {
-                    case string s:
-                        writer.WriteStringValue(null, s);
-                        break;
-                    case bool b:
-                        writer.WriteBoolValue(null, b);
-                        break;
-                    case byte b:
-                        writer.WriteByteValue(null, b);
-                        break;
-                    case sbyte b:
-                        writer.WriteSbyteValue(null, b);
-                        break;
-                    case int i:
-                        writer.WriteIntValue(null, i);
-                        break;
-                    case float f:
-                        writer.WriteFloatValue(null, f);
-                        break;
-                    case long l:
-                        writer.WriteLongValue(null, l);
-                        break;
-                    case double d:
-                        writer.WriteDoubleValue(null, d);
-                        break;
-                    case Guid g:
-                        writer.WriteGuidValue(null, g);
-                        break;
-                    case DateTimeOffset dto:
-                        writer.WriteDateTimeOffsetValue(null, dto);
-                        break;
-                    case TimeSpan timeSpan:
-                        writer.WriteTimeSpanValue(null, timeSpan);
-                        break;
-                    case Date date:
-                        writer.WriteDateValue(null, date);
-                        break;
-                    case Time time:
-                        writer.WriteTimeValue(null, time);
-                        break;
-                    case null:
-                        writer.WriteNullValue(null);
-                        break;
-                    default:
-                        throw new InvalidOperationException($"error serialization data value with unknown type {items[0]?.GetType()}");
-                }
-            } else {
-                if (items.Count() > 0)
-                    setRequestType(items[0], activity);
-                writer.WriteCollectionOfPrimitiveValues(null, items);
+                case string s:
+                    writer.WriteStringValue(null, s);
+                    break;
+                case bool b:
+                    writer.WriteBoolValue(null, b);
+                    break;
+                case byte b:
+                    writer.WriteByteValue(null, b);
+                    break;
+                case sbyte b:
+                    writer.WriteSbyteValue(null, b);
+                    break;
+                case int i:
+                    writer.WriteIntValue(null, i);
+                    break;
+                case float f:
+                    writer.WriteFloatValue(null, f);
+                    break;
+                case long l:
+                    writer.WriteLongValue(null, l);
+                    break;
+                case double d:
+                    writer.WriteDoubleValue(null, d);
+                    break;
+                case Guid g:
+                    writer.WriteGuidValue(null, g);
+                    break;
+                case DateTimeOffset dto:
+                    writer.WriteDateTimeOffsetValue(null, dto);
+                    break;
+                case TimeSpan timeSpan:
+                    writer.WriteTimeSpanValue(null, timeSpan);
+                    break;
+                case Date date:
+                    writer.WriteDateValue(null, date);
+                    break;
+                case Time time:
+                    writer.WriteTimeValue(null, time);
+                    break;
+                case null:
+                    writer.WriteNullValue(null);
+                    break;
+                default:
+                    throw new InvalidOperationException($"error serialization data value with unknown type {item?.GetType()}");
             }
             Headers.Add(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
