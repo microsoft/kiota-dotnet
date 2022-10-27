@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Kiota.Abstractions.Serialization;
+using Microsoft.Kiota.Abstractions.Tests.Mocks;
 using Moq;
 using Xunit;
 
@@ -193,6 +195,82 @@ namespace Microsoft.Kiota.Abstractions.Tests
 
             // Assert we now have an option
             Assert.NotNull(requestInfo.GetRequestOption<ResponseHandlerOption>());
+        }
+        [Fact]
+        public void SetsObjectContent() {
+            var requestAdapterMock = new Mock<IRequestAdapter>();
+            var serializationWriterMock = new Mock<ISerializationWriter>();
+            var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
+            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(serializationWriterMock.Object);
+            requestAdapterMock.SetupGet(x => x.SerializationWriterFactory).Returns(serializationWriterFactoryMock.Object);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.POST,
+                UrlTemplate = "{+baseurl}/users{?%24count}"
+            };
+
+            requestInfo.SetContentFromParsable(requestAdapterMock.Object, "application/json", new TestEntity());
+
+            // Assert we now have an option
+            serializationWriterMock.Verify(x => x.WriteObjectValue(It.IsAny<string>(), It.IsAny<IParsable>()), Times.Once);
+            serializationWriterMock.Verify(x => x.WriteCollectionOfObjectValues(It.IsAny<string>(), It.IsAny<IEnumerable<IParsable>>()), Times.Never);
+        }
+        [Fact]
+        public void SetsObjectCollectionContentSingleElement() {
+            var requestAdapterMock = new Mock<IRequestAdapter>();
+            var serializationWriterMock = new Mock<ISerializationWriter>();
+            var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
+            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(serializationWriterMock.Object);
+            requestAdapterMock.SetupGet(x => x.SerializationWriterFactory).Returns(serializationWriterFactoryMock.Object);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.POST,
+                UrlTemplate = "{+baseurl}/users{?%24count}"
+            };
+
+            requestInfo.SetContentFromParsable(requestAdapterMock.Object, "application/json", new [] {new TestEntity()});
+
+            // Assert we now have an option
+            serializationWriterMock.Verify(x => x.WriteObjectValue(It.IsAny<string>(), It.IsAny<IParsable>()), Times.Never);
+            serializationWriterMock.Verify(x => x.WriteCollectionOfObjectValues(It.IsAny<string>(), It.IsAny<IEnumerable<IParsable>>()), Times.Once);
+        }
+        [Fact]
+        public void SetsScalarContent() {
+            var requestAdapterMock = new Mock<IRequestAdapter>();
+            var serializationWriterMock = new Mock<ISerializationWriter>();
+            var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
+            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(serializationWriterMock.Object);
+            requestAdapterMock.SetupGet(x => x.SerializationWriterFactory).Returns(serializationWriterFactoryMock.Object);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.POST,
+                UrlTemplate = "{+baseurl}/users{?%24count}"
+            };
+
+            requestInfo.SetContentFromScalar(requestAdapterMock.Object, "application/json", "foo");
+
+            // Assert we now have an option
+            serializationWriterMock.Verify(x => x.WriteStringValue(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            serializationWriterMock.Verify(x => x.WriteCollectionOfPrimitiveValues(It.IsAny<string>(), It.IsAny<IEnumerable<string>>()), Times.Never);
+        }
+        [Fact]
+        public void SetsScalarCollectionContent() {
+            var requestAdapterMock = new Mock<IRequestAdapter>();
+            var serializationWriterMock = new Mock<ISerializationWriter>();
+            var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
+            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(serializationWriterMock.Object);
+            requestAdapterMock.SetupGet(x => x.SerializationWriterFactory).Returns(serializationWriterFactoryMock.Object);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.POST,
+                UrlTemplate = "{+baseurl}/users{?%24count}"
+            };
+
+            requestInfo.SetContentFromScalarCollection(requestAdapterMock.Object, "application/json", new[] {"foo"});
+
+            // Assert we now have an option
+            serializationWriterMock.Verify(x => x.WriteStringValue(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            serializationWriterMock.Verify(x => x.WriteCollectionOfPrimitiveValues(It.IsAny<string>(), It.IsAny<IEnumerable<string>>()), Times.Once);
         }
     }
 
