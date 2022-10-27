@@ -266,7 +266,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
                 UrlTemplate = "{+baseurl}/users{?%24count}"
             };
 
-            requestInfo.SetContentCollectionFromScalar(requestAdapterMock.Object, "application/json", new[] {"foo"});
+            requestInfo.SetContentFromScalarCollection(requestAdapterMock.Object, "application/json", new[] {"foo"});
 
             // Assert we now have an option
             serializationWriterMock.Verify(x => x.WriteStringValue(It.IsAny<string>(), It.IsAny<string>()), Times.Never);

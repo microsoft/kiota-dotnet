@@ -239,9 +239,9 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="items">The scalar values to serialize.</param>
         /// <param name="contentType">The content type to set.</param>
         /// <typeparam name="T">The model type to serialize.</typeparam>
-        public void SetContentCollectionFromScalar<T>(IRequestAdapter requestAdapter, string contentType, IEnumerable<T> items)
+        public void SetContentFromScalarCollection<T>(IRequestAdapter requestAdapter, string contentType, IEnumerable<T> items)
         {
-            using var activity = _activitySource?.StartActivity(nameof(SetContentCollectionFromScalar));
+            using var activity = _activitySource?.StartActivity(nameof(SetContentFromScalarCollection));
             using var writer = getSerializationWriter(requestAdapter, contentType, items);
             setRequestType(items.FirstOrDefault(static x => x != null), activity);
             writer.WriteCollectionOfPrimitiveValues(null, items);
