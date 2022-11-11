@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+## [1.0.0-preview.17] - 2022-11-11
+
+### Changed
+
+- Fixes a bug in the InMemoryBackingstore that would not detect changes in nested collections of complex types that had backing stores
+
 ## [1.0.0-preview.16] - 2022-10-28
 
 ### Changed
