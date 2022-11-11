@@ -72,6 +72,10 @@ namespace Microsoft.Kiota.Abstractions.Store
             {// if its the first time adding a IBackedModel property to the store, subscribe to its BackingStore and use the events to flag the property is "dirty"
                 backedModel.BackingStore?.Subscribe((keyString, oldObject, newObject) => Set(key, value));
             }
+            else if(value is ICollection collectionValues)
+            {// if its the first time adding a IBackedModel collection property to the store, subscribe to item properties' BackingStores and use the events to flag the collection property is "dirty"
+                collectionValues.OfType<IBackedModel>().ToList().ForEach(model => model.BackingStore?.Subscribe((keyString, oldObject, newObject) => Set(key, value))); ;
+            }
 
             foreach(var sub in subscriptions.Values)
                 sub.Invoke(key, oldValue?.Item2, value);

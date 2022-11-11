@@ -40,6 +40,12 @@ namespace Microsoft.Kiota.Abstractions.Tests.Mocks
             get { return BackingStore?.Get<TestEntity>("manager"); }
             set { BackingStore?.Set("manager", value); }
         }
+        /// <summary>The user or contact that is this user& works with.</summary>
+        public List<TestEntity> Colleagues
+        {
+            get { return BackingStore?.Get<List<TestEntity>>("colleagues"); }
+            set { BackingStore?.Set("colleagues", value); }
+        }
         /// <summary>
         /// Instantiates a new entity and sets the default values.
         /// </summary>

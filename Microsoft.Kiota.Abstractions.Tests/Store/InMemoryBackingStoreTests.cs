@@ -221,5 +221,33 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             Assert.Single(changedValues);
             Assert.Equal("manager", changedValues.First().Key);//Backingstore should detect manager property changed
         }
+        [Fact]
+        public void TestsBackingStoreEmbeddedInModelWithByUpdatingNestedIBackedModelCollectionProperty()
+        {
+            // Arrange dummy user with initialized backingstore
+            var testUser = new TestEntity
+            {
+                Id = "84c747c1-d2c0-410d-ba50-fc23e0b4abbe",
+                Colleagues = new List<TestEntity> 
+                {
+                    new TestEntity
+                    {
+                        Id = "2fe22fe5-1132-42cf-90f9-1dc17e325a74"
+                    }
+                } 
+            };
+            testUser.BackingStore.InitializationCompleted = testUser.Colleagues[0].BackingStore.InitializationCompleted = true;
+            // Act on the data by making a change in the nested Ibackedmodel collection item
+            testUser.Colleagues[0].BusinessPhones = new List<string>
+            {
+                "+1 234 567 891"
+            };
+            // Assert by retrieving only changed values
+            testUser.BackingStore.ReturnOnlyChangedValues = true;
+            var changedValues = testUser.BackingStore.Enumerate();
+            Assert.NotEmpty(changedValues);
+            Assert.Single(changedValues);
+            Assert.Equal("colleagues", changedValues.First().Key);//Backingstore should detect manager property changed
+        }
     }
 }
