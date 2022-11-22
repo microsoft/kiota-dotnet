@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+## [1.0.0-preview.18] - 2022-11-22
+
+### Changed
+
+- Bumps Tavis.UriTemplates to strongly name binary version
+
 ## [1.0.0-preview.17] - 2022-11-11
 
 ### Changed
