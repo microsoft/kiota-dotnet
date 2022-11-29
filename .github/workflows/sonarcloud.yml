@@ -4,10 +4,10 @@ on:
   push:
     branches:
       - main
-    paths-ignore: ['abstractions/**', 'authentication/**', 'serialization/**', 'http/**', '**.md', '.vscode/**', '**.svg']
+    paths-ignore: ['.vscode/**']
   pull_request:
     types: [opened, synchronize, reopened]
-    paths-ignore: ['abstractions/**', 'authentication/**', 'serialization/**', 'http/**', '**.md', '.vscode/**', '**.svg']
+    paths-ignore: ['.vscode/**']
 
 env:
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
