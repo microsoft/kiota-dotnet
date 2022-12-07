@@ -20,13 +20,13 @@ public class AuthenticationTests
             HttpMethod = Method.GET,
             URI = new Uri("http://localhost")
         };
-        Assert.Empty(testRequest.Headers); // header collection is empty
+        Assert.Empty(testRequest.Headers.Keys); // header collection is empty
 
         // Act
         await anonymousAuthenticationProvider.AuthenticateRequestAsync(testRequest);
 
         // Assert
-        Assert.Empty(testRequest.Headers); // header collection is still empty
+        Assert.Empty(testRequest.Headers.Keys); // header collection is still empty
 
     }
 
@@ -43,15 +43,15 @@ public class AuthenticationTests
             HttpMethod = Method.GET,
             URI = new Uri("http://localhost")
         };
-        Assert.Empty(testRequest.Headers); // header collection is empty
+        Assert.Empty(testRequest.Headers.Keys); // header collection is empty
 
         // Act
         await testAuthProvider.AuthenticateRequestAsync(testRequest);
 
         // Assert
-        Assert.NotEmpty(testRequest.Headers); // header collection is longer empty
-        Assert.Equal("Authorization", testRequest.Headers.First().Key); // First element is Auth header
-        Assert.Equal($"Bearer {expectedToken}", testRequest.Headers.First().Value); // First element is Auth header
+        Assert.NotEmpty(testRequest.Headers.Keys); // header collection is longer empty
+        Assert.True(testRequest.Headers.ContainsKey("Authorization")); // First element is Auth header
+        Assert.Equal($"Bearer {expectedToken}", testRequest.Headers.Get("Authorization").First()); // First element is Auth header
     }
 
     [Theory]

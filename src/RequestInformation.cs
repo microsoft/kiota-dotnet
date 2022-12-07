@@ -113,17 +113,7 @@ namespace Microsoft.Kiota.Abstractions
         /// <summary>
         /// The Request Headers.
         /// </summary>
-        public IDictionary<string, string> Headers { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        /// <summary>
-        /// Adds request headers to the request.
-        /// </summary>
-        /// <param name="source">The request headers to add.</param>
-        public void AddHeaders(IDictionary<string, string> source)
-        {
-            if(source == null) return;
-            foreach(var header in source)
-                Headers.AddOrReplace(header.Key, header.Value);
-        }
+        public RequestHeaders Headers { get; private set; } = new ();
         /// <summary>
         /// The Request Body.
         /// </summary>
