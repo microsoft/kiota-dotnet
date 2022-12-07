@@ -84,5 +84,5 @@ public class RequestHeaders {
     /// </summary>
     /// <param name="key">The name of the header to check for.</param>
     /// <returns>true if the headers contain a header with the specified name, false otherwise.</returns>
-    public bool ContainsKey(string key) => string.IsNullOrEmpty(key) ? false : _headers.ContainsKey(key);
+    public bool ContainsKey(string key) => !string.IsNullOrEmpty(key) && _headers.ContainsKey(key);
 }
