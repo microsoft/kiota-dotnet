@@ -51,7 +51,7 @@ public class AuthenticationTests
         // Assert
         Assert.NotEmpty(testRequest.Headers.Keys); // header collection is longer empty
         Assert.True(testRequest.Headers.ContainsKey("Authorization")); // First element is Auth header
-        Assert.Equal($"Bearer {expectedToken}", testRequest.Headers.Get("Authorization").First()); // First element is Auth header
+        Assert.Equal($"Bearer {expectedToken}", testRequest.Headers["Authorization"].First()); // First element is Auth header
     }
 
     [Theory]
