@@ -106,17 +106,17 @@ public class RequestHeaders : IDictionary<string,IEnumerable<string>> {
     public IEnumerator<KeyValuePair<string, IEnumerable<string>>> GetEnumerator() => new RequestHeadersEnumerator(_headers.GetEnumerator());
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     private sealed class RequestHeadersEnumerator : IEnumerator<KeyValuePair<string, IEnumerable<string>>> {
-        private readonly Dictionary<string, HashSet<string>>.Enumerator _enumerator;
-        public RequestHeadersEnumerator(Dictionary<string, HashSet<string>>.Enumerator enumerator)
+        private readonly IEnumerator _enumerator;
+        public RequestHeadersEnumerator(IEnumerator enumerator)
         {
             _enumerator = enumerator;
         }
-        public KeyValuePair<string, IEnumerable<string>> Current => new(_enumerator.Current.Key, _enumerator.Current.Value);
+        public KeyValuePair<string, IEnumerable<string>> Current => _enumerator.Current is KeyValuePair<string, HashSet<string>> current ? new(current.Key, current.Value) : throw new InvalidOperationException();
 
         object IEnumerator.Current => Current;
 
         public void Dispose() {
-            _enumerator.Dispose();
+            (_enumerator as IDisposable)?.Dispose();
             GC.SuppressFinalize(this);
         }
         public bool MoveNext() => _enumerator.MoveNext();
