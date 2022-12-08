@@ -10,9 +10,9 @@ public class RequestHeadersTests {
         var instance = new RequestHeaders();
         Assert.Throws<ArgumentNullException>(() => instance.Add(null, "value"));
         Assert.Throws<ArgumentNullException>(() => instance.Add("name", (string[])null));
-        instance.Add("name", new string[]{});
+        instance.Add("name", Array.Empty<string>());
         instance.Add("name", new List<string>());
-        instance.Add(new KeyValuePair<string, IEnumerable<string>>("name", new string[]{}));
+        instance.Add(new KeyValuePair<string, IEnumerable<string>>("name", Array.Empty<string>()));
         Assert.Throws<ArgumentNullException>(() => instance[null]);
         Assert.Throws<ArgumentNullException>(() => instance.Remove(null));
         Assert.Throws<ArgumentNullException>(() => instance.Remove(null, "value"));
