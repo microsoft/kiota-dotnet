@@ -115,10 +115,17 @@ namespace Microsoft.Kiota.Abstractions
         /// </summary>
         public RequestHeaders Headers { get; private set; } = new ();
         /// <summary>
+        /// Vanity method to add the headers to the request headers dictionary.
+        /// </summary>
+        public void AddHeaders(RequestHeaders headers) {
+            if(headers == null) return;
+            Headers.AddAll(headers);
+        }
+        /// <summary>
         /// The Request Body.
         /// </summary>
         public Stream Content { get; set; }
-        private Dictionary<string, IRequestOption> _requestOptions = new Dictionary<string, IRequestOption>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, IRequestOption> _requestOptions = new Dictionary<string, IRequestOption>(StringComparer.OrdinalIgnoreCase);
         /// <summary>
         /// Gets the options for this request. Options are unique by type. If an option of the same type is added twice, the last one wins.
         /// </summary>

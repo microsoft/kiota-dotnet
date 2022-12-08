@@ -56,11 +56,15 @@ public class RequestHeaders : IDictionary<string,IEnumerable<string>> {
         return false;
     }
     /// <summary>
-    /// Updates the headers with the values from the specified headers.
+    /// Adds all the headers values from the specified headers collection.
     /// </summary>
     /// <param name="headers">The headers to update the current headers with.</param>
-    public void Update(RequestHeaders headers) {
-        _headers = headers?._headers ?? throw new ArgumentNullException(nameof(headers));
+    public void AddAll(RequestHeaders headers) {
+        if(headers == null)
+            throw new ArgumentNullException(nameof(headers));
+        foreach(var header in headers)
+            foreach(var value in header.Value)
+                Add(header.Key, value);
     }
     /// <summary>
     /// Removes all headers.

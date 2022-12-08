@@ -17,7 +17,7 @@ public class RequestHeadersTests {
         Assert.Throws<ArgumentNullException>(() => instance.Remove(null));
         Assert.Throws<ArgumentNullException>(() => instance.Remove(null, "value"));
         Assert.Throws<ArgumentNullException>(() => instance.Remove("name", null));
-        Assert.Throws<ArgumentNullException>(() => instance.Update(null));
+        Assert.Throws<ArgumentNullException>(() => instance.AddAll(null));
         instance.ContainsKey(null);
     }
     [Fact]
@@ -87,7 +87,7 @@ public class RequestHeadersTests {
         instance.Add("name", "value");
         instance.Add("name", "value2");
         var instance2 = new RequestHeaders();
-        instance2.Update(instance);
+        instance2.AddAll(instance);
         Assert.NotEmpty(instance["name"]);
     }
 }
