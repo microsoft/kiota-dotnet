@@ -120,6 +120,6 @@ public class RequestHeaders : IDictionary<string,IEnumerable<string>> {
             GC.SuppressFinalize(this);
         }
         public bool MoveNext() => _enumerator.MoveNext();
-        public void Reset() => (_enumerator as IEnumerator)?.Reset();
+        public void Reset() => _enumerator.Reset();
     }
 }

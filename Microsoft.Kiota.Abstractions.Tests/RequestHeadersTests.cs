@@ -18,6 +18,7 @@ public class RequestHeadersTests {
         Assert.Throws<ArgumentNullException>(() => instance.Remove(null, "value"));
         Assert.Throws<ArgumentNullException>(() => instance.Remove("name", null));
         Assert.Throws<ArgumentNullException>(() => instance.Update(null));
+        instance.ContainsKey(null);
     }
     [Fact]
     public void AddsToNonExistent() {
@@ -53,6 +54,15 @@ public class RequestHeadersTests {
         Assert.False(instance.Remove("name"));
     }
     [Fact]
+    public void RemovesKVP() {
+        var instance = new RequestHeaders();
+        instance.Add("name", "value");
+        instance.Add("name", "value2");
+        Assert.True(instance.Remove(new KeyValuePair<string, IEnumerable<string>>("name", new [] { "value", "value2" })));
+        Assert.Null(instance["name"]);
+        Assert.False(instance.Remove("name"));
+    }
+    [Fact]
     public void Clears() {
         var instance = new RequestHeaders();
         instance.Add("name", "value");
@@ -70,5 +80,14 @@ public class RequestHeadersTests {
         Assert.Equal("name", enumerator.Current.Key);
         Assert.Equal(new [] { "value", "value2" }, enumerator.Current.Value);
         Assert.False(enumerator.MoveNext());
+    }
+    [Fact]
+    public void Updates() {
+        var instance = new RequestHeaders();
+        instance.Add("name", "value");
+        instance.Add("name", "value2");
+        var instance2 = new RequestHeaders();
+        instance2.Update(instance);
+        Assert.NotEmpty(instance["name"]);
     }
 }
