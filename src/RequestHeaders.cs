@@ -105,7 +105,7 @@ public class RequestHeaders : IDictionary<string,IEnumerable<string>> {
     /// <inheritdoc/>
     public IEnumerator<KeyValuePair<string, IEnumerable<string>>> GetEnumerator() => new RequestHeadersEnumerator(_headers.GetEnumerator());
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    private class RequestHeadersEnumerator : IEnumerator<KeyValuePair<string, IEnumerable<string>>> {
+    private sealed class RequestHeadersEnumerator : IEnumerator<KeyValuePair<string, IEnumerable<string>>> {
         private readonly Dictionary<string, HashSet<string>>.Enumerator _enumerator;
         public RequestHeadersEnumerator(Dictionary<string, HashSet<string>>.Enumerator enumerator)
         {
