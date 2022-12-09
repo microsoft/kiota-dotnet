@@ -90,7 +90,7 @@ public class RequestHeaders : IDictionary<string,IEnumerable<string>> {
             value = values;
             return true;
         }
-        value = Array.Empty<string>();
+        value = Enumerable.Empty<string>();
         return false;
     }
     /// <inheritdoc/>
