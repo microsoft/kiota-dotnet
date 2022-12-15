@@ -21,7 +21,7 @@ namespace Microsoft.Kiota.Abstractions.Store
         /// </summary>
         public bool ReturnOnlyChangedValues { get; set; }
         private readonly Dictionary<string, Tuple<bool, object>> store = new();
-        private Dictionary<string, Action<string, object, object>> subscriptions = new();
+        private readonly Dictionary<string, Action<string, object, object>> subscriptions = new();
 
         /// <summary>
         /// Gets the specified object with the given key from the store.
@@ -74,7 +74,7 @@ namespace Microsoft.Kiota.Abstractions.Store
             }
             else if(value is ICollection collectionValues)
             {// if its the first time adding a IBackedModel collection property to the store, subscribe to item properties' BackingStores and use the events to flag the collection property is "dirty"
-                collectionValues.OfType<IBackedModel>().ToList().ForEach(model => model.BackingStore?.Subscribe((keyString, oldObject, newObject) => Set(key, value))); ;
+                collectionValues.OfType<IBackedModel>().ToList().ForEach(model => model.BackingStore?.Subscribe((keyString, oldObject, newObject) => Set(key, value)));
             }
 
             foreach(var sub in subscriptions.Values)
