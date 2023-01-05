@@ -51,9 +51,11 @@ namespace Microsoft.Kiota.Abstractions
                     }
 
                     foreach(var queryStringParameter in QueryParameters)
-                    if(queryStringParameter.Value != null)
                     {
-                        parsedUrlTemplate.SetParameter(queryStringParameter.Key, GetSanitizedValue(queryStringParameter.Value));
+                        if(queryStringParameter.Value != null)
+                        {
+                            parsedUrlTemplate.SetParameter(queryStringParameter.Key, GetSanitizedValue(queryStringParameter.Value));
+                        }
                     }
                     return new Uri(parsedUrlTemplate.Resolve());
                 }
