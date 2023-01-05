@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -50,10 +51,10 @@ namespace Microsoft.Kiota.Abstractions
                     }
 
                     foreach(var queryStringParameter in QueryParameters)
-                        if(queryStringParameter.Value != null)
-                        {
-                            parsedUrlTemplate.SetParameter(queryStringParameter.Key, GetSanitizedValue(queryStringParameter.Value));
-                        }
+                    if(queryStringParameter.Value != null)
+                    {
+                        parsedUrlTemplate.SetParameter(queryStringParameter.Key, GetSanitizedValue(queryStringParameter.Value));
+                    }
                     return new Uri(parsedUrlTemplate.Resolve());
                 }
             }
@@ -105,8 +106,12 @@ namespace Microsoft.Kiota.Abstractions
                                                 Value: x.GetValue(source)
                                             )
                                         )
-                                        .Where(x => x.Value != null && !QueryParameters.ContainsKey(x.Name)))
+                                        .Where(x =>  x.Value != null &&
+                                                    !QueryParameters.ContainsKey(x.Name) &&
+                                                    !string.IsNullOrEmpty(x.Value.ToString())))// no need to add an empty string value
             {
+                if(property.Value is ICollection collection && collection.Count == 0)
+                    continue; // no need to add an empty collection
                 QueryParameters.AddOrReplace(property.Name, property.Value);
             }
         }

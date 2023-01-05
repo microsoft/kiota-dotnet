@@ -71,6 +71,46 @@ namespace Microsoft.Kiota.Abstractions.Tests
             Assert.Equal("%24select",requestInfo.QueryParameters.First().Key);
         }
         [Fact]
+        public void DoesNotSetEmptyStringQueryParameters()
+        {
+            // Arrange as the request builders would
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?%24search}"
+            };
+            Action<GetQueryParameters> q = x => x.Search = "";//empty string
+            var qParams = new GetQueryParameters();
+            q.Invoke(qParams);
+
+            // Act 
+            requestInfo.AddQueryParameters(qParams);
+
+            // Assert
+            Assert.False(requestInfo.QueryParameters.ContainsKey($"%24search"));
+            Assert.False(requestInfo.QueryParameters.ContainsKey("search"));
+        }
+        [Fact]
+        public void DoesNotSetEmptyCollectionQueryParameters()
+        {
+            // Arrange as the request builders would
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?%24select}"
+            };
+            Action<GetQueryParameters> q = x => x.Select = Array.Empty<string>(); //empty array
+            var qParams = new GetQueryParameters();
+            q.Invoke(qParams);
+
+            // Act 
+            requestInfo.AddQueryParameters(qParams);
+
+            // Assert
+            Assert.False(requestInfo.QueryParameters.ContainsKey($"%24select"));
+            Assert.False(requestInfo.QueryParameters.ContainsKey("select"));
+        }
+        [Fact]
         public void SetsPathParametersOfDateTimeOffsetType()
         {
             // Arrange as the request builders would
