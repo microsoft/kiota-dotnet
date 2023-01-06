@@ -110,10 +110,9 @@ namespace Microsoft.Kiota.Abstractions
                                         )
                                         .Where(x =>  x.Value != null &&
                                                     !QueryParameters.ContainsKey(x.Name) &&
-                                                    !string.IsNullOrEmpty(x.Value.ToString())))// no need to add an empty string value
+                                                    !string.IsNullOrEmpty(x.Value.ToString()) && // no need to add an empty string value
+                                                    (x.Value is not ICollection collection || collection.Count > 0))) // no need to add empty collection
             {
-                if(property.Value is ICollection collection && collection.Count == 0)
-                    continue; // no need to add an empty collection
                 QueryParameters.AddOrReplace(property.Name, property.Value);
             }
         }
