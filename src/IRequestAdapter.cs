@@ -70,5 +70,13 @@ namespace Microsoft.Kiota.Abstractions
         /// The base url for every request.
         /// </summary>
         string BaseUrl { get; set; }
+        /// <summary>
+        /// Converts the given RequestInformation into a native HTTP request used by the implementing adapter.
+        /// </summary>
+        /// <typeparam name="T">The type of the native request.</typeparam>
+        /// <param name="requestInfo">The RequestInformation object to use for the HTTP request.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use for cancelling the requests.</param>
+        /// <returns>The native HTTP request.</returns>
+        Task<T> ConvertToNativeRequestAsync<T>(RequestInformation requestInfo, CancellationToken cancellationToken = default);
     }
 }
