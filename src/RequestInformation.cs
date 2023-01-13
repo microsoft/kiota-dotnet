@@ -67,7 +67,7 @@ namespace Microsoft.Kiota.Abstractions
         /// </summary>
         /// <param name="value">Object to be sanitized</param>
         /// <returns>Sanitized object</returns>
-        private object GetSanitizedValue(object value) => value switch
+        private static object GetSanitizedValue(object value) => value switch
         {
             bool boolean => boolean.ToString().ToLower(),// pass in a lowercase string as the final url will be uppercase due to the way ToString() works for booleans
             DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("o"),// Default to ISO 8601 for datetimeoffsets in the url.
@@ -186,7 +186,7 @@ namespace Microsoft.Kiota.Abstractions
         public void SetStreamContent(Stream content)
         {
             using var activity = _activitySource?.StartActivity(nameof(SetStreamContent));
-            setRequestType(content, activity);
+            SetRequestType(content, activity);
             Content = content;
             Headers.Add(ContentTypeHeader, BinaryContentType);
         }
@@ -201,8 +201,8 @@ namespace Microsoft.Kiota.Abstractions
         public void SetContentFromParsable<T>(IRequestAdapter requestAdapter, string contentType, IEnumerable<T> items) where T : IParsable
         {
             using var activity = _activitySource?.StartActivity(nameof(SetContentFromParsable));
-            using var writer = getSerializationWriter(requestAdapter, contentType, items);
-            setRequestType(items.FirstOrDefault(static x => x != null), activity);
+            using var writer = GetSerializationWriter(requestAdapter, contentType, items);
+            SetRequestType(items.FirstOrDefault(static x => x != null), activity);
             writer.WriteCollectionOfObjectValues(null, items);
             Headers.Add(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
@@ -217,19 +217,19 @@ namespace Microsoft.Kiota.Abstractions
         public void SetContentFromParsable<T>(IRequestAdapter requestAdapter, string contentType, T item) where T : IParsable
         {
             using var activity = _activitySource?.StartActivity(nameof(SetContentFromParsable));
-            using var writer = getSerializationWriter(requestAdapter, contentType, item);
-            setRequestType(item, activity);
+            using var writer = GetSerializationWriter(requestAdapter, contentType, item);
+            SetRequestType(item, activity);
             writer.WriteObjectValue(null, item);
             Headers.Add(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
         }
-        private void setRequestType(object? result, Activity? activity)
+        private static void SetRequestType(object? result, Activity? activity)
         {
             if (activity == null) return;
             if (result == null) return;
             activity.SetTag("com.microsoft.kiota.request.type", result.GetType().FullName);
         }
-        private ISerializationWriter getSerializationWriter<T>(IRequestAdapter requestAdapter, string contentType, T item)
+        private static ISerializationWriter GetSerializationWriter<T>(IRequestAdapter requestAdapter, string contentType, T item)
         {
             if(string.IsNullOrEmpty(contentType)) throw new ArgumentNullException(nameof(contentType));
             if(requestAdapter == null) throw new ArgumentNullException(nameof(requestAdapter));
@@ -246,8 +246,8 @@ namespace Microsoft.Kiota.Abstractions
         public void SetContentFromScalarCollection<T>(IRequestAdapter requestAdapter, string contentType, IEnumerable<T> items)
         {
             using var activity = _activitySource?.StartActivity(nameof(SetContentFromScalarCollection));
-            using var writer = getSerializationWriter(requestAdapter, contentType, items);
-            setRequestType(items.FirstOrDefault(static x => x != null), activity);
+            using var writer = GetSerializationWriter(requestAdapter, contentType, items);
+            SetRequestType(items.FirstOrDefault(static x => x != null), activity);
             writer.WriteCollectionOfPrimitiveValues(null, items);
             Headers.Add(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
@@ -262,8 +262,8 @@ namespace Microsoft.Kiota.Abstractions
         public void SetContentFromScalar<T>(IRequestAdapter requestAdapter, string contentType, T item)
         {
             using var activity = _activitySource?.StartActivity(nameof(SetContentFromScalar));
-            using var writer = getSerializationWriter(requestAdapter, contentType, item);
-            setRequestType(item, activity);
+            using var writer = GetSerializationWriter(requestAdapter, contentType, item);
+            SetRequestType(item, activity);
             switch(item)
             {
                 case string s:
