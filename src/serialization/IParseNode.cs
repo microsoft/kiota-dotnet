@@ -16,13 +16,13 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         ///  Gets the string value of the node.
         /// </summary>
         /// <returns>The string value of the node.</returns>
-        string GetStringValue();
+        string? GetStringValue();
         /// <summary>
         ///  Gets a new parse node for the given identifier.
         /// </summary>
         /// <param name="identifier">The identifier.</param>
         /// <returns>The new parse node.</returns>
-        IParseNode GetChildNode(string identifier);
+        IParseNode? GetChildNode(string identifier);
         /// <summary>
         ///  Gets the boolean value of the node.
         /// </summary>
@@ -114,19 +114,19 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// </summary>
         /// <param name="factory">The factory to use to create the model object.</param>
         /// <returns>The model object value of the node.</returns>
-        T GetObjectValue<T>(ParsableFactory<T> factory) where T : IParsable;
+        T? GetObjectValue<T>(ParsableFactory<T> factory) where T : IParsable;
         /// <summary>
         /// Callback called before the node is deserialized.
         /// </summary>
-        Action<IParsable> OnBeforeAssignFieldValues { get; set; }
+        Action<IParsable>? OnBeforeAssignFieldValues { get; set; }
         /// <summary>
         /// Callback called after the node is deserialized.
         /// </summary>
-        Action<IParsable> OnAfterAssignFieldValues { get; set; }
+        Action<IParsable>? OnAfterAssignFieldValues { get; set; }
         /// <summary>
         /// Gets the byte array value of the node.
         /// </summary>
         /// <returns>The byte array value of the node.</returns>
-        byte[] GetByteArrayValue();
+        byte[]? GetByteArrayValue();
     }
 }

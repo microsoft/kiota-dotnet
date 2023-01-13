@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------
 
@@ -20,6 +20,6 @@ namespace Microsoft.Kiota.Abstractions.Authentication
         /// <param name="additionalAuthenticationContext">Additional authentication context to pass to the authentication library.</param>
         /// <param name="cancellationToken">The cancellation token for the task</param>
         /// <returns>A task to await for the authentication to be completed.</returns>
-        Task AuthenticateRequestAsync(RequestInformation request, Dictionary<string, object> additionalAuthenticationContext = default, CancellationToken cancellationToken = default);
+        Task AuthenticateRequestAsync(RequestInformation request, Dictionary<string, object>? additionalAuthenticationContext = default, CancellationToken cancellationToken = default);
     }
 }

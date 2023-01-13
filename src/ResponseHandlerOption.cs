@@ -12,6 +12,6 @@ namespace Microsoft.Kiota.Abstractions
         /// <summary>
         /// The <see cref="IResponseHandler"/> to use for a request
         /// </summary>
-        public IResponseHandler ResponseHandler { get; set; }
+        public IResponseHandler? ResponseHandler { get; set; }
     }
 }

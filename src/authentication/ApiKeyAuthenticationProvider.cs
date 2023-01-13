@@ -41,9 +41,10 @@ public class ApiKeyAuthenticationProvider : IAuthenticationProvider
         KeyLoc = keyLocation;
         AllowedHostsValidator = new AllowedHostsValidator(allowedHosts);
     }
-    private static ActivitySource _activitySource = new(typeof(RequestInformation).Namespace);
+    private static ActivitySource _activitySource = new(typeof(RequestInformation).Namespace!);
     /// <inheritdoc />
-    public Task AuthenticateRequestAsync(RequestInformation request, Dictionary<string, object> additionalAuthenticationContext = null, CancellationToken cancellationToken = default) {
+    public Task AuthenticateRequestAsync(RequestInformation request, Dictionary<string, object>? additionalAuthenticationContext = default, CancellationToken cancellationToken = default)
+    {
         if (request == null)
             throw new ArgumentNullException(nameof(request));
         using var span = _activitySource?.StartActivity(nameof(AuthenticateRequestAsync));

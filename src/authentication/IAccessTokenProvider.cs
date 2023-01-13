@@ -20,7 +20,7 @@ public interface IAccessTokenProvider
     /// <param name="additionalAuthenticationContext">Additional authentication context to pass to the authentication library.</param>
     /// <param name="cancellationToken">The cancellation token for the task</param>
     /// <returns>A Task that holds the access token to use for the request.</returns>
-    Task<string> GetAuthorizationTokenAsync(Uri uri, Dictionary<string, object> additionalAuthenticationContext = default, CancellationToken cancellationToken = default);
+    Task<string> GetAuthorizationTokenAsync(Uri uri, Dictionary<string, object>? additionalAuthenticationContext = default, CancellationToken cancellationToken = default);
     /// <summary>
     /// Returns the <see cref="AllowedHostsValidator"/> for the provider.
     /// </summary>

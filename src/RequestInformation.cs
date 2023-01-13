@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ namespace Microsoft.Kiota.Abstractions
     /// </summary>
     public class RequestInformation
     {
-        private Uri _rawUri;
+        private Uri? _rawUri;
         /// <summary>
         ///  The URI of the request.
         /// </summary>
@@ -37,11 +37,11 @@ namespace Microsoft.Kiota.Abstractions
                 else if(PathParameters.TryGetValue("request-raw-url", out var rawUrl) &&
                     rawUrl is string rawUrlString) {
                     URI = new Uri(rawUrlString);
-                    return _rawUri;
+                    return _rawUri!;
                 }
                 else
                 {
-                    if(UrlTemplate.IndexOf("{+baseurl}", StringComparison.OrdinalIgnoreCase) >= 0 && !PathParameters.ContainsKey("baseurl"))
+                    if(UrlTemplate?.IndexOf("{+baseurl}", StringComparison.OrdinalIgnoreCase) >= 0 && !PathParameters.ContainsKey("baseurl"))
                         throw new InvalidOperationException($"{nameof(PathParameters)} must contain a value for \"baseurl\" for the url to be built.");
 
                     var parsedUrlTemplate = new UriTemplate(UrlTemplate);
@@ -78,7 +78,7 @@ namespace Microsoft.Kiota.Abstractions
         /// <summary>
         /// The Url template for the current request.
         /// </summary>
-        public string UrlTemplate { get; set; }
+        public string? UrlTemplate { get; set; }
         /// <summary>
         /// The path parameters to use for the URL template when generating the URI.
         /// </summary>
@@ -109,11 +109,11 @@ namespace Microsoft.Kiota.Abstractions
                                             )
                                         )
                                         .Where(x =>  x.Value != null &&
-                                                    !QueryParameters.ContainsKey(x.Name) &&
+                                                    !QueryParameters.ContainsKey(x.Name!) &&
                                                     !string.IsNullOrEmpty(x.Value.ToString()) && // no need to add an empty string value
                                                     (x.Value is not ICollection collection || collection.Count > 0))) // no need to add empty collection
             {
-                QueryParameters.AddOrReplace(property.Name, property.Value);
+                QueryParameters.AddOrReplace(property.Name!, property.Value!);
             }
         }
         /// <summary>
@@ -130,7 +130,7 @@ namespace Microsoft.Kiota.Abstractions
         /// <summary>
         /// The Request Body.
         /// </summary>
-        public Stream Content { get; set; }
+        public Stream Content { get; set; } = Stream.Null;
         private readonly Dictionary<string, IRequestOption> _requestOptions = new Dictionary<string, IRequestOption>(StringComparer.OrdinalIgnoreCase);
         /// <summary>
         /// Gets the options for this request. Options are unique by type. If an option of the same type is added twice, the last one wins.
@@ -144,7 +144,7 @@ namespace Microsoft.Kiota.Abstractions
         {
             if(options == null) return;
             foreach(var option in options.Where(x => x != null))
-                _requestOptions.AddOrReplace(option.GetType().FullName, option);
+                _requestOptions.AddOrReplace(option.GetType().FullName!, option);
         }
         /// <summary>
         /// Removes given options from the current request.
@@ -153,14 +153,14 @@ namespace Microsoft.Kiota.Abstractions
         public void RemoveRequestOptions(params IRequestOption[] options)
         {
             if(!options?.Any() ?? false) throw new ArgumentNullException(nameof(options));
-            foreach(var optionName in options.Where(x => x != null).Select(x => x.GetType().FullName))
-                _requestOptions.Remove(optionName);
+            foreach(var optionName in options!.Where(x => x != null).Select(x => x.GetType().FullName))
+                _requestOptions.Remove(optionName!);
         }
 
         /// <summary>
         /// Gets a <see cref="IRequestOption"/> instance of the matching type.
         /// </summary>
-        public T GetRequestOption<T>() => _requestOptions.TryGetValue(typeof(T).FullName, out var requestOption) ? (T)requestOption : default;
+        public T? GetRequestOption<T>() => _requestOptions.TryGetValue(typeof(T).FullName!, out var requestOption) ? (T)requestOption : default;
 
         /// <summary>
         /// Adds a <see cref="IResponseHandler"/> as a <see cref="IRequestOption"/> for the request.
@@ -190,7 +190,7 @@ namespace Microsoft.Kiota.Abstractions
             Content = content;
             Headers.Add(ContentTypeHeader, BinaryContentType);
         }
-        private static ActivitySource _activitySource = new(typeof(RequestInformation).Namespace);
+        private static ActivitySource _activitySource = new(typeof(RequestInformation).Namespace!);
         /// <summary>
         /// Sets the request body from a model with the specified content type.
         /// </summary>
@@ -223,7 +223,8 @@ namespace Microsoft.Kiota.Abstractions
             Headers.Add(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
         }
-        private void setRequestType(object result, Activity activity) {
+        private void setRequestType(object? result, Activity? activity)
+        {
             if (activity == null) return;
             if (result == null) return;
             activity.SetTag("com.microsoft.kiota.request.type", result.GetType().FullName);

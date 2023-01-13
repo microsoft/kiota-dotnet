@@ -29,7 +29,7 @@ public class BaseBearerTokenAuthenticationProvider : IAuthenticationProvider
     private const string ClaimsKey = "claims";
 
     /// <inheritdoc />
-    public async Task AuthenticateRequestAsync(RequestInformation request, Dictionary<string, object> additionalAuthenticationContext = default, CancellationToken cancellationToken = default)
+    public async Task AuthenticateRequestAsync(RequestInformation request, Dictionary<string, object>? additionalAuthenticationContext = default, CancellationToken cancellationToken = default)
     {
         if(request == null) throw new ArgumentNullException(nameof(request));
         if(additionalAuthenticationContext != null &&

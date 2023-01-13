@@ -15,17 +15,17 @@ namespace Microsoft.Kiota.Abstractions.Store
         /// <summary>Gets a value from the backing store based on its key. Returns null if the value hasn't changed and "ReturnOnlyChangedValues" is true.</summary>
         /// <returns>The value from the backing store.</returns>
         /// <param name="key">The key to lookup the backing store with.</param>
-        T Get<T>(string key);
+        T? Get<T>(string key);
         /// <summary>
         /// Sets or updates the stored value for the given key.
         /// Will trigger subscriptions callbacks.
         /// </summary>
         /// <param name="key">The key to store and retrieve the information.</param>
         /// <param name="value">The value to be stored.</param>
-        void Set<T>(string key, T value);
+        void Set<T>(string key, T? value);
         /// <summary>Enumerates all the values stored in the backing store. Values will be filtered if "ReturnOnlyChangedValues" is true.</summary>
         /// <returns>The values available in the backing store.</returns>
-        IEnumerable<KeyValuePair<string, object>> Enumerate();
+        IEnumerable<KeyValuePair<string, object?>> Enumerate();
         /// <summary>
         /// Enumerates the keys for all values that changed to null.
         /// </summary>
@@ -36,13 +36,13 @@ namespace Microsoft.Kiota.Abstractions.Store
         /// </summary>
         /// <param name="callback">Callback to be invoked on data changes where the first parameter is the data key, the second the previous value and the third the new value.</param>
         /// <returns>The subscription Id to use when removing the subscription</returns>
-        string Subscribe(Action<string, object, object> callback);
+        string Subscribe(Action<string, object?, object?> callback);
         /// <summary>
         /// Creates a subscription to any data change happening, allowing to specify the subscription Id.
         /// </summary>
         /// <param name="callback">Callback to be invoked on data changes where the first parameter is the data key, the second the previous value and the third the new value.</param>
         /// <param name="subscriptionId">The subscription Id to use.</param>
-        void Subscribe(Action<string, object, object> callback, string subscriptionId);
+        void Subscribe(Action<string, object?, object?> callback, string subscriptionId);
         /// <summary>
         /// Removes a subscription from the store based on its subscription id.
         /// </summary>

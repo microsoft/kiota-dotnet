@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------
 
@@ -51,7 +51,7 @@ namespace Microsoft.Kiota.Abstractions.Extensions
         /// <param name="key">The key parameter.</param>
         /// <param name="value">The value</param>
         /// <returns>The previous value if any</returns>
-        public static TValue AddOrReplace<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue value)
+        public static TValue? AddOrReplace<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue value)
         {
             if(!dictionary.TryAdd(key, value))
             {

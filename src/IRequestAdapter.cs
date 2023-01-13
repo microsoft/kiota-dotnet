@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="errorMapping">The error factories mapping to use in case of a failed request.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use for cancelling the requests.</param>
         /// <returns>The deserialized response model.</returns>
-        Task<ModelType> SendAsync<ModelType>(RequestInformation requestInfo, ParsableFactory<ModelType> factory, Dictionary<string, ParsableFactory<IParsable>> errorMapping = default, CancellationToken cancellationToken = default) where ModelType : IParsable;
+        Task<ModelType?> SendAsync<ModelType>(RequestInformation requestInfo, ParsableFactory<ModelType> factory, Dictionary<string, ParsableFactory<IParsable>>? errorMapping = default, CancellationToken cancellationToken = default) where ModelType : IParsable;
         /// <summary>
         /// Executes the HTTP request specified by the given RequestInformation and returns the deserialized response model collection.
         /// </summary>
@@ -41,7 +41,7 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="errorMapping">The error factories mapping to use in case of a failed request.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use for cancelling the requests.</param>
         /// <returns>The deserialized response model collection.</returns>
-        Task<IEnumerable<ModelType>> SendCollectionAsync<ModelType>(RequestInformation requestInfo, ParsableFactory<ModelType> factory, Dictionary<string, ParsableFactory<IParsable>> errorMapping = default, CancellationToken cancellationToken = default) where ModelType : IParsable;
+        Task<IEnumerable<ModelType>?> SendCollectionAsync<ModelType>(RequestInformation requestInfo, ParsableFactory<ModelType> factory, Dictionary<string, ParsableFactory<IParsable>>? errorMapping = default, CancellationToken cancellationToken = default) where ModelType : IParsable;
         /// <summary>
         /// Executes the HTTP request specified by the given RequestInformation and returns the deserialized primitive response model.
         /// </summary>
@@ -49,7 +49,7 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="errorMapping">The error factories mapping to use in case of a failed request.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use for cancelling the requests.</param>
         /// <returns>The deserialized primitive response model.</returns>
-        Task<ModelType> SendPrimitiveAsync<ModelType>(RequestInformation requestInfo, Dictionary<string, ParsableFactory<IParsable>> errorMapping = default, CancellationToken cancellationToken = default);
+        Task<ModelType?> SendPrimitiveAsync<ModelType>(RequestInformation requestInfo, Dictionary<string, ParsableFactory<IParsable>>? errorMapping = default, CancellationToken cancellationToken = default);
         /// <summary>
         /// Executes the HTTP request specified by the given RequestInformation and returns the deserialized primitive response model collection.
         /// </summary>
@@ -57,7 +57,7 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="errorMapping">The error factories mapping to use in case of a failed request.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use for cancelling the requests.</param>
         /// <returns>The deserialized primitive response model collection.</returns>
-        Task<IEnumerable<ModelType>> SendPrimitiveCollectionAsync<ModelType>(RequestInformation requestInfo, Dictionary<string, ParsableFactory<IParsable>> errorMapping = default, CancellationToken cancellationToken = default);
+        Task<IEnumerable<ModelType>?> SendPrimitiveCollectionAsync<ModelType>(RequestInformation requestInfo, Dictionary<string, ParsableFactory<IParsable>>? errorMapping = default, CancellationToken cancellationToken = default);
         /// <summary>
         /// Executes the HTTP request specified by the given RequestInformation with no return content.
         /// </summary>
@@ -65,11 +65,11 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="errorMapping">The error factories mapping to use in case of a failed request.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use for cancelling the requests.</param>
         /// <returns>A Task to await completion.</returns>
-        Task SendNoContentAsync(RequestInformation requestInfo, Dictionary<string, ParsableFactory<IParsable>> errorMapping = default, CancellationToken cancellationToken = default);
+        Task SendNoContentAsync(RequestInformation requestInfo, Dictionary<string, ParsableFactory<IParsable>>? errorMapping = default, CancellationToken cancellationToken = default);
         /// <summary>
         /// The base url for every request.
         /// </summary>
-        string BaseUrl { get; set; }
+        string? BaseUrl { get; set; }
         /// <summary>
         /// Converts the given RequestInformation into a native HTTP request used by the implementing adapter.
         /// </summary>
@@ -77,6 +77,6 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="requestInfo">The RequestInformation object to use for the HTTP request.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use for cancelling the requests.</param>
         /// <returns>The native HTTP request.</returns>
-        Task<T> ConvertToNativeRequestAsync<T>(RequestInformation requestInfo, CancellationToken cancellationToken = default);
+        Task<T?> ConvertToNativeRequestAsync<T>(RequestInformation requestInfo, CancellationToken cancellationToken = default);
     }
 }
