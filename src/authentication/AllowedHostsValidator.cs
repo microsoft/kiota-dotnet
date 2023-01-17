@@ -19,7 +19,7 @@ namespace Microsoft.Kiota.Abstractions.Authentication
         /// The <see cref="AllowedHostsValidator"/> constructor
         /// </summary>
         /// <param name="validHosts"> Collection of valid Hosts</param>
-        public AllowedHostsValidator(IEnumerable<string> validHosts = null)
+        public AllowedHostsValidator(IEnumerable<string>? validHosts = null)
         {
             _allowedHosts = new HashSet<string>(validHosts ?? Array.Empty<string>(), StringComparer.OrdinalIgnoreCase);
         }

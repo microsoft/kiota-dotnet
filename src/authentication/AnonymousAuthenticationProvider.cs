@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ namespace Microsoft.Kiota.Abstractions.Authentication
     public class AnonymousAuthenticationProvider : IAuthenticationProvider
     {
         /// <inheritdoc />
-        public Task AuthenticateRequestAsync(RequestInformation request, Dictionary<string, object> additionalAuthenticationContext = default, CancellationToken cancellationToken = default)
+        public Task AuthenticateRequestAsync(RequestInformation request, Dictionary<string, object>? additionalAuthenticationContext = default, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }

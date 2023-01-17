@@ -35,7 +35,7 @@ public class RequestHeaders : IDictionary<string,IEnumerable<string>> {
     /// <inheritdoc/>
     public bool IsReadOnly => false;
     /// <inheritdoc/>
-    public IEnumerable<string> this[string key] { get => TryGetValue(key, out var result) ? result : null; set => Add(key, value); }
+    public IEnumerable<string> this[string key] { get => TryGetValue(key, out var result) ? result : throw new KeyNotFoundException($"Key not found : {key}"); set => Add(key, value); }
 
     /// <summary>
     /// Removes the specified value from the header with the specified name.
@@ -75,7 +75,9 @@ public class RequestHeaders : IDictionary<string,IEnumerable<string>> {
     /// <inheritdoc/>
     public bool ContainsKey(string key) => !string.IsNullOrEmpty(key) && _headers.ContainsKey(key);
     /// <inheritdoc/>
+#pragma warning disable CS8604 // Possible null reference argument. //Can't change signature of overriden method implementation
     public void Add(string key, IEnumerable<string> value) => Add(key, value?.ToArray());
+#pragma warning restore CS8604 // Possible null reference argument.
     /// <inheritdoc/>
     public bool Remove(string key) {
         if(string.IsNullOrEmpty(key))
