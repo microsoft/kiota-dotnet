@@ -42,7 +42,7 @@ public class RequestHeadersTests {
         instance.Remove("name", "value");
         Assert.Equal(new [] { "value2" }, instance["name"]);
         instance.Remove("name", "value2");
-        Assert.Null(instance["name"]);
+        Assert.Throws<KeyNotFoundException>(() => instance["name"]);
     }
     [Fact]
     public void Removes() {
@@ -50,7 +50,7 @@ public class RequestHeadersTests {
         instance.Add("name", "value");
         instance.Add("name", "value2");
         Assert.True(instance.Remove("name"));
-        Assert.Null(instance["name"]);
+        Assert.Throws<KeyNotFoundException>(() => instance["name"]);
         Assert.False(instance.Remove("name"));
     }
     [Fact]
@@ -59,7 +59,7 @@ public class RequestHeadersTests {
         instance.Add("name", "value");
         instance.Add("name", "value2");
         Assert.True(instance.Remove(new KeyValuePair<string, IEnumerable<string>>("name", new [] { "value", "value2" })));
-        Assert.Null(instance["name"]);
+        Assert.Throws<KeyNotFoundException>(() => instance["name"]);
         Assert.False(instance.Remove("name"));
     }
     [Fact]
@@ -68,7 +68,8 @@ public class RequestHeadersTests {
         instance.Add("name", "value");
         instance.Add("name", "value2");
         instance.Clear();
-        Assert.Null(instance["name"]);
+        Assert.Throws<KeyNotFoundException>(() => instance["name"]);
+        Assert.Empty(instance.Keys);
     }
     [Fact]
     public void GetsEnumerator() {

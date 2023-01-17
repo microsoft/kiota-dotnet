@@ -35,9 +35,7 @@ public class RequestHeaders : IDictionary<string,IEnumerable<string>> {
     /// <inheritdoc/>
     public bool IsReadOnly => false;
     /// <inheritdoc/>
-#pragma warning disable CS8603 // Possible null reference return. //Can't change signature of overriden method implementation
-    public IEnumerable<string> this[string key] { get => TryGetValue(key, out var result) ? result : null; set => Add(key, value); }
-#pragma warning restore CS8603 // Possible null reference return.
+    public IEnumerable<string> this[string key] { get => TryGetValue(key, out var result) ? result : throw new KeyNotFoundException($"Key not found : {key}"); set => Add(key, value); }
 
     /// <summary>
     /// Removes the specified value from the header with the specified name.
