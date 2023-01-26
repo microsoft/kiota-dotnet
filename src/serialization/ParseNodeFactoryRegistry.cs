@@ -32,7 +32,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// <summary>
         /// List of factories that are registered by content type.
         /// </summary>
-        public ConcurrentDictionary<string, IParseNodeFactory> ContentTypeAssociatedFactories { get; set; } = new ConcurrentDictionary<string, IParseNodeFactory>();
+        public ConcurrentDictionary<string, IParseNodeFactory> ContentTypeAssociatedFactories { get; set; } = new();
         internal static readonly Regex contentTypeVendorCleanupRegex = new(@"[^/]+\+", RegexOptions.Compiled);
         /// <summary>
         /// Get the <see cref="IParseNode"/> instance that is the root of the content
