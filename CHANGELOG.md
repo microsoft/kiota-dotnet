@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+## [1.0.0-rc.5] - 2023-01-26
+
+### Changed
+
+- Use concurrent dictionary for serialization registry to avoid race conditions.
+
+### Changed
+
 ## [1.0.0-rc.4] - 2023-01-17
 
 ### Changed

@@ -4,7 +4,6 @@
 
 using System;
 using System.Linq;
-using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
 using Microsoft.Kiota.Abstractions.Store;
 
@@ -46,10 +45,14 @@ namespace Microsoft.Kiota.Abstractions
         {
             ISerializationWriterFactory result = original ?? throw new ArgumentNullException(nameof(original));
             if(original is SerializationWriterFactoryRegistry registry)
+            {
                 EnableBackingStoreForSerializationRegistry(registry);
+                if(registry != SerializationWriterFactoryRegistry.DefaultInstance)// if the registry is the default instance, we already enabled it above. No need to do it twice
+                    EnableBackingStoreForSerializationRegistry(SerializationWriterFactoryRegistry.DefaultInstance);
+            }
             else
                 result = new BackingStoreSerializationWriterProxyFactory(original);
-            EnableBackingStoreForSerializationRegistry(SerializationWriterFactoryRegistry.DefaultInstance);
+
             return result;
         }
         /// <summary>
@@ -61,10 +64,14 @@ namespace Microsoft.Kiota.Abstractions
         {
             IParseNodeFactory result = original ?? throw new ArgumentNullException(nameof(original));
             if(original is ParseNodeFactoryRegistry registry)
+            {
                 EnableBackingStoreForParseNodeRegistry(registry);
+                if(registry != ParseNodeFactoryRegistry.DefaultInstance)// if the registry is the default instance, we already enabled it above. No need to do it twice
+                    EnableBackingStoreForParseNodeRegistry(ParseNodeFactoryRegistry.DefaultInstance);
+            }
             else
                 result = new BackingStoreParseNodeFactory(original);
-            EnableBackingStoreForParseNodeRegistry(ParseNodeFactoryRegistry.DefaultInstance);
+            
             return result;
         }
         private static void EnableBackingStoreForParseNodeRegistry(ParseNodeFactoryRegistry registry)
