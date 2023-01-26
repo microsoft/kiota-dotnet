@@ -15,7 +15,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             // Arrange
             var serializationFactoryRegistry = new SerializationWriterFactoryRegistry();
             var mockSerializationWriterFactory = new Mock<ISerializationWriterFactory>();
-            serializationFactoryRegistry.ContentTypeAssociatedFactories.Add(StreamContentType, mockSerializationWriterFactory.Object);
+            serializationFactoryRegistry.ContentTypeAssociatedFactories.TryAdd(StreamContentType, mockSerializationWriterFactory.Object);
         
             Assert.IsNotType<BackingStoreSerializationWriterProxyFactory>(serializationFactoryRegistry.ContentTypeAssociatedFactories[StreamContentType]);
         
@@ -32,7 +32,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             // Arrange
             var parseNodeRegistry = new ParseNodeFactoryRegistry();
             var mockParseNodeFactory = new Mock<IParseNodeFactory>();
-            parseNodeRegistry.ContentTypeAssociatedFactories.Add(StreamContentType, mockParseNodeFactory.Object);
+            parseNodeRegistry.ContentTypeAssociatedFactories.TryAdd(StreamContentType, mockParseNodeFactory.Object);
         
             Assert.IsNotType<BackingStoreParseNodeFactory>(parseNodeRegistry.ContentTypeAssociatedFactories[StreamContentType]);
         

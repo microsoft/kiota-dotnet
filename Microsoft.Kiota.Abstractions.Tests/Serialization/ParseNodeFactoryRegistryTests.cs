@@ -32,7 +32,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Serialization
             var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             var mockParseNode = new Mock<IParseNode>();
             mockParseNodeFactory.Setup(parseNodeFactory => parseNodeFactory.GetRootParseNode(streamContentType, It.IsAny<Stream>())).Returns(mockParseNode.Object);
-            _parseNodeFactoryRegistry.ContentTypeAssociatedFactories.Add(streamContentType, mockParseNodeFactory.Object);
+            _parseNodeFactoryRegistry.ContentTypeAssociatedFactories.TryAdd(streamContentType, mockParseNodeFactory.Object);
             // Act
             var rootParseNode = _parseNodeFactoryRegistry.GetRootParseNode(streamContentType, testStream);
             // Assert
@@ -48,7 +48,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Serialization
             var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             var mockParseNode = new Mock<IParseNode>();
             mockParseNodeFactory.Setup(parseNodeFactory => parseNodeFactory.GetRootParseNode(applicationJsonContentType, It.IsAny<Stream>())).Returns(mockParseNode.Object);
-            _parseNodeFactoryRegistry.ContentTypeAssociatedFactories.Add(applicationJsonContentType, mockParseNodeFactory.Object);
+            _parseNodeFactoryRegistry.ContentTypeAssociatedFactories.TryAdd(applicationJsonContentType, mockParseNodeFactory.Object);
             // Act
             var rootParseNode = _parseNodeFactoryRegistry.GetRootParseNode("application/vnd+json", testStream);
             // Assert

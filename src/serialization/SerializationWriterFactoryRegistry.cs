@@ -3,7 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 
 namespace Microsoft.Kiota.Abstractions.Serialization
@@ -30,7 +30,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// <summary>
         /// List of factories that are registered by content type.
         /// </summary>
-        public Dictionary<string, ISerializationWriterFactory> ContentTypeAssociatedFactories { get; set; } = new Dictionary<string, ISerializationWriterFactory>();
+        public ConcurrentDictionary<string, ISerializationWriterFactory> ContentTypeAssociatedFactories { get; set; } = new();
         /// <summary>
         /// Get the relevant <see cref="ISerializationWriter"/> instance for the given content type
         /// </summary>
