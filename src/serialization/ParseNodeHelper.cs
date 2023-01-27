@@ -16,7 +16,7 @@ public static class ParseNodeHelper {
     /// Merges the given fields deserializers for an intersection type into a single collection.
     /// </summary>
     /// <param name="targets">The collection of deserializers to merge.</param>
-    public static IDictionary<string, Action<IParseNode>> MergeDeserializersForIntersectionWrapper(params IParsable[] targets) {
+    public static IDictionary<string, Action<IParseNode>> MergeDeserializersForIntersectionWrapper(params IParsable?[] targets) {
         if (targets == null)
         {
             throw new ArgumentNullException(nameof(targets));
@@ -26,7 +26,8 @@ public static class ParseNodeHelper {
             throw new ArgumentException("At least one target must be provided.", nameof(targets));
         }
         
-        return targets.SelectMany(static x => x.GetFieldDeserializers())
+        return targets.Where(static x => x != null)
+                        .SelectMany(static x => x!.GetFieldDeserializers())
                         .GroupBy(static x => x.Key)
                         .Select(static x => x.First())
                         .ToDictionary(static x => x.Key, static x => x.Value);
