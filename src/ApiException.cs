@@ -23,4 +23,8 @@ public class ApiException : Exception
     public ApiException(string message, Exception innerException) : base(message, innerException)
     {
     }
+    /// <summary>
+    /// The HTTP response status code.
+    /// </summary>
+    public int ResponseStatusCode { get; set; }
 }
