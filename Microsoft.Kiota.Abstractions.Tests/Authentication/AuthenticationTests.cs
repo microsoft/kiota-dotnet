@@ -64,23 +64,23 @@ public class AuthenticationTests
     {
         // Test through the constructor
         // Arrange
-        var whiteList = new[] { "graph.microsoft.com", "graph.microsoft.us"};
-        var validator = new AllowedHostsValidator(whiteList);
+        var allowList = new[] { "graph.microsoft.com", "graph.microsoft.us"};
+        var validator = new AllowedHostsValidator(allowList);
 
         // Act 
         var validationResult = validator.IsUrlHostValid(new Uri(urlToTest));
 
         // Assert
         Assert.Equal(expectedResult, validationResult);
-        Assert.Contains(whiteList[0], validator.AllowedHosts);
-        Assert.Contains(whiteList[1], validator.AllowedHosts);
+        Assert.Contains(allowList[0], validator.AllowedHosts);
+        Assert.Contains(allowList[1], validator.AllowedHosts);
 
 
         // Test through the setter
         // Arrange
         var emptyValidator = new AllowedHostsValidator
         {
-            AllowedHosts = whiteList // set the validator through the property
+            AllowedHosts = allowList // set the validator through the property
         };
 
         // Act 
@@ -88,8 +88,8 @@ public class AuthenticationTests
 
         // Assert
         Assert.Equal(emptyValidatorResult, validationResult);
-        Assert.Contains(whiteList[0], emptyValidator.AllowedHosts);
-        Assert.Contains(whiteList[1], emptyValidator.AllowedHosts);
+        Assert.Contains(allowList[0], emptyValidator.AllowedHosts);
+        Assert.Contains(allowList[1], emptyValidator.AllowedHosts);
     }
 
 
