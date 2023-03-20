@@ -19,6 +19,7 @@ namespace Microsoft.Kiota.Abstractions
     /// </summary>
     public class RequestInformation
     {
+        internal const string RawUrlKey = "request-raw-url";
         private Uri? _rawUri;
         /// <summary>
         ///  The URI of the request.
@@ -34,7 +35,7 @@ namespace Microsoft.Kiota.Abstractions
             get {
                 if(_rawUri != null)
                     return _rawUri;
-                else if(PathParameters.TryGetValue("request-raw-url", out var rawUrl) &&
+                else if(PathParameters.TryGetValue(RawUrlKey, out var rawUrl) &&
                     rawUrl is string rawUrlString) {
                     URI = new Uri(rawUrlString);
                     return _rawUri!;
