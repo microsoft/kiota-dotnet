@@ -120,13 +120,14 @@ stages:
           CredScan: true
           PoliCheck: true
 
-      - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+      - task: EsrpCodeSigning@2
         displayName: 'ESRP DLL Strong Name'
         inputs:
           ConnectedServiceName: 'microsoftgraph ESRP CodeSign DLL and NuGet (AKV)'
           FolderPath: $(ProductBinPath)
           Pattern: Microsoft.Kiota.Abstractions.dll
           signConfigType: inlineSignParams
+          UseMinimatch: true
           inlineOperation: |
             [
                 {
@@ -146,12 +147,13 @@ stages:
             ]
           SessionTimeout: 20
 
-      - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+      - task: EsrpCodeSigning@2
         displayName: 'ESRP DLL CodeSigning'
         inputs:
           ConnectedServiceName: 'microsoftgraph ESRP CodeSign DLL and NuGet (AKV)'
           FolderPath: src
           signConfigType: inlineSignParams
+          UseMinimatch: true
           inlineOperation: |
             [
                 {
@@ -207,13 +209,14 @@ stages:
           arguments: '-projectPath "$(Build.SourcesDirectory)/src/Microsoft.Kiota.Abstractions.csproj" -packageName "Microsoft.Kiota.Abstractions"'
           pwsh: true
 
-      - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+      - task: EsrpCodeSigning@2
         displayName: 'ESRP CodeSigning Nuget Packages'
         inputs:
           ConnectedServiceName: 'microsoftgraph ESRP CodeSign DLL and NuGet (AKV)'
           FolderPath: '$(Build.ArtifactStagingDirectory)'
           Pattern: '*.nupkg'
           signConfigType: inlineSignParams
+          UseMinimatch: true
           inlineOperation: |
             [
                 {
