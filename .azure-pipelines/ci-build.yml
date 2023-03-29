@@ -125,7 +125,7 @@ stages:
         inputs:
           ConnectedServiceName: 'microsoftgraph ESRP CodeSign DLL and NuGet (AKV)'
           FolderPath: $(ProductBinPath)
-          Pattern: Microsoft.Kiota.Abstractions.dll
+          Pattern: **\*Microsoft.Kiota.Abstractions.dll
           signConfigType: inlineSignParams
           UseMinimatch: true
           inlineOperation: |
@@ -154,6 +154,7 @@ stages:
           FolderPath: src
           signConfigType: inlineSignParams
           UseMinimatch: true
+          Pattern: **\*Microsoft.Kiota.Abstractions.dll
           inlineOperation: |
             [
                 {
