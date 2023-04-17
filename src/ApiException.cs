@@ -33,5 +33,5 @@ public class ApiException : Exception
     /// <summary>
     /// The HTTP response headers.
     /// </summary>
-    public IDictionary<string, IEnumerable<string>> ResponseHeaders { get; set; } = new Dictionary<string, IEnumerable<string>>();
+    public IDictionary<string, IEnumerable<string>> ResponseHeaders { get; set; } = new Dictionary<string, IEnumerable<string>>(StringComparer.OrdinalIgnoreCase);
 }
