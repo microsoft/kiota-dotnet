@@ -13,7 +13,7 @@
     <PackageProjectUrl>https://microsoft.github.io/kiota/</PackageProjectUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <Deterministic>true</Deterministic>
-    <VersionPrefix>1.1.0</VersionPrefix>
+    <VersionPrefix>1.1.1</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>false</SignAssembly>
@@ -22,6 +22,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <IsTrimmable>true</IsTrimmable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!-- Enable this line once we go live to prevent breaking changes -->
     <!-- <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion> -->
