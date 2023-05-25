@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+## [1.1.2] - 2023-05-17
+
+### Changed
+
+- Fixes a bug in the InMemoryBackingStore that would not leave out properties in nested IBackedModel properties.
+
 ## [1.1.1] - 2023-04-06
 
 ### Added
