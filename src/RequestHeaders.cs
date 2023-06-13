@@ -8,7 +8,7 @@ namespace Microsoft.Kiota.Abstractions;
 /// <summary>Represents a collection of request headers.</summary>
 public class RequestHeaders : IDictionary<string,IEnumerable<string>> {
     private readonly Dictionary<string, HashSet<string>> _headers = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
-    private readonly HashSet<string> _singleValueHeaders = new HashSet<string> { "Content-Type" };
+    private readonly HashSet<string> _singleValueHeaders = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Content-Type" };
     /// <summary>
     /// Adds values to the header with the specified name.
     /// </summary>
