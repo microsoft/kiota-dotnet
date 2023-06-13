@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+## [1.1.3] - 2023-06-13
+
+### Fixed
+
+- Fixed a bug that would allow multiple "Content-Type", "Content-Length", and "Content-Location" header values.
+
 ## [1.1.2] - 2023-05-17
 
 ### Changed
@@ -65,7 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Adds support for nullable reference types 
+- Adds support for nullable reference types
 
 ## [1.0.0-rc.3] - 2023-01-09
 
