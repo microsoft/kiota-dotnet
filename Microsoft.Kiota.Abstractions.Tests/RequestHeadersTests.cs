@@ -38,7 +38,7 @@ public class RequestHeadersTests {
         var instance = new RequestHeaders();
         instance.Add("Content-Type", "value");
         instance.Add("Content-Type", "value2");
-        Assert.Equal(new[] { "value" }, instance["Content-Type"]);
+        Assert.Equal(new[] { "value2" }, instance["Content-Type"]);
     }
     [Fact]
     public void RemovesValue() {
