@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+## [1.1.4] - 2023-06-22
+
+### Fixed
+
+- Use concurrent dictionary for In memory backing store registry to avoid race conditions.
+
 ## [1.1.3] - 2023-06-13
 
 ### Fixed

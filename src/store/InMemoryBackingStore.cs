@@ -4,9 +4,9 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Kiota.Abstractions.Extensions;
 
 namespace Microsoft.Kiota.Abstractions.Store
 {
@@ -20,8 +20,8 @@ namespace Microsoft.Kiota.Abstractions.Store
         /// Determines whether the backing store should only return changed values when queried.
         /// </summary>
         public bool ReturnOnlyChangedValues { get; set; }
-        private readonly Dictionary<string, Tuple<bool, object?>> store = new();
-        private readonly Dictionary<string, Action<string, object?, object?>> subscriptions = new();
+        private readonly ConcurrentDictionary<string, Tuple<bool, object?>> store = new();
+        private readonly ConcurrentDictionary<string, Action<string, object?, object?>> subscriptions = new();
 
         /// <summary>
         /// Gets the specified object with the given key from the store.
@@ -129,7 +129,8 @@ namespace Microsoft.Kiota.Abstractions.Store
         }
 
         /// <summary>
-        /// Adds a callback to subscribe to events in the store with the given subscription id
+        /// Adds a callback to subscribe to events in the store with the given subscription id. 
+        /// If a subscription exists with the same subscriptionId, the callback is updated/replaced
         /// </summary>
         /// <param name="callback">The callback to add</param>
         /// <param name="subscriptionId">The subscription id to use for subscription</param>
@@ -139,7 +140,7 @@ namespace Microsoft.Kiota.Abstractions.Store
                 throw new ArgumentNullException(nameof(subscriptionId));
             if(callback == null)
                 throw new ArgumentNullException(nameof(callback));
-            subscriptions.Add(subscriptionId, callback);
+            subscriptions.AddOrUpdate(subscriptionId, callback, (_,_) => callback);
         }
 
         /// <summary>
@@ -148,7 +149,7 @@ namespace Microsoft.Kiota.Abstractions.Store
         /// <param name="subscriptionId">The id of the subscription to de-register </param>
         public void Unsubscribe(string subscriptionId)
         {
-            subscriptions.Remove(subscriptionId);
+            subscriptions.TryRemove(subscriptionId, out _);
         }
         /// <summary>
         /// Clears the store
