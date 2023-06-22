@@ -97,12 +97,11 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             testUser.AdditionalData.Add("anotherExtension", null);
             // Assert by retrieving only changed values
             testUser.BackingStore.ReturnOnlyChangedValues = true;
-            var changedValues = testUser.BackingStore.Enumerate();
+            var changedValues = testUser.BackingStore.Enumerate().ToDictionary(x => x.Key, y => y.Value);
             Assert.NotEmpty(changedValues);
             Assert.Equal(2, changedValues.Count());
-            var resultList = changedValues.ToList();
-            Assert.Equal("additionalData", resultList[0].Key);
-            Assert.Equal("businessPhones", resultList[1].Key);
+            Assert.True(changedValues.ContainsKey("businessPhones"));
+            Assert.True(changedValues.ContainsKey("additionalData"));
         }
         [Fact]
         public void TestsBackingStoreEmbeddedInModelWithCollectionPropertyReplacedWithNewCollection()

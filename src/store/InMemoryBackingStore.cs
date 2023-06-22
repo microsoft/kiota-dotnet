@@ -4,9 +4,9 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Kiota.Abstractions.Extensions;
 
 namespace Microsoft.Kiota.Abstractions.Store
 {
@@ -20,8 +20,8 @@ namespace Microsoft.Kiota.Abstractions.Store
         /// Determines whether the backing store should only return changed values when queried.
         /// </summary>
         public bool ReturnOnlyChangedValues { get; set; }
-        private readonly Dictionary<string, Tuple<bool, object?>> store = new();
-        private readonly Dictionary<string, Action<string, object?, object?>> subscriptions = new();
+        private readonly ConcurrentDictionary<string, Tuple<bool, object?>> store = new();
+        private readonly ConcurrentDictionary<string, Action<string, object?, object?>> subscriptions = new();
 
         /// <summary>
         /// Gets the specified object with the given key from the store.
@@ -139,7 +139,7 @@ namespace Microsoft.Kiota.Abstractions.Store
                 throw new ArgumentNullException(nameof(subscriptionId));
             if(callback == null)
                 throw new ArgumentNullException(nameof(callback));
-            subscriptions.Add(subscriptionId, callback);
+            subscriptions.TryAdd(subscriptionId, callback);
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace Microsoft.Kiota.Abstractions.Store
         /// <param name="subscriptionId">The id of the subscription to de-register </param>
         public void Unsubscribe(string subscriptionId)
         {
-            subscriptions.Remove(subscriptionId);
+            subscriptions.TryRemove(subscriptionId, out _);
         }
         /// <summary>
         /// Clears the store
