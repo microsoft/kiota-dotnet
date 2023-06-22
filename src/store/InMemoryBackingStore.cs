@@ -129,7 +129,8 @@ namespace Microsoft.Kiota.Abstractions.Store
         }
 
         /// <summary>
-        /// Adds a callback to subscribe to events in the store with the given subscription id
+        /// Adds a callback to subscribe to events in the store with the given subscription id. 
+        /// If a subscription exists with the same subscriptionId, the callback is updated/replaced
         /// </summary>
         /// <param name="callback">The callback to add</param>
         /// <param name="subscriptionId">The subscription id to use for subscription</param>
@@ -139,7 +140,7 @@ namespace Microsoft.Kiota.Abstractions.Store
                 throw new ArgumentNullException(nameof(subscriptionId));
             if(callback == null)
                 throw new ArgumentNullException(nameof(callback));
-            subscriptions.TryAdd(subscriptionId, callback);
+            subscriptions.AddOrUpdate(subscriptionId, callback, (_,_) => callback);
         }
 
         /// <summary>
