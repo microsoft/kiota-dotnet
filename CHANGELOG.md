@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+## [1.2.0] - 2023-06-28
+
+### Added
+
+- Added an interface to mark composed type wrappers and facilitate serialization.
+
 ## [1.1.4] - 2023-06-22
 
 ### Fixed
