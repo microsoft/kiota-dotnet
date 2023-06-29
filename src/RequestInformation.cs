@@ -45,7 +45,7 @@ namespace Microsoft.Kiota.Abstractions
                     if(UrlTemplate?.IndexOf("{+baseurl}", StringComparison.OrdinalIgnoreCase) >= 0 && !PathParameters.ContainsKey("baseurl"))
                         throw new InvalidOperationException($"{nameof(PathParameters)} must contain a value for \"baseurl\" for the url to be built.");
 
-                    var parsedUrlTemplate = new UriTemplate(UrlTemplate);
+                    var parsedUrlTemplate = new UriTemplate(UrlTemplate, caseInsensitiveParameterNames: true);
                     foreach(var urlTemplateParameter in PathParameters)
                     {
                         parsedUrlTemplate.SetParameter(urlTemplateParameter.Key, GetSanitizedValue(urlTemplateParameter.Value));
