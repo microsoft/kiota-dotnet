@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+## [1.2.1] - 2023-07-03
+
+### Fixed
+
+- Fixed a bug that caused the uri parameters not to be applied when the Uri template had a different casing than the parameter name that was used to set it.
 
 ## [1.2.0] - 2023-06-28
 
