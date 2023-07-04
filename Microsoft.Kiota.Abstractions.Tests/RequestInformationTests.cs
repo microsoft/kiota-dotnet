@@ -312,6 +312,22 @@ namespace Microsoft.Kiota.Abstractions.Tests
             serializationWriterMock.Verify(x => x.WriteStringValue(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             serializationWriterMock.Verify(x => x.WriteCollectionOfPrimitiveValues(It.IsAny<string>(), It.IsAny<IEnumerable<string>>()), Times.Once);
         }
+        [Fact]
+        public void GetUriResolvesParametersCaseInsensitive()
+        {
+            // Arrange
+            var testRequest = new RequestInformation()
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/{URITemplate}/ParameterMapping?IsCaseSensitive={IsCaseSensitive}"
+            };
+            // Act
+            testRequest.PathParameters.Add("UriTemplate", "UriTemplate");
+            testRequest.QueryParameters.Add("iscasesensitive", "false");
+
+            // Assert
+            Assert.Equal("http://localhost/UriTemplate/ParameterMapping?IsCaseSensitive=false", testRequest.URI.ToString());
+        }
     }
 
     /// <summary>The messages in a mailbox or folder. Read-only. Nullable.</summary>
