@@ -120,7 +120,8 @@ public class MultipartBody : IParsable
                     using var partWriter = RequestAdapter.SerializationWriterFactory.GetSerializationWriter(part.Value.Item1);
                     partWriter.WriteObjectValue(string.Empty, parsable);
                     using var partContent = partWriter.GetSerializedContent();
-                    partContent.Seek(0, SeekOrigin.Begin);
+                    if(partContent.CanSeek)
+                        partContent.Seek(0, SeekOrigin.Begin);
                     using var ms = new MemoryStream();
                     partContent.CopyTo(ms);
                     writer.WriteByteArrayValue(string.Empty, ms.ToArray());
@@ -131,7 +132,8 @@ public class MultipartBody : IParsable
                 }
                 else if(part.Value.Item2 is Stream currentStream)
                 {
-                    currentStream.Seek(0, SeekOrigin.Begin);
+                    if(currentStream.CanSeek)
+                        currentStream.Seek(0, SeekOrigin.Begin);
                     using var ms = new MemoryStream();
                     currentStream.CopyTo(ms);
                     writer.WriteByteArrayValue(string.Empty, ms.ToArray());
