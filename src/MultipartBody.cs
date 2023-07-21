@@ -16,7 +16,7 @@ namespace Microsoft.Kiota.Abstractions;
 /// </summary>
 public class MultipartBody : IParsable
 {
-    private Lazy<string> _boundary = new Lazy<string>(() => Guid.NewGuid().ToString("N"));
+    private readonly Lazy<string> _boundary = new Lazy<string>(() => Guid.NewGuid().ToString("N"));
     /// <summary>
     /// The boundary to use for the multipart body.
     /// </summary>
