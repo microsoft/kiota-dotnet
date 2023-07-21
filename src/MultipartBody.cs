@@ -14,7 +14,7 @@ namespace Microsoft.Kiota.Abstractions;
 /// <summary>
 /// Represents a multipart body for a request or a response.
 /// </summary>
-public class MultiPartBody : IParsable
+public class MultipartBody : IParsable
 {
     //TODO: adds to the content type header e.g. Content-Type: multipart/form-data; boundary=MyPartBoundary198374
     private Lazy<string> _boundary = new Lazy<string>(() => Guid.NewGuid().ToString("N"));
@@ -23,9 +23,14 @@ public class MultiPartBody : IParsable
     /// </summary>
     public string Boundary => _boundary.Value;
     /// <summary>
-    /// Request adapter to use to locate serialization factories.
+    /// Creates a new instance of <see cref="MultipartBody"/> with the specified request adapter.
     /// </summary>
-    public IRequestAdapter? RequestAdapter { get; set; }
+    /// <param name="requestAdapter">The request adapter to use.</param>
+    public MultipartBody(IRequestAdapter requestAdapter)
+    {
+        RequestAdapter = requestAdapter ?? throw new ArgumentNullException(nameof(requestAdapter));
+    }
+    private readonly IRequestAdapter RequestAdapter;
     /// <summary>
     /// Adds or replaces a part to the multipart body.
     /// </summary>
@@ -94,10 +99,6 @@ public class MultiPartBody : IParsable
         {
             throw new ArgumentNullException(nameof(writer));
         }
-        if (RequestAdapter == null)
-        {
-            throw new InvalidOperationException(nameof(RequestAdapter));
-        }
         if (RequestAdapter.SerializationWriterFactory == null)
         {
             throw new InvalidOperationException(nameof(RequestAdapter.SerializationWriterFactory));
@@ -106,12 +107,18 @@ public class MultiPartBody : IParsable
         {
             throw new InvalidOperationException("No parts to serialize");
         }
+        var first = true;
         foreach (var part in _parts)
         {
             try {
+                if (first)
+                    first = false;
+                else
+                    writer.WriteStringValue(string.Empty, string.Empty);
+
                 writer.WriteStringValue(string.Empty, $"--{Boundary}");
-                writer.WriteStringValue(string.Empty, $"Content-Type: {part.Value.Item1}");
-                writer.WriteStringValue(string.Empty, $"Content-Disposition: form-data; name=\"{part.Key}\"");
+                writer.WriteStringValue("Content-Type", $"{part.Value.Item1}");
+                writer.WriteStringValue("Content-Disposition", $"form-data; name=\"{part.Key}\"");
                 writer.WriteStringValue(string.Empty, string.Empty);
                 if (part.Value.Item2 is IParsable parsable)
                 {
@@ -138,6 +145,7 @@ public class MultiPartBody : IParsable
                 writer.WriteByteArrayValue(part.Key, currentBinary);
             }
         }
-        writer.WriteStringValue(string.Empty, $"--{Boundary}");
+        writer.WriteStringValue(string.Empty, string.Empty);
+        writer.WriteStringValue(string.Empty, $"--{Boundary}--");
     }
 }
