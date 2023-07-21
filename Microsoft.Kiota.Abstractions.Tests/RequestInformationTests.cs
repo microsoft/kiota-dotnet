@@ -347,7 +347,10 @@ namespace Microsoft.Kiota.Abstractions.Tests
             serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(serializationWriterMock.Object);
             requestAdapterMock.SetupGet(x => x.SerializationWriterFactory).Returns(serializationWriterFactoryMock.Object);
             // Given
-            var multipartBody = new MultipartBody(requestAdapterMock.Object);
+            var multipartBody = new MultipartBody
+            {
+                RequestAdapter = requestAdapterMock.Object
+            };
 
             // When
             testRequest.SetContentFromParsable(requestAdapterMock.Object, "multipart/form-data", multipartBody);

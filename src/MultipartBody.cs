@@ -22,14 +22,9 @@ public class MultipartBody : IParsable
     /// </summary>
     public string Boundary => _boundary.Value;
     /// <summary>
-    /// Creates a new instance of <see cref="MultipartBody"/> with the specified request adapter.
+    /// The request adapter to use for serialization.
     /// </summary>
-    /// <param name="requestAdapter">The request adapter to use.</param>
-    public MultipartBody(IRequestAdapter requestAdapter)
-    {
-        RequestAdapter = requestAdapter ?? throw new ArgumentNullException(nameof(requestAdapter));
-    }
-    private readonly IRequestAdapter RequestAdapter;
+    public IRequestAdapter? RequestAdapter { get; set; }
     /// <summary>
     /// Adds or replaces a part to the multipart body.
     /// </summary>
@@ -98,7 +93,7 @@ public class MultipartBody : IParsable
         {
             throw new ArgumentNullException(nameof(writer));
         }
-        if(RequestAdapter.SerializationWriterFactory == null)
+        if(RequestAdapter?.SerializationWriterFactory == null)
         {
             throw new InvalidOperationException(nameof(RequestAdapter.SerializationWriterFactory));
         }
