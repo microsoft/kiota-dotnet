@@ -16,7 +16,6 @@ namespace Microsoft.Kiota.Abstractions;
 /// </summary>
 public class MultipartBody : IParsable
 {
-    //TODO: adds to the content type header e.g. Content-Type: multipart/form-data; boundary=MyPartBoundary198374
     private Lazy<string> _boundary = new Lazy<string>(() => Guid.NewGuid().ToString("N"));
     /// <summary>
     /// The boundary to use for the multipart body.
@@ -40,20 +39,20 @@ public class MultipartBody : IParsable
     /// <param name="partValue">The value of the part.</param>
     public void AddOrReplacePart<T>(string partName, string contentType, T partValue)
     {
-        if (string.IsNullOrEmpty(partName))
+        if(string.IsNullOrEmpty(partName))
         {
             throw new ArgumentNullException(nameof(partName));
         }
-        if (string.IsNullOrEmpty(contentType))
+        if(string.IsNullOrEmpty(contentType))
         {
             throw new ArgumentNullException(nameof(contentType));
         }
-        if (partValue == null)
+        if(partValue == null)
         {
             throw new ArgumentNullException(nameof(partValue));
         }
         var value = new Tuple<string, object>(contentType, partValue);
-        if (!_parts.TryAdd(partName, value))
+        if(!_parts.TryAdd(partName, value))
         {
             _parts[partName] = value;
         }
@@ -66,11 +65,11 @@ public class MultipartBody : IParsable
     /// <returns>The value of the part.</returns>
     public T? GetPartValue<T>(string partName)
     {
-        if (string.IsNullOrEmpty(partName))
+        if(string.IsNullOrEmpty(partName))
         {
             throw new ArgumentNullException(nameof(partName));
         }
-        if (_parts.TryGetValue(partName, out var value))
+        if(_parts.TryGetValue(partName, out var value))
         {
             return (T)value.Item2;
         }
@@ -83,7 +82,7 @@ public class MultipartBody : IParsable
     /// <returns>True if the part was removed, false otherwise.</returns>   
     public bool RemovePart(string partName)
     {
-        if (string.IsNullOrEmpty(partName))
+        if(string.IsNullOrEmpty(partName))
         {
             throw new ArgumentNullException(nameof(partName));
         }
@@ -95,23 +94,24 @@ public class MultipartBody : IParsable
     /// <inheritdoc />
     public void Serialize(ISerializationWriter writer)
     {
-        if (writer == null)
+        if(writer == null)
         {
             throw new ArgumentNullException(nameof(writer));
         }
-        if (RequestAdapter.SerializationWriterFactory == null)
+        if(RequestAdapter.SerializationWriterFactory == null)
         {
             throw new InvalidOperationException(nameof(RequestAdapter.SerializationWriterFactory));
         }
-        if (!_parts.Any())
+        if(!_parts.Any())
         {
             throw new InvalidOperationException("No parts to serialize");
         }
         var first = true;
-        foreach (var part in _parts)
+        foreach(var part in _parts)
         {
-            try {
-                if (first)
+            try
+            {
+                if(first)
                     first = false;
                 else
                     writer.WriteStringValue(string.Empty, string.Empty);
@@ -120,7 +120,7 @@ public class MultipartBody : IParsable
                 writer.WriteStringValue("Content-Type", $"{part.Value.Item1}");
                 writer.WriteStringValue("Content-Disposition", $"form-data; name=\"{part.Key}\"");
                 writer.WriteStringValue(string.Empty, string.Empty);
-                if (part.Value.Item2 is IParsable parsable)
+                if(part.Value.Item2 is IParsable parsable)
                 {
                     using var partWriter = RequestAdapter.SerializationWriterFactory.GetSerializationWriter(part.Value.Item1);
                     partWriter.WriteObjectValue(string.Empty, parsable);
@@ -129,19 +129,29 @@ public class MultipartBody : IParsable
                     using var ms = new MemoryStream();
                     partContent.CopyTo(ms);
                     writer.WriteByteArrayValue(string.Empty, ms.ToArray());
-                } else if (part.Value.Item2 is string currentString) {
+                }
+                else if(part.Value.Item2 is string currentString)
+                {
                     writer.WriteStringValue(string.Empty, currentString);
-                } else if (part.Value.Item2 is Stream currentStream) {
+                }
+                else if(part.Value.Item2 is Stream currentStream)
+                {
                     currentStream.Seek(0, SeekOrigin.Begin);
                     using var ms = new MemoryStream();
                     currentStream.CopyTo(ms);
                     writer.WriteByteArrayValue(string.Empty, ms.ToArray());
-                } else if (part.Value.Item2 is byte[] currentBinary) {
+                }
+                else if(part.Value.Item2 is byte[] currentBinary)
+                {
                     writer.WriteByteArrayValue(string.Empty, currentBinary);
-                } else {
+                }
+                else
+                {
                     throw new InvalidOperationException($"Unsupported type {part.Value.Item2.GetType().Name} for part {part.Key}");
                 }
-            } catch (InvalidOperationException) when (part.Value.Item2 is byte[] currentBinary) { // binary payload
+            }
+            catch(InvalidOperationException) when(part.Value.Item2 is byte[] currentBinary)
+            { // binary payload
                 writer.WriteByteArrayValue(part.Key, currentBinary);
             }
         }

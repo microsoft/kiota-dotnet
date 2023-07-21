@@ -25,7 +25,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             // Assert
             Assert.Equal("http://localhost/baz/me?foo=bar", testRequest.URI.ToString());
             Assert.NotEmpty(testRequest.QueryParameters);
-            Assert.Equal("foo",testRequest.QueryParameters.First().Key);
+            Assert.Equal("foo", testRequest.QueryParameters.First().Key);
             Assert.Equal("bar", testRequest.QueryParameters.First().Value.ToString());
         }
         [Fact]
@@ -40,7 +40,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             var testRequestOption = new Mock<IRequestOption>().Object;
             Assert.Empty(testRequest.RequestOptions);
             // Act
-            testRequest.AddRequestOptions(new IRequestOption[] {testRequestOption});
+            testRequest.AddRequestOptions(new IRequestOption[] { testRequestOption });
             // Assert
             Assert.NotEmpty(testRequest.RequestOptions);
             Assert.Equal(testRequestOption, testRequest.RequestOptions.First());
@@ -68,7 +68,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             // Assert
             Assert.True(requestInfo.QueryParameters.ContainsKey("%24select"));
             Assert.False(requestInfo.QueryParameters.ContainsKey("select"));
-            Assert.Equal("%24select",requestInfo.QueryParameters.First().Key);
+            Assert.Equal("%24select", requestInfo.QueryParameters.First().Key);
         }
         [Fact]
         public void DoesNotSetEmptyStringQueryParameters()
@@ -180,7 +180,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             };
 
             // Act
-            requestInfo.PathParameters = new Dictionary<string, object>() 
+            requestInfo.PathParameters = new Dictionary<string, object>()
             {
                 { "baseurl","http://localhost" }
             };
@@ -237,7 +237,8 @@ namespace Microsoft.Kiota.Abstractions.Tests
             Assert.NotNull(requestInfo.GetRequestOption<ResponseHandlerOption>());
         }
         [Fact]
-        public void SetsObjectContent() {
+        public void SetsObjectContent()
+        {
             var requestAdapterMock = new Mock<IRequestAdapter>();
             var serializationWriterMock = new Mock<ISerializationWriter>();
             var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
@@ -256,7 +257,8 @@ namespace Microsoft.Kiota.Abstractions.Tests
             serializationWriterMock.Verify(x => x.WriteCollectionOfObjectValues(It.IsAny<string>(), It.IsAny<IEnumerable<IParsable>>()), Times.Never);
         }
         [Fact]
-        public void SetsObjectCollectionContentSingleElement() {
+        public void SetsObjectCollectionContentSingleElement()
+        {
             var requestAdapterMock = new Mock<IRequestAdapter>();
             var serializationWriterMock = new Mock<ISerializationWriter>();
             var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
@@ -268,14 +270,15 @@ namespace Microsoft.Kiota.Abstractions.Tests
                 UrlTemplate = "{+baseurl}/users{?%24count}"
             };
 
-            requestInfo.SetContentFromParsable(requestAdapterMock.Object, "application/json", new [] {new TestEntity()});
+            requestInfo.SetContentFromParsable(requestAdapterMock.Object, "application/json", new[] { new TestEntity() });
 
             // Assert we now have an option
             serializationWriterMock.Verify(x => x.WriteObjectValue(It.IsAny<string>(), It.IsAny<IParsable>()), Times.Never);
             serializationWriterMock.Verify(x => x.WriteCollectionOfObjectValues(It.IsAny<string>(), It.IsAny<IEnumerable<IParsable>>()), Times.Once);
         }
         [Fact]
-        public void SetsScalarContent() {
+        public void SetsScalarContent()
+        {
             var requestAdapterMock = new Mock<IRequestAdapter>();
             var serializationWriterMock = new Mock<ISerializationWriter>();
             var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
@@ -294,7 +297,8 @@ namespace Microsoft.Kiota.Abstractions.Tests
             serializationWriterMock.Verify(x => x.WriteCollectionOfPrimitiveValues(It.IsAny<string>(), It.IsAny<IEnumerable<string>>()), Times.Never);
         }
         [Fact]
-        public void SetsScalarCollectionContent() {
+        public void SetsScalarCollectionContent()
+        {
             var requestAdapterMock = new Mock<IRequestAdapter>();
             var serializationWriterMock = new Mock<ISerializationWriter>();
             var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
@@ -306,7 +310,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
                 UrlTemplate = "{+baseurl}/users{?%24count}"
             };
 
-            requestInfo.SetContentFromScalarCollection(requestAdapterMock.Object, "application/json", new[] {"foo"});
+            requestInfo.SetContentFromScalarCollection(requestAdapterMock.Object, "application/json", new[] { "foo" });
 
             // Assert we now have an option
             serializationWriterMock.Verify(x => x.WriteStringValue(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
@@ -327,6 +331,32 @@ namespace Microsoft.Kiota.Abstractions.Tests
 
             // Assert
             Assert.Equal("http://localhost/UriTemplate/ParameterMapping?IsCaseSensitive=false", testRequest.URI.ToString());
+        }
+        [Fact]
+        public void SetsBoundaryOnMultipartBody()
+        {
+            // Arrange
+            var testRequest = new RequestInformation()
+            {
+                HttpMethod = Method.POST,
+                UrlTemplate = "http://localhost/{URITemplate}/ParameterMapping?IsCaseSensitive={IsCaseSensitive}"
+            };
+            var requestAdapterMock = new Mock<IRequestAdapter>();
+            var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
+            var serializationWriterMock = new Mock<ISerializationWriter>();
+            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(serializationWriterMock.Object);
+            requestAdapterMock.SetupGet(x => x.SerializationWriterFactory).Returns(serializationWriterFactoryMock.Object);
+            // Given
+            var multipartBody = new MultipartBody(requestAdapterMock.Object);
+
+            // When
+            testRequest.SetContentFromParsable(requestAdapterMock.Object, "multipart/form-data", multipartBody);
+
+            // Then
+            Assert.NotNull(multipartBody.Boundary);
+            Assert.True(testRequest.Headers.TryGetValue("Content-Type", out var contentType));
+            Assert.Single(contentType);
+            Assert.Equal("multipart/form-data; boundary=" + multipartBody.Boundary, contentType.First());
         }
     }
 
