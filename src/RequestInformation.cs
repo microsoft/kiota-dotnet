@@ -225,12 +225,12 @@ namespace Microsoft.Kiota.Abstractions
             using var activity = _activitySource?.StartActivity(nameof(SetContentFromParsable));
             using var writer = GetSerializationWriter(requestAdapter, contentType, item);
             SetRequestType(item, activity);
-            writer.WriteObjectValue(null, item);
             if(item is MultipartBody mpBody)
             {
                 contentType += "; boundary=" + mpBody.Boundary;
                 mpBody.RequestAdapter = requestAdapter;
             }
+            writer.WriteObjectValue(null, item);
             Headers.Add(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
         }
