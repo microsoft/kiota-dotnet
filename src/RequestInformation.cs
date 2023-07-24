@@ -227,7 +227,10 @@ namespace Microsoft.Kiota.Abstractions
             SetRequestType(item, activity);
             writer.WriteObjectValue(null, item);
             if(item is MultipartBody mpBody)
+            {
                 contentType += "; boundary=" + mpBody.Boundary;
+                mpBody.RequestAdapter = requestAdapter;
+            }
             Headers.Add(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
         }
