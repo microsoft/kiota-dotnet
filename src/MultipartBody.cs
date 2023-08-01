@@ -109,12 +109,12 @@ public class MultipartBody : IParsable
                 if(first)
                     first = false;
                 else
-                    writer.WriteStringValue(string.Empty, string.Empty);
+                    AddNewLine(writer);
 
                 writer.WriteStringValue(string.Empty, $"--{Boundary}");
                 writer.WriteStringValue("Content-Type", $"{part.Value.Item1}");
                 writer.WriteStringValue("Content-Disposition", $"form-data; name=\"{part.Key}\"");
-                writer.WriteStringValue(string.Empty, string.Empty);
+                AddNewLine(writer);
                 if(part.Value.Item2 is IParsable parsable)
                 {
                     using var partWriter = RequestAdapter.SerializationWriterFactory.GetSerializationWriter(part.Value.Item1);
@@ -129,6 +129,10 @@ public class MultipartBody : IParsable
                 else if(part.Value.Item2 is string currentString)
                 {
                     writer.WriteStringValue(string.Empty, currentString);
+                }
+                else if(part.Value.Item2 is MemoryStream originalMemoryStream)
+                {
+                    writer.WriteByteArrayValue(string.Empty, originalMemoryStream.ToArray());
                 }
                 else if(part.Value.Item2 is Stream currentStream)
                 {
@@ -152,7 +156,11 @@ public class MultipartBody : IParsable
                 writer.WriteByteArrayValue(part.Key, currentBinary);
             }
         }
-        writer.WriteStringValue(string.Empty, string.Empty);
+        AddNewLine(writer);
         writer.WriteStringValue(string.Empty, $"--{Boundary}--");
+    }
+    private void AddNewLine(ISerializationWriter writer)
+    {
+        writer.WriteStringValue(string.Empty, string.Empty);
     }
 }
