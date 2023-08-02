@@ -409,7 +409,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             Assert.True(changedNestedValues.ContainsKey("id"));
             Assert.True(changedNestedValues.ContainsKey("businessPhones"));
             var businessPhones = ((Tuple<ICollection, int>)changedNestedValues["businessPhones"]).Item1;
-            Assert.Equal(1, businessPhones.Count);
+            Assert.Single(businessPhones);
         }
     }
 }

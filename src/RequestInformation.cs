@@ -24,19 +24,23 @@ namespace Microsoft.Kiota.Abstractions
         /// <summary>
         ///  The URI of the request.
         /// </summary>
-        public Uri URI {
-            set {
+        public Uri URI
+        {
+            set
+            {
                 if(value == null)
                     throw new ArgumentNullException(nameof(value));
                 QueryParameters.Clear();
                 PathParameters.Clear();
                 _rawUri = value;
             }
-            get {
+            get
+            {
                 if(_rawUri != null)
                     return _rawUri;
                 else if(PathParameters.TryGetValue(RawUrlKey, out var rawUrl) &&
-                    rawUrl is string rawUrlString) {
+                    rawUrl is string rawUrlString)
+                {
                     URI = new Uri(rawUrlString);
                     return _rawUri!;
                 }
@@ -109,7 +113,7 @@ namespace Microsoft.Kiota.Abstractions
                                                 Value: x.GetValue(source)
                                             )
                                         )
-                                        .Where(x =>  x.Value != null &&
+                                        .Where(x => x.Value != null &&
                                                     !QueryParameters.ContainsKey(x.Name!) &&
                                                     !string.IsNullOrEmpty(x.Value.ToString()) && // no need to add an empty string value
                                                     (x.Value is not ICollection collection || collection.Count > 0))) // no need to add empty collection
@@ -120,11 +124,12 @@ namespace Microsoft.Kiota.Abstractions
         /// <summary>
         /// The Request Headers.
         /// </summary>
-        public RequestHeaders Headers { get; private set; } = new ();
+        public RequestHeaders Headers { get; private set; } = new();
         /// <summary>
         /// Vanity method to add the headers to the request headers dictionary.
         /// </summary>
-        public void AddHeaders(RequestHeaders headers) {
+        public void AddHeaders(RequestHeaders headers)
+        {
             if(headers == null) return;
             Headers.AddAll(headers);
         }
@@ -220,14 +225,19 @@ namespace Microsoft.Kiota.Abstractions
             using var activity = _activitySource?.StartActivity(nameof(SetContentFromParsable));
             using var writer = GetSerializationWriter(requestAdapter, contentType, item);
             SetRequestType(item, activity);
+            if(item is MultipartBody mpBody)
+            {
+                contentType += "; boundary=" + mpBody.Boundary;
+                mpBody.RequestAdapter = requestAdapter;
+            }
             writer.WriteObjectValue(null, item);
             Headers.Add(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
         }
         private static void SetRequestType(object? result, Activity? activity)
         {
-            if (activity == null) return;
-            if (result == null) return;
+            if(activity == null) return;
+            if(result == null) return;
             activity.SetTag("com.microsoft.kiota.request.type", result.GetType().FullName);
         }
         private static ISerializationWriter GetSerializationWriter<T>(IRequestAdapter requestAdapter, string contentType, T item)
