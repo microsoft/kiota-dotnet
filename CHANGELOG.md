@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2023-08-08
+
+### Fixed
+
+- Fixed a bug where excess duplicate subscriptions would be created on the same property in the backing store causing performance issues in some scenarios. Related to https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/1994
+
 ## [1.3.0] - 2023-08-01
 
 ### Added
