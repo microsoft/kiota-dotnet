@@ -74,7 +74,7 @@ namespace Microsoft.Kiota.Abstractions.Store
                 {
                     backedModel.BackingStore.InitializationCompleted = false;// All its properties are dirty as the model has been touched.
                     Set(key, value);
-                });
+                },key); // use property name(key) as subscriptionId to prevent excess subscription creation in the event this is called again
             }
             // if its an IBackedModel collection property to the store, subscribe to item properties' BackingStores and use the events to flag the collection property is "dirty"
             if(value is ICollection collectionValues)
@@ -86,7 +86,7 @@ namespace Microsoft.Kiota.Abstractions.Store
                     model.BackingStore.Subscribe((keyString, oldObject, newObject) =>
                     {
                         Set(key, value);
-                    });
+                    },key);// use property name(key) as subscriptionId to prevent excess subscription creation in the event this is called again
                 });
             }
 
