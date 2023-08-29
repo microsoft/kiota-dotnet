@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest # Temporary switch to windows till https://github.com/microsoft/vstest/issues/4549 is released in dotnet version after 7.0.400
     env:
       solutionName: Microsoft.Kiota.Abstractions.sln
     steps:
