@@ -8,9 +8,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using stduritemplate;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
-using Tavis.UriTemplates;
 
 namespace Microsoft.Kiota.Abstractions
 {
@@ -49,20 +49,21 @@ namespace Microsoft.Kiota.Abstractions
                     if(UrlTemplate?.IndexOf("{+baseurl}", StringComparison.OrdinalIgnoreCase) >= 0 && !PathParameters.ContainsKey("baseurl"))
                         throw new InvalidOperationException($"{nameof(PathParameters)} must contain a value for \"baseurl\" for the url to be built.");
 
-                    var parsedUrlTemplate = new UriTemplate(UrlTemplate, caseInsensitiveParameterNames: true);
+                    var substitutions = new Dictionary<string, object>();
                     foreach(var urlTemplateParameter in PathParameters)
                     {
-                        parsedUrlTemplate.SetParameter(urlTemplateParameter.Key, GetSanitizedValue(urlTemplateParameter.Value));
+                        substitutions.Add(urlTemplateParameter.Key, GetSanitizedValue(urlTemplateParameter.Value));
                     }
 
                     foreach(var queryStringParameter in QueryParameters)
                     {
                         if(queryStringParameter.Value != null)
                         {
-                            parsedUrlTemplate.SetParameter(queryStringParameter.Key, GetSanitizedValue(queryStringParameter.Value));
+                            substitutions.Add(queryStringParameter.Key, GetSanitizedValue(queryStringParameter.Value));
                         }
                     }
-                    return new Uri(parsedUrlTemplate.Resolve());
+
+                    return new Uri(StdUriTemplate.Expand(UrlTemplate, substitutions));
                 }
             }
         }
