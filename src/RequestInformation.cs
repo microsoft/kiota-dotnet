@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using stduritemplate;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
 
@@ -63,7 +62,7 @@ namespace Microsoft.Kiota.Abstractions
                         }
                     }
 
-                    return new Uri(StdUriTemplate.Expand(UrlTemplate, substitutions));
+                    return new Uri(Std.UriTemplate.Expand(UrlTemplate, substitutions));
                 }
             }
         }
