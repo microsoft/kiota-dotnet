@@ -317,7 +317,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             serializationWriterMock.Verify(x => x.WriteCollectionOfPrimitiveValues(It.IsAny<string>(), It.IsAny<IEnumerable<string>>()), Times.Once);
         }
         [Fact]
-        public void GetUriResolvesParametersCaseInsensitive()
+        public void GetUriResolvesParametersCaseSensitive()
         {
             // Arrange
             var testRequest = new RequestInformation()
@@ -326,8 +326,8 @@ namespace Microsoft.Kiota.Abstractions.Tests
                 UrlTemplate = "http://localhost/{URITemplate}/ParameterMapping?IsCaseSensitive={IsCaseSensitive}"
             };
             // Act
-            testRequest.PathParameters.Add("UriTemplate", "UriTemplate");
-            testRequest.QueryParameters.Add("iscasesensitive", "false");
+            testRequest.PathParameters.Add("URITemplate", "UriTemplate");
+            testRequest.QueryParameters.Add("IsCaseSensitive", false);
 
             // Assert
             Assert.Equal("http://localhost/UriTemplate/ParameterMapping?IsCaseSensitive=false", testRequest.URI.ToString());
