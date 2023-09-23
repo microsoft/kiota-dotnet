@@ -77,6 +77,7 @@ namespace Microsoft.Kiota.Abstractions
             bool boolean => boolean.ToString().ToLower(),// pass in a lowercase string as the final url will be uppercase due to the way ToString() works for booleans
             DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("o"),// Default to ISO 8601 for datetimeoffsets in the url.
             DateTime dateTime => dateTime.ToString("o"),// Default to ISO 8601 for datetimes in the url.
+            Guid guid => guid.ToString("D"),// Default of 32 digits separated by hyphens
             _ => value,//return object as is as the ToString method is good enough.
         };
 
