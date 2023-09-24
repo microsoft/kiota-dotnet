@@ -111,6 +111,26 @@ namespace Microsoft.Kiota.Abstractions.Tests
             Assert.False(requestInfo.QueryParameters.ContainsKey("select"));
         }
         [Fact]
+        public void DoesNotSetQueryParametersToLowerCaseFirstCharacter()
+        {
+            // Arrange as the request builders would
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?%TenantId}"
+            };
+            Action<GetQueryParameters> q = x => x.TenantId = "Tenant1";
+            var qParams = new GetQueryParameters();
+            q.Invoke(qParams);
+
+            // Act 
+            requestInfo.AddQueryParameters(qParams);
+
+            // Assert
+            Assert.Contains("TenantId", requestInfo.QueryParameters.Keys);
+            Assert.DoesNotContain("tenantId", requestInfo.QueryParameters.Keys);
+        }
+        [Fact]
         public void SetsPathParametersOfDateTimeOffsetType()
         {
             // Arrange as the request builders would
@@ -406,5 +426,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
         /// <summary>Search items by search phrases</summary>
         [QueryParameter("%24search")]
         public string Search { get; set; }
+        /// <summary>Restrict to TenantId</summary>
+        public string TenantId { get; set; }
     }
 }

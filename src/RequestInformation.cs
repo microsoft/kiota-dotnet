@@ -110,7 +110,7 @@ namespace Microsoft.Kiota.Abstractions
                                             x => (
                                                 Name: x.GetCustomAttributes(false)
                                                     .OfType<QueryParameterAttribute>()
-                                                    .FirstOrDefault()?.TemplateName ?? x.Name.ToFirstCharacterLowerCase(),
+                                                    .FirstOrDefault()?.TemplateName ?? x.Name,
                                                 Value: x.GetValue(source)
                                             )
                                         )
