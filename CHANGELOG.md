@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.3] - 2023-09-25
+
 ### Changed
 
 - Removed the code that changed the first character of the query parameter name to lower case
+- Added sanitization of guid values in query parameters
 
 ## [1.3.2] - 2023-09-21
 
