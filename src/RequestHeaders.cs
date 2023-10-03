@@ -40,6 +40,7 @@ public class RequestHeaders : IDictionary<string, IEnumerable<string>>
     /// </summary>
     /// <param name="headerName">The name of the header to add values to.</param>
     /// <param name="headerValue">The values to add to the header.</param>
+    /// <returns>If the headerValue have been added to the Dictionary.</returns>
     public bool TryAdd(string headerName, string headerValue)
     {
         if(string.IsNullOrEmpty(headerName))
