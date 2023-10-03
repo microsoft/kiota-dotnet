@@ -4,9 +4,11 @@ using Xunit;
 
 namespace Microsoft.Kiota.Abstractions.Tests;
 
-public class RequestHeadersTests {
+public class RequestHeadersTests
+{
     [Fact]
-    public void Defensive() {
+    public void Defensive()
+    {
         var instance = new RequestHeaders();
         Assert.Throws<ArgumentNullException>(() => instance.Add(null, "value"));
         Assert.Throws<ArgumentNullException>(() => instance.Add("name", (string[])null));
@@ -21,38 +23,66 @@ public class RequestHeadersTests {
         instance.ContainsKey(null);
     }
     [Fact]
-    public void AddsToNonExistent() {
+    public void AddsToNonExistent()
+    {
         var instance = new RequestHeaders();
         instance.Add("name", "value");
-        Assert.Equal(new [] { "value" }, instance["name"]);
+        Assert.Equal(new[] { "value" }, instance["name"]);
     }
     [Fact]
-    public void AddsToExistent() {
+    public void TryAddsToNonExistent()
+    {
+        var instance = new RequestHeaders();
+        instance.TryAdd("name", "value");
+        Assert.Equal(new[] { "value" }, instance["name"]);
+    }
+    [Fact]
+    public void AddsToExistent()
+    {
         var instance = new RequestHeaders();
         instance.Add("name", "value");
         instance.Add("name", "value2");
-        Assert.Equal(new [] { "value", "value2" }, instance["name"]);
+        Assert.Equal(new[] { "value", "value2" }, instance["name"]);
     }
     [Fact]
-    public void AddsSingleValueHeaderToExistent() {
+    public void TryAddsToExistent()
+    {
+        var instance = new RequestHeaders();
+        instance.TryAdd("name", "value");
+        instance.TryAdd("name", "value2");
+        Assert.Equal(new[] { "value" }, instance["name"]);
+    }
+    [Fact]
+    public void AddsSingleValueHeaderToExistent()
+    {
         var instance = new RequestHeaders();
         instance.Add("Content-Type", "value");
         instance.Add("Content-Type", "value2");
         Assert.Equal(new[] { "value2" }, instance["Content-Type"]);
     }
     [Fact]
-    public void RemovesValue() {
+    public void TryAddsSingleValueHeaderToExistent()
+    {
+        var instance = new RequestHeaders();
+        instance.TryAdd("Content-Type", "value");
+        instance.TryAdd("Content-Type", "value2");
+        Assert.Equal(new[] { "value" }, instance["Content-Type"]);
+    }
+    [Fact]
+    public void RemovesValue()
+    {
         var instance = new RequestHeaders();
         instance.Remove("name", "value");
         instance.Add("name", "value");
         instance.Add("name", "value2");
         instance.Remove("name", "value");
-        Assert.Equal(new [] { "value2" }, instance["name"]);
+        Assert.Equal(new[] { "value2" }, instance["name"]);
         instance.Remove("name", "value2");
         Assert.Throws<KeyNotFoundException>(() => instance["name"]);
     }
     [Fact]
-    public void Removes() {
+    public void Removes()
+    {
         var instance = new RequestHeaders();
         instance.Add("name", "value");
         instance.Add("name", "value2");
@@ -61,16 +91,18 @@ public class RequestHeadersTests {
         Assert.False(instance.Remove("name"));
     }
     [Fact]
-    public void RemovesKVP() {
+    public void RemovesKVP()
+    {
         var instance = new RequestHeaders();
         instance.Add("name", "value");
         instance.Add("name", "value2");
-        Assert.True(instance.Remove(new KeyValuePair<string, IEnumerable<string>>("name", new [] { "value", "value2" })));
+        Assert.True(instance.Remove(new KeyValuePair<string, IEnumerable<string>>("name", new[] { "value", "value2" })));
         Assert.Throws<KeyNotFoundException>(() => instance["name"]);
         Assert.False(instance.Remove("name"));
     }
     [Fact]
-    public void Clears() {
+    public void Clears()
+    {
         var instance = new RequestHeaders();
         instance.Add("name", "value");
         instance.Add("name", "value2");
@@ -79,18 +111,20 @@ public class RequestHeadersTests {
         Assert.Empty(instance.Keys);
     }
     [Fact]
-    public void GetsEnumerator() {
+    public void GetsEnumerator()
+    {
         var instance = new RequestHeaders();
         instance.Add("name", "value");
         instance.Add("name", "value2");
         using var enumerator = instance.GetEnumerator();
         Assert.True(enumerator.MoveNext());
         Assert.Equal("name", enumerator.Current.Key);
-        Assert.Equal(new [] { "value", "value2" }, enumerator.Current.Value);
+        Assert.Equal(new[] { "value", "value2" }, enumerator.Current.Value);
         Assert.False(enumerator.MoveNext());
     }
     [Fact]
-    public void Updates() {
+    public void Updates()
+    {
         var instance = new RequestHeaders();
         instance.Add("name", "value");
         instance.Add("name", "value2");
