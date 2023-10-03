@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.4] - 2023-10-04
+
+### Changed
+
+- Added a TryAdd method on the RequestHeaders Dictionary
+
 ## [1.3.3] - 2023-09-25
 
 ### Changed
