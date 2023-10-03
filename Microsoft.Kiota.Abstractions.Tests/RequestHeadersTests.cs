@@ -33,7 +33,8 @@ public class RequestHeadersTests
     public void TryAddsToNonExistent()
     {
         var instance = new RequestHeaders();
-        instance.TryAdd("name", "value");
+        var result = instance.TryAdd("name", "value");
+        Assert.True(result);
         Assert.Equal(new[] { "value" }, instance["name"]);
     }
     [Fact]
@@ -48,8 +49,10 @@ public class RequestHeadersTests
     public void TryAddsToExistent()
     {
         var instance = new RequestHeaders();
-        instance.TryAdd("name", "value");
-        instance.TryAdd("name", "value2");
+        var result = instance.TryAdd("name", "value");
+        Assert.True(result);
+        result = instance.TryAdd("name", "value2");
+        Assert.False(result);
         Assert.Equal(new[] { "value" }, instance["name"]);
     }
     [Fact]

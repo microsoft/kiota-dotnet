@@ -40,14 +40,18 @@ public class RequestHeaders : IDictionary<string, IEnumerable<string>>
     /// </summary>
     /// <param name="headerName">The name of the header to add values to.</param>
     /// <param name="headerValue">The values to add to the header.</param>
-    public void TryAdd(string headerName, string headerValue)
+    public bool TryAdd(string headerName, string headerValue)
     {
         if(string.IsNullOrEmpty(headerName))
             throw new ArgumentNullException(nameof(headerName));
         if(headerValue == null)
             throw new ArgumentNullException(nameof(headerValue));
         if(!_headers.ContainsKey(headerName))
+        {
             _headers.Add(headerName, new HashSet<string> { headerValue });
+            return true;
+        }
+        return false;
     }
     /// <inheritdoc/>
     public ICollection<string> Keys => _headers.Keys;
