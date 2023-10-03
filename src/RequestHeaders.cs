@@ -49,22 +49,6 @@ public class RequestHeaders : IDictionary<string, IEnumerable<string>>
         if(!_headers.ContainsKey(headerName))
             _headers.Add(headerName, new HashSet<string> { headerValue });
     }
-    private void AddImpl(string headerName, bool appendIfPresent, params string[] headerValues)
-    {
-        if(string.IsNullOrEmpty(headerName))
-            throw new ArgumentNullException(nameof(headerName));
-        if(headerValues == null)
-            throw new ArgumentNullException(nameof(headerValues));
-        if(!headerValues.Any())
-            return;
-        if(_singleValueHeaders.Contains(headerName))
-            _headers[headerName] = new HashSet<string> { headerValues[0] };
-        else if(_headers.TryGetValue(headerName, out var values))
-            foreach(var headerValue in headerValues)
-                values.Add(headerValue);
-        else
-            _headers.Add(headerName, new HashSet<string>(headerValues));
-    }
     /// <inheritdoc/>
     public ICollection<string> Keys => _headers.Keys;
     /// <inheritdoc/>
