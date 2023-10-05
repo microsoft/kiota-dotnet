@@ -195,7 +195,7 @@ namespace Microsoft.Kiota.Abstractions
             using var activity = _activitySource?.StartActivity(nameof(SetStreamContent));
             SetRequestType(content, activity);
             Content = content;
-            Headers.Add(ContentTypeHeader, BinaryContentType);
+            Headers.TryAdd(ContentTypeHeader, BinaryContentType);
         }
         private static ActivitySource _activitySource = new(typeof(RequestInformation).Namespace!);
         /// <summary>
@@ -211,7 +211,7 @@ namespace Microsoft.Kiota.Abstractions
             using var writer = GetSerializationWriter(requestAdapter, contentType, items);
             SetRequestType(items.FirstOrDefault(static x => x != null), activity);
             writer.WriteCollectionOfObjectValues(null, items);
-            Headers.Add(ContentTypeHeader, contentType);
+            Headers.TryAdd(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
         }
         /// <summary>
@@ -232,7 +232,7 @@ namespace Microsoft.Kiota.Abstractions
                 mpBody.RequestAdapter = requestAdapter;
             }
             writer.WriteObjectValue(null, item);
-            Headers.Add(ContentTypeHeader, contentType);
+            Headers.TryAdd(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
         }
         private static void SetRequestType(object? result, Activity? activity)
@@ -261,7 +261,7 @@ namespace Microsoft.Kiota.Abstractions
             using var writer = GetSerializationWriter(requestAdapter, contentType, items);
             SetRequestType(items.FirstOrDefault(static x => x != null), activity);
             writer.WriteCollectionOfPrimitiveValues(null, items);
-            Headers.Add(ContentTypeHeader, contentType);
+            Headers.TryAdd(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
         }
         /// <summary>
@@ -323,7 +323,7 @@ namespace Microsoft.Kiota.Abstractions
                 default:
                     throw new InvalidOperationException($"error serialization data value with unknown type {item?.GetType()}");
             }
-            Headers.Add(ContentTypeHeader, contentType);
+            Headers.TryAdd(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
         }
     }
