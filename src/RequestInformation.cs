@@ -190,12 +190,19 @@ namespace Microsoft.Kiota.Abstractions
         /// Sets the request body to a binary stream.
         /// </summary>
         /// <param name="content">The binary stream to set as a body.</param>
-        public void SetStreamContent(Stream content)
+        [Obsolete("Use SetStreamContent and pass the content type instead")]
+        public void SetStreamContent(Stream content) => SetStreamContent(content, BinaryContentType);
+        /// <summary>
+        /// Sets the request body to a binary stream.
+        /// </summary>
+        /// <param name="content">The binary stream to set as a body.</param>
+        /// <param name="contentType">The content type to set.</param>
+        public void SetStreamContent(Stream content, string contentType)
         {
             using var activity = _activitySource?.StartActivity(nameof(SetStreamContent));
             SetRequestType(content, activity);
             Content = content;
-            Headers.TryAdd(ContentTypeHeader, BinaryContentType);
+            Headers.TryAdd(ContentTypeHeader, contentType);
         }
         private static ActivitySource _activitySource = new(typeof(RequestInformation).Namespace!);
         /// <summary>
