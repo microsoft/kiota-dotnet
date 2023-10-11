@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2023-10-12
+
+### Added
+
+- Added a method to set the request body content type in request information on binary payloads.
+
 ## [1.3.5] - 2023-10-05
 
 ### Changed
