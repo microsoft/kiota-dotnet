@@ -33,7 +33,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <NoWarn>$(NoWarn);NU5048</NoWarn>
+    <NoWarn>$(NoWarn);NU5048;NETSDK1138</NoWarn>
     <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
 
