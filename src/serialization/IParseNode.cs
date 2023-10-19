@@ -4,6 +4,9 @@
 
 using System;
 using System.Collections.Generic;
+#if NET5_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
 
 namespace Microsoft.Kiota.Abstractions.Serialization
 {
@@ -97,7 +100,11 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// Gets the collection of enum values of the node.
         /// </summary>
         /// <returns>The collection of enum values.</returns>
+#if NET5_0_OR_GREATER
+        IEnumerable<T?> GetCollectionOfEnumValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]T>() where T : struct, Enum;
+#else
         IEnumerable<T?> GetCollectionOfEnumValues<T>() where T : struct, Enum;
+#endif
         /// <summary>
         /// Gets the collection of model objects values of the node.
         /// </summary>
@@ -108,7 +115,11 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// Gets the enum value of the node.
         /// </summary>
         /// <returns>The enum value of the node.</returns>
+#if NET5_0_OR_GREATER
+        T? GetEnumValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]T>() where T : struct, Enum;
+#else
         T? GetEnumValue<T>() where T : struct, Enum;
+#endif
         /// <summary>
         /// Gets the model object value of the node.
         /// </summary>

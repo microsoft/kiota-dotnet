@@ -5,6 +5,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+#if NET5_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
 
 namespace Microsoft.Kiota.Abstractions.Serialization
 {
@@ -114,7 +117,11 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// </summary>
         /// <param name="key">The key to be used for the written value. May be null.</param>
         /// <param name="values">The enum values to be written.</param>
+#if NET5_0_OR_GREATER
+        void WriteCollectionOfEnumValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]T>(string? key, IEnumerable<T?>? values) where T : struct, Enum;
+#else
         void WriteCollectionOfEnumValues<T>(string? key, IEnumerable<T?>? values) where T : struct, Enum;
+#endif
         /// <summary>
         /// Writes the specified byte array as a base64 string to the stream with an optional given key.
         /// </summary>
@@ -133,7 +140,11 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// </summary>
         /// <param name="key">The key to be used for the written value. May be null.</param>
         /// <param name="value">The enum value to be written.</param>
+#if NET5_0_OR_GREATER
+        void WriteEnumValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T>(string? key, T? value) where T : struct, Enum;
+#else
         void WriteEnumValue<T>(string? key, T? value) where T : struct, Enum;
+#endif
         /// <summary>
         /// Writes a null value for the specified key.
         /// </summary>
