@@ -43,7 +43,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="[6.0,8.0)" />
-    <PackageReference Include="Std.UriTemplate" Version="0.0.44" />
+    <PackageReference Include="Std.UriTemplate" Version="0.0.46" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
