@@ -10,6 +10,9 @@ using System.IO;
 using System.Linq;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
+#if NET5_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
 
 namespace Microsoft.Kiota.Abstractions
 {
@@ -101,10 +104,14 @@ namespace Microsoft.Kiota.Abstractions
         /// Vanity method to add the query parameters to the request query parameters dictionary.
         /// </summary>
         /// <param name="source">The query parameters to add.</param>
-        public void AddQueryParameters(object source)
+#if NET5_0_OR_GREATER
+        public void AddQueryParameters<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(T source)
+#else
+        public void AddQueryParameters<T>(T source)
+#endif
         {
             if(source == null) return;
-            foreach(var property in source.GetType()
+            foreach(var property in typeof(T)
                                         .GetProperties()
                                         .Select(
                                             x => (
