@@ -20,23 +20,23 @@ public class JsonSerializationHelpers
     /// </summary>
     /// <param name="parsableFactory">The factory to create the object.</param>
     /// <param name="serializedRepresentation">The serialized representation of the object.</param>
-    public static T Deserialize<T>(string serializedRepresentation, ParsableFactory<T> parsableFactory) where T : IParsable
+    public static T? Deserialize<T>(string serializedRepresentation, ParsableFactory<T> parsableFactory) where T : IParsable
     => SerializationHelpers.Deserialize(_jsonContentType, serializedRepresentation, parsableFactory);
     /// <summary>
     /// Deserializes the given stream into a object based on the content type.
     /// </summary>
     /// <param name="stream">The stream to deserialize.</param>
     /// <param name="parsableFactory">The factory to create the object.</param>
-    public static T Deserialize<T>(Stream stream, ParsableFactory<T> parsableFactory) where T : IParsable
+    public static T? Deserialize<T>(Stream stream, ParsableFactory<T> parsableFactory) where T : IParsable
     => SerializationHelpers.Deserialize(_jsonContentType, stream, parsableFactory);
     /// <summary>
     /// Deserializes the given stream into a object based on the content type.
     /// </summary>
     /// <param name="stream">The stream to deserialize.</param>
 #if NET5_0_OR_GREATER
-    public static T Deserialize<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(Stream stream) where T : IParsable
+    public static T? Deserialize<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(Stream stream) where T : IParsable
 #else
-    public static T Deserialize<T>(Stream stream) where T : IParsable
+    public static T? Deserialize<T>(Stream stream) where T : IParsable
 #endif
     => SerializationHelpers.Deserialize<T>(_jsonContentType, stream);
     /// <summary>
@@ -44,9 +44,9 @@ public class JsonSerializationHelpers
     /// </summary>
     /// <param name="serializedRepresentation">The serialized representation of the object.</param>
 #if NET5_0_OR_GREATER
-    public static T Deserialize<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string serializedRepresentation) where T : IParsable
+    public static T? Deserialize<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string serializedRepresentation) where T : IParsable
 #else
-    public static T Deserialize<T>(string serializedRepresentation) where T : IParsable
+    public static T? Deserialize<T>(string serializedRepresentation) where T : IParsable
 #endif
     => SerializationHelpers.Deserialize<T>(_jsonContentType, serializedRepresentation);
 }

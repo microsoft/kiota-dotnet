@@ -18,7 +18,6 @@ public class SerializationHelpersTests
         using var stream = new MemoryStream();
         Assert.Throws<ArgumentNullException>(() => SerializationHelpers.Deserialize<TestEntity>(_jsonContentType, stream, null));
         Assert.Throws<ArgumentNullException>(() => SerializationHelpers.Deserialize<TestEntity>(_jsonContentType, "", null));
-        Assert.Throws<InvalidOperationException>(() => SerializationHelpers.Deserialize(_jsonContentType, stream, TestEntity.CreateFromDiscriminatorValue));
     }
     [Fact]
     public void DeserializesObjectWithoutReflection()
