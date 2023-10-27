@@ -53,7 +53,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
             var cleanedContentType = contentTypeVendorCleanupRegex.Replace(vendorSpecificContentType, string.Empty);
             if(ContentTypeAssociatedFactories.ContainsKey(cleanedContentType))
                 return ContentTypeAssociatedFactories[cleanedContentType].GetRootParseNode(cleanedContentType, content);
-            
+
             throw new InvalidOperationException($"Content type {cleanedContentType} does not have a factory registered to be parsed");
         }
     }

@@ -55,16 +55,16 @@ public class AuthenticationTests
     }
 
     [Theory]
-    [InlineData("https://graph.microsoft.com",true)]// PASS
-    [InlineData("https://graph.microsoft.us/v1.0/me",true)]// PASS as we don't look at the path segment
-    [InlineData("https://test.microsoft.com",false)]// Fail
-    [InlineData("https://grAph.MicrosofT.com",true)] // PASS since we don't care about case
-    [InlineData("https://developer.microsoft.com",false)] // Failed
+    [InlineData("https://graph.microsoft.com", true)]// PASS
+    [InlineData("https://graph.microsoft.us/v1.0/me", true)]// PASS as we don't look at the path segment
+    [InlineData("https://test.microsoft.com", false)]// Fail
+    [InlineData("https://grAph.MicrosofT.com", true)] // PASS since we don't care about case
+    [InlineData("https://developer.microsoft.com", false)] // Failed
     public void AllowedHostValidatorValidatesUrls(string urlToTest, bool expectedResult)
     {
         // Test through the constructor
         // Arrange
-        var allowList = new[] { "graph.microsoft.com", "graph.microsoft.us"};
+        var allowList = new[] { "graph.microsoft.com", "graph.microsoft.us" };
         var validator = new AllowedHostsValidator(allowList);
 
         // Act 

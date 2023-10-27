@@ -12,7 +12,7 @@ namespace Microsoft.Kiota.Abstractions;
 public sealed class QueryParameterAttribute : Attribute
 {
     private readonly string templateName;
-    
+
     ///<summary>
     /// Creates a new instance of the attribute
     ///</summary>
@@ -22,7 +22,7 @@ public sealed class QueryParameterAttribute : Attribute
         if(string.IsNullOrEmpty(templateName)) throw new ArgumentNullException(nameof(templateName));
         this.templateName = templateName;
     }
-    
+
     ///<summary>
     /// The name of the parameter in the template.
     ///</summary>

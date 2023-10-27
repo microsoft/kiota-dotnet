@@ -39,11 +39,11 @@ public abstract class BaseRequestBuilder
     /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
     /// <param name="urlTemplate">Url template to use to build the URL for the current request builder</param>
     /// <param name="rawUrl">The raw URL to use for the current request builder</param>
-    protected BaseRequestBuilder(IRequestAdapter requestAdapter, string urlTemplate, string rawUrl):this(requestAdapter, urlTemplate, new Dictionary<string, object>() {
+    protected BaseRequestBuilder(IRequestAdapter requestAdapter, string urlTemplate, string rawUrl) : this(requestAdapter, urlTemplate, new Dictionary<string, object>() {
         { RequestInformation.RawUrlKey, rawUrl }
     })
     {
-        if (string.IsNullOrEmpty(rawUrl))
+        if(string.IsNullOrEmpty(rawUrl))
         {
             throw new ArgumentNullException(nameof(rawUrl));
         }

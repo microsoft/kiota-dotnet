@@ -74,7 +74,7 @@ namespace Microsoft.Kiota.Abstractions.Store
                 {
                     backedModel.BackingStore.InitializationCompleted = false;// All its properties are dirty as the model has been touched.
                     Set(key, value);
-                },key); // use property name(key) as subscriptionId to prevent excess subscription creation in the event this is called again
+                }, key); // use property name(key) as subscriptionId to prevent excess subscription creation in the event this is called again
             }
             // if its an IBackedModel collection property to the store, subscribe to item properties' BackingStores and use the events to flag the collection property is "dirty"
             if(value is ICollection collectionValues)
@@ -86,7 +86,7 @@ namespace Microsoft.Kiota.Abstractions.Store
                     model.BackingStore.Subscribe((keyString, oldObject, newObject) =>
                     {
                         Set(key, value);
-                    },key);// use property name(key) as subscriptionId to prevent excess subscription creation in the event this is called again
+                    }, key);// use property name(key) as subscriptionId to prevent excess subscription creation in the event this is called again
                 });
             }
 
@@ -101,7 +101,7 @@ namespace Microsoft.Kiota.Abstractions.Store
         public IEnumerable<KeyValuePair<string, object?>> Enumerate()
         {
             if(ReturnOnlyChangedValues)// refresh the state of collection properties if they've changed in size.
-                store.ToList().ForEach(x => EnsureCollectionPropertyIsConsistent(x.Key,x.Value.Item2)); 
+                store.ToList().ForEach(x => EnsureCollectionPropertyIsConsistent(x.Key, x.Value.Item2));
 
             return (ReturnOnlyChangedValues ? store.Where(x => x.Value.Item1) : store)
                 .Select(x => new KeyValuePair<string, object?>(x.Key, x.Value.Item2));
@@ -140,7 +140,7 @@ namespace Microsoft.Kiota.Abstractions.Store
                 throw new ArgumentNullException(nameof(subscriptionId));
             if(callback == null)
                 throw new ArgumentNullException(nameof(callback));
-            subscriptions.AddOrUpdate(subscriptionId, callback, (_,_) => callback);
+            subscriptions.AddOrUpdate(subscriptionId, callback, (_, _) => callback);
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace Microsoft.Kiota.Abstractions.Store
                 // Call Get<>() on nested properties so that this method may be called recursively to ensure collections are consistent
                 collectionTuple.Item1.OfType<IBackedModel>().ToList().ForEach(store => store.BackingStore.Enumerate()
                     .ToList().ForEach(item => store.BackingStore.Get<object>(item.Key)));
-                
+
                 if(collectionTuple.Item2 != collectionTuple.Item1.Count) // and the size has changed since we last updated)
                 {
                     Set(key, collectionTuple.Item1); //ensure the store is notified the collection property is "dirty"

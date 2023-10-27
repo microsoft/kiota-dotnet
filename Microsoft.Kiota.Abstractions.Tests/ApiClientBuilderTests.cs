@@ -8,7 +8,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
     public class ApiClientBuilderTests
     {
         private const string StreamContentType = "application/octet-stream";
-    
+
         [Fact]
         public void EnableBackingStoreForSerializationWriterFactory()
         {
@@ -16,12 +16,12 @@ namespace Microsoft.Kiota.Abstractions.Tests
             var serializationFactoryRegistry = new SerializationWriterFactoryRegistry();
             var mockSerializationWriterFactory = new Mock<ISerializationWriterFactory>();
             serializationFactoryRegistry.ContentTypeAssociatedFactories.TryAdd(StreamContentType, mockSerializationWriterFactory.Object);
-        
+
             Assert.IsNotType<BackingStoreSerializationWriterProxyFactory>(serializationFactoryRegistry.ContentTypeAssociatedFactories[StreamContentType]);
-        
+
             // Act
             ApiClientBuilder.EnableBackingStoreForSerializationWriterFactory(serializationFactoryRegistry);
-        
+
             // Assert the type has changed due to backing store enabling
             Assert.IsType<BackingStoreSerializationWriterProxyFactory>(serializationFactoryRegistry.ContentTypeAssociatedFactories[StreamContentType]);
         }
@@ -52,12 +52,12 @@ namespace Microsoft.Kiota.Abstractions.Tests
             var parseNodeRegistry = new ParseNodeFactoryRegistry();
             var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             parseNodeRegistry.ContentTypeAssociatedFactories.TryAdd(StreamContentType, mockParseNodeFactory.Object);
-        
+
             Assert.IsNotType<BackingStoreParseNodeFactory>(parseNodeRegistry.ContentTypeAssociatedFactories[StreamContentType]);
-        
+
             // Act
             ApiClientBuilder.EnableBackingStoreForParseNodeFactory(parseNodeRegistry);
-        
+
             // Assert the type has changed due to backing store enabling
             Assert.IsType<BackingStoreParseNodeFactory>(parseNodeRegistry.ContentTypeAssociatedFactories[StreamContentType]);
         }
