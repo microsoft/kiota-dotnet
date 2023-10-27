@@ -8,26 +8,26 @@ using Xunit;
 
 namespace Microsoft.Kiota.Abstractions.Tests.Serialization;
 
-public class SerializationHelpersTests
+public class DeserializationHelpersTests
 {
     private const string _jsonContentType = "application/json";
     [Fact]
     public void DefensiveObject()
     {
-        Assert.Throws<ArgumentNullException>(() => SerializationHelpers.Deserialize<TestEntity>(null, (Stream)null, null));
-        Assert.Throws<ArgumentNullException>(() => SerializationHelpers.Deserialize<TestEntity>(_jsonContentType, (Stream)null, null));
+        Assert.Throws<ArgumentNullException>(() => DeserializationHelpers.Deserialize<TestEntity>(null, (Stream)null, null));
+        Assert.Throws<ArgumentNullException>(() => DeserializationHelpers.Deserialize<TestEntity>(_jsonContentType, (Stream)null, null));
         using var stream = new MemoryStream();
-        Assert.Throws<ArgumentNullException>(() => SerializationHelpers.Deserialize<TestEntity>(_jsonContentType, stream, null));
-        Assert.Throws<ArgumentNullException>(() => SerializationHelpers.Deserialize<TestEntity>(_jsonContentType, "", null));
+        Assert.Throws<ArgumentNullException>(() => DeserializationHelpers.Deserialize<TestEntity>(_jsonContentType, stream, null));
+        Assert.Throws<ArgumentNullException>(() => DeserializationHelpers.Deserialize<TestEntity>(_jsonContentType, "", null));
     }
     [Fact]
     public void DefensiveObjectCollection()
     {
-        Assert.Throws<ArgumentNullException>(() => SerializationHelpers.DeserializeCollection<TestEntity>(null, (Stream)null, null));
-        Assert.Throws<ArgumentNullException>(() => SerializationHelpers.DeserializeCollection<TestEntity>(_jsonContentType, (Stream)null, null));
+        Assert.Throws<ArgumentNullException>(() => DeserializationHelpers.DeserializeCollection<TestEntity>(null, (Stream)null, null));
+        Assert.Throws<ArgumentNullException>(() => DeserializationHelpers.DeserializeCollection<TestEntity>(_jsonContentType, (Stream)null, null));
         using var stream = new MemoryStream();
-        Assert.Throws<ArgumentNullException>(() => SerializationHelpers.DeserializeCollection<TestEntity>(_jsonContentType, stream, null));
-        Assert.Throws<ArgumentNullException>(() => SerializationHelpers.DeserializeCollection<TestEntity>(_jsonContentType, "", null));
+        Assert.Throws<ArgumentNullException>(() => DeserializationHelpers.DeserializeCollection<TestEntity>(_jsonContentType, stream, null));
+        Assert.Throws<ArgumentNullException>(() => DeserializationHelpers.DeserializeCollection<TestEntity>(_jsonContentType, "", null));
     }
     [Fact]
     public void DeserializesObjectWithoutReflection()
@@ -43,7 +43,7 @@ public class SerializationHelpersTests
         mockJsonParseNodeFactory.Setup(x => x.ValidContentType).Returns(_jsonContentType);
         ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockJsonParseNodeFactory.Object;
 
-        var result = SerializationHelpers.Deserialize(_jsonContentType, strValue, TestEntity.CreateFromDiscriminatorValue);
+        var result = DeserializationHelpers.Deserialize(_jsonContentType, strValue, TestEntity.CreateFromDiscriminatorValue);
 
         Assert.NotNull(result);
     }
@@ -61,7 +61,7 @@ public class SerializationHelpersTests
         mockJsonParseNodeFactory.Setup(x => x.ValidContentType).Returns(_jsonContentType);
         ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockJsonParseNodeFactory.Object;
 
-        var result = SerializationHelpers.Deserialize<TestEntity>(_jsonContentType, strValue);
+        var result = DeserializationHelpers.Deserialize<TestEntity>(_jsonContentType, strValue);
 
         Assert.NotNull(result);
     }
@@ -81,7 +81,7 @@ public class SerializationHelpersTests
         mockJsonParseNodeFactory.Setup(x => x.ValidContentType).Returns(_jsonContentType);
         ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockJsonParseNodeFactory.Object;
 
-        var result = SerializationHelpers.DeserializeCollection(_jsonContentType, strValue, TestEntity.CreateFromDiscriminatorValue);
+        var result = DeserializationHelpers.DeserializeCollection(_jsonContentType, strValue, TestEntity.CreateFromDiscriminatorValue);
 
         Assert.NotNull(result);
         Assert.Single(result);

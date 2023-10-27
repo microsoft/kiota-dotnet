@@ -17,7 +17,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization;
 /// <summary>
 /// Set of helper methods for serialization
 /// </summary>
-public static class SerializationHelpers
+public static class DeserializationHelpers
 {
     /// <summary>
     /// Deserializes the given stream into an object based on the content type.
