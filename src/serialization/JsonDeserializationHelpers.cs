@@ -13,7 +13,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization;
 /// <summary>
 /// Set of helper methods for JSON serialization
 /// </summary>
-public class JsonDeserializationHelpers
+public static class JsonDeserializationHelpers
 {
     private const string _jsonContentType = "application/json";
     /// <summary>
