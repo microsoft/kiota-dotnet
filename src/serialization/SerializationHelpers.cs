@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization;
 public static class SerializationHelpers
 {
     /// <summary>
-    /// Deserializes the given stream into a object based on the content type.
+    /// Deserializes the given stream into an object based on the content type.
     /// </summary>
     /// <param name="contentType">The content type of the stream.</param>
     /// <param name="parsableFactory">The factory to create the object.</param>
@@ -40,7 +41,7 @@ public static class SerializationHelpers
         return stream;
     }
     /// <summary>
-    /// Deserializes the given stream into a object based on the content type.
+    /// Deserializes the given stream into an object based on the content type.
     /// </summary>
     /// <param name="contentType">The content type of the stream.</param>
     /// <param name="stream">The stream to deserialize.</param>
@@ -54,7 +55,7 @@ public static class SerializationHelpers
         return parseNode.GetObjectValue(parsableFactory);
     }
     /// <summary>
-    /// Deserializes the given stream into a object based on the content type.
+    /// Deserializes the given stream into an object based on the content type.
     /// </summary>
     /// <param name="contentType">The content type of the stream.</param>
     /// <param name="stream">The stream to deserialize.</param>
@@ -76,7 +77,7 @@ public static class SerializationHelpers
         return (ParsableFactory<T>)factoryMethod.CreateDelegate(typeof(ParsableFactory<T>));
     }
     /// <summary>
-    /// Deserializes the given stream into a object based on the content type.
+    /// Deserializes the given stream into an object based on the content type.
     /// </summary>
     /// <param name="contentType">The content type of the stream.</param>
     /// <param name="serializedRepresentation">The serialized representation of the object.</param>
@@ -87,4 +88,52 @@ public static class SerializationHelpers
 #endif
     => Deserialize(contentType, serializedRepresentation, GetFactoryFromType<T>());
 
+    /// <summary>
+    /// Deserializes the given stream into a collection of objects based on the content type.
+    /// </summary>
+    /// <param name="contentType">The content type of the stream.</param>
+    /// <param name="stream">The stream to deserialize.</param>
+    /// <param name="parsableFactory">The factory to create the object.</param>
+    public static IEnumerable<T> DeserializeCollection<T>(string contentType, Stream stream, ParsableFactory<T> parsableFactory) where T : IParsable
+    {
+        if(string.IsNullOrEmpty(contentType)) throw new ArgumentNullException(nameof(contentType));
+        if(stream == null) throw new ArgumentNullException(nameof(stream));
+        if(parsableFactory == null) throw new ArgumentNullException(nameof(parsableFactory));
+        var parseNode = ParseNodeFactoryRegistry.DefaultInstance.GetRootParseNode(contentType, stream);
+        return parseNode.GetCollectionOfObjectValues(parsableFactory);
+    }
+    /// <summary>
+    /// Deserializes the given stream into a collection of objects based on the content type.
+    /// </summary>
+    /// <param name="contentType">The content type of the stream.</param>
+    /// <param name="serializedRepresentation">The serialized representation of the objects.</param>
+    /// <param name="parsableFactory">The factory to create the object.</param>
+    public static IEnumerable<T> DeserializeCollection<T>(string contentType, string serializedRepresentation, ParsableFactory<T> parsableFactory) where T : IParsable
+    {
+        if(string.IsNullOrEmpty(serializedRepresentation)) throw new ArgumentNullException(nameof(serializedRepresentation));
+        using var stream = GetStreamFromString(serializedRepresentation);
+        return DeserializeCollection(contentType, stream, parsableFactory);
+    }
+    /// <summary>
+    /// Deserializes the given stream into a collection of objects based on the content type.
+    /// </summary>
+    /// <param name="contentType">The content type of the stream.</param>
+    /// <param name="stream">The stream to deserialize.</param>
+#if NET5_0_OR_GREATER
+    public static IEnumerable<T> DeserializeCollection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string contentType, Stream stream) where T : IParsable
+#else
+    public static IEnumerable<T> DeserializeCollection<T>(string contentType, Stream stream) where T : IParsable
+#endif
+    => DeserializeCollection(contentType, stream, GetFactoryFromType<T>());
+    /// <summary>
+    /// Deserializes the given stream into a collection of objects based on the content type.
+    /// </summary>
+    /// <param name="contentType">The content type of the stream.</param>
+    /// <param name="serializedRepresentation">The serialized representation of the object.</param>
+#if NET5_0_OR_GREATER
+    public static IEnumerable<T> DeserializeCollection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string contentType, string serializedRepresentation) where T : IParsable
+#else
+    public static IEnumerable<T> DeserializeCollection<T>(string contentType, string serializedRepresentation) where T : IParsable
+#endif
+    => DeserializeCollection(contentType, serializedRepresentation, GetFactoryFromType<T>());
 }
