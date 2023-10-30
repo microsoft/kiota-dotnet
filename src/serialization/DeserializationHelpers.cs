@@ -72,7 +72,7 @@ public static class DeserializationHelpers
 #endif
     {
         var type = typeof(T);
-        var factoryMethod = type.GetMethods().FirstOrDefault(static x => x.IsStatic && "CreateFromDiscriminatorValue".Equals(x.Name, StringComparison.OrdinalIgnoreCase)) ??
+        var factoryMethod = Array.Find(type.GetMethods(), static x => x.IsStatic && "CreateFromDiscriminatorValue".Equals(x.Name, StringComparison.OrdinalIgnoreCase)) ??
                             throw new InvalidOperationException($"No factory method found for type {type.Name}");
         return (ParsableFactory<T>)factoryMethod.CreateDelegate(typeof(ParsableFactory<T>));
     }
