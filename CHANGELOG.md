@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2023-10-31
+
+### Added
+
+- Added helper methods to facilitate serialization and deserialization of models. [microsoft/kiota#3406](https://github.com/microsoft/kiota/issues/3406)
+
 ## [1.5.0] - 2023-10-19
 
 ### Added
