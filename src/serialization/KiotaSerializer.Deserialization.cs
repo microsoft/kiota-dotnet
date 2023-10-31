@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -14,10 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Kiota.Abstractions.Serialization;
 
-/// <summary>
-/// Set of helper methods for serialization
-/// </summary>
-public static class DeserializationHelpers
+public static partial class KiotaSerializer
 {
     /// <summary>
     /// Deserializes the given stream into an object based on the content type.

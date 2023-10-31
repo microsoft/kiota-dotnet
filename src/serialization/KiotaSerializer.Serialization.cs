@@ -15,7 +15,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization;
 /// <summary>
 /// Set of helper methods for serialization
 /// </summary>
-public static class SerializationHelpers
+public static partial class KiotaSerializer
 {
     /// <summary>
     /// Serializes the given object into a string based on the content type.

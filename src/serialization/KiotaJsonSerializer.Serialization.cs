@@ -10,12 +10,8 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Kiota.Abstractions.Serialization;
 
-/// <summary>
-/// Set of helper methods for JSON serialization
-/// </summary>
-public static class JsonSerializationHelpers
+public static partial class KiotaJsonSerializer
 {
-    private const string _jsonContentType = "application/json";
     /// <summary>
     /// Serializes the given object into a string based on the content type.
     /// </summary>
@@ -23,7 +19,7 @@ public static class JsonSerializationHelpers
     /// <param name="value">The object to serialize.</param>
     /// <returns>The serialized representation as a stream.</returns>
     public static Stream SerializeAsStream<T>(T value) where T : IParsable
-    => SerializationHelpers.SerializeAsStream(_jsonContentType, value);
+    => KiotaSerializer.SerializeAsStream(_jsonContentType, value);
 
     /// <summary>
     /// Serializes the given object into a string based on the content type.
@@ -32,7 +28,7 @@ public static class JsonSerializationHelpers
     /// <param name="value">The object to serialize.</param>
     /// <returns>The serialized representation as a string.</returns>
     public static string SerializeAsString<T>(T value) where T : IParsable
-    => SerializationHelpers.SerializeAsString(_jsonContentType, value);
+    => KiotaSerializer.SerializeAsString(_jsonContentType, value);
 
     /// <summary>
     /// Serializes the given object into a string based on the content type.
@@ -41,7 +37,7 @@ public static class JsonSerializationHelpers
     /// <param name="value">The object to serialize.</param>
     /// <returns>The serialized representation as a stream.</returns>
     public static Stream SerializeAsStream<T>(IEnumerable<T> value) where T : IParsable
-    => SerializationHelpers.SerializeAsStream(_jsonContentType, value);
+    => KiotaSerializer.SerializeAsStream(_jsonContentType, value);
 
     /// <summary>
     /// Serializes the given object into a string based on the content type.
@@ -50,6 +46,6 @@ public static class JsonSerializationHelpers
     /// <param name="value">The object to serialize.</param>
     /// <returns>The serialized representation as a string.</returns>
     public static string SerializeAsString<T>(IEnumerable<T> value) where T : IParsable
-    => SerializationHelpers.SerializeAsString(_jsonContentType, value);
+    => KiotaSerializer.SerializeAsString(_jsonContentType, value);
 
 }

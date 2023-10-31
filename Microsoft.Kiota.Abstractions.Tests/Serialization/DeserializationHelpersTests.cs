@@ -14,20 +14,20 @@ public class DeserializationHelpersTests
     [Fact]
     public void DefensiveObject()
     {
-        Assert.Throws<ArgumentNullException>(() => DeserializationHelpers.Deserialize<TestEntity>(null, (Stream)null, null));
-        Assert.Throws<ArgumentNullException>(() => DeserializationHelpers.Deserialize<TestEntity>(_jsonContentType, (Stream)null, null));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.Deserialize<TestEntity>(null, (Stream)null, null));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.Deserialize<TestEntity>(_jsonContentType, (Stream)null, null));
         using var stream = new MemoryStream();
-        Assert.Throws<ArgumentNullException>(() => DeserializationHelpers.Deserialize<TestEntity>(_jsonContentType, stream, null));
-        Assert.Throws<ArgumentNullException>(() => DeserializationHelpers.Deserialize<TestEntity>(_jsonContentType, "", null));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.Deserialize<TestEntity>(_jsonContentType, stream, null));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.Deserialize<TestEntity>(_jsonContentType, "", null));
     }
     [Fact]
     public void DefensiveObjectCollection()
     {
-        Assert.Throws<ArgumentNullException>(() => DeserializationHelpers.DeserializeCollection<TestEntity>(null, (Stream)null, null));
-        Assert.Throws<ArgumentNullException>(() => DeserializationHelpers.DeserializeCollection<TestEntity>(_jsonContentType, (Stream)null, null));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.DeserializeCollection<TestEntity>(null, (Stream)null, null));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.DeserializeCollection<TestEntity>(_jsonContentType, (Stream)null, null));
         using var stream = new MemoryStream();
-        Assert.Throws<ArgumentNullException>(() => DeserializationHelpers.DeserializeCollection<TestEntity>(_jsonContentType, stream, null));
-        Assert.Throws<ArgumentNullException>(() => DeserializationHelpers.DeserializeCollection<TestEntity>(_jsonContentType, "", null));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.DeserializeCollection<TestEntity>(_jsonContentType, stream, null));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.DeserializeCollection<TestEntity>(_jsonContentType, "", null));
     }
     [Fact]
     public void DeserializesObjectWithoutReflection()
@@ -43,7 +43,7 @@ public class DeserializationHelpersTests
         mockJsonParseNodeFactory.Setup(x => x.ValidContentType).Returns(_jsonContentType);
         ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockJsonParseNodeFactory.Object;
 
-        var result = DeserializationHelpers.Deserialize(_jsonContentType, strValue, TestEntity.CreateFromDiscriminatorValue);
+        var result = KiotaSerializer.Deserialize(_jsonContentType, strValue, TestEntity.CreateFromDiscriminatorValue);
 
         Assert.NotNull(result);
     }
@@ -61,7 +61,7 @@ public class DeserializationHelpersTests
         mockJsonParseNodeFactory.Setup(x => x.ValidContentType).Returns(_jsonContentType);
         ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockJsonParseNodeFactory.Object;
 
-        var result = DeserializationHelpers.Deserialize<TestEntity>(_jsonContentType, strValue);
+        var result = KiotaSerializer.Deserialize<TestEntity>(_jsonContentType, strValue);
 
         Assert.NotNull(result);
     }
@@ -81,7 +81,7 @@ public class DeserializationHelpersTests
         mockJsonParseNodeFactory.Setup(x => x.ValidContentType).Returns(_jsonContentType);
         ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockJsonParseNodeFactory.Object;
 
-        var result = DeserializationHelpers.DeserializeCollection(_jsonContentType, strValue, TestEntity.CreateFromDiscriminatorValue);
+        var result = KiotaSerializer.DeserializeCollection(_jsonContentType, strValue, TestEntity.CreateFromDiscriminatorValue);
 
         Assert.NotNull(result);
         Assert.Single(result);

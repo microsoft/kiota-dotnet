@@ -15,14 +15,14 @@ public class SerializationHelpersTests
     [Fact]
     public void DefensiveObject()
     {
-        Assert.Throws<ArgumentNullException>(() => SerializationHelpers.SerializeAsStream(null, (TestEntity)null));
-        Assert.Throws<ArgumentNullException>(() => SerializationHelpers.SerializeAsStream(_jsonContentType, (TestEntity)null));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.SerializeAsStream(null, (TestEntity)null));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.SerializeAsStream(_jsonContentType, (TestEntity)null));
     }
     [Fact]
     public void DefensiveObjectCollection()
     {
-        Assert.Throws<ArgumentNullException>(() => SerializationHelpers.SerializeAsStream(null, (IEnumerable<TestEntity>)null));
-        Assert.Throws<ArgumentNullException>(() => SerializationHelpers.SerializeAsStream(_jsonContentType, (IEnumerable<TestEntity>)null));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.SerializeAsStream(null, (IEnumerable<TestEntity>)null));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.SerializeAsStream(_jsonContentType, (IEnumerable<TestEntity>)null));
     }
     [Fact]
     public void SerializesObject()
@@ -33,7 +33,7 @@ public class SerializationHelpersTests
         mockSerializationWriterFactory.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(mockSerializationWriter.Object);
         SerializationWriterFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockSerializationWriterFactory.Object;
 
-        var result = SerializationHelpers.SerializeAsString(_jsonContentType, new TestEntity()
+        var result = KiotaSerializer.SerializeAsString(_jsonContentType, new TestEntity()
         {
             Id = "123"
         });
@@ -53,7 +53,7 @@ public class SerializationHelpersTests
         mockSerializationWriterFactory.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(mockSerializationWriter.Object);
         SerializationWriterFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockSerializationWriterFactory.Object;
 
-        var result = SerializationHelpers.SerializeAsString(_jsonContentType, new List<TestEntity> {
+        var result = KiotaSerializer.SerializeAsString(_jsonContentType, new List<TestEntity> {
             new()
             {
                 Id = "123"
