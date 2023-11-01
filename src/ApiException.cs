@@ -12,9 +12,9 @@ namespace Microsoft.Kiota.Abstractions;
 public class ApiException : Exception
 {
     /// <inheritdoc/>
-    public ApiException(): base()
+    public ApiException() : base()
     {
-        
+
     }
     /// <inheritdoc/>
     public ApiException(string message) : base(message)
@@ -24,7 +24,7 @@ public class ApiException : Exception
     public ApiException(string message, Exception innerException) : base(message, innerException)
     {
     }
-    
+
     /// <summary>
     /// The HTTP response status code.
     /// </summary>

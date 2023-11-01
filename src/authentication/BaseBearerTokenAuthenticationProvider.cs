@@ -24,7 +24,7 @@ public class BaseBearerTokenAuthenticationProvider : IAuthenticationProvider
     /// <summary>
     ///     Gets the <see cref="IAccessTokenProvider" /> to use for getting the access token.
     /// </summary>
-    public IAccessTokenProvider AccessTokenProvider {get; private set;}
+    public IAccessTokenProvider AccessTokenProvider { get; private set; }
     private const string AuthorizationHeaderKey = "Authorization";
     private const string ClaimsKey = "claims";
 

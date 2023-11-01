@@ -28,7 +28,7 @@ namespace Microsoft.Kiota.Abstractions.Extensions
             {
                 throw new ArgumentNullException(nameof(dictionary));
             }
-            
+
             if(key == null)
             {
                 throw new ArgumentNullException(nameof(key));

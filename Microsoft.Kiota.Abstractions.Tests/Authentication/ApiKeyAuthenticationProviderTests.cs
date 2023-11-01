@@ -5,9 +5,11 @@ using Xunit;
 
 namespace Microsoft.Kiota.Abstractions.Tests;
 
-public class ApiKeyAuthenticationProviderTests {
+public class ApiKeyAuthenticationProviderTests
+{
     [Fact]
-    public void DefensiveProgramming() {
+    public void DefensiveProgramming()
+    {
         Assert.Throws<ArgumentNullException>(() => new ApiKeyAuthenticationProvider(null, "param", ApiKeyAuthenticationProvider.KeyLocation.Header));
         Assert.Throws<ArgumentNullException>(() => new ApiKeyAuthenticationProvider("key", null, ApiKeyAuthenticationProvider.KeyLocation.Header));
 
@@ -15,9 +17,11 @@ public class ApiKeyAuthenticationProviderTests {
         Assert.ThrowsAsync<ArgumentNullException>(() => value.AuthenticateRequestAsync(null));
     }
     [Fact]
-    public async Task AddsInHeader() {
+    public async Task AddsInHeader()
+    {
         var value = new ApiKeyAuthenticationProvider("key", "param", ApiKeyAuthenticationProvider.KeyLocation.Header);
-        var request = new RequestInformation {
+        var request = new RequestInformation
+        {
             UrlTemplate = "https://localhost{?param1}",
         };
         await value.AuthenticateRequestAsync(request);
@@ -25,9 +29,11 @@ public class ApiKeyAuthenticationProviderTests {
         Assert.Contains("param", request.Headers.Keys);
     }
     [Fact]
-    public async Task AddsInQueryParameters() {
+    public async Task AddsInQueryParameters()
+    {
         var value = new ApiKeyAuthenticationProvider("key", "param", ApiKeyAuthenticationProvider.KeyLocation.QueryParameter);
-        var request = new RequestInformation {
+        var request = new RequestInformation
+        {
             UrlTemplate = "https://localhost{?param1}",
         };
         await value.AuthenticateRequestAsync(request);
@@ -35,9 +41,11 @@ public class ApiKeyAuthenticationProviderTests {
         Assert.DoesNotContain("param", request.Headers.Keys);
     }
     [Fact]
-    public async Task AddsInQueryParametersWithOtherParameters() {
+    public async Task AddsInQueryParametersWithOtherParameters()
+    {
         var value = new ApiKeyAuthenticationProvider("key", "param", ApiKeyAuthenticationProvider.KeyLocation.QueryParameter);
-        var request = new RequestInformation {
+        var request = new RequestInformation
+        {
             UrlTemplate = "https://localhost{?param1}",
         };
         request.QueryParameters.Add("param1", "value1");

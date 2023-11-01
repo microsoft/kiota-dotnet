@@ -71,7 +71,7 @@ namespace Microsoft.Kiota.Abstractions
             }
             else
                 result = new BackingStoreParseNodeFactory(original);
-            
+
             return result;
         }
         private static void EnableBackingStoreForParseNodeRegistry(ParseNodeFactoryRegistry registry)

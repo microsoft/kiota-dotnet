@@ -44,7 +44,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
             var vendorSpecificContentType = contentType.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).First();
             if(ContentTypeAssociatedFactories.ContainsKey(vendorSpecificContentType))
                 return ContentTypeAssociatedFactories[vendorSpecificContentType].GetSerializationWriter(vendorSpecificContentType);
-            
+
             var cleanedContentType = ParseNodeFactoryRegistry.contentTypeVendorCleanupRegex.Replace(vendorSpecificContentType, string.Empty);
             if(ContentTypeAssociatedFactories.ContainsKey(cleanedContentType))
                 return ContentTypeAssociatedFactories[cleanedContentType].GetSerializationWriter(cleanedContentType);

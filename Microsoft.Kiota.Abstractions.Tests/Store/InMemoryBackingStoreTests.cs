@@ -21,7 +21,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             testBackingStore.Set("name", "Peter");
             // Assert
             Assert.NotEmpty(testBackingStore.Enumerate());
-            Assert.Equal("Peter",testBackingStore.Enumerate().First().Value);
+            Assert.Equal("Peter", testBackingStore.Enumerate().First().Value);
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             };
             testUser.BackingStore.InitializationCompleted = true;
             // Act on the data by making a change
-            testUser.BusinessPhones = new List<string> 
+            testUser.BusinessPhones = new List<string>
             {
                 "+1 234 567 891"
             };
@@ -84,7 +84,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             var testUser = new TestEntity
             {
                 Id = "84c747c1-d2c0-410d-ba50-fc23e0b4abbe",
-                AdditionalData = new Dictionary<string, object> 
+                AdditionalData = new Dictionary<string, object>
                 {
                     { "extensionData" , null }
                 }
@@ -182,7 +182,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             Assert.Equal("businessPhones", changedValues.First().Key);
             var businessPhones = testUser.BackingStore.Get<List<string>>("businessPhones");
             Assert.NotNull(businessPhones);
-            Assert.Equal(2,businessPhones.Count);//both items come back as the property is dirty
+            Assert.Equal(2, businessPhones.Count);//both items come back as the property is dirty
         }
         [Fact]
         public void TestsBackingStoreEmbeddedInModelWithBySettingNestedIBackedModel()
@@ -194,7 +194,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             };
             testUser.BackingStore.InitializationCompleted = true;
             // Act on the data by making a change
-            testUser.Manager = new TestEntity 
+            testUser.Manager = new TestEntity
             {
                 Id = "2fe22fe5-1132-42cf-90f9-1dc17e325a74"
             };
@@ -206,7 +206,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             Assert.Equal("manager", changedValues.First().Key);
             var manager = changedValues.First().Value as TestEntity;
             Assert.NotNull(manager);
-            Assert.Equal("2fe22fe5-1132-42cf-90f9-1dc17e325a74",manager.Id);
+            Assert.Equal("2fe22fe5-1132-42cf-90f9-1dc17e325a74", manager.Id);
             var testUserSubscriptions = GetSubscriptionsPropertyFromBackingStore(testUser.BackingStore);
             Assert.Empty(testUserSubscriptions);// subscription only is added in nested store
             var managerSubscriptions = GetSubscriptionsPropertyFromBackingStore(testUser.Manager.BackingStore);
@@ -238,7 +238,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             Assert.Equal("manager", changedValues.First().Key);//Backingstore should detect manager property changed
             var manager = changedValues.First().Value as TestEntity;
             Assert.NotNull(manager);
-            Assert.Equal("2fe22fe5-1132-42cf-90f9-1dc17e325a74",manager.Id);
+            Assert.Equal("2fe22fe5-1132-42cf-90f9-1dc17e325a74", manager.Id);
             var testUserSubscriptions = GetSubscriptionsPropertyFromBackingStore(testUser.BackingStore);
             Assert.Empty(testUserSubscriptions);// subscription only is added in nested store
             var managerSubscriptions = GetSubscriptionsPropertyFromBackingStore(testUser.Manager.BackingStore);
@@ -269,13 +269,13 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             Assert.NotEmpty(changedValues);
             Assert.Single(changedValues);
             Assert.Equal("manager", changedValues.First().Key);//BackingStore should detect manager property changed
-            var changedNestedValues = testUser.Manager.BackingStore.Enumerate().ToDictionary(x => x.Key, y=> y.Value);
-            Assert.Equal(4,changedNestedValues.Count);
+            var changedNestedValues = testUser.Manager.BackingStore.Enumerate().ToDictionary(x => x.Key, y => y.Value);
+            Assert.Equal(4, changedNestedValues.Count);
             Assert.True(changedNestedValues.ContainsKey("id"));
             Assert.True(changedNestedValues.ContainsKey("businessPhones"));
             var manager = changedValues.First().Value as TestEntity;
             Assert.NotNull(manager);
-            Assert.Equal("2fe22fe5-1132-42cf-90f9-1dc17e325a74",manager.Id);
+            Assert.Equal("2fe22fe5-1132-42cf-90f9-1dc17e325a74", manager.Id);
             var testUserSubscriptions = GetSubscriptionsPropertyFromBackingStore(testUser.BackingStore);
             Assert.Empty(testUserSubscriptions);// subscription only is added in nested store
             var managerSubscriptions = GetSubscriptionsPropertyFromBackingStore(testUser.Manager.BackingStore);
@@ -288,13 +288,13 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             var testUser = new TestEntity
             {
                 Id = "84c747c1-d2c0-410d-ba50-fc23e0b4abbe",
-                Colleagues = new List<TestEntity> 
+                Colleagues = new List<TestEntity>
                 {
                     new TestEntity
                     {
                         Id = "2fe22fe5-1132-42cf-90f9-1dc17e325a74"
                     }
-                } 
+                }
             };
             testUser.BackingStore.InitializationCompleted = testUser.Colleagues[0].BackingStore.InitializationCompleted = true;
             // Act on the data by making a change in the nested Ibackedmodel collection item
@@ -310,7 +310,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             Assert.Equal("colleagues", changedValues.First().Key);//Backingstore should detect manager property changed
             var colleagues = testUser.BackingStore.Get<List<TestEntity>>("colleagues");
             Assert.NotNull(colleagues);
-            Assert.Equal("2fe22fe5-1132-42cf-90f9-1dc17e325a74",colleagues[0].Id);
+            Assert.Equal("2fe22fe5-1132-42cf-90f9-1dc17e325a74", colleagues[0].Id);
             var testUserSubscriptions = GetSubscriptionsPropertyFromBackingStore(testUser.BackingStore);
             Assert.Empty(testUserSubscriptions);// subscription only is added in nested store
             var colleagueSubscriptions = GetSubscriptionsPropertyFromBackingStore(testUser.Colleagues[0].BackingStore);
@@ -323,13 +323,13 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             var testUser = new TestEntity
             {
                 Id = "84c747c1-d2c0-410d-ba50-fc23e0b4abbe",
-                Colleagues = new List<TestEntity> 
+                Colleagues = new List<TestEntity>
                 {
                     new TestEntity
                     {
                         Id = "2fe22fe5-1132-42cf-90f9-1dc17e325a74"
                     }
-                } 
+                }
             };
             testUser.BackingStore.InitializationCompleted = testUser.Colleagues[0].BackingStore.InitializationCompleted = true;
             // Act on the data by making a change in the nested Ibackedmodel collection item
@@ -344,8 +344,8 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             Assert.NotEmpty(changedValues);
             Assert.Single(changedValues);
             Assert.Equal("colleagues", changedValues.First().Key);//BackingStore should detect manager property changed
-            var changedNestedValues = testUser.Colleagues[0].BackingStore.Enumerate().ToDictionary(x => x.Key, y=> y.Value);
-            Assert.Equal(4,changedNestedValues.Count);
+            var changedNestedValues = testUser.Colleagues[0].BackingStore.Enumerate().ToDictionary(x => x.Key, y => y.Value);
+            Assert.Equal(4, changedNestedValues.Count);
             Assert.True(changedNestedValues.ContainsKey("id"));
             Assert.True(changedNestedValues.ContainsKey("businessPhones"));
             var testUserSubscriptions = GetSubscriptionsPropertyFromBackingStore(testUser.BackingStore);
@@ -360,7 +360,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             var testUser = new TestEntity
             {
                 Id = "84c747c1-d2c0-410d-ba50-fc23e0b4abbe",
-                Colleagues = new List<TestEntity> 
+                Colleagues = new List<TestEntity>
                 {
                     new TestEntity
                     {
@@ -370,7 +370,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
                             "+1 234 567 891"
                         }
                     }
-                } 
+                }
             };
             testUser.BackingStore.InitializationCompleted = testUser.Colleagues[0].BackingStore.InitializationCompleted = true;
             // Act on the data by making a change in the nested Ibackedmodel collection item
@@ -382,8 +382,8 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             Assert.NotEmpty(changedValues);
             Assert.Single(changedValues);
             Assert.Equal("colleagues", changedValues.First().Key);//Backingstore should detect manager property changed
-            var changedNestedValues = testUser.Colleagues[0].BackingStore.Enumerate().ToDictionary(x => x.Key, y=> y.Value);
-            Assert.Equal(4,changedNestedValues.Count);
+            var changedNestedValues = testUser.Colleagues[0].BackingStore.Enumerate().ToDictionary(x => x.Key, y => y.Value);
+            Assert.Equal(4, changedNestedValues.Count);
             Assert.True(changedNestedValues.ContainsKey("id"));
             Assert.True(changedNestedValues.ContainsKey("businessPhones"));
             var businessPhones = ((Tuple<ICollection, int>)changedNestedValues["businessPhones"]).Item1;
@@ -400,7 +400,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             var testUser = new TestEntity
             {
                 Id = "84c747c1-d2c0-410d-ba50-fc23e0b4abbe",
-                Colleagues = new List<TestEntity> 
+                Colleagues = new List<TestEntity>
                 {
                     new TestEntity
                     {
@@ -410,7 +410,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
                             "+1 234 567 891"
                         }
                     }
-                } 
+                }
             };
             testUser.BackingStore.InitializationCompleted = testUser.Colleagues[0].BackingStore.InitializationCompleted = true;
             // Act on the data by making a change in the nested Ibackedmodel collection item
@@ -421,7 +421,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             // Assert by retrieving only changed values
             testUser.BackingStore.ReturnOnlyChangedValues = true;
             testUser.Colleagues[0].BackingStore.ReturnOnlyChangedValues = true; //serializer will do this. 
-            var changedValues = testUser.BackingStore.Enumerate().ToDictionary(x => x.Key, y=> y.Value);
+            var changedValues = testUser.BackingStore.Enumerate().ToDictionary(x => x.Key, y => y.Value);
             Assert.NotEmpty(changedValues);
             Assert.Single(changedValues);
             Assert.Equal("colleagues", changedValues.First().Key);//Backingstore should detect manager property changed
@@ -429,8 +429,8 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             Assert.Equal(2, colleagues.Count);
             Assert.Equal("2fe22fe5-1132-42cf-90f9-1dc17e325a74", colleagues[0].Id);
             Assert.Equal("2fe22fe5-1132-42cf-90f9-1dc17e325a74", colleagues[1].Id);
-            var changedNestedValues = testUser.Colleagues[0].BackingStore.Enumerate().ToDictionary(x => x.Key, y=> y.Value);
-            Assert.Equal(4,changedNestedValues.Count);
+            var changedNestedValues = testUser.Colleagues[0].BackingStore.Enumerate().ToDictionary(x => x.Key, y => y.Value);
+            Assert.Equal(4, changedNestedValues.Count);
             Assert.True(changedNestedValues.ContainsKey("id"));
             Assert.True(changedNestedValues.ContainsKey("businessPhones"));
             var businessPhones = ((Tuple<ICollection, int>)changedNestedValues["businessPhones"]).Item1;
@@ -448,9 +448,9 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
         /// <returns></returns>
         private static IDictionary<string, Action<string, object, object>> GetSubscriptionsPropertyFromBackingStore(IBackingStore backingStore)
         {
-            if(backingStore is not InMemoryBackingStore inMemoryBackingStore) 
+            if(backingStore is not InMemoryBackingStore inMemoryBackingStore)
                 return default;
-            
+
             var subscriptionsFieldInfo = typeof(InMemoryBackingStore).GetField("subscriptions", BindingFlags.NonPublic | BindingFlags.Instance);
             return (IDictionary<string, Action<string, object, object>>)subscriptionsFieldInfo?.GetValue(inMemoryBackingStore);
         }
