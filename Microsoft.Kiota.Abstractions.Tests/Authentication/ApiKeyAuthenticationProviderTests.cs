@@ -12,7 +12,7 @@ public class ApiKeyAuthenticationProviderTests {
         Assert.Throws<ArgumentNullException>(() => new ApiKeyAuthenticationProvider("key", null, ApiKeyAuthenticationProvider.KeyLocation.Header));
 
         var value = new ApiKeyAuthenticationProvider("key", "param", ApiKeyAuthenticationProvider.KeyLocation.Header);
-        Assert.ThrowsAsync<ArgumentNullException>(async () => await value.AuthenticateRequestAsync(null));
+        Assert.ThrowsAsync<ArgumentNullException>(() => value.AuthenticateRequestAsync(null));
     }
     [Fact]
     public async Task AddsInHeader() {
