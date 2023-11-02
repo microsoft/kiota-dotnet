@@ -195,7 +195,50 @@ namespace Microsoft.Kiota.Abstractions.Tests
             // Assert
             Assert.Contains($"%24requestId=6d320a89-2d8f-4204-855d-b98a1bc176d4", requestInfo.URI.OriginalString);
         }
+        [Fact]
+        public void SetsPathParametersOfDateType()
+        {
+            // Arrange as the request builders would
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/users{?%24date}"
+            };
 
+            // Act
+            var date = new Date(2023,10,26);
+            var pathParameters = new Dictionary<string, object>
+            {
+                { "%24date", date }
+            };
+
+            requestInfo.PathParameters = pathParameters;
+
+            // Assert
+            Assert.Contains($"%24date=2023-10-26", requestInfo.URI.OriginalString);
+        }
+        [Fact]
+        public void SetsPathParametersOfTimeType()
+        {
+            // Arrange as the request builders would
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/users{?%24time}"
+            };
+
+            // Act
+            var time = new Time(6,0,0);
+            var pathParameters = new Dictionary<string, object>
+            {
+                { "%24time", time }
+            };
+
+            requestInfo.PathParameters = pathParameters;
+
+            // Assert
+            Assert.Contains($"%24time=06%3A00%3A00", requestInfo.URI.OriginalString);
+        }
         [Fact]
         public void ThrowsInvalidOperationExceptionWhenBaseUrlNotSet()
         {

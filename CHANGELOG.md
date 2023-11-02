@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.1] - 2023-11-02
+
+### Changed
+
+- Fixes sanitization of Date and Time values in query and path parameters
+
 ## [1.6.0] - 2023-10-31
 
 ### Added
