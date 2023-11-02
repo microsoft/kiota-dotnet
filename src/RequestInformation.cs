@@ -81,6 +81,8 @@ namespace Microsoft.Kiota.Abstractions
             DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("o"),// Default to ISO 8601 for datetimeoffsets in the url.
             DateTime dateTime => dateTime.ToString("o"),// Default to ISO 8601 for datetimes in the url.
             Guid guid => guid.ToString("D"),// Default of 32 digits separated by hyphens
+            Date date => date.ToString(), //Default to string format of the custom date object
+            Time time => time.ToString(), //Default to string format of the custom time object
             _ => value,//return object as is as the ToString method is good enough.
         };
 
