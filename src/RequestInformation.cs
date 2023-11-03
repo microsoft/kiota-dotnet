@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
 #if NET5_0_OR_GREATER
@@ -21,6 +22,39 @@ namespace Microsoft.Kiota.Abstractions
     /// </summary>
     public class RequestInformation
     {
+        /// <summary>
+        /// Creates a new instance of <see cref="RequestInformation"/>.
+        /// </summary>
+        public RequestInformation()
+        {
+
+        }
+        /// <summary>
+        /// Creates a new instance of <see cref="RequestInformation"/> with the given method and url template.
+        /// </summary>
+        /// <param name="method"></param>
+        /// <param name="urlTemplate"></param>
+        /// <param name="pathParameters"></param>
+        public RequestInformation(Method method, string urlTemplate, IDictionary<string, object> pathParameters)
+        {
+            HttpMethod = method;
+            UrlTemplate = urlTemplate;
+            PathParameters = pathParameters;
+        }
+        /// <summary>
+        /// Configures the current request configuration headers, query parameters, and options base on the callback provided.
+        /// </summary>
+        /// <typeparam name="T">Type for the query parameters</typeparam>
+        /// <param name="requestConfiguration">Callback to configure the request</param>
+        public void Configure<T>(Action<RequestConfiguration<T>>? requestConfiguration) where T : DefaultQueryParameters, new()
+        {
+            if(requestConfiguration == null) return;
+            var requestConfig = new RequestConfiguration<T>();
+            requestConfiguration(requestConfig);
+            AddQueryParameters(requestConfig.QueryParameters);
+            AddRequestOptions(requestConfig.Options);
+            AddHeaders(requestConfig.Headers);
+        }
         internal const string RawUrlKey = "request-raw-url";
         private Uri? _rawUri;
         /// <summary>
