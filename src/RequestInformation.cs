@@ -45,7 +45,7 @@ namespace Microsoft.Kiota.Abstractions
         /// </summary>
         /// <typeparam name="T">Type for the query parameters</typeparam>
         /// <param name="requestConfiguration">Callback to configure the request</param>
-        public void Configure<T>(Action<RequestConfiguration<T>>? requestConfiguration) where T : DefaultQueryParameters, new()
+        public void Configure<T>(Action<RequestConfiguration<T>>? requestConfiguration) where T : class, new()
         {
             if(requestConfiguration == null) return;
             var requestConfig = new RequestConfiguration<T>();
