@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2023-11-07
+
+### Added
+
+- Added methods in request information to reduce the amount of code being generated.
+
 ## [1.6.1] - 2023-11-02
 
 ### Changed
