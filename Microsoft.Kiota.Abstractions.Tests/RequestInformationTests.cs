@@ -458,7 +458,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             // Act
             testRequest.AddQueryParameters(new GetQueryParameters { DataSet = TestEnum.First });
             // Assert
-            Assert.Equal("http://localhost/me?dataset=first", testRequest.URI.ToString());
+            Assert.Equal("http://localhost/me?dataset=1", testRequest.URI.ToString());
         }
         [Fact]
         public void SetsEnumValues()
@@ -472,7 +472,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             // Act
             testRequest.AddQueryParameters(new GetQueryParameters { DataSets = new TestEnum[] { TestEnum.First, TestEnum.Second } });
             // Assert
-            Assert.Equal("http://localhost/me?datasets=first,second", testRequest.URI.ToString());
+            Assert.Equal("http://localhost/me?datasets=1,2", testRequest.URI.ToString());
         }
     }
 

@@ -4,8 +4,8 @@ namespace Microsoft.Kiota.Abstractions.Tests.Mocks;
 
 public enum TestEnum
 {
-    [EnumMember(Value = "first")]
+    [EnumMember(Value = "1")]
     First,
-    [EnumMember(Value = "second")]
+    [EnumMember(Value = "2")]
     Second,
 }
