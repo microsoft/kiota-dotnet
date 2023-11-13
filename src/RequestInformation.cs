@@ -118,7 +118,7 @@ namespace Microsoft.Kiota.Abstractions
             Guid guid => guid.ToString("D"),// Default of 32 digits separated by hyphens
             Date date => date.ToString(), //Default to string format of the custom date object
             Time time => time.ToString(), //Default to string format of the custom time object
-            _ => value,//return object as is as the ToString method is good enough.
+            _ => ReplaceEnumValueByStringRepresentation(value),//return object as is as the ToString method is good enough.
         };
 
         /// <summary>
@@ -163,25 +163,28 @@ namespace Microsoft.Kiota.Abstractions
                                                     !string.IsNullOrEmpty(x.Value.ToString()) && // no need to add an empty string value
                                                     (x.Value is not ICollection collection || collection.Count > 0))) // no need to add empty collection
             {
-                if(property.Value is Enum enumValue && GetEnumName(enumValue) is string enumValueName)
-                {
-                    QueryParameters.AddOrReplace(property.Name!, enumValueName);
-                }
-                else if(property.Value is Array collection && collection.Length > 0 && collection.GetValue(0) is Enum)
-                {
-                    var passedArray = new string[collection.Length];
-                    for(var i = 0; i < collection.Length; i++)
-                    {// this is ugly but necessary due to covariance limitations with pattern matching
-                        passedArray[i] = GetEnumName((Enum)collection.GetValue(i)!)!;
-                    }
-                    QueryParameters.AddOrReplace(property.Name!, passedArray);
-                }
-                else
-                    QueryParameters.AddOrReplace(property.Name!, property.Value!);
+                QueryParameters.AddOrReplace(property.Name!, ReplaceEnumValueByStringRepresentation(property.Value!));
             }
         }
+        private static object ReplaceEnumValueByStringRepresentation(object source)
+        {
+            if(source is Enum enumValue && GetEnumName(enumValue) is string enumValueName)
+            {
+                return enumValueName;
+            }
+            else if(source is Array collection && collection.Length > 0 && collection.GetValue(0) is Enum)
+            {
+                var passedArray = new string[collection.Length];
+                for(var i = 0; i < collection.Length; i++)
+                {// this is ugly but necessary due to covariance limitations with pattern matching
+                    passedArray[i] = GetEnumName((Enum)collection.GetValue(i)!)!;
+                }
+                return passedArray;
+            }
+            else return source;
+        }
 #if NET5_0_OR_GREATER
-        private static string? GetEnumName<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]T>(T value) where T : Enum
+        private static string? GetEnumName<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T>(T value) where T : Enum
 #else
         private static string? GetEnumName<T>(T value) where T : Enum
 #endif

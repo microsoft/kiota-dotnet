@@ -447,7 +447,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             Assert.Equal("multipart/form-data; boundary=" + multipartBody.Boundary, contentType.First());
         }
         [Fact]
-        public void SetsEnumValue()
+        public void SetsEnumValueInQueryParameters()
         {
             // Arrange
             var testRequest = new RequestInformation()
@@ -461,7 +461,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             Assert.Equal("http://localhost/me?dataset=1", testRequest.URI.ToString());
         }
         [Fact]
-        public void SetsEnumValues()
+        public void SetsEnumValuesInQueryParameters()
         {
             // Arrange
             var testRequest = new RequestInformation()
@@ -473,6 +473,34 @@ namespace Microsoft.Kiota.Abstractions.Tests
             testRequest.AddQueryParameters(new GetQueryParameters { DataSets = new TestEnum[] { TestEnum.First, TestEnum.Second } });
             // Assert
             Assert.Equal("http://localhost/me?datasets=1,2", testRequest.URI.ToString());
+        }
+        [Fact]
+        public void SetsEnumValueInPathParameters()
+        {
+            // Arrange
+            var testRequest = new RequestInformation()
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/{dataset}"
+            };
+            // Act
+            testRequest.PathParameters.Add("dataset", TestEnum.First);
+            // Assert
+            Assert.Equal("http://localhost/1", testRequest.URI.ToString());
+        }
+        [Fact]
+        public void SetsEnumValuesInPathParameters()
+        {
+            // Arrange
+            var testRequest = new RequestInformation()
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/{dataset}"
+            };
+            // Act
+            testRequest.PathParameters.Add("dataset", new TestEnum[] { TestEnum.First, TestEnum.Second });
+            // Assert
+            Assert.Equal("http://localhost/1,2", testRequest.URI.ToString());
         }
     }
 
