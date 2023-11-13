@@ -206,7 +206,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             };
 
             // Act
-            var date = new Date(2023,10,26);
+            var date = new Date(2023, 10, 26);
             var pathParameters = new Dictionary<string, object>
             {
                 { "%24date", date }
@@ -228,7 +228,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             };
 
             // Act
-            var time = new Time(6,0,0);
+            var time = new Time(6, 0, 0);
             var pathParameters = new Dictionary<string, object>
             {
                 { "%24time", time }
@@ -446,6 +446,34 @@ namespace Microsoft.Kiota.Abstractions.Tests
             Assert.Single(contentType);
             Assert.Equal("multipart/form-data; boundary=" + multipartBody.Boundary, contentType.First());
         }
+        [Fact]
+        public void SetsEnumValue()
+        {
+            // Arrange
+            var testRequest = new RequestInformation()
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?dataset}"
+            };
+            // Act
+            testRequest.AddQueryParameters(new GetQueryParameters { DataSet = TestEnum.First });
+            // Assert
+            Assert.Equal("http://localhost/me?dataset=first", testRequest.URI.ToString());
+        }
+        [Fact]
+        public void SetsEnumValues()
+        {
+            // Arrange
+            var testRequest = new RequestInformation()
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?datasets}"
+            };
+            // Act
+            testRequest.AddQueryParameters(new GetQueryParameters { DataSets = new TestEnum[] { TestEnum.First, TestEnum.Second } });
+            // Assert
+            Assert.Equal("http://localhost/me?datasets=first,second", testRequest.URI.ToString());
+        }
     }
 
     /// <summary>The messages in a mailbox or folder. Read-only. Nullable.</summary>
@@ -471,5 +499,11 @@ namespace Microsoft.Kiota.Abstractions.Tests
         public string Search { get; set; }
         /// <summary>Restrict to TenantId</summary>
         public string TenantId { get; set; }
+        /// <summary>Which Dataset to use</summary>
+        [QueryParameter("dataset")]
+        public TestEnum DataSet { get; set; }
+        /// <summary>Which Dataset to use</summary>
+        [QueryParameter("datasets")]
+        public TestEnum[] DataSets { get; set; }
     }
 }
