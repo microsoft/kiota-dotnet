@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.1] - 2023-11-13
+
+### Changed
+
+- Fixed an issue where path and query parameters of enum type would not be expanded properly. [microsoft/kiota#3693](https://github.com/microsoft/kiota/issues/3693)
+
 ## [1.7.0] - 2023-11-07
 
 ### Added
