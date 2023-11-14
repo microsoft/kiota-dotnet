@@ -3,21 +3,21 @@ name: Build and Test
 on:
   workflow_dispatch:
   push:
-    branches: [ 'main', 'dev', 'feature/*' ]
+    branches: ["main", "dev", "feature/*"]
   pull_request:
-    branches: [ 'main', 'dev' ]
+    branches: ["main", "dev"]
 
 jobs:
   build-and-test:
-    runs-on: windows-latest # Temporary switch to windows till https://github.com/microsoft/vstest/issues/4549 is released in dotnet version after 7.0.400
+    runs-on: ubuntu-latest
     env:
       solutionName: Microsoft.Kiota.Abstractions.sln
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3.0.3
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 8.x
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
