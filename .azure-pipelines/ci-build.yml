@@ -32,7 +32,7 @@ stages:
       - task: UseDotNet@2
         displayName: 'Use .NET 6'
         inputs:
-          version: 6.x
+          version: 8.x
 
       - task: PoliCheck@2
         displayName: 'Run PoliCheck "/src"'
@@ -75,7 +75,7 @@ stages:
         inputs:
           command: test
           projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.Abstractions.sln'
-          arguments: '--configuration $(BuildConfiguration) --no-build --framework net6.0'
+          arguments: '--configuration $(BuildConfiguration) --no-build --framework net8.0'
 
       # CredScan
       - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@3
