@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     env:
       solutionName: Microsoft.Kiota.Abstractions.sln
     steps:

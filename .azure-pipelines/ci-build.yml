@@ -30,7 +30,7 @@ stages:
       steps:
 
       - task: UseDotNet@2 # needed for ESRP sign
-        displayName: 'Use .NET 8'
+        displayName: 'Use .NET 6'
         inputs:
           version: 6.x
 
