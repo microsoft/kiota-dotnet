@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <IsPackable>false</IsPackable>
-    <TargetFrameworks>net462;net6.0</TargetFrameworks>
+    <TargetFrameworks>net462;net8.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <OutputType>Library</OutputType>
     <IsTestProject>true</IsTestProject>
@@ -14,7 +14,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <!-- We need Microsoft.TestPlatform.ObjectModel for net framework execution in linux environments https://github.com/microsoft/vstest/issues/2469-->
+    <!-- We need Microsoft.TestPlatform.ObjectModel for net framework execution in linux
+    environments https://github.com/microsoft/vstest/issues/2469-->
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.8.0" />
     <PackageReference Include="Moq" Version="4.20.69" />
     <PackageReference Include="xunit" Version="2.6.1" />
