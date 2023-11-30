@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.3] - 2023-11-30
+
+### Changed
+
+- Fixed an issue where arrays of non-string types passed into the query parameter were not being converted to strings leading to Invalid cast exceptions. [microsoft/kiota#3354](https://github.com/microsoft/kiota/issues/3354)
+
 ## [1.7.2] - 2023-11-14
 
 ### Added
