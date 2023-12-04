@@ -502,7 +502,166 @@ namespace Microsoft.Kiota.Abstractions.Tests
             // Assert
             Assert.Equal("http://localhost/1,2", testRequest.URI.ToString());
         }
+
+
+        [Fact]
+        public void SetsIntValueInQueryParameters()
+        {
+            // Arrange
+            var testRequest = new RequestInformation()
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?item}"
+            };
+            // Act
+            testRequest.AddQueryParameters(new GetQueryParameters { Item = 1 });
+            // Assert
+            Assert.Equal("http://localhost/me?item=1", testRequest.URI.ToString());
+        }
+        [Fact]
+        public void SetsIntValuesInQueryParameters()
+        {
+            // Arrange
+            var requestInfo = new RequestInformation()
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?items}"
+            };
+            // Act
+            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new object []{1,2}});
+            // Assert
+            Assert.Equal("http://localhost/me?items=1,2", requestInfo.URI.ToString());
+        }
+
+        [Fact]
+        public void SetsBooleanValuesInQueryParameters()
+        {
+            // Arrange
+            var requestInfo = new RequestInformation()
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?items}"
+            };
+            // Act
+            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new  object [] { true, false } });
+            // Assert
+            Assert.Equal("http://localhost/me?items=true,false", requestInfo.URI.ToString());
+        }
+
+        [Fact]
+        public void SetsDateTimeOffsetValuesInQueryParameters()
+        {
+           var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?items}"
+            };
+
+            // Act
+            var dateTime1 = new DateTimeOffset(2022, 8, 1, 0, 0, 0, TimeSpan.Zero);
+            var dateTime2 = new DateTimeOffset(2022, 8, 2, 0, 0, 0, TimeSpan.Zero);
+
+            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new object[] { dateTime1, dateTime2 } });
+
+            // Assert
+            Assert.Equal("http://localhost/me?items=2022-08-01T00%3A00%3A00.0000000%2B00%3A00,2022-08-02T00%3A00%3A00.0000000%2B00%3A00", requestInfo.URI.OriginalString);
+        }
+        [Fact]
+        public void SetsDateTimeValuesInQueryParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?items}"
+            };
+
+            // Act
+            var dateTime1 = new DateTime(2022, 8, 1, 0, 0, 0);
+            var dateTime2 = new DateTime(2022, 8, 2, 0, 0, 0);
+
+            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new object[] { dateTime1, dateTime2 } });
+
+            // Assert
+            Assert.Equal("http://localhost/me?items=2022-08-01T00%3A00%3A00.0000000,2022-08-02T00%3A00%3A00.0000000", requestInfo.URI.OriginalString);
+        }
+
+        [Fact]
+        public void SetsDateValuesInQueryParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?items}"
+            };
+
+            // Act
+            var date1 = new Date(2022, 8, 1);
+            var date2 = new Date(2022, 8, 2);
+
+            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new object[] { date1, date2 } });
+
+            // Assert
+            Assert.Equal("http://localhost/me?items=2022-08-01,2022-08-02", requestInfo.URI.OriginalString);
+        }
+
+        [Fact]
+        public void SetsTimeValuesInQueryParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?items}"
+            };
+
+            // Act
+            var date1 = new Time(10,0,0);
+            var date2 = new Time(11, 1, 1);
+
+            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new object[] { date1, date2 } });
+
+            // Assert
+            Assert.Equal("http://localhost/me?items=10%3A00%3A00,11%3A01%3A01", requestInfo.URI.OriginalString);
+        }
+
+        [Fact]
+        public void SetsGuidValuesInQueryParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?items}"
+            };
+
+            // Act
+            var g1 = Guid.Parse("55331110-6817-4A9B-83B2-57617E3E08E5");
+            var g2 = Guid.Parse("482DFF4F-63D6-47F4-A88B-5CAEC03180D4");
+
+            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new object[] { g1, g2 } });
+
+            // Assert
+            Assert.Equal("http://localhost/me?items=55331110-6817-4a9b-83b2-57617e3e08e5,482dff4f-63d6-47f4-a88b-5caec03180d4", requestInfo.URI.OriginalString);
+        }
+
+
+        [Fact]
+        public void DoesNotExpandSecondLayerArrays()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?items}"
+            };
+
+            // Act
+            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new object[]{new int[]{1,2,3,4} } });
+            // Assert
+            Assert.Equal("http://localhost/me?items=System.Int32%5B%5D", requestInfo.URI.OriginalString);
+        }
+
+
     }
+
+    
 
     /// <summary>The messages in a mailbox or folder. Read-only. Nullable.</summary>
     internal class GetQueryParameters
@@ -533,5 +692,10 @@ namespace Microsoft.Kiota.Abstractions.Tests
         /// <summary>Which Dataset to use</summary>
         [QueryParameter("datasets")]
         public TestEnum[] DataSets { get; set; }
+
+        [QueryParameter("item")]
+        public object Item { get; set; }
+        [QueryParameter("items")]
+        public object[] Items { get; set; }
     }
 }

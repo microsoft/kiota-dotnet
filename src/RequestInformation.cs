@@ -5,10 +5,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -89,14 +91,14 @@ namespace Microsoft.Kiota.Abstractions
                     var substitutions = new Dictionary<string, object>();
                     foreach(var urlTemplateParameter in PathParameters)
                     {
-                        substitutions.Add(urlTemplateParameter.Key, GetSanitizedValue(urlTemplateParameter.Value));
+                        substitutions.Add(urlTemplateParameter.Key, GetSanitizedValues(urlTemplateParameter.Value));
                     }
 
                     foreach(var queryStringParameter in QueryParameters)
                     {
                         if(queryStringParameter.Value != null)
                         {
-                            substitutions.Add(queryStringParameter.Key, GetSanitizedValue(queryStringParameter.Value));
+                            substitutions.Add(queryStringParameter.Key, GetSanitizedValues(queryStringParameter.Value));
                         }
                     }
 
@@ -104,6 +106,12 @@ namespace Microsoft.Kiota.Abstractions
                 }
             }
         }
+
+        private static object GetSanitizedValues(object value) => value switch
+        {
+            Array array => ExpandArray(array),
+            _ => GetSanitizedValue(value),
+        };
 
         /// <summary>
         /// Sanitizes objects in order to appear appropiately in the URL
@@ -163,25 +171,28 @@ namespace Microsoft.Kiota.Abstractions
                                                     !string.IsNullOrEmpty(x.Value.ToString()) && // no need to add an empty string value
                                                     (x.Value is not ICollection collection || collection.Count > 0))) // no need to add empty collection
             {
-                QueryParameters.AddOrReplace(property.Name!, ReplaceEnumValueByStringRepresentation(property.Value!));
+                QueryParameters.AddOrReplace(property.Name!, property.Value!);
             }
         }
+
+        private static object ExpandArray(Array collection)
+        {
+            var passedArray = new string[collection.Length];
+            for(var i = 0; i < collection.Length; i++)
+            {
+                passedArray[i] = GetSanitizedValue(collection.GetValue(i)!).ToString()!;
+            }
+            return passedArray;
+        }
+
         private static object ReplaceEnumValueByStringRepresentation(object source)
         {
             if(source is Enum enumValue && GetEnumName(enumValue) is string enumValueName)
             {
                 return enumValueName;
             }
-            else if(source is Array collection && collection.Length > 0 && collection.GetValue(0) is Enum)
-            {
-                var passedArray = new string[collection.Length];
-                for(var i = 0; i < collection.Length; i++)
-                {// this is ugly but necessary due to covariance limitations with pattern matching
-                    passedArray[i] = GetEnumName((Enum)collection.GetValue(i)!)!;
-                }
-                return passedArray;
-            }
-            else return source;
+            
+            return source;
         }
 #if NET5_0_OR_GREATER
         private static string? GetEnumName<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T>(T value) where T : Enum
