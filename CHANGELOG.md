@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.5] - 2024-01-11
+
+### Changed
+
+- Fixes missing query parameters when the parameter values are empty strings.(https://github.com/microsoft/kiota-abstractions-dotnet/issues/172)
+
 ## [1.7.4] - 2024-01-09
 
 ### Changed
