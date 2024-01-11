@@ -87,8 +87,9 @@ namespace Microsoft.Kiota.Abstractions.Tests
             requestInfo.AddQueryParameters(qParams);
 
             // Assert
-            Assert.False(requestInfo.QueryParameters.ContainsKey($"%24search"));
+            Assert.True(requestInfo.QueryParameters.ContainsKey($"%24search"));
             Assert.False(requestInfo.QueryParameters.ContainsKey("search"));
+            Assert.Equal("http://localhost/me?%24search=", requestInfo.URI.OriginalString);
         }
         [Fact]
         public void DoesNotSetEmptyCollectionQueryParameters()
