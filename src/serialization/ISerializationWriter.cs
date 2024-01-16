@@ -151,6 +151,12 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// <param name="key">The key to be used for the written value. May be null.</param>
         void WriteNullValue(string? key);
         /// <summary>
+        /// Writes the specified untyped value to the stream with an optional given key.
+        /// </summary>
+        /// <param name="key">The key to be used for the written value. May be null.</param>
+        /// <param name="value">The untyped value to be written.</param>
+        void WriteUntypedValue(string? key, UntypedNode? value);
+        /// <summary>
         /// Writes the specified additional data to the stream.
         /// </summary>
         /// <param name="value">The additional data to be written.</param>
