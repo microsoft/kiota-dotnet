@@ -14,7 +14,6 @@ namespace Microsoft.Kiota.Abstractions.Serialization
     public class UntypedNode : IParsable
     {
         private static readonly IDictionary<string, Action<IParseNode>> _fieldDeserializers = new ReadOnlyDictionary<string, Action<IParseNode>>(new Dictionary<string, Action<IParseNode>>());
-        private static readonly UntypedNode _modelObject = new ();
         /// <summary>
         /// The value assigned to untyped node.
         /// </summary>
@@ -35,7 +34,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         public static UntypedNode CreateFromDiscriminator(IParseNode parseNode)
         {
             _ = parseNode ?? throw new ArgumentNullException(nameof(parseNode));
-            return _modelObject;
+            return new();
         }
     }
 }
