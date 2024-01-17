@@ -3,8 +3,6 @@
 // ------------------------------------------------------------------------------
 
 using System.Collections.Generic;
-#if NET5_0_OR_GREATER
-#endif
 
 namespace Microsoft.Kiota.Abstractions.Serialization
 {

@@ -139,10 +139,5 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// </summary>
         /// <returns>The byte array value of the node.</returns>
         byte[]? GetByteArrayValue();
-        /// <summary>
-        /// Gets the untyped value of the node
-        /// </summary>
-        /// <returns>The untyped value of the node.</returns>
-        UntypedNode? GetUntypedValue();
     }
 }
