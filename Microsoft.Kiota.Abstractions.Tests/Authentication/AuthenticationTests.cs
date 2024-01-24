@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -111,5 +111,26 @@ public class AuthenticationTests
         // Assert
         Assert.True(validationResult);
         Assert.Empty(validator.AllowedHosts);
+    }
+
+    [Theory]
+    [InlineData("https://graph.microsoft.com")] // https
+    [InlineData("http://graph.microsoft.us")] // http
+    [InlineData("HTTPS://TEST.MICROSOFT.COM")] // https with upperCase
+    [InlineData("http://TEST.MICROSOFT.COM")] // http with upperCase
+    [InlineData("http://developer.microsoft.com,graph.microsoft.com")] // a valid and an invalid together
+    public void AllowedHostValidatorThrowsArgumentExceptionOnNonValidHost(string commaSeparatedHosts)
+    {
+        // Test through the constructor
+        // Arrange
+        var urlStrings = commaSeparatedHosts.Split(new char [] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+        // Assert constructor throws
+        var exception = Assert.Throws<ArgumentException>(() => new AllowedHostsValidator(urlStrings));
+        Assert.Equal("host should not contain http or https prefix", exception.Message);
+        // Assert setter throws
+        var validator = new AllowedHostsValidator();
+        Assert.Throws<ArgumentException>(() => validator.AllowedHosts = urlStrings);
+        Assert.Equal("host should not contain http or https prefix", exception.Message);
     }
 }

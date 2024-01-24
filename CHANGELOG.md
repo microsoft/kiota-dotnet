@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.6] - 2024-01-24
+
+### Changed
+
+- Improve AllowedHost validator to throw an error if `https://` or `http://` prefix is present in a allowed host value.(https://github.com/microsoft/kiota-abstractions-dotnet/issues/165)
+
 ## [1.7.5] - 2024-01-11
 
 ### Changed

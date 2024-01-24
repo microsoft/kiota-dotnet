@@ -21,7 +21,9 @@ namespace Microsoft.Kiota.Abstractions.Authentication
         /// <param name="validHosts"> Collection of valid Hosts</param>
         public AllowedHostsValidator(IEnumerable<string>? validHosts = null)
         {
-            _allowedHosts = new HashSet<string>(validHosts ?? Array.Empty<string>(), StringComparer.OrdinalIgnoreCase);
+            validHosts ??= Array.Empty<string>();
+            ValidateHosts(validHosts);
+            _allowedHosts = new HashSet<string>(validHosts, StringComparer.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -33,6 +35,7 @@ namespace Microsoft.Kiota.Abstractions.Authentication
             set
             {
                 if(value is null) throw new ArgumentNullException(nameof(value));
+                ValidateHosts(value);
                 _allowedHosts = new HashSet<string>(value.Where(x => !string.IsNullOrEmpty(x)), StringComparer.OrdinalIgnoreCase);
             }
         }
@@ -48,6 +51,18 @@ namespace Microsoft.Kiota.Abstractions.Authentication
         public bool IsUrlHostValid(Uri uri)
         {
             return !_allowedHosts.Any() || _allowedHosts.Contains(uri.Host);
+        }
+
+        private static void ValidateHosts(IEnumerable<string> hostsToValidate)
+        {
+            if(hostsToValidate is null) 
+                throw new ArgumentNullException(nameof(hostsToValidate));
+
+            if (hostsToValidate.Any(static host => host.StartsWith("http://", StringComparison.OrdinalIgnoreCase) 
+                                                || host.StartsWith("https://", StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new ArgumentException("host should not contain http or https prefix");
+            }
         }
     }
 }
