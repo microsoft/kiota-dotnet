@@ -5,14 +5,14 @@
 namespace Microsoft.Kiota.Abstractions.Serialization
 {
     /// <summary>
-    /// Represents an untyped node with number value.
+    /// Represents an untyped node with long value.
     /// </summary>
-    /// <param name="value">The number value associated with the node.</param>
-    public class UntypedNumber(string value) : UntypedNode
+    /// <param name="value">The long value associated with the node.</param>
+    public class UntypedLong(long value) : UntypedNode
     {
         /// <summary>
-        /// The number associated with untyped number node.
+        /// The value associated with untyped long node.
         /// </summary>
-        public new string Value { get; } = value;
+        public new long Value { get; } = value;
     }
 }
