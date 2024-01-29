@@ -199,7 +199,7 @@ namespace Microsoft.Kiota.Abstractions
         private static string? GetEnumName<T>(T value) where T : Enum
 #endif
         {
-            var type = value.GetType();
+            var type = typeof(T);
 
             if(Enum.GetName(type, value) is not { } name)
                 throw new ArgumentException($"Invalid Enum value {value} for enum of type {type}");
