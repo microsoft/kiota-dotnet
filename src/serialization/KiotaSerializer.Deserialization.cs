@@ -31,7 +31,9 @@ public static partial class KiotaSerializer
     {
         var stream = new MemoryStream();
         using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true);
-        writer.Write(source);
+        
+        // Some clients enforce async stream processing.
+        writer.WriteAsync(source).GetAwaiter().GetResult();
         writer.Flush();
         stream.Position = 0;
         return stream;
