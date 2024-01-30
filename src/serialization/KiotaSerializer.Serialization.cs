@@ -70,9 +70,7 @@ public static partial class KiotaSerializer
     private static string GetStringFromStream(Stream stream)
     {
         using var reader = new StreamReader(stream);
-
-        // Some clients enforce async stream processing.
-        return reader.ReadToEndAsync().GetAwaiter().GetResult();
+        return reader.ReadToEndAsync().ConfigureAwait(false).GetAwaiter().GetResult(); // so the asp.net projects don't get an error
     }
     private static ISerializationWriter GetSerializationWriter(string contentType, object value)
     {
