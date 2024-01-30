@@ -5,12 +5,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -114,11 +112,11 @@ namespace Microsoft.Kiota.Abstractions
         };
 
         /// <summary>
-        /// Sanitizes objects in order to appear appropiately in the URL
+        /// Sanitizes objects in order to appear appropriately in the URL
         /// </summary>
         /// <param name="value">Object to be sanitized</param>
         /// <returns>Sanitized object</returns>
-        private static object GetSanitizedValue(object value) => value switch
+        private static string GetSanitizedValue(object value) => value switch
         {
             bool boolean => boolean.ToString().ToLower(),// pass in a lowercase string as the final url will be uppercase due to the way ToString() works for booleans
             DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("o"),// Default to ISO 8601 for datetimeoffsets in the url.
@@ -174,37 +172,37 @@ namespace Microsoft.Kiota.Abstractions
             }
         }
 
-        private static object ExpandArray(Array collection)
+        private static string[] ExpandArray(Array collection)
         {
             var passedArray = new string[collection.Length];
             for(var i = 0; i < collection.Length; i++)
             {
-                passedArray[i] = GetSanitizedValue(collection.GetValue(i)!).ToString()!;
+                passedArray[i] = GetSanitizedValue(collection.GetValue(i)!)!;
             }
             return passedArray;
         }
 
-        private static object ReplaceEnumValueByStringRepresentation(object source)
+        private static string ReplaceEnumValueByStringRepresentation(object source)
         {
             if(source is Enum enumValue && GetEnumName(enumValue) is string enumValueName)
             {
                 return enumValueName;
             }
             
-            return source;
+            return source.ToString()!;
         }
 #if NET5_0_OR_GREATER
-        private static string? GetEnumName<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T>(T value) where T : Enum
+        private static string? GetEnumName<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(T value) where T : Enum
 #else
         private static string? GetEnumName<T>(T value) where T : Enum
 #endif
         {
-            var type = typeof(T);
+            var type = value.GetType();
 
             if(Enum.GetName(type, value) is not { } name)
                 throw new ArgumentException($"Invalid Enum value {value} for enum of type {type}");
 
-            if(type.GetMember(name).FirstOrDefault()?.GetCustomAttribute<EnumMemberAttribute>() is { } attribute)
+            if(type.GetField(name)?.GetCustomAttribute<EnumMemberAttribute>() is { } attribute)
                 return attribute.Value;
 
             return name.ToFirstCharacterLowerCase();
@@ -225,7 +223,7 @@ namespace Microsoft.Kiota.Abstractions
         /// The Request Body.
         /// </summary>
         public Stream Content { get; set; } = Stream.Null;
-        private readonly Dictionary<string, IRequestOption> _requestOptions = new Dictionary<string, IRequestOption>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, IRequestOption> _requestOptions = new(StringComparer.OrdinalIgnoreCase);
         /// <summary>
         /// Gets the options for this request. Options are unique by type. If an option of the same type is added twice, the last one wins.
         /// </summary>
@@ -246,8 +244,8 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="options">Options to remove.</param>
         public void RemoveRequestOptions(params IRequestOption[] options)
         {
-            if(!options?.Any() ?? false) throw new ArgumentNullException(nameof(options));
-            foreach(var optionName in options!.Where(x => x != null).Select(x => x.GetType().FullName))
+            if(options.Length == 0) throw new ArgumentNullException(nameof(options));
+            foreach(var optionName in options.Where(x => x != null).Select(x => x.GetType().FullName))
                 _requestOptions.Remove(optionName!);
         }
 
@@ -291,7 +289,7 @@ namespace Microsoft.Kiota.Abstractions
             Content = content;
             Headers.TryAdd(ContentTypeHeader, contentType);
         }
-        private static ActivitySource _activitySource = new(typeof(RequestInformation).Namespace!);
+        private static readonly ActivitySource _activitySource = new(typeof(RequestInformation).Namespace!);
         /// <summary>
         /// Sets the request body from a model with the specified content type.
         /// </summary>

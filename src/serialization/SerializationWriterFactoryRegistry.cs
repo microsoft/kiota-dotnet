@@ -42,12 +42,12 @@ namespace Microsoft.Kiota.Abstractions.Serialization
                 throw new ArgumentNullException(nameof(contentType));
 
             var vendorSpecificContentType = contentType.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).First();
-            if(ContentTypeAssociatedFactories.ContainsKey(vendorSpecificContentType))
-                return ContentTypeAssociatedFactories[vendorSpecificContentType].GetSerializationWriter(vendorSpecificContentType);
+            if(ContentTypeAssociatedFactories.TryGetValue(vendorSpecificContentType, out var vendorFactory))
+                return vendorFactory.GetSerializationWriter(vendorSpecificContentType);
 
             var cleanedContentType = ParseNodeFactoryRegistry.contentTypeVendorCleanupRegex.Replace(vendorSpecificContentType, string.Empty);
-            if(ContentTypeAssociatedFactories.ContainsKey(cleanedContentType))
-                return ContentTypeAssociatedFactories[cleanedContentType].GetSerializationWriter(cleanedContentType);
+            if(ContentTypeAssociatedFactories.TryGetValue(cleanedContentType, out var factory))
+                return factory.GetSerializationWriter(cleanedContentType);
 
             throw new InvalidOperationException($"Content type {cleanedContentType} does not have a factory registered to be parsed");
         }

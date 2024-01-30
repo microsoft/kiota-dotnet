@@ -31,7 +31,7 @@ public static partial class KiotaSerializer
     {
         var stream = new MemoryStream();
         using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true);
-        writer.WriteAsync(source).GetAwaiter().GetResult(); // so the asp.net projects don't get an error
+        writer.Write(source);
         writer.Flush();
         stream.Position = 0;
         return stream;
