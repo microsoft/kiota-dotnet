@@ -10,9 +10,11 @@ namespace Microsoft.Kiota.Abstractions.Serialization
     /// <param name="value">The double value associated with the node.</param>
     public class UntypedDouble(double value) : UntypedNode
     {
+        private readonly double _value = value;
         /// <summary>
-        /// The value associated with untyped double node.
+        /// Gets the value associated with untyped double node.
         /// </summary>
-        public new double Value { get; } = value;
+        /// <returns>The value associated with untyped double node.</returns>
+        public override object GetValue() => _value;
     }
 }

@@ -15,10 +15,6 @@ namespace Microsoft.Kiota.Abstractions.Serialization
     {
         private static readonly IDictionary<string, Action<IParseNode>> _fieldDeserializers = new ReadOnlyDictionary<string, Action<IParseNode>>(new Dictionary<string, Action<IParseNode>>());
         /// <summary>
-        /// The value assigned to untyped node.
-        /// </summary>
-        public object? Value => null;
-        /// <summary>
         /// The deserialization information for the current model
         /// </summary>
         public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers() => _fieldDeserializers;
@@ -36,5 +32,10 @@ namespace Microsoft.Kiota.Abstractions.Serialization
             _ = parseNode ?? throw new ArgumentNullException(nameof(parseNode));
             return new();
         }
+        /// <summary>
+        /// Gets the value assigned to untyped node.
+        /// </summary>
+        /// <returns>The value assigned to untyped node.</returns>
+        public virtual object? GetValue() => throw new NotImplementedException();
     }
 }

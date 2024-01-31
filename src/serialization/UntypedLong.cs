@@ -13,6 +13,11 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// <summary>
         /// The value associated with untyped long node.
         /// </summary>
-        public new long Value { get; } = value;
+        private readonly long _value = value;
+        /// <summary>
+        /// Gets the value associated with untyped long node.
+        /// </summary>
+        /// <returns>The value associated with untyped long node.</returns>
+        public override object GetValue() => _value;
     }
 }

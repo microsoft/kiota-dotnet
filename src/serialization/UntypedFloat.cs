@@ -10,9 +10,11 @@ namespace Microsoft.Kiota.Abstractions.Serialization
     /// <param name="value">The float value associated with the node.</param>
     public class UntypedFloat(float value) : UntypedNode
     {
+        private readonly float _value = value;
         /// <summary>
-        /// The value associated with untyped float node.
+        /// Gets the value associated with untyped float node.
         /// </summary>
-        public new float Value { get; } = value;
+        /// <returns>The value associated with untyped float node.</returns>
+        public override object GetValue() => _value;
     }
 }

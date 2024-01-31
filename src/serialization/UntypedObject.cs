@@ -10,11 +10,13 @@ namespace Microsoft.Kiota.Abstractions.Serialization
     /// Represents an untyped node with object value.
     /// </summary>
     /// <param name="properties">Properties associated with the node.</param>
-    public class UntypedObject(IDictionary<string, UntypedNode>? properties) : UntypedNode
+    public class UntypedObject(IDictionary<string, UntypedNode> properties) : UntypedNode
     {
+        private readonly IDictionary<string, UntypedNode> _properties = properties;
         /// <summary>
-        /// Properties associated with untyped object node.
+        /// Gets properties associated with untyped object node.
         /// </summary>
-        public IDictionary<string, UntypedNode>? Properties { get; } = properties;
+        /// <returns>Properties associated with untyped object node.</returns>
+        public override object GetValue() => _properties;
     }
 }

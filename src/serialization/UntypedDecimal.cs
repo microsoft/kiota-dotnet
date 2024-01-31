@@ -10,9 +10,11 @@ namespace Microsoft.Kiota.Abstractions.Serialization
     /// <param name="value">The decimal value associated with the node.</param>
     public class UntypedDecimal(decimal value) : UntypedNode
     {
+        private readonly decimal _value = value;
         /// <summary>
-        /// The value associated with untyped decimal node.
+        /// Gets the value associated with untyped decimal node.
         /// </summary>
-        public new decimal Value { get; } = value;
+        /// <returns>The value associated with untyped decimal node.</returns>
+        public override object GetValue() => _value;
     }
 }

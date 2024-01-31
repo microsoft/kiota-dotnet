@@ -10,9 +10,11 @@ namespace Microsoft.Kiota.Abstractions.Serialization
     /// <param name="value">The integer value associated with the node.</param>
     public class UntypedInteger(int value): UntypedNode
     {
+        private readonly int _value = value;
         /// <summary>
-        /// The value associated with untyped integer node.
+        /// Gets the value associated with untyped integer node.
         /// </summary>
-        public new int Value { get; } = value;
+        /// <returns>The value associated with untyped integer node.</returns>
+        public override object GetValue() => _value;
     }
 }
