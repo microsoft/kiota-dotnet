@@ -15,6 +15,6 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// Gets the value associated with untyped double node.
         /// </summary>
         /// <returns>The value associated with untyped double node.</returns>
-        public override object GetValue() => _value;
+        public new double GetValue() => _value;
     }
 }

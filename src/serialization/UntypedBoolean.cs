@@ -15,6 +15,6 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// Gets the value associated with untyped boolean node.
         /// </summary>
         /// <returns>The value associated with untyped boolean node.</returns>
-        public override object GetValue() => _value;
+        public new bool GetValue() => _value;
     }
 }

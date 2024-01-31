@@ -15,6 +15,6 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// Gets the string associated with untyped string node.
         /// </summary>
         /// <returns>The string associated with untyped string node.</returns>
-        public override object? GetValue() => _value;
+        public new string? GetValue() => _value;
     }
 }

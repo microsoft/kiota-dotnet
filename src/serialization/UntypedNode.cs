@@ -36,6 +36,6 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// Gets the value assigned to untyped node.
         /// </summary>
         /// <returns>The value assigned to untyped node.</returns>
-        public virtual object? GetValue() => throw new NotImplementedException();
+        public object? GetValue() => throw new NotImplementedException();
     }
 }

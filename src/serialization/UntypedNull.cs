@@ -13,6 +13,6 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// Gets the value associated with untyped null node.
         /// </summary>
         /// <returns>The value associated with untyped null node.</returns>
-        public override object? GetValue() => null;
+        public new object? GetValue() => null;
     }
 }

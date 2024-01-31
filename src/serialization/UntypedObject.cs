@@ -17,6 +17,6 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// Gets properties associated with untyped object node.
         /// </summary>
         /// <returns>Properties associated with untyped object node.</returns>
-        public override object GetValue() => _properties;
+        public new IDictionary<string, UntypedNode> GetValue() => _properties;
     }
 }

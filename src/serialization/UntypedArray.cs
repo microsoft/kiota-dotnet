@@ -17,6 +17,6 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// Gets the collection of untyped child nodes.
         /// </summary>
         /// <returns>The collection of untyped child nodes.</returns>
-        public override object GetValue() => _value;
+        public new IEnumerable<UntypedNode> GetValue() => _value;
     }
 }
