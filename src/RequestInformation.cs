@@ -116,7 +116,7 @@ namespace Microsoft.Kiota.Abstractions
         /// </summary>
         /// <param name="value">Object to be sanitized</param>
         /// <returns>Sanitized object</returns>
-        private static string GetSanitizedValue(object value) => value switch
+        private static object GetSanitizedValue(object value) => value switch
         {
             bool boolean => boolean.ToString().ToLower(),// pass in a lowercase string as the final url will be uppercase due to the way ToString() works for booleans
             DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("o"),// Default to ISO 8601 for datetimeoffsets in the url.
@@ -177,19 +177,19 @@ namespace Microsoft.Kiota.Abstractions
             var passedArray = new string[collection.Length];
             for(var i = 0; i < collection.Length; i++)
             {
-                passedArray[i] = GetSanitizedValue(collection.GetValue(i)!)!;
+                passedArray[i] = GetSanitizedValue(collection.GetValue(i)!).ToString()!;
             }
             return passedArray;
         }
 
-        private static string ReplaceEnumValueByStringRepresentation(object source)
+        private static object ReplaceEnumValueByStringRepresentation(object source)
         {
             if(source is Enum enumValue && GetEnumName(enumValue) is string enumValueName)
             {
                 return enumValueName;
             }
             
-            return source.ToString()!;
+            return source;
         }
 #if NET5_0_OR_GREATER
         private static string? GetEnumName<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(T value) where T : Enum
