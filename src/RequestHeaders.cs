@@ -25,7 +25,7 @@ public class RequestHeaders : IDictionary<string, IEnumerable<string>>
             throw new ArgumentNullException(nameof(headerName));
         if(headerValues == null)
             throw new ArgumentNullException(nameof(headerValues));
-        if(!headerValues.Any())
+        if(headerValues.Length == 0)
             return;
         if(_singleValueHeaders.Contains(headerName))
             _headers[headerName] = new HashSet<string> { headerValues[0] };
@@ -79,7 +79,7 @@ public class RequestHeaders : IDictionary<string, IEnumerable<string>>
         if(_headers.TryGetValue(headerName, out var values))
         {
             var result = values.Remove(headerValue);
-            if(!values.Any())
+            if(values.Count == 0)
                 _headers.Remove(headerName);
             return result;
         }

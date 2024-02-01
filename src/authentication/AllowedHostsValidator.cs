@@ -50,7 +50,7 @@ namespace Microsoft.Kiota.Abstractions.Authentication
         /// </returns>
         public bool IsUrlHostValid(Uri uri)
         {
-            return !_allowedHosts.Any() || _allowedHosts.Contains(uri.Host);
+            return _allowedHosts.Count == 0 || _allowedHosts.Contains(uri.Host);
         }
 
         private static void ValidateHosts(IEnumerable<string> hostsToValidate)

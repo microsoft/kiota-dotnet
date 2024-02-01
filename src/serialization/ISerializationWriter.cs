@@ -141,7 +141,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// <param name="key">The key to be used for the written value. May be null.</param>
         /// <param name="value">The enum value to be written.</param>
 #if NET5_0_OR_GREATER
-        void WriteEnumValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T>(string? key, T? value) where T : struct, Enum;
+        void WriteEnumValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(string? key, T? value) where T : struct, Enum;
 #else
         void WriteEnumValue<T>(string? key, T? value) where T : struct, Enum;
 #endif
