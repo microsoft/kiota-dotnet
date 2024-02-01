@@ -172,12 +172,12 @@ namespace Microsoft.Kiota.Abstractions
             }
         }
 
-        private static string[] ExpandArray(Array collection)
+        private static object[] ExpandArray(Array collection)
         {
-            var passedArray = new string[collection.Length];
+            var passedArray = new object[collection.Length];
             for(var i = 0; i < collection.Length; i++)
             {
-                passedArray[i] = GetSanitizedValue(collection.GetValue(i)!).ToString()!;
+                passedArray[i] = GetSanitizedValue(collection.GetValue(i)!);
             }
             return passedArray;
         }
@@ -188,7 +188,7 @@ namespace Microsoft.Kiota.Abstractions
             {
                 return enumValueName;
             }
-            
+
             return source;
         }
 #if NET5_0_OR_GREATER
