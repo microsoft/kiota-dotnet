@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.7] - 2024-02-01
+
+### Changed
+
+- Fixed AOT trimming warnings the URI template parameters resolution. [microsoft/kiota#4065](https://github.com/microsoft/kiota/issues/4065).
+
 ## [1.7.6] - 2024-01-24
 
 ### Changed
