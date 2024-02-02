@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.8] - 2024-02-02
+
+### Changed
+
+- Updated `DynamicallyAccessedMembers` annotations for the `WriteCollectionOfEnumValues` method.
+
 ## [1.7.7] - 2024-02-01
 
 ### Changed
