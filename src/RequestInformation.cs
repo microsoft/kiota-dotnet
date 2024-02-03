@@ -47,7 +47,11 @@ namespace Microsoft.Kiota.Abstractions
         /// </summary>
         /// <typeparam name="T">Type for the query parameters</typeparam>
         /// <param name="requestConfiguration">Callback to configure the request</param>
+#if NET5_0_OR_GREATER
+        public void Configure<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(Action<RequestConfiguration<T>>? requestConfiguration) where T : class, new()
+#else
         public void Configure<T>(Action<RequestConfiguration<T>>? requestConfiguration) where T : class, new()
+#endif
         {
             if(requestConfiguration == null) return;
             var requestConfig = new RequestConfiguration<T>();
