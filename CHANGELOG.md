@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.9] - 2024-02-05
+
+### Changed
+
+- Added `DynamicallyAccessedMembers` annotation to `RequestInformation.Configure`.
+- Fixes `IsTrimmable` property on the project.
+
 ## [1.7.8] - 2024-02-02
 
 ### Changed
