@@ -76,5 +76,5 @@ jobs:
           ./.sonar/scanner/dotnet-sonarscanner begin /k:"microsoft_kiota-abstractions-dotnet" /o:"microsoft" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="Microsoft.Kiota.Abstractions.Tests/coverage.net8.0.opencover.xml"
           dotnet workload restore
           dotnet build
-          dotnet test Microsoft.Kiota.Abstractions.sln --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+          dotnet test Microsoft.Kiota.Abstractions.sln --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover --framework net8.0
           ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
