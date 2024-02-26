@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Fixed AOT compiler warnings from ILC.
+- Update IParseNode enum methods `DynamicallyAccessedMembersAttribute` to `PublicFields`.
  
 ## [1.7.10] - 2024-02-26
 
