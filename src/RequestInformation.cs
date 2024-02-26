@@ -206,12 +206,12 @@ namespace Microsoft.Kiota.Abstractions
             if (Enum.GetName(type, value) is not { } name)
                 throw new ArgumentException($"Invalid Enum value {value} for enum of type {type}");
 
-#pragma warning disable IL2075 // Enumerating Enum fields is always trimming/AOT safe - https://github.com/dotnet/runtime/issues/97737
-            if (type.GetField(name, BindingFlags.Static | BindingFlags.Public)?.GetCustomAttribute<EnumMemberAttribute>() is { } attribute)
-                return attribute.Value;
-#pragma warning restore IL2075
+            [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2075:UnrecognizedReflectionPattern",
+                Justification = "Enumerating Enum fields is always trimming/AOT safe - https://github.com/dotnet/runtime/issues/97737")]
+            static string? GetEnumMemberValue(Type enumType, string name) =>
+                enumType.GetField(name, BindingFlags.Static | BindingFlags.Public)?.GetCustomAttribute<EnumMemberAttribute>() is { } attribute ? attribute.Value : null;
 
-            return name.ToFirstCharacterLowerCase();
+            return GetEnumMemberValue(type, name) ?? name.ToFirstCharacterLowerCase();
         }
         /// <summary>
         /// The Request Headers.
