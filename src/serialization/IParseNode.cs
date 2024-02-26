@@ -101,7 +101,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// </summary>
         /// <returns>The collection of enum values.</returns>
 #if NET5_0_OR_GREATER
-        IEnumerable<T?>? GetCollectionOfEnumValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]T>() where T : struct, Enum;
+        IEnumerable<T?>? GetCollectionOfEnumValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>() where T : struct, Enum;
 #else
         IEnumerable<T?>? GetCollectionOfEnumValues<T>() where T : struct, Enum;
 #endif
@@ -116,7 +116,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// </summary>
         /// <returns>The enum value of the node.</returns>
 #if NET5_0_OR_GREATER
-        T? GetEnumValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]T>() where T : struct, Enum;
+        T? GetEnumValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>() where T : struct, Enum;
 #else
         T? GetEnumValue<T>() where T : struct, Enum;
 #endif

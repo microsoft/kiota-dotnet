@@ -87,8 +87,9 @@ namespace Microsoft.Kiota.Abstractions.Tests
             requestInfo.AddQueryParameters(qParams);
 
             // Assert
-            Assert.False(requestInfo.QueryParameters.ContainsKey($"%24search"));
+            Assert.True(requestInfo.QueryParameters.ContainsKey($"%24search"));
             Assert.False(requestInfo.QueryParameters.ContainsKey("search"));
+            Assert.Equal("http://localhost/me?%24search=", requestInfo.URI.OriginalString);
         }
         [Fact]
         public void DoesNotSetEmptyCollectionQueryParameters()
@@ -528,7 +529,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
                 UrlTemplate = "http://localhost/me{?items}"
             };
             // Act
-            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new object []{1,2}});
+            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new object[] { 1, 2 } });
             // Assert
             Assert.Equal("http://localhost/me?items=1,2", requestInfo.URI.ToString());
         }
@@ -543,7 +544,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
                 UrlTemplate = "http://localhost/me{?items}"
             };
             // Act
-            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new  object [] { true, false } });
+            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new object[] { true, false } });
             // Assert
             Assert.Equal("http://localhost/me?items=true,false", requestInfo.URI.ToString());
         }
@@ -551,7 +552,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
         [Fact]
         public void SetsDateTimeOffsetValuesInQueryParameters()
         {
-           var requestInfo = new RequestInformation
+            var requestInfo = new RequestInformation
             {
                 HttpMethod = Method.GET,
                 UrlTemplate = "http://localhost/me{?items}"
@@ -614,7 +615,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             };
 
             // Act
-            var date1 = new Time(10,0,0);
+            var date1 = new Time(10, 0, 0);
             var date2 = new Time(11, 1, 1);
 
             requestInfo.AddQueryParameters(new GetQueryParameters { Items = new object[] { date1, date2 } });
@@ -653,15 +654,15 @@ namespace Microsoft.Kiota.Abstractions.Tests
             };
 
             // Act
-            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new object[]{new int[]{1,2,3,4} } });
+            requestInfo.AddQueryParameters(new GetQueryParameters { Items = [new int[] { 1, 2, 3, 4 }] });
             // Assert
-            Assert.Equal("http://localhost/me?items=System.Int32%5B%5D", requestInfo.URI.OriginalString);
+            Assert.Throws<ArgumentException>(() => requestInfo.URI.OriginalString);
         }
 
 
     }
 
-    
+
 
     /// <summary>The messages in a mailbox or folder. Read-only. Nullable.</summary>
     internal class GetQueryParameters

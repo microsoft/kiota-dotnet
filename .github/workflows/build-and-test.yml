@@ -7,6 +7,11 @@ on:
   pull_request:
     branches: ["main", "dev"]
 
+permissions:
+  contents: read #those permissions are required to run the codeql analysis
+  actions: read
+  security-events: write
+
 jobs:
   build-and-test:
     runs-on: windows-latest
@@ -26,7 +31,9 @@ jobs:
         run: dotnet restore ${{ env.solutionName }}
       - name: Build
         run: dotnet build ${{ env.solutionName }} --no-restore -c Release /p:UseSharedCompilation=false
-      - name: Test
-        run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal -c Release /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=opencover
+      - name: Test for net462
+        run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal -c Release --framework net462
+      - name: Test for net8.0 and collect coverage
+        run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal -c Release /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=opencover --framework net8.0
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

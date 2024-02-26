@@ -97,7 +97,7 @@ public class MultipartBody : IParsable
         {
             throw new InvalidOperationException(nameof(RequestAdapter.SerializationWriterFactory));
         }
-        if(!_parts.Any())
+        if(_parts.Count == 0)
         {
             throw new InvalidOperationException("No parts to serialize");
         }

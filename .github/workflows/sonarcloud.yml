@@ -9,6 +9,10 @@ on:
     types: [opened, synchronize, reopened]
     paths-ignore: [".vscode/**"]
 
+permissions:
+  contents: read
+  pull-requests: read
+
 env:
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
@@ -44,14 +48,14 @@ jobs:
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: Cache SonarCloud packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
       - name: Cache SonarCloud scanner
         id: cache-sonar-scanner
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./.sonar/scanner
           key: ${{ runner.os }}-sonar-scanner
@@ -72,5 +76,5 @@ jobs:
           ./.sonar/scanner/dotnet-sonarscanner begin /k:"microsoft_kiota-abstractions-dotnet" /o:"microsoft" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="Microsoft.Kiota.Abstractions.Tests/coverage.net8.0.opencover.xml"
           dotnet workload restore
           dotnet build
-          dotnet test Microsoft.Kiota.Abstractions.sln --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+          dotnet test Microsoft.Kiota.Abstractions.sln --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover --framework net8.0
           ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"

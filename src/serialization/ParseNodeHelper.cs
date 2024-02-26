@@ -23,7 +23,7 @@ public static class ParseNodeHelper
         {
             throw new ArgumentNullException(nameof(targets));
         }
-        if(!targets.Any())
+        if(targets.Length == 0)
         {
             throw new ArgumentException("At least one target must be provided.", nameof(targets));
         }

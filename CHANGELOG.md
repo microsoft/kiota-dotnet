@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.11] - 2024-02-26
+
+### Changed
+
+- Updated IParseNode enum methods `DynamicallyAccessedMembersAttribute` to `PublicFields`.
+- Fixed AOT compiler warnings from ILC.
+ 
+## [1.7.10] - 2024-02-26
+
+### Changed
+
+- Added `net6.0` and `net8.0` as target frameworks.
+
+## [1.7.9] - 2024-02-05
+
+### Changed
+
+- Added `DynamicallyAccessedMembers` annotation to `RequestInformation.Configure`.
+- Fixes `IsTrimmable` property on the project.
+
+## [1.7.8] - 2024-02-02
+
+### Changed
+
+- Updated `DynamicallyAccessedMembers` annotations for the `WriteCollectionOfEnumValues` method.
+
+## [1.7.7] - 2024-02-01
+
+### Changed
+
+- Fixed AOT trimming warnings the URI template parameters resolution. [microsoft/kiota#4065](https://github.com/microsoft/kiota/issues/4065).
+
+## [1.7.6] - 2024-01-24
+
+### Changed
+
+- Improve AllowedHost validator to throw an error if `https://` or `http://` prefix is present in a allowed host value.(https://github.com/microsoft/kiota-abstractions-dotnet/issues/165)
+
+## [1.7.5] - 2024-01-11
+
+### Changed
+
+- Fixes missing query parameters when the parameter values are empty strings.(https://github.com/microsoft/kiota-abstractions-dotnet/issues/172)
+
 ## [1.7.4] - 2024-01-09
 
 ### Changed
