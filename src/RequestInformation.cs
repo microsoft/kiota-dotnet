@@ -8,10 +8,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Microsoft.Kiota.Abstractions.Extensions;
-using Microsoft.Kiota.Abstractions.Serialization;
 using System.Runtime.Serialization;
 using System.Reflection;
+using Microsoft.Kiota.Abstractions.Extensions;
+using Microsoft.Kiota.Abstractions.Serialization;
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
 #endif
@@ -211,7 +211,6 @@ namespace Microsoft.Kiota.Abstractions
 
             return name.ToFirstCharacterLowerCase();
         }
-
         /// <summary>
         /// The Request Headers.
         /// </summary>
