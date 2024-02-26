@@ -206,8 +206,10 @@ namespace Microsoft.Kiota.Abstractions
             if (Enum.GetName(type, value) is not { } name)
                 throw new ArgumentException($"Invalid Enum value {value} for enum of type {type}");
 
-            [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2075:UnrecognizedReflectionPattern",
+#if NET5_0_OR_GREATER
+            [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2070:UnrecognizedReflectionPattern",
                 Justification = "Enumerating Enum fields is always trimming/AOT safe - https://github.com/dotnet/runtime/issues/97737")]
+#endif
             static string? GetEnumMemberValue(Type enumType, string name) =>
                 enumType.GetField(name, BindingFlags.Static | BindingFlags.Public)?.GetCustomAttribute<EnumMemberAttribute>() is { } attribute ? attribute.Value : null;
 
