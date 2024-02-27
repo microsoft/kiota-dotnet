@@ -53,7 +53,7 @@ namespace Microsoft.Kiota.Abstractions
         public void Configure<T>(Action<RequestConfiguration<T>>? requestConfiguration) where T : class, new()
 #endif
         {
-            if(requestConfiguration == null) return;
+            if (requestConfiguration == null) return;
             var requestConfig = new RequestConfiguration<T>();
             requestConfiguration(requestConfig);
             AddQueryParameters(requestConfig.QueryParameters);
@@ -69,7 +69,7 @@ namespace Microsoft.Kiota.Abstractions
         {
             set
             {
-                if(value == null)
+                if (value == null)
                     throw new ArgumentNullException(nameof(value));
                 QueryParameters.Clear();
                 PathParameters.Clear();
@@ -77,9 +77,9 @@ namespace Microsoft.Kiota.Abstractions
             }
             get
             {
-                if(_rawUri != null)
+                if (_rawUri != null)
                     return _rawUri;
-                else if(PathParameters.TryGetValue(RawUrlKey, out var rawUrl) &&
+                else if (PathParameters.TryGetValue(RawUrlKey, out var rawUrl) &&
                     rawUrl is string rawUrlString)
                 {
                     URI = new Uri(rawUrlString);
@@ -87,18 +87,18 @@ namespace Microsoft.Kiota.Abstractions
                 }
                 else
                 {
-                    if(UrlTemplate?.IndexOf("{+baseurl}", StringComparison.OrdinalIgnoreCase) >= 0 && !PathParameters.ContainsKey("baseurl"))
+                    if (UrlTemplate?.IndexOf("{+baseurl}", StringComparison.OrdinalIgnoreCase) >= 0 && !PathParameters.ContainsKey("baseurl"))
                         throw new InvalidOperationException($"{nameof(PathParameters)} must contain a value for \"baseurl\" for the url to be built.");
 
                     var substitutions = new Dictionary<string, object>();
-                    foreach(var urlTemplateParameter in PathParameters)
+                    foreach (var urlTemplateParameter in PathParameters)
                     {
                         substitutions.Add(urlTemplateParameter.Key, GetSanitizedValues(urlTemplateParameter.Value));
                     }
 
-                    foreach(var queryStringParameter in QueryParameters)
+                    foreach (var queryStringParameter in QueryParameters)
                     {
-                        if(queryStringParameter.Value != null)
+                        if (queryStringParameter.Value != null)
                         {
                             substitutions.Add(queryStringParameter.Key, GetSanitizedValues(queryStringParameter.Value));
                         }
@@ -157,8 +157,8 @@ namespace Microsoft.Kiota.Abstractions
         public void AddQueryParameters<T>(T source)
 #endif
         {
-            if(source == null) return;
-            foreach(var property in typeof(T)
+            if (source == null) return;
+            foreach (var property in typeof(T)
                                         .GetProperties()
                                         .Select(
                                             x => (
@@ -179,7 +179,7 @@ namespace Microsoft.Kiota.Abstractions
         private static object[] ExpandArray(Array collection)
         {
             var passedArray = new object[collection.Length];
-            for(var i = 0; i < collection.Length; i++)
+            for (var i = 0; i < collection.Length; i++)
             {
                 passedArray[i] = GetSanitizedValue(collection.GetValue(i)!);
             }
@@ -188,7 +188,7 @@ namespace Microsoft.Kiota.Abstractions
 
         private static object ReplaceEnumValueByStringRepresentation(object source)
         {
-            if(source is Enum enumValue && GetEnumName(enumValue) is string enumValueName)
+            if (source is Enum enumValue && GetEnumName(enumValue) is string enumValueName)
             {
                 return enumValueName;
             }
@@ -203,13 +203,17 @@ namespace Microsoft.Kiota.Abstractions
         {
             var type = value.GetType();
 
-            if(Enum.GetName(type, value) is not { } name)
+            if (Enum.GetName(type, value) is not { } name)
                 throw new ArgumentException($"Invalid Enum value {value} for enum of type {type}");
 
-            if(type.GetField(name)?.GetCustomAttribute<EnumMemberAttribute>() is { } attribute)
-                return attribute.Value;
+#if NET5_0_OR_GREATER
+            [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2070:UnrecognizedReflectionPattern",
+                Justification = "Enumerating Enum fields is always trimming/AOT safe - https://github.com/dotnet/runtime/issues/97737")]
+#endif
+            static string? GetEnumMemberValue(Type enumType, string name) =>
+                enumType.GetField(name, BindingFlags.Static | BindingFlags.Public)?.GetCustomAttribute<EnumMemberAttribute>() is { } attribute ? attribute.Value : null;
 
-            return name.ToFirstCharacterLowerCase();
+            return GetEnumMemberValue(type, name) ?? name.ToFirstCharacterLowerCase();
         }
         /// <summary>
         /// The Request Headers.
@@ -220,7 +224,7 @@ namespace Microsoft.Kiota.Abstractions
         /// </summary>
         public void AddHeaders(RequestHeaders headers)
         {
-            if(headers == null) return;
+            if (headers == null) return;
             Headers.AddAll(headers);
         }
         /// <summary>
@@ -238,8 +242,8 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="options">The option to add.</param>
         public void AddRequestOptions(IEnumerable<IRequestOption> options)
         {
-            if(options == null) return;
-            foreach(var option in options.Where(x => x != null))
+            if (options == null) return;
+            foreach (var option in options.Where(x => x != null))
                 _requestOptions.AddOrReplace(option.GetType().FullName!, option);
         }
         /// <summary>
@@ -248,8 +252,8 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="options">Options to remove.</param>
         public void RemoveRequestOptions(params IRequestOption[] options)
         {
-            if(options.Length == 0) throw new ArgumentNullException(nameof(options));
-            foreach(var optionName in options.Where(x => x != null).Select(x => x.GetType().FullName))
+            if (options.Length == 0) throw new ArgumentNullException(nameof(options));
+            foreach (var optionName in options.Where(x => x != null).Select(x => x.GetType().FullName))
                 _requestOptions.Remove(optionName!);
         }
 
@@ -263,7 +267,7 @@ namespace Microsoft.Kiota.Abstractions
         /// </summary>
         public void SetResponseHandler(IResponseHandler responseHandler)
         {
-            if(responseHandler == null)
+            if (responseHandler == null)
                 throw new ArgumentNullException(nameof(responseHandler));
 
             var responseHandlerOption = new ResponseHandlerOption
@@ -322,7 +326,7 @@ namespace Microsoft.Kiota.Abstractions
             using var activity = _activitySource?.StartActivity(nameof(SetContentFromParsable));
             using var writer = GetSerializationWriter(requestAdapter, contentType, item);
             SetRequestType(item, activity);
-            if(item is MultipartBody mpBody)
+            if (item is MultipartBody mpBody)
             {
                 contentType += "; boundary=" + mpBody.Boundary;
                 mpBody.RequestAdapter = requestAdapter;
@@ -333,15 +337,15 @@ namespace Microsoft.Kiota.Abstractions
         }
         private static void SetRequestType(object? result, Activity? activity)
         {
-            if(activity == null) return;
-            if(result == null) return;
+            if (activity == null) return;
+            if (result == null) return;
             activity.SetTag("com.microsoft.kiota.request.type", result.GetType().FullName);
         }
         private static ISerializationWriter GetSerializationWriter<T>(IRequestAdapter requestAdapter, string contentType, T item)
         {
-            if(string.IsNullOrEmpty(contentType)) throw new ArgumentNullException(nameof(contentType));
-            if(requestAdapter == null) throw new ArgumentNullException(nameof(requestAdapter));
-            if(item == null) throw new InvalidOperationException($"{nameof(item)} cannot be null");
+            if (string.IsNullOrEmpty(contentType)) throw new ArgumentNullException(nameof(contentType));
+            if (requestAdapter == null) throw new ArgumentNullException(nameof(requestAdapter));
+            if (item == null) throw new InvalidOperationException($"{nameof(item)} cannot be null");
             return requestAdapter.SerializationWriterFactory.GetSerializationWriter(contentType);
         }
         /// <summary>
@@ -372,7 +376,7 @@ namespace Microsoft.Kiota.Abstractions
             using var activity = _activitySource?.StartActivity(nameof(SetContentFromScalar));
             using var writer = GetSerializationWriter(requestAdapter, contentType, item);
             SetRequestType(item, activity);
-            switch(item)
+            switch (item)
             {
                 case string s:
                     writer.WriteStringValue(null, s);
