@@ -48,6 +48,15 @@ extends:
             displayName: 'Use .NET 8'
             inputs:
               version: 8.x
+          
+          - task: PowerShell@2
+            displayName: 'Enable signing'
+            inputs:
+              targetType: filePath
+              filePath: 'scripts\EnableSigning.ps1'
+              arguments: '-projectPath "$(Build.SourcesDirectory)/src/Microsoft.Kiota.Abstractions.csproj"'
+              pwsh: true
+            enabled: true
               
           # Install the nuget tool.
           - task: NuGetToolInstaller@1
@@ -71,6 +80,33 @@ extends:
               projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.Abstractions.sln'
               arguments: '--configuration $(BuildConfiguration) --no-build --framework net8.0'
 
+          - task: EsrpCodeSigning@2
+            displayName: 'ESRP DLL Strong Name'
+            inputs:
+              ConnectedServiceName: 'microsoftgraph ESRP CodeSign DLL and NuGet (AKV)'
+              FolderPath: $(ProductBinPath)
+              Pattern: '**\*Microsoft.Kiota.Abstractions.dll'
+              signConfigType: inlineSignParams
+              UseMinimatch: true
+              inlineOperation: |
+                [
+                    {
+                        "keyCode": "CP-233863-SN",
+                        "operationSetCode": "StrongNameSign",
+                        "parameters": [],
+                        "toolName": "sign",
+                        "toolVersion": "1.0"
+                    },
+                    {
+                        "keyCode": "CP-233863-SN",
+                        "operationSetCode": "StrongNameVerify",
+                        "parameters": [],
+                        "toolName": "sign",
+                        "toolVersion": "1.0"
+                    }
+                ]
+              SessionTimeout: 20
+          
           - task: EsrpCodeSigning@2
             displayName: 'ESRP DLL CodeSigning'
             inputs:
