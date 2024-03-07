@@ -11,6 +11,24 @@ namespace Microsoft.Kiota.Abstractions.Tests
     public class RequestInformationTests
     {
         [Fact]
+        public void SetUriCorrectlyEscapesDataString()
+        {
+            // Arrange
+            var testRequest = new RequestInformation()
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/repos/{owner}/{repo}/labels/{name}"
+            };
+            // Act
+            testRequest.PathParameters.Add("owner", "me");
+            testRequest.PathParameters.Add("repo", "test");
+            testRequest.PathParameters.Add("name", "profane content 🤬");
+            // Assert
+            var actual = testRequest.URI.AbsoluteUri.ToString();
+            Assert.Equal("http://localhost/repos/me/test/labels/profane%20content%20%F0%9F%A4%AC", actual);
+            Assert.Empty(testRequest.QueryParameters);
+        }
+        [Fact]
         public void SetUriExtractsQueryParameters()
         {
             // Arrange
