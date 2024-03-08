@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.12] - 2024-03-08
+
+### Changed
+
+- Upgrade `Std.UriTemplate` NuGet package to version 0.54.
+- Add a unit test for emoji in URI template parameters.
+
 ## [1.7.11] - 2024-02-26
 
 ### Changed
