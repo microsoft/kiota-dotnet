@@ -246,6 +246,7 @@ extends:
                   displayName: 'NuGet push'
                   inputs:
                     packagesToPush: '$(Pipeline.Workspace)/Nugets/Microsoft.Kiota.Abstractions.*.nupkg'
+                    packageParentPath: '$(Pipeline.Workspace)'
                     nuGetFeedType: external
                     publishFeedCredentials: 'Kiota Nuget Connection'
                 - task: GitHubRelease@1
