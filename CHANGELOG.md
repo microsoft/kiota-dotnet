@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2024-03-18
+
+### Added
+
+- Added support for untyped nodes. (https://github.com/microsoft/kiota-abstractions-dotnet/issues/175)
+
 ## [1.7.12] - 2024-03-08
 
 ### Changed
