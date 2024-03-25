@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
 
@@ -32,7 +33,8 @@ public class MultipartBody : IParsable
     /// <param name="partName">The name of the part.</param>
     /// <param name="contentType">The content type of the part.</param>
     /// <param name="partValue">The value of the part.</param>
-    public void AddOrReplacePart<T>(string partName, string contentType, T partValue)
+    /// <param name="fileName">An optional file name for the part.</param>
+    public void AddOrReplacePart<T>(string partName, string contentType, T partValue, string? fileName = null)
     {
         if(string.IsNullOrEmpty(partName))
         {
@@ -46,7 +48,7 @@ public class MultipartBody : IParsable
         {
             throw new ArgumentNullException(nameof(partValue));
         }
-        var value = new Tuple<string, object>(contentType, partValue);
+        var value = new Part(partName, partValue, contentType, fileName);
         if(!_parts.TryAdd(partName, value))
         {
             _parts[partName] = value;
@@ -66,7 +68,10 @@ public class MultipartBody : IParsable
         }
         if(_parts.TryGetValue(partName, out var value))
         {
-            return (T)value.Item2;
+            if(value == null)
+                return default;
+
+            return (T)value.Content;
         }
         return default;
     }
@@ -83,7 +88,8 @@ public class MultipartBody : IParsable
         }
         return _parts.Remove(partName);
     }
-    private readonly Dictionary<string, Tuple<string, object>> _parts = new Dictionary<string, Tuple<string, object>>(StringComparer.OrdinalIgnoreCase);
+
+    private readonly Dictionary<string, Part> _parts = new Dictionary<string, Part>(StringComparer.OrdinalIgnoreCase);
     /// <inheritdoc />
     public IDictionary<string, Action<IParseNode>> GetFieldDeserializers() => throw new NotImplementedException();
     /// <inheritdoc />
@@ -102,8 +108,13 @@ public class MultipartBody : IParsable
             throw new InvalidOperationException("No parts to serialize");
         }
         var first = true;
-        foreach(var part in _parts)
+        var contentDispositionBuilder = new StringBuilder();
+        foreach(var pair in _parts)
         {
+            var part = pair.Value;
+            if (part == null)
+                throw new InvalidOperationException($"Part {pair.Key} was null");
+
             try
             {
                 if(first)
@@ -112,12 +123,26 @@ public class MultipartBody : IParsable
                     AddNewLine(writer);
 
                 writer.WriteStringValue(string.Empty, $"--{Boundary}");
-                writer.WriteStringValue("Content-Type", $"{part.Value.Item1}");
-                writer.WriteStringValue("Content-Disposition", $"form-data; name=\"{part.Key}\"");
-                AddNewLine(writer);
-                if(part.Value.Item2 is IParsable parsable)
+                writer.WriteStringValue("Content-Type", part.ContentType);
+
+                contentDispositionBuilder.Clear();
+                contentDispositionBuilder.Append("form-data; name=\"");
+                contentDispositionBuilder.Append(part.Name);
+                contentDispositionBuilder.Append("\"");
+
+                if (part.FileName != null)
                 {
-                    using var partWriter = RequestAdapter.SerializationWriterFactory.GetSerializationWriter(part.Value.Item1);
+                    contentDispositionBuilder.Append("; filename=\"");
+                    contentDispositionBuilder.Append(part.FileName);
+                    contentDispositionBuilder.Append("\"");
+                }
+
+                writer.WriteStringValue("Content-Disposition", contentDispositionBuilder.ToString());
+
+                AddNewLine(writer);
+                if(part.Content is IParsable parsable)
+                {
+                    using var partWriter = RequestAdapter.SerializationWriterFactory.GetSerializationWriter(part.ContentType);
                     partWriter.WriteObjectValue(string.Empty, parsable);
                     using var partContent = partWriter.GetSerializedContent();
                     if(partContent.CanSeek)
@@ -126,15 +151,15 @@ public class MultipartBody : IParsable
                     partContent.CopyTo(ms);
                     writer.WriteByteArrayValue(string.Empty, ms.ToArray());
                 }
-                else if(part.Value.Item2 is string currentString)
+                else if(part.Content is string currentString)
                 {
                     writer.WriteStringValue(string.Empty, currentString);
                 }
-                else if(part.Value.Item2 is MemoryStream originalMemoryStream)
+                else if(part.Content is MemoryStream originalMemoryStream)
                 {
                     writer.WriteByteArrayValue(string.Empty, originalMemoryStream.ToArray());
                 }
-                else if(part.Value.Item2 is Stream currentStream)
+                else if(part.Content is Stream currentStream)
                 {
                     if(currentStream.CanSeek)
                         currentStream.Seek(0, SeekOrigin.Begin);
@@ -142,18 +167,18 @@ public class MultipartBody : IParsable
                     currentStream.CopyTo(ms);
                     writer.WriteByteArrayValue(string.Empty, ms.ToArray());
                 }
-                else if(part.Value.Item2 is byte[] currentBinary)
+                else if(part.Content is byte[] currentBinary)
                 {
                     writer.WriteByteArrayValue(string.Empty, currentBinary);
                 }
                 else
                 {
-                    throw new InvalidOperationException($"Unsupported type {part.Value.Item2.GetType().Name} for part {part.Key}");
+                    throw new InvalidOperationException($"Unsupported type {part.Content.GetType().Name} for part {pair.Key}");
                 }
             }
-            catch(InvalidOperationException) when(part.Value.Item2 is byte[] currentBinary)
+            catch(InvalidOperationException) when(part?.Content is byte[] currentBinary)
             { // binary payload
-                writer.WriteByteArrayValue(part.Key, currentBinary);
+                writer.WriteByteArrayValue(pair.Key, currentBinary);
             }
         }
         AddNewLine(writer);
@@ -162,5 +187,21 @@ public class MultipartBody : IParsable
     private void AddNewLine(ISerializationWriter writer)
     {
         writer.WriteStringValue(string.Empty, string.Empty);
+    }
+
+    private class Part
+    {
+        public Part(string name, object content, string contentType, string? fileName)
+        {
+            this.Name = name;
+            this.Content = content;
+            this.ContentType = contentType;
+            this.FileName = fileName;
+        }
+
+        public string Name { get; }
+        public object Content { get; }
+        public string ContentType { get; }
+        public string? FileName { get; }
     }
 }
