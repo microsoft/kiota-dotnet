@@ -178,7 +178,7 @@ public class MultipartBody : IParsable
             }
             catch(InvalidOperationException) when(part?.Content is byte[] currentBinary)
             { // binary payload
-                writer.WriteByteArrayValue(pair.Key, currentBinary);
+                writer.WriteByteArrayValue(part.Name, currentBinary);
             }
         }
         AddNewLine(writer);
