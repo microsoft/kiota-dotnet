@@ -245,6 +245,7 @@ extends:
                 - task: 1ES.PublishNuget@1
                   displayName: 'NuGet push'
                   inputs:
+                    command: push
                     packagesToPush: '$(Pipeline.Workspace)/Microsoft.Kiota.Abstractions.*.nupkg'
                     packageParentPath: '$(Pipeline.Workspace)'
                     nuGetFeedType: external
