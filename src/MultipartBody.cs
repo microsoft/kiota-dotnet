@@ -109,12 +109,8 @@ public class MultipartBody : IParsable
         }
         var first = true;
         var contentDispositionBuilder = new StringBuilder();
-        foreach(var pair in _parts)
+        foreach(var part in _parts.Values)
         {
-            var part = pair.Value;
-            if (part == null)
-                throw new InvalidOperationException($"Part {pair.Key} was null");
-
             try
             {
                 if(first)
@@ -173,7 +169,7 @@ public class MultipartBody : IParsable
                 }
                 else
                 {
-                    throw new InvalidOperationException($"Unsupported type {part.Content.GetType().Name} for part {pair.Key}");
+                    throw new InvalidOperationException($"Unsupported type {part.Content.GetType().Name} for part {part.Name}");
                 }
             }
             catch(InvalidOperationException) when(part?.Content is byte[] currentBinary)
