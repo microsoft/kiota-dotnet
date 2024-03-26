@@ -239,13 +239,13 @@ extends:
                   displayName: 'Extract release information to pipeline'
                   inputs:
                     targetType: 'filePath'
-                    filePath: $(Pipeline.Workspace)\Nugets\scripts\GetNugetPackageVersion.ps1
+                    filePath: $(Pipeline.Workspace)\scripts\GetNugetPackageVersion.ps1
                     pwsh: true
-                    arguments: '-packageDirPath "$(Pipeline.Workspace)/Nugets/"'
+                    arguments: '-packageDirPath "$(Pipeline.Workspace)/"'
                 - task: 1ES.PublishNuget@1
                   displayName: 'NuGet push'
                   inputs:
-                    packagesToPush: '$(Pipeline.Workspace)/Nugets/Microsoft.Kiota.Abstractions.*.nupkg'
+                    packagesToPush: '$(Pipeline.Workspace)/Microsoft.Kiota.Abstractions.*.nupkg'
                     packageParentPath: '$(Pipeline.Workspace)'
                     nuGetFeedType: external
                     publishFeedCredentials: 'Kiota Nuget Connection'
