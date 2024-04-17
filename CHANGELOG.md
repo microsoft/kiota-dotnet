@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `MultipartBody` now supports an optional `fileName` parameter to specify the file name of the part. (https://github.com/microsoft/kiota-abstractions-dotnet/issues/212)
+- Have made System.Diagnostics.DiagnosticSource only be included on Net Standard's TFM & net 5 (https://github.com/microsoft/kiota-abstractions-dotnet/issues/218)
 
 ## [1.8.0] - 2024-03-18
 
