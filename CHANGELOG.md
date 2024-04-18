@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.3] - 2024-04-18
+
+- Have set the license expression on the nuget package rather than bundling in a file (https://github.com/microsoft/kiota-abstractions-dotnet/issues/219)
+
 ## [1.8.2] - 2024-04-18
 
 - Have made System.Diagnostics.DiagnosticSource only be included on Net Standard's TFM & net 5 (https://github.com/microsoft/kiota-abstractions-dotnet/issues/218)
