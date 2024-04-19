@@ -15,7 +15,7 @@
     <PackageProjectUrl>https://aka.ms/kiota/docs</PackageProjectUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <Deterministic>true</Deterministic>
-    <VersionPrefix>1.8.3</VersionPrefix>
+    <VersionPrefix>1.8.4</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>false</SignAssembly>
@@ -44,7 +44,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-    <PackageReference Include="Std.UriTemplate" Version="0.0.56" />
+    <PackageReference Include="Std.UriTemplate" Version="0.0.57" />
   </ItemGroup>
 
   <!-- NET 5 target to be removed on next major version-->
