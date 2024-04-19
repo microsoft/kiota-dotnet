@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.4] - 2024-04-19
+
+- Bumps Std.UriTemplate to version 0.0.57
+
 ## [1.8.3] - 2024-04-18
 
 - Have set the license expression on the nuget package rather than bundling in a file (https://github.com/microsoft/kiota-abstractions-dotnet/issues/219)
