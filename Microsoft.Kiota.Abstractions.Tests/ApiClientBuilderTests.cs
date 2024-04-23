@@ -50,7 +50,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
         {
             // Arrange
             var parseNodeRegistry = new ParseNodeFactoryRegistry();
-            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
             parseNodeRegistry.ContentTypeAssociatedFactories.TryAdd(StreamContentType, mockParseNodeFactory.Object);
 
             Assert.IsNotType<BackingStoreParseNodeFactory>(parseNodeRegistry.ContentTypeAssociatedFactories[StreamContentType]);
@@ -67,7 +67,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
         {
             // Arrange
             var parseNodeRegistry = new ParseNodeFactoryRegistry();
-            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
             parseNodeRegistry.ContentTypeAssociatedFactories.TryAdd(StreamContentType, mockParseNodeFactory.Object);
             ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories.TryAdd(StreamContentType, mockParseNodeFactory.Object);
 

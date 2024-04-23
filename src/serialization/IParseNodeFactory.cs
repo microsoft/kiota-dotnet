@@ -2,6 +2,7 @@
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------
 
+using System;
 using System.IO;
 
 namespace Microsoft.Kiota.Abstractions.Serialization
@@ -21,6 +22,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// <param name="content">The stream to read the parse node from.</param>
         /// <param name="contentType">The content type of the parse node.</param>
         /// <returns>A parse node.</returns>
+        [Obsolete("Use GetRootParseNodeAsync instead")]
         IParseNode GetRootParseNode(string contentType, Stream content);
     }
 }

@@ -7,13 +7,15 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.Kiota.Abstractions.Serialization
 {
     /// <summary>
     ///  This factory holds a list of all the registered factories for the various types of nodes.
     /// </summary>
-    public class ParseNodeFactoryRegistry : IParseNodeFactory
+    public class ParseNodeFactoryRegistry : IAsyncParseNodeFactory
     {
         /// <summary>
         /// The valid content type for the <see cref="ParseNodeFactoryRegistry"/>
@@ -32,14 +34,16 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// <summary>
         /// List of factories that are registered by content type.
         /// </summary>
-        public ConcurrentDictionary<string, IParseNodeFactory> ContentTypeAssociatedFactories { get; set; } = new();
+        public ConcurrentDictionary<string, IAsyncParseNodeFactory> ContentTypeAssociatedFactories { get; set; } = new();
         internal static readonly Regex contentTypeVendorCleanupRegex = new(@"[^/]+\+", RegexOptions.Compiled);
+
         /// <summary>
         /// Get the <see cref="IParseNode"/> instance that is the root of the content
         /// </summary>
         /// <param name="contentType">The content type of the stream</param>
         /// <param name="content">The <see cref="Stream"/> to parse</param>
         /// <returns></returns>
+        [Obsolete("Use GetRootParseNodeAsync instead")]
         public IParseNode GetRootParseNode(string contentType, Stream content)
         {
             if(string.IsNullOrEmpty(contentType))
@@ -53,6 +57,30 @@ namespace Microsoft.Kiota.Abstractions.Serialization
             var cleanedContentType = contentTypeVendorCleanupRegex.Replace(vendorSpecificContentType, string.Empty);
             if(ContentTypeAssociatedFactories.TryGetValue(cleanedContentType, out var factory))
                 return factory.GetRootParseNode(cleanedContentType, content);
+
+            throw new InvalidOperationException($"Content type {cleanedContentType} does not have a factory registered to be parsed");
+        }
+        /// <summary>
+        /// Get the <see cref="IParseNode"/> instance that is the root of the content
+        /// </summary>
+        /// <param name="contentType">The content type of the stream</param>
+        /// <param name="content">The <see cref="Stream"/> to parse</param>
+        /// <param name="cancellationToken">The cancellation token for the task</param>
+        /// <returns></returns>
+        public async Task<IParseNode> GetRootParseNodeAsync(string contentType, Stream content, 
+            CancellationToken cancellationToken = default)
+        {
+            if(string.IsNullOrEmpty(contentType))
+                throw new ArgumentNullException(nameof(contentType));
+            _ = content ?? throw new ArgumentNullException(nameof(content));
+
+            var vendorSpecificContentType = contentType.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).First();
+            if(ContentTypeAssociatedFactories.TryGetValue(vendorSpecificContentType, out var vendorFactory))
+                return await vendorFactory.GetRootParseNodeAsync(vendorSpecificContentType, content, cancellationToken).ConfigureAwait(false);
+
+            var cleanedContentType = contentTypeVendorCleanupRegex.Replace(vendorSpecificContentType, string.Empty);
+            if(ContentTypeAssociatedFactories.TryGetValue(cleanedContentType, out var factory))
+                return await factory.GetRootParseNodeAsync(cleanedContentType, content, cancellationToken);
 
             throw new InvalidOperationException($"Content type {cleanedContentType} does not have a factory registered to be parsed");
         }
