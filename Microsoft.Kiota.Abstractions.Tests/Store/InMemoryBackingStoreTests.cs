@@ -440,6 +440,31 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             var colleagueSubscriptions = GetSubscriptionsPropertyFromBackingStore(testUser.Colleagues[0].BackingStore);
             Assert.Single(colleagueSubscriptions);// only one subscription to be invoked for the collection "colleagues"
         }
+        
+        [Fact]
+        public void TestsBackingStoreNestedInvocationCounts()
+        {
+            // Arrange dummy user with initialized backing store
+            var invocationCount = 0;
+            var testUser = new TestEntity();
+            testUser.BackingStore.Subscribe((_, _, _) => invocationCount++, "testId");
+            testUser.Id = "84c747c1-d2c0-410d-ba50-fc23e0b4abbe";
+            var colleagues = new List<TestEntity>();
+            for(int i = 0; i < 10; i++)
+            {
+                colleagues.Add(new TestEntity
+                {
+                    Id = "2fe22fe5-1132-42cf-90f9-1dc17e325a74",
+                    BusinessPhones = new List<string>
+                    {
+                        "+1 234 567 891"
+                    }
+                });
+            }
+            testUser.Colleagues = colleagues;
+            testUser.BackingStore.InitializationCompleted = true;
+            Assert.Equal(2,invocationCount);
+        }
 
         /// <summary>
         /// Helper function to pull out the private `subscriptions` collection property from the InMemoryBackingStore class
