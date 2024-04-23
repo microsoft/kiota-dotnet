@@ -448,7 +448,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             var invocationCount = 0;
             var testUser = new TestEntity();
             testUser.BackingStore.Subscribe((_, _, _) => invocationCount++, "testId");
-            testUser.Id = "84c747c1-d2c0-410d-ba50-fc23e0b4abbe";
+            testUser.Id = "84c747c1-d2c0-410d-ba50-fc23e0b4abbe"; // invocation site 1
             var colleagues = new List<TestEntity>();
             for(int i = 0; i < 10; i++)
             {
@@ -461,9 +461,10 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
                     }
                 });
             }
-            testUser.Colleagues = colleagues;
-            testUser.BackingStore.InitializationCompleted = true;
-            Assert.Equal(2,invocationCount);
+            testUser.Colleagues = colleagues; // invocation site 2
+            testUser.BackingStore.InitializationCompleted = true; // initialize
+            
+            Assert.Equal(2,invocationCount);// only called twice
         }
 
         /// <summary>
