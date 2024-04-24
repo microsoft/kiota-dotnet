@@ -166,8 +166,8 @@ public static partial class KiotaSerializer
         using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true);
 
         // Some clients enforce async stream processing.
-        await writer.WriteAsync(source);
-        writer.Flush();
+        await writer.WriteAsync(source).ConfigureAwait(false);
+        await writer.FlushAsync().ConfigureAwait(false);
         stream.Position = 0;
         return stream;
     }
