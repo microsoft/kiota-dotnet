@@ -50,7 +50,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
                 throw new ArgumentNullException(nameof(contentType));
             _ = content ?? throw new ArgumentNullException(nameof(content));
 
-            var (factory, correctContentType) = GetFactory<IAsyncParseNodeFactory>(contentType);
+            var (factory, correctContentType) = GetFactory<IParseNodeFactory>(contentType);
             return factory.GetRootParseNode(correctContentType, content);
         }
         /// <summary>
