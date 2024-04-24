@@ -34,7 +34,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// <summary>
         /// List of factories that are registered by content type.
         /// </summary>
-        public ConcurrentDictionary<string, IAsyncParseNodeFactory> ContentTypeAssociatedFactories { get; set; } = new();
+        public ConcurrentDictionary<string, IParseNodeFactory> ContentTypeAssociatedFactories { get; set; } = new();
         internal static readonly Regex contentTypeVendorCleanupRegex = new(@"[^/]+\+", RegexOptions.Compiled);
 
         /// <summary>
@@ -76,11 +76,24 @@ namespace Microsoft.Kiota.Abstractions.Serialization
 
             var vendorSpecificContentType = contentType.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).First();
             if(ContentTypeAssociatedFactories.TryGetValue(vendorSpecificContentType, out var vendorFactory))
-                return await vendorFactory.GetRootParseNodeAsync(vendorSpecificContentType, content, cancellationToken).ConfigureAwait(false);
+            {
+                if(vendorFactory is not IAsyncParseNodeFactory vendorFactoryAsync)
+                {
+                    throw new Exception("IAsyncParseNodeFactory is required for async operations");
+                }
+
+                return await vendorFactoryAsync.GetRootParseNodeAsync(vendorSpecificContentType, content, cancellationToken).ConfigureAwait(false);
+            }
 
             var cleanedContentType = contentTypeVendorCleanupRegex.Replace(vendorSpecificContentType, string.Empty);
             if(ContentTypeAssociatedFactories.TryGetValue(cleanedContentType, out var factory))
-                return await factory.GetRootParseNodeAsync(cleanedContentType, content, cancellationToken);
+            {
+                if(factory is not IAsyncParseNodeFactory vendorFactoryAsync)
+                {
+                    throw new Exception("IAsyncParseNodeFactory is required for async operations");
+                }
+                return await vendorFactoryAsync.GetRootParseNodeAsync(cleanedContentType, content, cancellationToken);
+            }
 
             throw new InvalidOperationException($"Content type {cleanedContentType} does not have a factory registered to be parsed");
         }

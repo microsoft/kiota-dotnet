@@ -18,7 +18,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// The valid content type for the <see cref="ParseNodeProxyFactory"/> instance
         /// </summary>
         public string ValidContentType { get { return _concrete.ValidContentType; } }
-        private readonly IAsyncParseNodeFactory _concrete;
+        private readonly IParseNodeFactory _concrete;
         private readonly Action<IParsable> _onBefore;
         private readonly Action<IParsable> _onAfter;
         /// <summary>
@@ -27,7 +27,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// <param name="concrete">The concrete factory to wrap.</param>
         /// <param name="onBefore">The callback to invoke before the deserialization of any model object.</param>
         /// <param name="onAfter">The callback to invoke after the deserialization of any model object.</param>
-        public ParseNodeProxyFactory(IAsyncParseNodeFactory concrete, Action<IParsable> onBefore, Action<IParsable> onAfter)
+        public ParseNodeProxyFactory(IParseNodeFactory concrete, Action<IParsable> onBefore, Action<IParsable> onAfter)
         {
             _concrete = concrete ?? throw new ArgumentNullException(nameof(concrete));
             _onBefore = onBefore;
@@ -67,7 +67,11 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         public async Task<IParseNode> GetRootParseNodeAsync(string contentType, Stream content, 
             CancellationToken cancellationToken = default)
         {
-            var node = await _concrete.GetRootParseNodeAsync(contentType, content).ConfigureAwait(false);
+            if (_concrete is not IAsyncParseNodeFactory asyncConcrete)
+            {
+                throw new Exception("IAsyncParseNodeFactory is required for async operations");
+            }
+            var node = await asyncConcrete.GetRootParseNodeAsync(contentType, content).ConfigureAwait(false);
             var originalBefore = node.OnBeforeAssignFieldValues;
             var originalAfter = node.OnAfterAssignFieldValues;
             node.OnBeforeAssignFieldValues = (x) =>

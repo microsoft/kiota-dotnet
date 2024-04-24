@@ -29,7 +29,7 @@ namespace Microsoft.Kiota.Abstractions
         /// Registers the default deserializer to the registry.
         /// </summary>
         /// <typeparam name="T">The type of the parse node factory to register</typeparam>
-        public static void RegisterDefaultDeserializer<T>() where T : IAsyncParseNodeFactory, new()
+        public static void RegisterDefaultDeserializer<T>() where T : IParseNodeFactory, new()
         {
             var deserializerFactory = new T();
             ParseNodeFactoryRegistry.DefaultInstance
@@ -60,9 +60,9 @@ namespace Microsoft.Kiota.Abstractions
         /// </summary>
         /// <param name="original">The parse node factory to enable the backing store on.</param>
         /// <returns>A new parse node factory with the backing store enabled.</returns>
-        public static IAsyncParseNodeFactory EnableBackingStoreForParseNodeFactory(IAsyncParseNodeFactory original)
+        public static IParseNodeFactory EnableBackingStoreForParseNodeFactory(IParseNodeFactory original)
         {
-            IAsyncParseNodeFactory result = original ?? throw new ArgumentNullException(nameof(original));
+            var result = original ?? throw new ArgumentNullException(nameof(original));
             if(original is ParseNodeFactoryRegistry registry)
             {
                 EnableBackingStoreForParseNodeRegistry(registry);

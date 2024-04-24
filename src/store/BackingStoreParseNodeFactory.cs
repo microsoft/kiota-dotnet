@@ -14,7 +14,7 @@ namespace Microsoft.Kiota.Abstractions.Store
         /// <summary>
         /// Initializes a new instance of the <see cref="BackingStoreParseNodeFactory"/> class given a concrete implementation of <see cref="IParseNodeFactory"/>.
         /// </summary>
-        public BackingStoreParseNodeFactory(IAsyncParseNodeFactory concrete) : base(
+        public BackingStoreParseNodeFactory(IParseNodeFactory concrete) : base(
             concrete,
             (x) =>
             {
