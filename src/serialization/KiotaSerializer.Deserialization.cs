@@ -23,12 +23,14 @@ public static partial class KiotaSerializer
     /// <param name="contentType">The content type of the stream.</param>
     /// <param name="parsableFactory">The factory to create the object.</param>
     /// <param name="serializedRepresentation">The serialized representation of the object.</param>
-    [Obsolete("Use DeserializeAsync instead")]
+    //[Obsolete("Use DeserializeAsync instead")]
     public static T? Deserialize<T>(string contentType, string serializedRepresentation, ParsableFactory<T> parsableFactory) where T : IParsable
     {
         if(string.IsNullOrEmpty(serializedRepresentation)) throw new ArgumentNullException(nameof(serializedRepresentation));
         using var stream = GetStreamFromString(serializedRepresentation);
+#pragma warning disable CS0618 // Type or member is obsolete
         return Deserialize(contentType, stream, parsableFactory);
+#pragma warning restore CS0618 // Type or member is obsolete
     }
     private static Stream GetStreamFromString(string source)
     {
@@ -85,7 +87,6 @@ public static partial class KiotaSerializer
     /// </summary>
     /// <param name="contentType">The content type of the stream.</param>
     /// <param name="serializedRepresentation">The serialized representation of the object.</param>
-    [Obsolete("Use DeserializeAsync instead")]
 #if NET5_0_OR_GREATER
     public static T? Deserialize<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string contentType, string serializedRepresentation) where T : IParsable
 #else
@@ -114,12 +115,13 @@ public static partial class KiotaSerializer
     /// <param name="contentType">The content type of the stream.</param>
     /// <param name="serializedRepresentation">The serialized representation of the objects.</param>
     /// <param name="parsableFactory">The factory to create the object.</param>
-    [Obsolete("Use DeserializeCollectionAsync instead")]
     public static IEnumerable<T> DeserializeCollection<T>(string contentType, string serializedRepresentation, ParsableFactory<T> parsableFactory) where T : IParsable
     {
         if(string.IsNullOrEmpty(serializedRepresentation)) throw new ArgumentNullException(nameof(serializedRepresentation));
         using var stream = GetStreamFromString(serializedRepresentation);
+#pragma warning disable CS0618 // Type or member is obsolete
         return DeserializeCollection(contentType, stream, parsableFactory);
+#pragma warning restore CS0618 // Type or member is obsolete
     }
     /// <summary>
     /// Deserializes the given stream into a collection of objects based on the content type.
@@ -138,7 +140,6 @@ public static partial class KiotaSerializer
     /// </summary>
     /// <param name="contentType">The content type of the stream.</param>
     /// <param name="serializedRepresentation">The serialized representation of the object.</param>
-    [Obsolete("Use DeserializeCollectionAsync instead")]
 #if NET5_0_OR_GREATER
     public static IEnumerable<T> DeserializeCollection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string contentType, string serializedRepresentation) where T : IParsable
 #else

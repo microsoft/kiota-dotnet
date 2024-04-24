@@ -24,7 +24,6 @@ public static partial class KiotaJsonSerializer
     /// </summary>
     /// <param name="parsableFactory">The factory to create the object.</param>
     /// <param name="serializedRepresentation">The serialized representation of the object.</param>
-    [Obsolete("Use DeserializeAsync instead")]
     public static T? Deserialize<T>(string serializedRepresentation, ParsableFactory<T> parsableFactory) where T : IParsable
         => KiotaSerializer.Deserialize(_jsonContentType, serializedRepresentation, parsableFactory);
     /// <summary>
@@ -50,7 +49,6 @@ public static partial class KiotaJsonSerializer
     /// Deserializes the given stream into an object.
     /// </summary>
     /// <param name="serializedRepresentation">The serialized representation of the object.</param>
-    [Obsolete("Use DeserializeAsync instead")]
 #if NET5_0_OR_GREATER
     public static T? Deserialize<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string serializedRepresentation) where T : IParsable
 #else
@@ -70,7 +68,6 @@ public static partial class KiotaJsonSerializer
     /// </summary>
     /// <param name="serializedRepresentation">The serialized representation of the objects.</param>
     /// <param name="parsableFactory">The factory to create the object.</param>
-    [Obsolete("Use DeserializeCollectionAsync instead")]
     public static IEnumerable<T> DeserializeCollection<T>(string serializedRepresentation, ParsableFactory<T> parsableFactory) where T : IParsable
     => KiotaSerializer.DeserializeCollection(_jsonContentType, serializedRepresentation, parsableFactory);
     /// <summary>
@@ -88,7 +85,6 @@ public static partial class KiotaJsonSerializer
     /// Deserializes the given stream into a collection of objects based on the content type.
     /// </summary>
     /// <param name="serializedRepresentation">The serialized representation of the object.</param>
-    [Obsolete("Use DeserializeCollectionAsync instead")]
 #if NET5_0_OR_GREATER
     public static IEnumerable<T> DeserializeCollection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string serializedRepresentation) where T : IParsable
 #else
