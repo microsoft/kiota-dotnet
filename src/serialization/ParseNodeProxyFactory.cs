@@ -43,6 +43,15 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         public IParseNode GetRootParseNode(string contentType, Stream content)
         {
             var node = _concrete.GetRootParseNode(contentType, content);
+            WireParseNode(node);
+            return node;
+        }
+        /// <summary>
+        /// Wires node to before and after actions.
+        /// </summary>
+        /// <param name="node">A parse node to wire.</param>
+        private void WireParseNode(IParseNode node)
+        {
             var originalBefore = node.OnBeforeAssignFieldValues;
             var originalAfter = node.OnAfterAssignFieldValues;
             node.OnBeforeAssignFieldValues = (x) =>
@@ -55,7 +64,6 @@ namespace Microsoft.Kiota.Abstractions.Serialization
                 _onAfter?.Invoke(x);
                 originalAfter?.Invoke(x);
             };
-            return node;
         }
         /// <summary>
         /// Create a parse node from the given stream and content type.
@@ -72,18 +80,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
                 throw new Exception("IAsyncParseNodeFactory is required for async operations");
             }
             var node = await asyncConcrete.GetRootParseNodeAsync(contentType, content).ConfigureAwait(false);
-            var originalBefore = node.OnBeforeAssignFieldValues;
-            var originalAfter = node.OnAfterAssignFieldValues;
-            node.OnBeforeAssignFieldValues = (x) =>
-            {
-                _onBefore?.Invoke(x);
-                originalBefore?.Invoke(x);
-            };
-            node.OnAfterAssignFieldValues = (x) =>
-            {
-                _onAfter?.Invoke(x);
-                originalAfter?.Invoke(x);
-            };
+            WireParseNode(node);
             return node;
         }
     }
