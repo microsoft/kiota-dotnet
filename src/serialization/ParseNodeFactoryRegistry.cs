@@ -50,15 +50,8 @@ namespace Microsoft.Kiota.Abstractions.Serialization
                 throw new ArgumentNullException(nameof(contentType));
             _ = content ?? throw new ArgumentNullException(nameof(content));
 
-            var vendorSpecificContentType = contentType.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).First();
-            if(ContentTypeAssociatedFactories.TryGetValue(vendorSpecificContentType, out var vendorFactory))
-                return vendorFactory.GetRootParseNode(vendorSpecificContentType, content);
-
-            var cleanedContentType = contentTypeVendorCleanupRegex.Replace(vendorSpecificContentType, string.Empty);
-            if(ContentTypeAssociatedFactories.TryGetValue(cleanedContentType, out var factory))
-                return factory.GetRootParseNode(cleanedContentType, content);
-
-            throw new InvalidOperationException($"Content type {cleanedContentType} does not have a factory registered to be parsed");
+            var (factory, correctContentType) = GetFactory<IAsyncParseNodeFactory>(contentType);
+            return factory.GetRootParseNode(correctContentType, content);
         }
         /// <summary>
         /// Get the <see cref="IParseNode"/> instance that is the root of the content
@@ -74,28 +67,46 @@ namespace Microsoft.Kiota.Abstractions.Serialization
                 throw new ArgumentNullException(nameof(contentType));
             _ = content ?? throw new ArgumentNullException(nameof(content));
 
+            var (factory, correctContentType) = GetFactory<IAsyncParseNodeFactory>(contentType);
+
+            return await factory.GetRootParseNodeAsync(correctContentType, content, cancellationToken).ConfigureAwait(false);
+        }
+        /// <summary>
+        /// Get the <typeparamref name="T"/> instance for the given <paramref name="contentType"/>.
+        /// </summary>
+        /// <typeparam name="T">Type of the <see cref="IParseNodeFactory"/>.</typeparam>
+        /// <param name="contentType">The content type of the stream</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="Exception"></exception>
+        public (T, string ContentType) GetFactory<T>(string contentType)
+            where T: IParseNodeFactory
+        {
+            string resultContentType;
             var vendorSpecificContentType = contentType.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).First();
-            if(ContentTypeAssociatedFactories.TryGetValue(vendorSpecificContentType, out var vendorFactory))
+            IParseNodeFactory? factory;
+            if(!ContentTypeAssociatedFactories.TryGetValue(vendorSpecificContentType, out factory))
             {
-                if(vendorFactory is not IAsyncParseNodeFactory vendorFactoryAsync)
+                var cleanedContentType = resultContentType = contentTypeVendorCleanupRegex.Replace(vendorSpecificContentType, string.Empty);
+                if(!ContentTypeAssociatedFactories.TryGetValue(cleanedContentType, out factory))
                 {
-                    throw new Exception("IAsyncParseNodeFactory is required for async operations");
+                    throw new InvalidOperationException($"Content type {cleanedContentType} does not have a factory registered to be parsed");
                 }
-
-                return await vendorFactoryAsync.GetRootParseNodeAsync(vendorSpecificContentType, content, cancellationToken).ConfigureAwait(false);
+                else
+                {
+                    resultContentType = cleanedContentType;
+                }
+            }
+            else
+            {
+                resultContentType = vendorSpecificContentType;
             }
 
-            var cleanedContentType = contentTypeVendorCleanupRegex.Replace(vendorSpecificContentType, string.Empty);
-            if(ContentTypeAssociatedFactories.TryGetValue(cleanedContentType, out var factory))
+            if(factory is T typedFactory)
             {
-                if(factory is not IAsyncParseNodeFactory vendorFactoryAsync)
-                {
-                    throw new Exception("IAsyncParseNodeFactory is required for async operations");
-                }
-                return await vendorFactoryAsync.GetRootParseNodeAsync(cleanedContentType, content, cancellationToken);
+                return (typedFactory, resultContentType);
             }
-
-            throw new InvalidOperationException($"Content type {cleanedContentType} does not have a factory registered to be parsed");
+            throw new Exception($"{typeof(T).Name} factory is required");
         }
     }
 }
