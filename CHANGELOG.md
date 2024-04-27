@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Adds asynchronous deserialization support and marks synchronous as obsolete. https://github.com/microsoft/kiota-abstractions-dotnet/issues/223
+
+### Added
+
+- Added asynchronous deserialization methods (to KiotaJsonSerializer.Deserialization and KiotaSerializer.Deserialization).
+- Added IAsyncParseNodeFactory interface to provide asynchronous version of GetRootParseNode: GetRootParseNodeAsync.
+- Added ParseNodeFactoryRegistry.GetRootParseNodeAsync method.
+- Added ParseNodeProxyFactory.GetRootParseNodeAsync method
+
+### Changed
+
+- Marked synchronous deserialization methods as obsolete.
+- Marked IParseNodeFactory.GetRootParseNode as obsolete.
+- Refactored ParseNodeFactoryRegistry.GetFactory to support both asynchronous (IAsyncParseNodeFactory) and synchronous (IParseNodeFactory) factories.
+
 ## [1.8.4] - 2024-04-19
 
 - Bumps Std.UriTemplate to version 0.0.57
