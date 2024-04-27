@@ -30,13 +30,13 @@ public static partial class KiotaSerializer
         using var stream = GetStreamFromString(serializedRepresentation);
         return Deserialize(contentType, stream, parsableFactory);
     }
+    [Obsolete("Use GetStreamFromStringAsync instead")]
     private static Stream GetStreamFromString(string source)
     {
         var stream = new MemoryStream();
         using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true);
 
-        // Some clients enforce async stream processing.
-        writer.WriteAsync(source).GetAwaiter().GetResult();
+        writer.Write(source);
         writer.Flush();
         stream.Position = 0;
         return stream;
