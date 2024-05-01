@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2024-05-06
+
 Adds asynchronous deserialization support and marks synchronous as obsolete. https://github.com/microsoft/kiota-abstractions-dotnet/issues/223
 
 ### Added
