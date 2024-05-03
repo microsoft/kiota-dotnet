@@ -7,29 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Adds async overloads for serialization helpers
+
 ## [1.8.4] - 2024-04-19
 
 - Bumps Std.UriTemplate to version 0.0.57
 
 ## [1.8.3] - 2024-04-18
 
-- Have set the license expression on the nuget package rather than bundling in a file (https://github.com/microsoft/kiota-abstractions-dotnet/issues/219)
+- Have set the license expression on the nuget package rather than bundling in a file (<https://github.com/microsoft/kiota-abstractions-dotnet/issues/219>)
 
 ## [1.8.2] - 2024-04-18
 
-- Have made System.Diagnostics.DiagnosticSource only be included on Net Standard's TFM & net 5 (https://github.com/microsoft/kiota-abstractions-dotnet/issues/218)
+- Have made System.Diagnostics.DiagnosticSource only be included on Net Standard's TFM & net 5 (<https://github.com/microsoft/kiota-abstractions-dotnet/issues/218>)
 
 ## [1.8.1] - 2024-03-26
 
 ### Changed
 
-- `MultipartBody` now supports an optional `fileName` parameter to specify the file name of the part. (https://github.com/microsoft/kiota-abstractions-dotnet/issues/212)
+- `MultipartBody` now supports an optional `fileName` parameter to specify the file name of the part. (<https://github.com/microsoft/kiota-abstractions-dotnet/issues/212>)
 
 ## [1.8.0] - 2024-03-18
 
 ### Added
 
-- Added support for untyped nodes. (https://github.com/microsoft/kiota-abstractions-dotnet/issues/175)
+- Added support for untyped nodes. (<https://github.com/microsoft/kiota-abstractions-dotnet/issues/175>)
 
 ## [1.7.12] - 2024-03-08
 
@@ -44,7 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated IParseNode enum methods `DynamicallyAccessedMembersAttribute` to `PublicFields`.
 - Fixed AOT compiler warnings from ILC.
- 
+
 ## [1.7.10] - 2024-02-26
 
 ### Changed
@@ -74,20 +76,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Improve AllowedHost validator to throw an error if `https://` or `http://` prefix is present in a allowed host value.(https://github.com/microsoft/kiota-abstractions-dotnet/issues/165)
+- Improve AllowedHost validator to throw an error if `https://` or `http://` prefix is present in a allowed host value.(<https://github.com/microsoft/kiota-abstractions-dotnet/issues/165>)
 
 ## [1.7.5] - 2024-01-11
 
 ### Changed
 
-- Fixes missing query parameters when the parameter values are empty strings.(https://github.com/microsoft/kiota-abstractions-dotnet/issues/172)
+- Fixes missing query parameters when the parameter values are empty strings.(<https://github.com/microsoft/kiota-abstractions-dotnet/issues/172>)
 
 ## [1.7.4] - 2024-01-09
 
 ### Changed
 
 - Fixed Method not found error due to conflicting dependencies by updating Std.UriTemplate dependency.
-- Fixed unicode characters decoding in URI (https://github.com/std-uritemplate/std-uritemplate/issues/114).
+- Fixed unicode characters decoding in URI (<https://github.com/std-uritemplate/std-uritemplate/issues/114>).
 
 ## [1.7.3] - 2023-11-30
 
@@ -166,7 +168,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed a bug where excess duplicate subscriptions would be created on the same property in the backing store causing performance issues in some scenarios. Related to https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/1994
+- Fixed a bug where excess duplicate subscriptions would be created on the same property in the backing store causing performance issues in some scenarios. Related to <https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/1994>
 
 ## [1.3.0] - 2023-08-01
 
