@@ -7,7 +7,7 @@ using Microsoft.Kiota.Abstractions.Serialization;
 namespace Microsoft.Kiota.Abstractions.Store
 {
     /// <summary>
-    /// Proxy implementation of <see cref="IParseNodeFactory"/> for the <see cref="IBackingStore">backing store</see> that automatically sets the state of the backing store when deserializing.
+    /// Proxy implementation of <see cref="IAsyncParseNodeFactory"/> for the <see cref="IBackingStore">backing store</see> that automatically sets the state of the backing store when deserializing.
     /// </summary>
     public class BackingStoreParseNodeFactory : ParseNodeProxyFactory
     {

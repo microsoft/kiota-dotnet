@@ -4,13 +4,15 @@
 
 using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.Kiota.Abstractions.Serialization
 {
     /// <summary>
     /// Proxy factory that allows the composition of before and after callbacks on existing factories.
     /// </summary>
-    public abstract class ParseNodeProxyFactory : IParseNodeFactory
+    public abstract class ParseNodeProxyFactory : IAsyncParseNodeFactory
     {
         /// <summary>
         /// The valid content type for the <see cref="ParseNodeProxyFactory"/> instance
@@ -37,9 +39,19 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// <param name="content">The stream to read the parse node from.</param>
         /// <param name="contentType">The content type of the parse node.</param>
         /// <returns>A parse node.</returns>
+        [Obsolete("Use GetRootParseNodeAsync instead")]
         public IParseNode GetRootParseNode(string contentType, Stream content)
         {
             var node = _concrete.GetRootParseNode(contentType, content);
+            WireParseNode(node);
+            return node;
+        }
+        /// <summary>
+        /// Wires node to before and after actions.
+        /// </summary>
+        /// <param name="node">A parse node to wire.</param>
+        private void WireParseNode(IParseNode node)
+        {
             var originalBefore = node.OnBeforeAssignFieldValues;
             var originalAfter = node.OnAfterAssignFieldValues;
             node.OnBeforeAssignFieldValues = (x) =>
@@ -52,6 +64,23 @@ namespace Microsoft.Kiota.Abstractions.Serialization
                 _onAfter?.Invoke(x);
                 originalAfter?.Invoke(x);
             };
+        }
+        /// <summary>
+        /// Create a parse node from the given stream and content type.
+        /// </summary>
+        /// <param name="content">The stream to read the parse node from.</param>
+        /// <param name="contentType">The content type of the parse node.</param>
+        /// <param name="cancellationToken">The cancellation token for the task</param>
+        /// <returns>A parse node.</returns>
+        public async Task<IParseNode> GetRootParseNodeAsync(string contentType, Stream content, 
+            CancellationToken cancellationToken = default)
+        {
+            if (_concrete is not IAsyncParseNodeFactory asyncConcrete)
+            {
+                throw new Exception("IAsyncParseNodeFactory is required for async operations");
+            }
+            var node = await asyncConcrete.GetRootParseNodeAsync(contentType, content).ConfigureAwait(false);
+            WireParseNode(node);
             return node;
         }
     }

@@ -62,7 +62,7 @@ namespace Microsoft.Kiota.Abstractions
         /// <returns>A new parse node factory with the backing store enabled.</returns>
         public static IParseNodeFactory EnableBackingStoreForParseNodeFactory(IParseNodeFactory original)
         {
-            IParseNodeFactory result = original ?? throw new ArgumentNullException(nameof(original));
+            var result = original ?? throw new ArgumentNullException(nameof(original));
             if(original is ParseNodeFactoryRegistry registry)
             {
                 EnableBackingStoreForParseNodeRegistry(registry);
