@@ -101,7 +101,7 @@ public static partial class KiotaSerializer
     private static string GetStringFromStream(Stream stream)
     {
         using var reader = new StreamReader(stream);
-        return reader.ReadToEndAsync().ConfigureAwait(false).GetAwaiter().GetResult(); // so the asp.net projects don't get an error
+        return reader.ReadToEnd();
     }
     private static async Task<string> GetStringFromStreamAsync(Stream stream, CancellationToken cancellationToken)
     {
