@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.1] - 2024-05-13
+
 ### Changed
 
 - Removes GetAwaiter() call in KiotaSerializer.GetStringFromStream and makes it fully synchronous.
