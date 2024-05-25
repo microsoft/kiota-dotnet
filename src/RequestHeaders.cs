@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Microsoft.Kiota.Abstractions;
 
@@ -35,6 +34,7 @@ public class RequestHeaders : IDictionary<string, IEnumerable<string>>
         else
             _headers.Add(headerName, new HashSet<string>(headerValues));
     }
+
     /// <summary>
     /// Adds values to the header with the specified name if it's not already present
     /// </summary>
@@ -54,14 +54,30 @@ public class RequestHeaders : IDictionary<string, IEnumerable<string>>
         }
         return false;
     }
+
     /// <inheritdoc/>
     public ICollection<string> Keys => _headers.Keys;
+
     /// <inheritdoc/>
-    public ICollection<IEnumerable<string>> Values => _headers.Values.Cast<IEnumerable<string>>().ToList();
+    public ICollection<IEnumerable<string>> Values
+    {
+        get
+        {
+            var values = new List<IEnumerable<string>>();
+            foreach(var value in _headers.Values)
+            {
+                values.Add(value);
+            }
+            return values;
+        }
+    }
+
     /// <inheritdoc/>
     public int Count => _headers.Count;
+
     /// <inheritdoc/>
     public bool IsReadOnly => false;
+
     /// <inheritdoc/>
     public IEnumerable<string> this[string key] { get => TryGetValue(key, out var result) ? result : throw new KeyNotFoundException($"Key not found : {key}"); set => Add(key, value); }
 
@@ -85,6 +101,7 @@ public class RequestHeaders : IDictionary<string, IEnumerable<string>>
         }
         return false;
     }
+
     /// <summary>
     /// Adds all the headers values from the specified headers collection.
     /// </summary>
@@ -97,6 +114,7 @@ public class RequestHeaders : IDictionary<string, IEnumerable<string>>
             foreach(var value in header.Value)
                 Add(header.Key, value);
     }
+
     /// <summary>
     /// Removes all headers.
     /// </summary>
@@ -104,12 +122,28 @@ public class RequestHeaders : IDictionary<string, IEnumerable<string>>
     {
         _headers.Clear();
     }
+
     /// <inheritdoc/>
     public bool ContainsKey(string key) => !string.IsNullOrEmpty(key) && _headers.ContainsKey(key);
+
     /// <inheritdoc/>
-#pragma warning disable CS8604 // Possible null reference argument. //Can't change signature of overriden method implementation
-    public void Add(string key, IEnumerable<string> value) => Add(key, value?.ToArray());
-#pragma warning restore CS8604 // Possible null reference argument.
+    public void Add(string key, IEnumerable<string> value)
+    {
+        if(value == null)
+        {
+            Add(key, null!);
+        }
+        else
+        {
+            var valueArray = new List<string>();
+            foreach(var v in value)
+            {
+                valueArray.Add(v);
+            }
+            Add(key, valueArray.ToArray());
+        }
+    }
+
     /// <inheritdoc/>
     public bool Remove(string key)
     {
@@ -127,15 +161,36 @@ public class RequestHeaders : IDictionary<string, IEnumerable<string>>
             value = values;
             return true;
         }
-        value = Enumerable.Empty<string>();
+        value = [];
         return false;
     }
+
     /// <inheritdoc/>
     public void Add(KeyValuePair<string, IEnumerable<string>> item) => Add(item.Key, item.Value);
+
     /// <inheritdoc/>
-    public bool Contains(KeyValuePair<string, IEnumerable<string>> item) => TryGetValue(item.Key, out var values) && item.Value.All(x => values.Contains(x)) && values.Count() == item.Value.Count();
+    public bool Contains(KeyValuePair<string, IEnumerable<string>> item)
+    {
+        if(!TryGetValue(item.Key, out var values)) return false;
+
+        var itemValueList = new List<string>(item.Value);
+
+        int valuesCount = 0;
+        foreach(var value in values)
+        {
+            valuesCount++;
+            if(!itemValueList.Contains(value))
+            {
+                return false;
+            }
+        }
+
+        return valuesCount == itemValueList.Count;
+    }
+
     /// <inheritdoc/>
     public void CopyTo(KeyValuePair<string, IEnumerable<string>>[] array, int arrayIndex) => throw new NotImplementedException();
+
     /// <inheritdoc/>
     public bool Remove(KeyValuePair<string, IEnumerable<string>> item)
     {

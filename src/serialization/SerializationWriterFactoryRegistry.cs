@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Linq;
 
 namespace Microsoft.Kiota.Abstractions.Serialization
 {
@@ -41,7 +40,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
             if(string.IsNullOrEmpty(contentType))
                 throw new ArgumentNullException(nameof(contentType));
 
-            var vendorSpecificContentType = contentType.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).First();
+            var vendorSpecificContentType = contentType.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[0];
             if(ContentTypeAssociatedFactories.TryGetValue(vendorSpecificContentType, out var vendorFactory))
                 return vendorFactory.GetSerializationWriter(vendorSpecificContentType);
 

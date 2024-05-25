@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Microsoft.Kiota.Abstractions.Serialization;
 
@@ -28,10 +27,22 @@ public static class ParseNodeHelper
             throw new ArgumentException("At least one target must be provided.", nameof(targets));
         }
 
-        return targets.Where(static x => x != null)
-                        .SelectMany(static x => x!.GetFieldDeserializers())
-                        .GroupBy(static x => x.Key)
-                        .Select(static x => x.First())
-                        .ToDictionary(static x => x.Key, static x => x.Value);
+        var result = new Dictionary<string, Action<IParseNode>>();
+        foreach(var target in targets)
+        {
+            if(target != null)
+            {
+                var fieldDeserializers = target.GetFieldDeserializers();
+                foreach(var fieldDeserializer in fieldDeserializers)
+                {
+                    if(!result.ContainsKey(fieldDeserializer.Key))
+                    {
+                        result.Add(fieldDeserializer.Key, fieldDeserializer.Value);
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 }

@@ -6,7 +6,6 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Microsoft.Kiota.Abstractions.Store
 {
@@ -58,7 +57,6 @@ namespace Microsoft.Kiota.Abstractions.Store
                 throw new ArgumentNullException(nameof(key));
 
             var valueToAdd = new Tuple<bool, object?>(InitializationCompleted, value);
-            //If we are adding a collection, keep track of the size incase its modified with a call to Add or Remove
             if(value is ICollection collection)
                 valueToAdd = new Tuple<bool, object?>(InitializationCompleted, new Tuple<ICollection, int>(collection, collection.Count));
 
@@ -69,28 +67,30 @@ namespace Microsoft.Kiota.Abstractions.Store
                 store[key] = valueToAdd;
             }
             else if(value is IBackedModel backedModel)
-            {// if its the first time adding a IBackedModel property to the store, subscribe to its BackingStore and use the events to flag the property is "dirty"
+            {
                 backedModel.BackingStore?.Subscribe((keyString, oldObject, newObject) =>
                 {
-                    backedModel.BackingStore.InitializationCompleted = false;// All its properties are dirty as the model has been touched.
+                    backedModel.BackingStore.InitializationCompleted = false;
                     Set(key, value);
-                }, key); // use property name(key) as subscriptionId to prevent excess subscription creation in the event this is called again
-            }
-            // if its an IBackedModel collection property to the store, subscribe to item properties' BackingStores and use the events to flag the collection property is "dirty"
-            if(value is ICollection collectionValues)
-            {
-                // All the list items are dirty as the model has been touched.
-                collectionValues.OfType<IBackedModel>().ToList().ForEach(model =>
-                {
-                    model.BackingStore.InitializationCompleted = false;
-                    model.BackingStore.Subscribe((keyString, oldObject, newObject) =>
-                    {
-                        Set(key, value);
-                    }, key);// use property name(key) as subscriptionId to prevent excess subscription creation in the event this is called again
-                });
+                }, key);
             }
 
-            foreach(var sub in subscriptions.Values.ToList())
+            if(value is ICollection collectionValues)
+            {
+                foreach(var item in collectionValues)
+                {
+                    if(item is IBackedModel model)
+                    {
+                        model.BackingStore.InitializationCompleted = false;
+                        model.BackingStore.Subscribe((keyString, oldObject, newObject) =>
+                        {
+                            Set(key, value);
+                        }, key);
+                    }
+                }
+            }
+
+            foreach(var sub in subscriptions.Values)
                 sub.Invoke(key, oldValue?.Item2, value);
         }
 
@@ -100,11 +100,25 @@ namespace Microsoft.Kiota.Abstractions.Store
         /// <returns>A collection of changed values or the whole store based on the <see cref="ReturnOnlyChangedValues"/> configuration value.</returns>
         public IEnumerable<KeyValuePair<string, object?>> Enumerate()
         {
-            if(ReturnOnlyChangedValues)// refresh the state of collection properties if they've changed in size.
-                store.ToList().ForEach(x => EnsureCollectionPropertyIsConsistent(x.Key, x.Value.Item2));
+            var result = new List<KeyValuePair<string, object?>>();
 
-            return (ReturnOnlyChangedValues ? store.Where(x => x.Value.Item1) : store)
-                .Select(x => new KeyValuePair<string, object?>(x.Key, x.Value.Item2));
+            if(ReturnOnlyChangedValues)
+            {
+                foreach(var item in store)
+                {
+                    EnsureCollectionPropertyIsConsistent(item.Key, item.Value.Item2);
+                }
+            }
+
+            foreach(var item in store)
+            {
+                if(!ReturnOnlyChangedValues || item.Value.Item1)
+                {
+                    result.Add(new KeyValuePair<string, object?>(item.Key, item.Value.Item2));
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -113,7 +127,13 @@ namespace Microsoft.Kiota.Abstractions.Store
         /// <returns>A collection of strings containing keys changed to null </returns>
         public IEnumerable<string> EnumerateKeysForValuesChangedToNull()
         {
-            return store.Where(x => x.Value.Item1 && x.Value.Item2 == null).Select(x => x.Key);
+            foreach(var item in store)
+            {
+                if(item.Value.Item1 && item.Value.Item2 == null)
+                {
+                    yield return item.Key;
+                }
+            }
         }
 
         /// <summary>
@@ -167,7 +187,7 @@ namespace Microsoft.Kiota.Abstractions.Store
             set
             {
                 isInitializationComplete = value;
-                foreach(var key in store.Keys.ToList())
+                foreach(var key in store.Keys)
                 {
                     if(store[key].Item2 is IBackedModel model)
                         model.BackingStore.InitializationCompleted = value;//forward the initialization status to nested IBackedModel instances
@@ -179,21 +199,30 @@ namespace Microsoft.Kiota.Abstractions.Store
 
         private void EnsureCollectionPropertyIsConsistent(string key, object? storeItem)
         {
-            if(storeItem is Tuple<ICollection, int> collectionTuple)  // check if we put in a collection annotated with the size
+            if(storeItem is Tuple<ICollection, int> collectionTuple)
             {
-                // Call Get<>() on nested properties so that this method may be called recursively to ensure collections are consistent
-                collectionTuple.Item1.OfType<IBackedModel>().ToList().ForEach(store => store.BackingStore.Enumerate()
-                    .ToList().ForEach(item => store.BackingStore.Get<object>(item.Key)));
-
-                if(collectionTuple.Item2 != collectionTuple.Item1.Count) // and the size has changed since we last updated)
+                foreach(var item in collectionTuple.Item1)
                 {
-                    Set(key, collectionTuple.Item1); //ensure the store is notified the collection property is "dirty"
+                    if(item is IBackedModel store)
+                    {
+                        foreach(var innerItem in store.BackingStore.Enumerate())
+                        {
+                            store.BackingStore.Get<object>(innerItem.Key);
+                        }
+                    }
+                }
+
+                if(collectionTuple.Item2 != collectionTuple.Item1.Count)
+                {
+                    Set(key, collectionTuple.Item1);
                 }
             }
             else if(storeItem is IBackedModel backedModel)
             {
-                // Call Get<>() on nested properties so that this method may be called recursively to ensure collections are consistent
-                backedModel.BackingStore.Enumerate().ToList().ForEach(item => backedModel.BackingStore.Get<object>(item.Key));
+                foreach(var item in backedModel.BackingStore.Enumerate())
+                {
+                    backedModel.BackingStore.Get<object>(item.Key);
+                }
             }
         }
     }

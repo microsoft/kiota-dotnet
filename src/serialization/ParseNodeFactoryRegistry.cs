@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,7 +59,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// <param name="content">The <see cref="Stream"/> to parse</param>
         /// <param name="cancellationToken">The cancellation token for the task</param>
         /// <returns></returns>
-        public async Task<IParseNode> GetRootParseNodeAsync(string contentType, Stream content, 
+        public async Task<IParseNode> GetRootParseNodeAsync(string contentType, Stream content,
             CancellationToken cancellationToken = default)
         {
             if(string.IsNullOrEmpty(contentType))
@@ -80,10 +79,10 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="Exception"></exception>
         public (T, string ContentType) GetFactory<T>(string contentType)
-            where T: IParseNodeFactory
+            where T : IParseNodeFactory
         {
             string resultContentType;
-            var vendorSpecificContentType = contentType.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).First();
+            var vendorSpecificContentType = contentType.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[0];
             IParseNodeFactory? factory;
             if(!ContentTypeAssociatedFactories.TryGetValue(vendorSpecificContentType, out factory))
             {
