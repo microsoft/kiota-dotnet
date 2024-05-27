@@ -75,7 +75,7 @@ namespace Microsoft.Kiota.Abstractions
         /// <returns>The string time of day.</returns>
         public override string ToString()
         {
-            return this.DateTime.ToString("HH:mm:ss");
+            return this.DateTime.ToString("HH\\:mm\\:ss");
         }
     }
 }
