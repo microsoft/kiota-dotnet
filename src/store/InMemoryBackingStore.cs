@@ -68,6 +68,7 @@ namespace Microsoft.Kiota.Abstractions.Store
             }
             else if(value is IBackedModel backedModel)
             {
+                // if its the first time adding a IBackedModel property to the store, subscribe to its BackingStore and use the events to flag the property is "dirty"
                 backedModel.BackingStore?.Subscribe((keyString, oldObject, newObject) =>
                 {
                     backedModel.BackingStore.InitializationCompleted = false;
