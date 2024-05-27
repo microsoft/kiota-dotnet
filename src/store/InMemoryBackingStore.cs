@@ -78,6 +78,7 @@ namespace Microsoft.Kiota.Abstractions.Store
 
             if(value is ICollection collectionValues)
             {
+                // All the list items are dirty as the model has been touched.
                 foreach(var item in collectionValues)
                 {
                     if(item is IBackedModel model)
@@ -86,7 +87,7 @@ namespace Microsoft.Kiota.Abstractions.Store
                         model.BackingStore.Subscribe((keyString, oldObject, newObject) =>
                         {
                             Set(key, value);
-                        }, key);
+                        }, key); // use property name(key) as subscriptionId to prevent excess subscription creation in the event this is called again
                     }
                 }
             }
@@ -103,7 +104,7 @@ namespace Microsoft.Kiota.Abstractions.Store
         {
             var result = new List<KeyValuePair<string, object?>>();
 
-            if(ReturnOnlyChangedValues)
+            if(ReturnOnlyChangedValues) // refresh the state of collection properties if they've changed in size.
             {
                 foreach(var item in store)
                 {
@@ -200,8 +201,9 @@ namespace Microsoft.Kiota.Abstractions.Store
 
         private void EnsureCollectionPropertyIsConsistent(string key, object? storeItem)
         {
-            if(storeItem is Tuple<ICollection, int> collectionTuple)
+            if(storeItem is Tuple<ICollection, int> collectionTuple) // check if we put in a collection annotated with the size
             {
+                // Call Get<>() on nested properties so that this method may be called recursively to ensure collections are consistent
                 foreach(var item in collectionTuple.Item1)
                 {
                     if(item is IBackedModel store)
@@ -213,13 +215,14 @@ namespace Microsoft.Kiota.Abstractions.Store
                     }
                 }
 
-                if(collectionTuple.Item2 != collectionTuple.Item1.Count)
+                if(collectionTuple.Item2 != collectionTuple.Item1.Count) // and the size has changed since we last updated)
                 {
-                    Set(key, collectionTuple.Item1);
+                    Set(key, collectionTuple.Item1); //ensure the store is notified the collection property is "dirty"
                 }
             }
             else if(storeItem is IBackedModel backedModel)
             {
+                // Call Get<>() on nested properties so that this method may be called recursively to ensure collections are consistent
                 foreach(var item in backedModel.BackingStore.Enumerate())
                 {
                     backedModel.BackingStore.Get<object>(item.Key);
