@@ -158,41 +158,28 @@ namespace Microsoft.Kiota.Abstractions
         {
             if(source == null) return;
 
-            foreach(var propertyInfo in typeof(T).GetProperties())
+            var properties = typeof(T).GetProperties();
+            foreach(var propertyInfo in properties)
             {
-                var attributes = propertyInfo.GetCustomAttributes(false);
-
-                QueryParameterAttribute? queryParameterAttribute = null;
-                foreach(var attribute in attributes)
+                var queryParameterAttribute = (QueryParameterAttribute?)null;
+                foreach(var attribute in propertyInfo.GetCustomAttributes(false))
                 {
-                    if(attribute is QueryParameterAttribute qpAttribute)
+                    if(attribute is QueryParameterAttribute attr)
                     {
-                        queryParameterAttribute = qpAttribute;
+                        queryParameterAttribute = attr;
                         break;
                     }
                 }
 
-                if(queryParameterAttribute is not null)
-                {
-                    var templateName = queryParameterAttribute.TemplateName ?? propertyInfo.Name;
-                    var value = propertyInfo.GetValue(source);
+                var name = queryParameterAttribute?.TemplateName ?? propertyInfo.Name;
+                var value = propertyInfo.GetValue(source);
 
-                    if(value != null)
+                if(value != null && !QueryParameters.ContainsKey(name))
+                {
+                    var collection = value as ICollection;
+                    if(collection == null || collection.Count > 0)
                     {
-                        if(!QueryParameters.ContainsKey(templateName))
-                        {
-                            if(value is ICollection collection)
-                            {
-                                if(collection.Count > 0)
-                                {
-                                    QueryParameters.AddOrReplace(templateName, value);
-                                }
-                            }
-                            else
-                            {
-                                QueryParameters.AddOrReplace(templateName, value);
-                            }
-                        }
+                        QueryParameters.AddOrReplace(name, value);
                     }
                 }
             }
