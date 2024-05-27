@@ -97,7 +97,7 @@ namespace Microsoft.Kiota.Abstractions
             var keysToUpdate = new List<string>();
             foreach(var entry in registry.ContentTypeAssociatedFactories)
             {
-                if(!(entry.Value is BackingStoreSerializationWriterProxyFactory || entry.Value is SerializationWriterFactoryRegistry))
+                if(entry.Value is not (BackingStoreSerializationWriterProxyFactory or SerializationWriterFactoryRegistry))
                 {
                     keysToUpdate.Add(entry.Key);
                 }
