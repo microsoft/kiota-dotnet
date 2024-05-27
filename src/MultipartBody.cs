@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -126,7 +125,7 @@ public class MultipartBody : IParsable
                 contentDispositionBuilder.Append(part.Name);
                 contentDispositionBuilder.Append("\"");
 
-                if (part.FileName != null)
+                if(part.FileName != null)
                 {
                     contentDispositionBuilder.Append("; filename=\"");
                     contentDispositionBuilder.Append(part.FileName);

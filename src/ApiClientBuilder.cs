@@ -3,7 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using Microsoft.Kiota.Abstractions.Serialization;
 using Microsoft.Kiota.Abstractions.Store;
 
@@ -74,26 +74,38 @@ namespace Microsoft.Kiota.Abstractions
 
             return result;
         }
+
         private static void EnableBackingStoreForParseNodeRegistry(ParseNodeFactoryRegistry registry)
         {
-            foreach(var entry in registry
-                                    .ContentTypeAssociatedFactories
-                                    .Where(x => !(x.Value is BackingStoreParseNodeFactory ||
-                                                    x.Value is ParseNodeFactoryRegistry))
-                                    .ToList()) // earlier versions of .NET do not allow direct modification of dictionary values while iterating
+            var keysToUpdate = new List<string>();
+            foreach(var entry in registry.ContentTypeAssociatedFactories)
             {
-                registry.ContentTypeAssociatedFactories[entry.Key] = new BackingStoreParseNodeFactory(entry.Value);
+                if(entry.Value is not (BackingStoreSerializationWriterProxyFactory or SerializationWriterFactoryRegistry))
+                {
+                    keysToUpdate.Add(entry.Key);
+                }
+            }
+
+            foreach(var key in keysToUpdate)
+            {
+                registry.ContentTypeAssociatedFactories[key] = new BackingStoreParseNodeFactory(registry.ContentTypeAssociatedFactories[key]);
             }
         }
+
         private static void EnableBackingStoreForSerializationRegistry(SerializationWriterFactoryRegistry registry)
         {
-            foreach(var entry in registry
-                                    .ContentTypeAssociatedFactories
-                                    .Where(x => !(x.Value is BackingStoreSerializationWriterProxyFactory ||
-                                                    x.Value is SerializationWriterFactoryRegistry))
-                                    .ToList()) // earlier versions of .NET do not allow direct modification of dictionary values while iterating
+            var keysToUpdate = new List<string>();
+            foreach(var entry in registry.ContentTypeAssociatedFactories)
             {
-                registry.ContentTypeAssociatedFactories[entry.Key] = new BackingStoreSerializationWriterProxyFactory(entry.Value);
+                if(entry.Value is not (BackingStoreSerializationWriterProxyFactory or SerializationWriterFactoryRegistry))
+                {
+                    keysToUpdate.Add(entry.Key);
+                }
+            }
+
+            foreach(var key in keysToUpdate)
+            {
+                registry.ContentTypeAssociatedFactories[key] = new BackingStoreSerializationWriterProxyFactory(registry.ContentTypeAssociatedFactories[key]);
             }
         }
     }
