@@ -1,6 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using Microsoft.Kiota.Abstractions.Serialization;
 using Microsoft.Kiota.Abstractions.Tests.Mocks;
 using Moq;
@@ -257,6 +259,34 @@ namespace Microsoft.Kiota.Abstractions.Tests
 
             // Assert
             Assert.Contains($"%24time=06%3A00%3A00", requestInfo.URI.OriginalString);
+        }
+        [Fact]
+        public void CurrentCultureDoesNotAffectTimeSerialization()
+        {
+            // Arrange as the request builders would
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/users{?%24time}"
+            };
+
+            var currentCulture = CultureInfo.CurrentCulture;
+
+            // Act
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("da-DK");
+            var time = new Time(6, 0, 0);
+            var pathParameters = new Dictionary<string, object>
+            {
+                { "%24time", time }
+            };
+
+            requestInfo.PathParameters = pathParameters;
+
+            // Assert
+            Assert.Contains($"%24time=06%3A00%3A00", requestInfo.URI.OriginalString);
+
+            // Cleanup
+            Thread.CurrentThread.CurrentCulture = currentCulture;
         }
         [Fact]
         public void ThrowsInvalidOperationExceptionWhenBaseUrlNotSet()

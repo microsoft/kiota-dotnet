@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.9.1] - 2024-05-24
+## [1.9.3] - 2024-05-28
+
+### Changed
+
+- Fix time formatting for other cultures.
+
+## [1.9.2] - 2024-05-24
 
 ### Changed
 
