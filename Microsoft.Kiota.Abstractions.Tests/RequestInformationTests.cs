@@ -271,11 +271,9 @@ namespace Microsoft.Kiota.Abstractions.Tests
             };
 
             var currentCulture = CultureInfo.CurrentCulture;
-            var currentUICulture = CultureInfo.CurrentUICulture;
 
             // Act
             Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("da-DK");
-            Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("da-DK");
             var time = new Time(6, 0, 0);
             var pathParameters = new Dictionary<string, object>
             {
@@ -289,7 +287,6 @@ namespace Microsoft.Kiota.Abstractions.Tests
 
             // Cleanup
             Thread.CurrentThread.CurrentCulture = currentCulture;
-            Thread.CurrentThread.CurrentUICulture = currentUICulture;
         }
         [Fact]
         public void ThrowsInvalidOperationExceptionWhenBaseUrlNotSet()
