@@ -148,7 +148,14 @@ public class MultipartBody : IParsable
                 }
                 else if(part.Content is string currentString)
                 {
-                    writer.WriteStringValue(string.Empty, currentString);
+                    using var partWriter = RequestAdapter.SerializationWriterFactory.GetSerializationWriter(part.ContentType);
+                    partWriter.WriteStringValue(string.Empty, currentString);
+                    using var partContent = partWriter.GetSerializedContent();
+                    if(partContent.CanSeek)
+                        partContent.Seek(0, SeekOrigin.Begin);
+                    using var ms = new MemoryStream();
+                    partContent.CopyTo(ms);
+                    writer.WriteByteArrayValue(string.Empty, ms.ToArray());
                 }
                 else if(part.Content is MemoryStream originalMemoryStream)
                 {

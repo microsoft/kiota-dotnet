@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Fix time formatting for other cultures.
+- Fix MultipartBody serialization
 
 ## [1.9.2] - 2024-05-24
 
