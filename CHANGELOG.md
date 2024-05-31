@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Kiota's `Date` and `Time` types are interchangeable with the system `DateOnly` and `TimeOnly` types through implicit conversion operators.
+
 ## [1.9.4] - 2024-05-31
 
 ### Changed

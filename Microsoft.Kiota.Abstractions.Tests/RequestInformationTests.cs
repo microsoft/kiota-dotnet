@@ -260,6 +260,52 @@ namespace Microsoft.Kiota.Abstractions.Tests
             // Assert
             Assert.Contains($"%24time=06%3A00%3A00", requestInfo.URI.OriginalString);
         }
+#if NET6_0_OR_GREATER
+        [Fact]
+        public void SetsPathParametersOfDateOnlyType()
+        {
+            // Arrange as the request builders would
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/users{?%24date}"
+            };
+
+            // Act
+            var date = new DateOnly(2023, 10, 26);
+            var pathParameters = new Dictionary<string, object>
+            {
+                { "%24date", date }
+            };
+
+            requestInfo.PathParameters = pathParameters;
+
+            // Assert
+            Assert.Contains($"%24date=2023-10-26", requestInfo.URI.OriginalString);
+        }
+        [Fact]
+        public void SetsPathParametersOfTimeOnlyType()
+        {
+            // Arrange as the request builders would
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/users{?%24time}"
+            };
+
+            // Act
+            var time = new TimeOnly(6, 0, 0);
+            var pathParameters = new Dictionary<string, object>
+            {
+                { "%24time", time }
+            };
+
+            requestInfo.PathParameters = pathParameters;
+
+            // Assert
+            Assert.Contains($"%24time=06%3A00%3A00", requestInfo.URI.OriginalString);
+        }
+#endif
         [Fact]
         public void CurrentCultureDoesNotAffectTimeSerialization()
         {
@@ -663,14 +709,54 @@ namespace Microsoft.Kiota.Abstractions.Tests
             };
 
             // Act
-            var date1 = new Time(10, 0, 0);
-            var date2 = new Time(11, 1, 1);
+            var time1 = new Time(10, 0, 0);
+            var time2 = new Time(11, 1, 1);
 
-            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new object[] { date1, date2 } });
+            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new object[] { time1, time2 } });
 
             // Assert
             Assert.Equal("http://localhost/me?items=10%3A00%3A00,11%3A01%3A01", requestInfo.URI.OriginalString);
         }
+
+#if NET6_0_OR_GREATER
+        [Fact]
+        public void SetsDateOnlyValuesInQueryParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?items}"
+            };
+
+            // Act
+            Date date1 = new DateOnly(2022, 8, 1);
+            DateOnly date2 = new Date(2022, 8, 2);
+
+            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new object[] { date1, date2 } });
+
+            // Assert
+            Assert.Equal("http://localhost/me?items=2022-08-01,2022-08-02", requestInfo.URI.OriginalString);
+        }
+
+        [Fact]
+        public void SetsTimeOnlyValuesInQueryParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?items}"
+            };
+
+            // Act
+            Time time1 = new TimeOnly(10, 0, 0);
+            TimeOnly time2 = new Time(11, 1, 1);
+
+            requestInfo.AddQueryParameters(new GetQueryParameters { Items = new object[] { time1, time2 } });
+
+            // Assert
+            Assert.Equal("http://localhost/me?items=10%3A00%3A00,11%3A01%3A01", requestInfo.URI.OriginalString);
+        }
+#endif
 
         [Fact]
         public void SetsGuidValuesInQueryParameters()

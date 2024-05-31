@@ -11,6 +11,22 @@ namespace Microsoft.Kiota.Abstractions
     /// </summary>
     public struct Date
     {
+#if NET6_0_OR_GREATER
+        /// <summary>
+        /// Converts the supplied <see cref="DateOnly"/> parameter to <see cref="Date"/>.
+        /// </summary>
+        /// <param name="date">The <see cref="DateOnly"/> to be converted.</param>
+        /// <returns>A new <see cref="Date"/> structure whose years, months and days are equal to those of the supplied date.</returns>
+        public static implicit operator Date(DateOnly date) => new(date.Year, date.Month, date.Day);
+
+        /// <summary>
+        /// Converts the supplied <see cref="Date"/> parameter to <see cref="DateOnly"/>.
+        /// </summary>
+        /// <param name="date">The <see cref="Date"/> to be converted.</param>
+        /// <returns>A new <see cref="DateOnly"/> structure whose years, months and days are equal to those of the supplied date.</returns>
+        public static implicit operator DateOnly(Date date) => new(date.Year, date.Month, date.Day);
+#endif
+
         /// <summary>
         /// Create a new Date object from a <see cref="DateTime"/> object
         /// </summary>
