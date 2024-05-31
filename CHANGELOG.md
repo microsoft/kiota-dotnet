@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.4] - 2024-05-31
+
+### Changed
+
+- Fix MultipartBody serialization
+
 ## [1.9.3] - 2024-05-28
 
 ### Changed
