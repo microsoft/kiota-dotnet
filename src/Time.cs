@@ -11,6 +11,21 @@ namespace Microsoft.Kiota.Abstractions
     /// </summary>
     public struct Time
     {
+#if NET6_0_OR_GREATER
+        /// <summary>
+        /// Converts the supplied <see cref="TimeOnly"/> parameter to <see cref="Time"/>.
+        /// </summary>
+        /// <param name="time">The <see cref="TimeOnly"/> to be converted.</param>
+        /// <returns>A new <see cref="Time"/> structure whose hours, minutes, seconds and milliseconds are equal to those of the supplied time.</returns>
+        public static implicit operator Time(TimeOnly time) => new(new DateTime(1, 1, 1, time.Hour, time.Minute, time.Second, time.Millisecond));
+
+        /// <summary>
+        /// Converts the supplied <see cref="Time"/> parameter to <see cref="TimeOnly"/>.
+        /// </summary>
+        /// <param name="time">The <see cref="Time"/> to be converted.</param>
+        /// <returns>A new <see cref="TimeOnly"/> structure whose hours, minutes, seconds and milliseconds are equal to those of the supplied time.</returns>
+        public static implicit operator TimeOnly(Time time) => new(time.DateTime.Hour, time.DateTime.Minute, time.DateTime.Second, time.DateTime.Millisecond);
+#endif
         /// <summary>
         /// Create a new Time from hours, minutes, and seconds.
         /// </summary>
