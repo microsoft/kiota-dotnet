@@ -1,5 +1,6 @@
 // ------------------------------------------------------------------------------
-//  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
+//  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  
+//  See License in the project root for license information.
 // ------------------------------------------------------------------------------
 
 using System;
@@ -9,7 +10,7 @@ using System.Collections.Generic;
 namespace Microsoft.Kiota.Abstractions.Extensions
 {
     /// <summary>
-    /// Extension methods for <see cref="IEnumerable"/>
+    /// Extension methods for <see cref="IEnumerable{T}"/>
     /// </summary>
     public static class IEnumerableExtensions
     {
@@ -18,12 +19,11 @@ namespace Microsoft.Kiota.Abstractions.Extensions
         /// </summary>
         /// <typeparam name="T">The type of elements in the collection.</typeparam>
         /// <param name="e">The enumerable to convert.</param>
-        /// <returns>A <see cref="List{T}"/> containing the elements of the enumerable.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when the input enumerable is null.</exception>
-        public static List<T> AsList<T>(this IEnumerable<T> e)
+        /// <returns>A <see cref="List{T}"/> containing the elements of the enumerable, or <c>null</c> if the input is <c>null</c>.</returns>
+        public static List<T>? AsList<T>(this IEnumerable<T>? e)
         {
-            if (e is null) throw new ArgumentNullException(nameof(e), "Input collection cannot be null.");
-            
+            if (e is null) return null;
+
             if (e is List<T> list) return list;
 
             return new List<T>(e);
@@ -34,11 +34,10 @@ namespace Microsoft.Kiota.Abstractions.Extensions
         /// </summary>
         /// <typeparam name="T">The type of elements in the collection.</typeparam>
         /// <param name="e">The enumerable to convert.</param>
-        /// <returns>An array containing the elements of the enumerable.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when the input enumerable is null.</exception>
-        public static T[] AsArray<T>(this IEnumerable<T> e)
+        /// <returns>An array containing the elements of the enumerable, or <c>null</c> if the input is <c>null</c>.</returns>
+        public static T[]? AsArray<T>(this IEnumerable<T>? e)
         {
-            if (e is null) throw new ArgumentNullException(nameof(e), "Input collection cannot be null.");
+            if (e is null) return null;
 
             if (e is T[] array) return array;
 
