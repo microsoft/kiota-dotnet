@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Microsoft.Kiota.Abstractions.Extensions
 {
     /// <summary>
-    /// Extension methods for the <see cref="IEnumerable"/>
+    /// Extension methods for <see cref="IEnumerable"/>
     /// </summary>
     public static class IEnumerableExtensions
     {
