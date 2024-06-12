@@ -44,7 +44,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-    <PackageReference Include="Std.UriTemplate" Version="0.0.59" />
+    <PackageReference Include="Std.UriTemplate" Version="1.0.1" />
   </ItemGroup>
 
   <!-- NET 5 target to be removed on next major version-->
