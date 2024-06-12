@@ -62,12 +62,12 @@ namespace Microsoft.Kiota.Abstractions.Extensions
             foreach (var item in e) result[count++] = item;
             return result;
 
-            static AllocateOnHeap(int count)
+            static T[] AllocateOnHeap(int count)
             {
 #if NET5_0_OR_GREATER
-                return GC.AllocateUninitializedArray<T>(collection.Count);
+                return GC.AllocateUninitializedArray<T>(count);
 #else
-                return new T[collection.Count];
+                return new T[count];
 #endif
             }
         }
