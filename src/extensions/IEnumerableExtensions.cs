@@ -46,11 +46,7 @@ namespace Microsoft.Kiota.Abstractions.Extensions
             if (e is ICollection<T> collection)
             {
                 // Allocate an array with the exact size
-#if NET5_0_OR_GREATER
-                result = GC.AllocateUninitializedArray<T>(collection.Count);
-#else
-                result = new T[collection.Count];
-#endif
+                result = AllocateOnHeap(collection.Count);
                 collection.CopyTo(result, 0);
                 return result;
             }
@@ -59,17 +55,21 @@ namespace Microsoft.Kiota.Abstractions.Extensions
             int count = 0;
             foreach (var item in e) count++;
 
-            // Allocate array with the counted size
-#if NET5_0_OR_GREATER
-            result = GC.AllocateUninitializedArray<T>(count);
-#else
-            result = new T[count];
-#endif
+            result = AllocateOnHeap(count);
 
             // Second pass to copy the elements
             count = 0;
             foreach (var item in e) result[count++] = item;
             return result;
+
+            static AllocateOnHeap(int count)
+            {
+#if NET5_0_OR_GREATER
+                return GC.AllocateUninitializedArray<T>(collection.Count);
+#else
+                return new T[collection.Count];
+#endif
+            }
         }
     }
 }
