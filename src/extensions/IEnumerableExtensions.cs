@@ -17,6 +17,14 @@ namespace Microsoft.Kiota.Abstractions.Extensions
 
         public static T[] AsArray<T>(this IEnumerable<T> e)
         {
+            if (e is ICollection<T> collection)
+            {
+                // Allocate an array with the exact size
+                T[] result = GC.AllocateUninitializedArray<T>(collection.Count);
+                collection.CopyTo(result, 0);
+                return result;
+            }
+
             // First pass to count the elements
             int count = 0;
             foreach (var item in e) count++;
