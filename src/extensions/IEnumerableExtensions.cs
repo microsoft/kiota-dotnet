@@ -13,14 +13,29 @@ namespace Microsoft.Kiota.Abstractions.Extensions
     /// </summary>
     public static class IEnumerableExtensions
     {
-        public static List<T> AsList<T>(this IEnumerable<T> e) => new List<T>(e);
+        public static List<T> AsList<T>(this IEnumerable<T> e)
+        {
+            if (e is null) ThrowHelper.ThrowArgumentNullException(nameof(e));
+            
+            if (e is List<T> list) return list;
+
+            return new List<T>(e);
+        }
 
         public static T[] AsArray<T>(this IEnumerable<T> e)
         {
+            if (e is null) ThrowHelper.ThrowArgumentNullException(nameof(e));
+
+            if (e is T[] array) return array;
+
             if (e is ICollection<T> collection)
             {
                 // Allocate an array with the exact size
+#if NET5_0_OR_GREATER
                 T[] result = GC.AllocateUninitializedArray<T>(collection.Count);
+#else
+                T[] result = new T[count];
+#endif
                 collection.CopyTo(result, 0);
                 return result;
             }
