@@ -56,7 +56,7 @@ Catch {
     Exit 1
 }
 
-$currentPublishedVersion = [System.Management.Automation.SemanticVersion]$nugetIndex.items[$nugetIndex.items.Count - 1].upper
+$currentPublishedVersion = $nugetIndex.items | Select-Object -ExpandProperty upper | ForEach-Object { [System.Management.Automation.SemanticVersion]$_ } | sort-object | Select-Object -Last 1
 
 # Validate that the version number has been updated.
 if ($currentProjectVersion -le $currentPublishedVersion) {
