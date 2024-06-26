@@ -139,13 +139,16 @@ public class MultipartBody : IParsable
                 {
                     using var partWriter = RequestAdapter.SerializationWriterFactory.GetSerializationWriter(part.ContentType);
                     partWriter.WriteObjectValue(string.Empty, parsable);
-                    WriteSerializedContent(writer, partWriter);
+                    using var partContent = partWriter.GetSerializedContent();
+                    if(partContent.CanSeek)
+                        partContent.Seek(0, SeekOrigin.Begin);
+                    using var ms = new MemoryStream();
+                    partContent.CopyTo(ms);
+                    writer.WriteByteArrayValue(string.Empty, ms.ToArray());
                 }
                 else if(part.Content is string currentString)
                 {
-                    using var partWriter = RequestAdapter.SerializationWriterFactory.GetSerializationWriter(part.ContentType);
-                    partWriter.WriteStringValue(string.Empty, currentString);
-                    WriteSerializedContent(writer, partWriter);
+                    writer.WriteStringValue(string.Empty, currentString);
                 }
                 else if(part.Content is MemoryStream originalMemoryStream)
                 {
@@ -173,22 +176,12 @@ public class MultipartBody : IParsable
                 writer.WriteByteArrayValue(part.Name, currentBinary);
             }
         }
-        AddNewLine(writer);
+
         writer.WriteStringValue(string.Empty, $"--{Boundary}--");
     }
     private void AddNewLine(ISerializationWriter writer)
     {
         writer.WriteStringValue(string.Empty, string.Empty);
-    }
-
-    private void WriteSerializedContent(ISerializationWriter writer, ISerializationWriter partWriter)
-    {
-        using var partContent = partWriter.GetSerializedContent();
-        if(partContent.CanSeek)
-            partContent.Seek(0, SeekOrigin.Begin);
-        using var ms = new MemoryStream();
-        partContent.CopyTo(ms);
-        writer.WriteByteArrayValue(string.Empty, ms.ToArray());
     }
 
     private class Part
