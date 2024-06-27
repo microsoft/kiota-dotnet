@@ -15,7 +15,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
         }
 
         [Fact]
-        public void EnumGenericIsParsedIfValuesAreIntegers()
+        public void EnumWithFlagsGenericIsParsedIfValuesAreIntegers()
         {
             var result = EnumHelpers.GetEnumValue<TestEnumWithFlags>("1,2");
 
@@ -31,7 +31,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
         }
 
         [Fact]
-        public void EnumGenericIsParsedIfValuesAreStrings()
+        public void EnumWithFlagsGenericIsParsedIfValuesAreStrings()
         {
             var result = EnumHelpers.GetEnumValue<TestEnumWithFlags>("Value1,Value3");
 
@@ -47,7 +47,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
         }
 
         [Fact]
-        public void EnumGenericIsParsedIfValuesAreFromEnumMember()
+        public void EnumWithFlagsGenericIsParsedIfValuesAreFromEnumMember()
         {
             var result = EnumHelpers.GetEnumValue<TestEnumWithFlags>("Value__2,Value__3");
 
@@ -71,7 +71,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
         }
 
         [Fact]
-        public void EnumIsParsedIfValuesAreIntegers()
+        public void EnumWithFlagsIsParsedIfValuesAreIntegers()
         {
             var result = EnumHelpers.GetEnumValue(typeof(TestEnumWithFlags), "1,2");
 
@@ -87,7 +87,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
         }
 
         [Fact]
-        public void EnumIsParsedIfValuesAreStrings()
+        public void EnumWithFlagsIsParsedIfValuesAreStrings()
         {
             var result = EnumHelpers.GetEnumValue(typeof(TestEnumWithFlags), "Value1,Value3");
 
@@ -103,7 +103,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
         }
 
         [Fact]
-        public void EnumIsParsedIfValuesAreFromEnumMember()
+        public void EnumWithFlagsIsParsedIfValuesAreFromEnumMember()
         {
             var result = EnumHelpers.GetEnumValue(typeof(TestEnumWithFlags), "Value__2,Value__3");
 

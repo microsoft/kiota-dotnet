@@ -84,8 +84,8 @@ namespace Microsoft.Kiota.Abstractions.Helpers
         /// <summary>
         /// Gets the enum value from the raw value for the given type
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="rawValue"></param>
+        /// <param name="type">Enum type</param>
+        /// <param name="rawValue">Raw value</param>
         /// <returns></returns>
 #if NET5_0_OR_GREATER
         public static object? GetEnumValue([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type? type, string rawValue)
