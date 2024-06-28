@@ -27,7 +27,6 @@ namespace Microsoft.Kiota.Abstractions.Helpers
         {
             if(string.IsNullOrEmpty(rawValue)) return null;
 
-            var type = typeof(T);
             rawValue = ToEnumRawName<T>(rawValue!);
             if(typeof(T).IsDefined(typeof(FlagsAttribute)))
             {
@@ -58,12 +57,7 @@ namespace Microsoft.Kiota.Abstractions.Helpers
         private static string ToEnumRawName<T>(string value) where T : struct, Enum
 #endif
         {
-            if(TryGetFieldValueName(typeof(T), value, out var val))
-            {
-                value = val;
-            }
-
-            return value;
+            return TryGetFieldValueName(typeof(T), value, out var val) ? val : value;
         }
 
 #if NET5_0_OR_GREATER
@@ -72,13 +66,7 @@ namespace Microsoft.Kiota.Abstractions.Helpers
         private static ReadOnlySpan<char> ToEnumRawName<T>(ReadOnlySpan<char> span) where T : struct, Enum
 #endif
         {
-            var value = span.ToString();
-            if(TryGetFieldValueName(typeof(T), value, out var val))
-            {
-                value = val;
-            }
-
-            return value.AsSpan();
+            return TryGetFieldValueName(typeof(T), span.ToString(), out var val) ? val.AsSpan() : span;
         }
 
         /// <summary>
