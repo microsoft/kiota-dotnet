@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.9.7] - 2024-06-28
+## [1.9.7] - 2024-07-04
 
 - Add helper methods to parse enums from strings.
 
