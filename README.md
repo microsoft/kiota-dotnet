@@ -12,6 +12,7 @@ Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README
 1. [Authentication - Azure](./src/authentication/azure/README.md)
 1. [Http - HttpClient](./src/http/httpClient/README.md)
 1. [Serialization - JSON](./src/serialization/json/README.md)
+1. [Serialization - FORM](./src/serialization/form/README.md)
 
 ## Debugging
 

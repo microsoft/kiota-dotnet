@@ -32,6 +32,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Kiota.Serializati
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Kiota.Serialization.Json", "src\serialization\json\Microsoft.Kiota.Serialization.Json.csproj", "{87168872-0B10-4BBB-9017-2501E76FE50A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Kiota.Serialization.Form", "src\serialization\form\Microsoft.Kiota.Serialization.Form.csproj", "{08C40934-39AB-4BD6-8306-7EF84122BF70}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Kiota.Serialization.Form.Tests", "tests\serialization\form\Microsoft.Kiota.Serialization.Form.Tests.csproj", "{E0C5DCE4-2CF5-4EA3-B351-3DD97081A9F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +78,14 @@ Global
 		{87168872-0B10-4BBB-9017-2501E76FE50A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87168872-0B10-4BBB-9017-2501E76FE50A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87168872-0B10-4BBB-9017-2501E76FE50A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08C40934-39AB-4BD6-8306-7EF84122BF70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08C40934-39AB-4BD6-8306-7EF84122BF70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08C40934-39AB-4BD6-8306-7EF84122BF70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08C40934-39AB-4BD6-8306-7EF84122BF70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0C5DCE4-2CF5-4EA3-B351-3DD97081A9F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0C5DCE4-2CF5-4EA3-B351-3DD97081A9F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0C5DCE4-2CF5-4EA3-B351-3DD97081A9F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0C5DCE4-2CF5-4EA3-B351-3DD97081A9F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
