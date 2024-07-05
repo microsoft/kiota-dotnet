@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Sdk Name="Microsoft.DotNet.PackageValidation" Version="1.0.0-preview.7.21379.12" />
+
+  <PropertyGroup>
+    <Description>Kiota Http provider implementation for dotnet with HttpClient.</Description>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <AssemblyTitle>Kiota Http Library for dotnet</AssemblyTitle>
+    <Authors>Microsoft</Authors>
+    <!-- NET 5 target to be removed on next major version-->
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0;net6.0;net8.0;net462</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageIconUrl>http://go.microsoft.com/fwlink/?LinkID=288890</PackageIconUrl>
+    <RepositoryUrl>https://github.com/microsoft/kiota-http-dotnet</RepositoryUrl>
+    <PackageProjectUrl>https://aka.ms/kiota/docs</PackageProjectUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+    <VersionPrefix>1.4.3</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <!-- Enable this line once we go live to prevent breaking changes -->
+    <!-- <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion> -->
+    <SignAssembly>false</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <PackageReleaseNotes>
+      https://github.com/microsoft/kiota-http-dotnet/blob/main/CHANGELOG.md
+    </PackageReleaseNotes>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);NU5048;NETSDK1138</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)','net5.0'))">
+    <IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)','net8.0'))">
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <!-- NET 5 target to be removed on next major version-->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0' or '$(TargetFramework)'== 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1' or '$(TargetFramework)' == 'net462'">
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="[6.0,9.0)" />
+    <PackageReference Include="System.Text.Json" Version="[6.0,9.0)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+    <PackageReference Include="System.Net.Http.WinHttpHandler" Version="[6.0,9.0)" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\abstractions\Microsoft.Kiota.Abstractions.csproj" />
+    <ProjectReference Include="..\..\generated\KiotaGenerated.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+</Project>

@@ -22,6 +22,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Kiota.Authenticat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Kiota.Authentication.Azure.Tests", "tests\authentication\azure\Microsoft.Kiota.Authentication.Azure.Tests.csproj", "{71161CE4-C748-4CD3-A5ED-A2B806B24360}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Kiota.Http.HttpClientLibrary", "src\http\httpClient\Microsoft.Kiota.Http.HttpClientLibrary.csproj", "{B0D5E430-0A53-4A2A-B9B2-5CC83CC27652}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KiotaGenerated", "src\generated\KiotaGenerated.csproj", "{A3771749-0661-4A8D-AC16-FF338AB71FC4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Kiota.Http.HttpClientLibrary.Tests", "tests\http\httpClient\Microsoft.Kiota.Http.HttpClientLibrary.Tests.csproj", "{644AA85A-6AA8-4DCC-AD97-13DC9660ED3A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +50,18 @@ Global
 		{71161CE4-C748-4CD3-A5ED-A2B806B24360}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71161CE4-C748-4CD3-A5ED-A2B806B24360}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71161CE4-C748-4CD3-A5ED-A2B806B24360}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0D5E430-0A53-4A2A-B9B2-5CC83CC27652}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0D5E430-0A53-4A2A-B9B2-5CC83CC27652}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0D5E430-0A53-4A2A-B9B2-5CC83CC27652}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0D5E430-0A53-4A2A-B9B2-5CC83CC27652}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3771749-0661-4A8D-AC16-FF338AB71FC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3771749-0661-4A8D-AC16-FF338AB71FC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3771749-0661-4A8D-AC16-FF338AB71FC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3771749-0661-4A8D-AC16-FF338AB71FC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{644AA85A-6AA8-4DCC-AD97-13DC9660ED3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{644AA85A-6AA8-4DCC-AD97-13DC9660ED3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{644AA85A-6AA8-4DCC-AD97-13DC9660ED3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{644AA85A-6AA8-4DCC-AD97-13DC9660ED3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

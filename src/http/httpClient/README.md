@@ -1,20 +1,22 @@
-# Kiota Libraries for dotnet
+# Kiota Http Library for dotnet
 
-The Kiota abstractions Library for dotnet is the dotnet library defining the basic constructs Kiota projects need once an SDK has been generated from an OpenAPI definition.
+[![Build and Test](https://github.com/microsoft/kiota-http-dotnet/actions/workflows/build-and_test.yml/badge.svg?branch=main)](https://github.com/microsoft/kiota-http-dotnet/actions/workflows/build-and_test.yml) [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Http.HttpClientLibrary?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Http.HttpClientLibrary/)
 
-A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to the abstraction package to build and run.
+The Kiota HTTP Library for dotnet is the dotnet HTTP library implementation with [HttpClient](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclient?view=net-6.0).
+
+A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to a HTTP package to make HTTP requests to an API endpoint.
 
 Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README.md).
 
-## Libraries
+## Using the Kiota Http Library for dotnet
 
-1. [Abstractions](./src/abstractions/README.md)
-1. [Authentication - Azure](./src/authentication/azure/README.md)
-1. [Http - HttpClient](./src/http/httpClient/README.md)
+```shell
+dotnet add package Microsoft.Kiota.Http.HttpClientLibrary
+```
 
 ## Debugging
 
-If you are using Visual Studio Code as your IDE, the **launch.json** file already contains the configuration to build and test the library. Otherwise, you can open the **Microsoft.Kiota.Abstractions.sln** with Visual Studio.
+If you are using Visual Studio Code as your IDE, the **launch.json** file already contains the configuration to build and test the library. Otherwise, you can open the **Microsoft.Kiota.Http.HttpClientLibrary.sln** with Visual Studio.
 
 ## Contributing
 
