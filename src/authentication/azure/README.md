@@ -1,7 +1,5 @@
 # Kiota Azure Identity authentication provider library for dotnet
 
-[![Build and Test](https://github.com/microsoft/kiota-authentication-azure-dotnet/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/microsoft/kiota-authentication-azure-dotnet/actions/workflows/build-and-test.yml) [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Authentication.Azure?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Authentication.Azure/)
-
 The Kiota Azure Identity authentication provider library for dotnet is the authentication provider implementation with [Azure.Identity](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/identity-readme).
 
 A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to a authentication provider library to authenticate HTTP requests to an API endpoint.

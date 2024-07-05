@@ -62,7 +62,7 @@ jobs:
           CoverletOutputFormat: "opencover" # https://github.com/microsoft/vstest/issues/4014#issuecomment-1307913682
         shell: pwsh
         run: |
-          dotnet tool run dotnet-sonarscanner begin /k:"microsoft_kiota-abstractions-dotnet" /o:"microsoft" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="tests\abstractions\coverage.net8.0.opencover.xml,tests\authentication\azure\coverage.net8.0.opencover.xml,tests\http\httpClient\coverage.net8.0.opencover.xml,tests\serialization\json\coverage.net8.0.opencover.xml,tests\serialization\text\coverage.net8.0.opencover.xml,tests\serialization\form\coverage.net8.0.opencover.xml,tests\serialization\multipart\coverage.net8.0.opencover.xml,"
+          dotnet tool run dotnet-sonarscanner begin /k:"microsoft_kiota-abstractions-dotnet" /o:"microsoft" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="tests/abstractions/coverage.net8.0.opencover.xml,tests/authentication/azure/coverage.net8.0.opencover.xml,tests/http/httpClient/coverage.net8.0.opencover.xml,tests/serialization/json/coverage.net8.0.opencover.xml,tests/serialization/text/coverage.net8.0.opencover.xml,tests/serialization/form/coverage.net8.0.opencover.xml,tests/serialization/multipart/coverage.net8.0.opencover.xml"
           dotnet workload restore
           dotnet build
           dotnet test Microsoft.Kiota.sln --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover --framework net8.0

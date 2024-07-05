@@ -1,7 +1,5 @@
 # Kiota URI Form Encoded Serialization Library for dotnet
 
-[![Build and Test](https://github.com/microsoft/kiota-serialization-form-dotnet/actions/workflows/build-and_test.yml/badge.svg?branch=main)](https://github.com/microsoft/kiota-serialization-form-dotnet/actions/workflows/build-and_test.yml) [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Form?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Form/)
-
 The Form Serialization Library for dotnet is the dotnet `application/x-www-form-urlencoded` serialization library implementation.
 
 A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to a form serialization package to handle `application/x-www-form-urlencoded` payloads from a supporting API endpoint.

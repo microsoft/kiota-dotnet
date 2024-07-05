@@ -1,7 +1,5 @@
 # Kiota Multipart Serialization Library for dotnet
 
-[![Build and Test](https://github.com/microsoft/kiota-serialization-multipart-dotnet/actions/workflows/build-and_test.yml/badge.svg?branch=main)](https://github.com/microsoft/kiota-serialization-multipart-dotnet/actions/workflows/build-and_test.yml) [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Multipart?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Multipart/)
-
 The Multipart Serialization Library for dotnet is the dotnet Multipart serialization library implementation.
 
 A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to a multipart serialization package to handle multipart payloads from an API endpoint.

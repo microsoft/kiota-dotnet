@@ -1,7 +1,5 @@
 # Kiota Json Serialization Library for dotnet
 
-[![Build and Test](https://github.com/microsoft/kiota-serialization-json-dotnet/actions/workflows/build-and_test.yml/badge.svg?branch=main)](https://github.com/microsoft/kiota-serialization-json-dotnet/actions/workflows/build-and_test.yml) [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Json?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Json/)
-
 The Json Serialization Library for dotnet is the dotnet JSON serialization library implementation with System.Text.Json
 
 A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to a json serialization package to handle json payloads from an API endpoint.

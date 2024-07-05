@@ -1,24 +1,28 @@
 # Kiota Libraries for dotnet
 
-The Kiota abstractions Library for dotnet is the dotnet library defining the basic constructs Kiota projects need once an SDK has been generated from an OpenAPI definition.
+[![Build, Test, CodeQl](https://github.com/microsoft/kiota-abstractions-dotnet/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/microsoft/kiota-abstractions-dotnet/actions/workflows/build-and-test.yml)
 
-A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to the abstraction package to build and run.
+The Kiota abstractions libraries define the basic constructs Kiota projects need once an SDK has been generated from an OpenAPI definition.
+
+A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to the libraries to build and run by providing default implementations for serialization and http transport.
 
 Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README.md).
 
 ## Libraries
 
-1. [Abstractions](./src/abstractions/README.md)
-1. [Authentication - Azure](./src/authentication/azure/README.md)
-1. [Http - HttpClient](./src/http/httpClient/README.md)
-1. [Serialization - JSON](./src/serialization/json/README.md)
-1. [Serialization - FORM](./src/serialization/form/README.md)
-1. [Serialization - TEXT](./src/serialization/text/README.md)
-1. [Serialization - MULTIPART](./src/serialization/multipart/README.md)
+| Library | Nuget Release |
+| ------ | ------ |
+| [Abstractions](./src/abstractions/README.md) |  [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Abstractions?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Abstractions/) |
+| [Authentication - Azure](./src/authentication/azure/README.md) | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Authentication.Azure?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Authentication.Azure/) |
+| [Http - HttpClientLibrary](./src/http/httpClient/README.md) | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Http.HttpClientLibrary?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Http.HttpClientLibrary/) |
+| [Serialization - JSON](./src/serialization/json/README.md) | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Json?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Json/) |
+| [Serialization - FORM](./src/serialization/form/README.md) | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Form?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Form/) |
+| [Serialization - TEXT](./src/serialization/text/README.md) | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Text?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Text/) |
+| [Serialization - MULTIPART](./src/serialization/multipart/README.md) | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Multipart?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Multipart/) |
 
 ## Debugging
 
-If you are using Visual Studio Code as your IDE, the **launch.json** file already contains the configuration to build and test the library. Otherwise, you can open the **Microsoft.Kiota.Abstractions.sln** with Visual Studio.
+If you are using Visual Studio Code as your IDE, the **launch.json** file already contains the configuration to build and test the library. Otherwise, you can open the **Microsoft.Kiota.sln** with Visual Studio.
 
 ## Contributing
 

@@ -1,7 +1,5 @@
 # Kiota Text Serialization Library for dotnet
 
-[![Build and Test](https://github.com/microsoft/kiota-serialization-text-dotnet/actions/workflows/build-and_test.yml/badge.svg?branch=main)](https://github.com/microsoft/kiota-serialization-text-dotnet/actions/workflows/build-and_test.yml) [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Text?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Text/)
-
 The Text Serialization Library for dotnet is the dotnet Text serialization library implementation to handle text/plain responses.
 
 A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to a Text serialization package to handle text/plain payloads from an API endpoint.

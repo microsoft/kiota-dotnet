@@ -1,7 +1,5 @@
 # Kiota Http Library for dotnet
 
-[![Build and Test](https://github.com/microsoft/kiota-http-dotnet/actions/workflows/build-and_test.yml/badge.svg?branch=main)](https://github.com/microsoft/kiota-http-dotnet/actions/workflows/build-and_test.yml) [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Http.HttpClientLibrary?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Http.HttpClientLibrary/)
-
 The Kiota HTTP Library for dotnet is the dotnet HTTP library implementation with [HttpClient](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclient?view=net-6.0).
 
 A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to a HTTP package to make HTTP requests to an API endpoint.
