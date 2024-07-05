@@ -1,21 +1,22 @@
-# Kiota Libraries for dotnet
+# Kiota Json Serialization Library for dotnet
 
-The Kiota abstractions Library for dotnet is the dotnet library defining the basic constructs Kiota projects need once an SDK has been generated from an OpenAPI definition.
+[![Build and Test](https://github.com/microsoft/kiota-serialization-json-dotnet/actions/workflows/build-and_test.yml/badge.svg?branch=main)](https://github.com/microsoft/kiota-serialization-json-dotnet/actions/workflows/build-and_test.yml) [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Json?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Json/)
 
-A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to the abstraction package to build and run.
+The Json Serialization Library for dotnet is the dotnet JSON serialization library implementation with System.Text.Json
+
+A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to a json serialization package to handle json payloads from an API endpoint.
 
 Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README.md).
 
-## Libraries
+## Using the Kiota Json Serialization Library
 
-1. [Abstractions](./src/abstractions/README.md)
-1. [Authentication - Azure](./src/authentication/azure/README.md)
-1. [Http - HttpClient](./src/http/httpClient/README.md)
-1. [Serialization - JSON](./src/serialization/json/README.md)
+```shell
+dotnet add package Microsoft.Kiota.Serialization.Json
+```
 
 ## Debugging
 
-If you are using Visual Studio Code as your IDE, the **launch.json** file already contains the configuration to build and test the library. Otherwise, you can open the **Microsoft.Kiota.Abstractions.sln** with Visual Studio.
+If you are using Visual Studio Code as your IDE, the **launch.json** file already contains the configuration to build and test the library. Otherwise, you can open the **Microsoft.Kiota.Serialization.Json.sln** with Visual Studio.
 
 ## Contributing
 

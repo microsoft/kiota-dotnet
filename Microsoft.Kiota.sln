@@ -28,6 +28,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KiotaGenerated", "src\gener
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Kiota.Http.HttpClientLibrary.Tests", "tests\http\httpClient\Microsoft.Kiota.Http.HttpClientLibrary.Tests.csproj", "{644AA85A-6AA8-4DCC-AD97-13DC9660ED3A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Kiota.Serialization.Json.Tests", "tests\serialization\json\Microsoft.Kiota.Serialization.Json.Tests.csproj", "{841CFE44-B635-4BDC-A138-AF7510B795E9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Kiota.Serialization.Json", "src\serialization\json\Microsoft.Kiota.Serialization.Json.csproj", "{87168872-0B10-4BBB-9017-2501E76FE50A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +66,14 @@ Global
 		{644AA85A-6AA8-4DCC-AD97-13DC9660ED3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{644AA85A-6AA8-4DCC-AD97-13DC9660ED3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{644AA85A-6AA8-4DCC-AD97-13DC9660ED3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{841CFE44-B635-4BDC-A138-AF7510B795E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{841CFE44-B635-4BDC-A138-AF7510B795E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{841CFE44-B635-4BDC-A138-AF7510B795E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{841CFE44-B635-4BDC-A138-AF7510B795E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87168872-0B10-4BBB-9017-2501E76FE50A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87168872-0B10-4BBB-9017-2501E76FE50A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87168872-0B10-4BBB-9017-2501E76FE50A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87168872-0B10-4BBB-9017-2501E76FE50A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
