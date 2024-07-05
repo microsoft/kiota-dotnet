@@ -1,24 +1,22 @@
-# Kiota Libraries for dotnet
+# Kiota Text Serialization Library for dotnet
 
-The Kiota abstractions Library for dotnet is the dotnet library defining the basic constructs Kiota projects need once an SDK has been generated from an OpenAPI definition.
+[![Build and Test](https://github.com/microsoft/kiota-serialization-text-dotnet/actions/workflows/build-and_test.yml/badge.svg?branch=main)](https://github.com/microsoft/kiota-serialization-text-dotnet/actions/workflows/build-and_test.yml) [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Text?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Text/)
 
-A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to the abstraction package to build and run.
+The Text Serialization Library for dotnet is the dotnet Text serialization library implementation to handle text/plain responses.
+
+A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to a Text serialization package to handle text/plain payloads from an API endpoint.
 
 Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README.md).
 
-## Libraries
+## Using the Kiota Text Serialization Library
 
-1. [Abstractions](./src/abstractions/README.md)
-1. [Authentication - Azure](./src/authentication/azure/README.md)
-1. [Http - HttpClient](./src/http/httpClient/README.md)
-1. [Serialization - JSON](./src/serialization/json/README.md)
-1. [Serialization - FORM](./src/serialization/form/README.md)
-1. [Serialization - TEXT](./src/serialization/text/README.md)
-1. [Serialization - MULTIPART](./src/serialization/multipart/README.md)
+```shell
+dotnet add package Microsoft.Kiota.Serialization.Text
+```
 
 ## Debugging
 
-If you are using Visual Studio Code as your IDE, the **launch.json** file already contains the configuration to build and test the library. Otherwise, you can open the **Microsoft.Kiota.Abstractions.sln** with Visual Studio.
+If you are using Visual Studio Code as your IDE, the **launch.json** file already contains the configuration to build and test the library. Otherwise, you can open the **Microsoft.Kiota.Serialization.Text.sln** with Visual Studio.
 
 ## Contributing
 
