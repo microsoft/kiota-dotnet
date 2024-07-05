@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -49,7 +50,11 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="errorMapping">The error factories mapping to use in case of a failed request.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use for cancelling the requests.</param>
         /// <returns>The deserialized primitive response model.</returns>
+#if NET5_0_OR_GREATER
+        Task<ModelType?> SendPrimitiveAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] ModelType>(RequestInformation requestInfo, Dictionary<string, ParsableFactory<IParsable>>? errorMapping = default, CancellationToken cancellationToken = default);
+#else
         Task<ModelType?> SendPrimitiveAsync<ModelType>(RequestInformation requestInfo, Dictionary<string, ParsableFactory<IParsable>>? errorMapping = default, CancellationToken cancellationToken = default);
+#endif
         /// <summary>
         /// Executes the HTTP request specified by the given RequestInformation and returns the deserialized primitive response model collection.
         /// </summary>
@@ -57,7 +62,11 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="errorMapping">The error factories mapping to use in case of a failed request.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use for cancelling the requests.</param>
         /// <returns>The deserialized primitive response model collection.</returns>
+#if NET5_0_OR_GREATER
+        Task<IEnumerable<ModelType>?> SendPrimitiveCollectionAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] ModelType>(RequestInformation requestInfo, Dictionary<string, ParsableFactory<IParsable>>? errorMapping = default, CancellationToken cancellationToken = default);
+#else
         Task<IEnumerable<ModelType>?> SendPrimitiveCollectionAsync<ModelType>(RequestInformation requestInfo, Dictionary<string, ParsableFactory<IParsable>>? errorMapping = default, CancellationToken cancellationToken = default);
+#endif
         /// <summary>
         /// Executes the HTTP request specified by the given RequestInformation with no return content.
         /// </summary>
