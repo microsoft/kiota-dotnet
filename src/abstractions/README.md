@@ -1,4 +1,6 @@
-# Kiota Libraries for dotnet
+# Kiota Abstractions Library for dotnet
+
+[![Build, Test, CodeQl](https://github.com/microsoft/kiota-abstractions-dotnet/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/microsoft/kiota-abstractions-dotnet/actions/workflows/build-and-test.yml) [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Abstractions?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Abstractions/)
 
 The Kiota abstractions Library for dotnet is the dotnet library defining the basic constructs Kiota projects need once an SDK has been generated from an OpenAPI definition.
 
@@ -6,9 +8,11 @@ A [Kiota](https://github.com/microsoft/kiota) generated project will need a refe
 
 Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README.md).
 
-## Libraries
+## Using the Abstractions Library
 
-1. [Abstractions](./src/abstractions/README.md)
+```shell
+dotnet add package Microsoft.Kiota.Abstractions --prerelease
+```
 
 ## Debugging
 
