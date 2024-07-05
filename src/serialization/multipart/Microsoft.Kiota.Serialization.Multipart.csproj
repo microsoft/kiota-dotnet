@@ -10,7 +10,7 @@
     <LangVersion>latest</LangVersion>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageIconUrl>http://go.microsoft.com/fwlink/?LinkID=288890</PackageIconUrl>
-    <RepositoryUrl>https://github.com/microsoft/kiota-serialization-multipart-dotnet</RepositoryUrl>
+    <RepositoryUrl>https://github.com/microsoft/kiota-dotnet</RepositoryUrl>
     <PackageProjectUrl>https://aka.ms/kiota/docs</PackageProjectUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <Deterministic>true</Deterministic>
@@ -24,7 +24,7 @@
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
     <PackageReleaseNotes>
-      https://github.com/microsoft/kiota-serialization-multipart-dotnet/releases
+        https://github.com/microsoft/kiota-dotnet/releases
     </PackageReleaseNotes>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>

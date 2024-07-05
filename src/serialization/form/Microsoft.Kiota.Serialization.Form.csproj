@@ -11,7 +11,7 @@
     <Nullable>enable</Nullable>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageIconUrl>http://go.microsoft.com/fwlink/?LinkID=288890</PackageIconUrl>
-    <RepositoryUrl>https://github.com/microsoft/kiota-serialization-form-dotnet</RepositoryUrl>
+    <RepositoryUrl>https://github.com/microsoft/kiota-dotnet</RepositoryUrl>
     <PackageProjectUrl>https://aka.ms/kiota/docs</PackageProjectUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <Deterministic>true</Deterministic>
@@ -28,7 +28,7 @@
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
     <PackageReleaseNotes>
-      https://github.com/microsoft/kiota-serialization-form-dotnet/blob/main/CHANGELOG.md
+        https://github.com/microsoft/kiota-dotnet/releases
     </PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
