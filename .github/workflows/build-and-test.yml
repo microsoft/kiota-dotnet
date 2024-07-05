@@ -16,7 +16,7 @@ jobs:
   build-and-test:
     runs-on: windows-latest
     env:
-      solutionName: Microsoft.Kiota.Abstractions.sln
+      solutionName: Microsoft.Kiota.sln
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET
