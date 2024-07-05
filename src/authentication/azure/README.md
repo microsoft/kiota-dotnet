@@ -1,22 +1,22 @@
-# Kiota Abstractions Library for dotnet
+# Kiota Azure Identity authentication provider library for dotnet
 
-[![Build, Test, CodeQl](https://github.com/microsoft/kiota-abstractions-dotnet/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/microsoft/kiota-abstractions-dotnet/actions/workflows/build-and-test.yml) [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Abstractions?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Abstractions/)
+[![Build and Test](https://github.com/microsoft/kiota-authentication-azure-dotnet/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/microsoft/kiota-authentication-azure-dotnet/actions/workflows/build-and-test.yml) [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Authentication.Azure?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Authentication.Azure/)
 
-The Kiota abstractions Library for dotnet is the dotnet library defining the basic constructs Kiota projects need once an SDK has been generated from an OpenAPI definition.
+The Kiota Azure Identity authentication provider library for dotnet is the authentication provider implementation with [Azure.Identity](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/identity-readme).
 
-A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to the abstraction package to build and run.
+A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to a authentication provider library to authenticate HTTP requests to an API endpoint.
 
 Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README.md).
 
-## Using the Abstractions Library
+## Using Azure Identity authentication provider library for dotnet
 
 ```shell
-dotnet add package Microsoft.Kiota.Abstractions
+dotnet add package Microsoft.Kiota.Authentication.Azure
 ```
 
 ## Debugging
 
-If you are using Visual Studio Code as your IDE, the **launch.json** file already contains the configuration to build and test the library. Otherwise, you can open the **Microsoft.Kiota.Abstractions.sln** with Visual Studio.
+If you are using Visual Studio Code as your IDE, the **launch.json** file already contains the configuration to build and test the library. Otherwise, you can open the **Microsoft.Kiota.Authentication.Azure.sln** with Visual Studio.
 
 ## Contributing
 

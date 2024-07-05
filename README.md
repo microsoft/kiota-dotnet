@@ -9,6 +9,7 @@ Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README
 ## Libraries
 
 1. [Abstractions](./src/abstractions/README.md)
+1. [Authentication - Azure](./src/authentication/azure/README.md)
 
 ## Debugging
 
