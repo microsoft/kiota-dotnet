@@ -24,7 +24,7 @@ Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README
 
 ## Release notes
 
-The Kiota Libraries releases notes are available from [Roadmap](CHANGELOG.md)
+The Kiota Libraries releases notes are available from the [CHANGELOG](CHANGELOG.md)
 
 ## Debugging
 
