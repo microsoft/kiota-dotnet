@@ -16,7 +16,7 @@ jobs:
   build-and-test:
     runs-on: windows-latest
     env:
-      solutionName: Microsoft.Kiota.Abstractions.sln
+      solutionName: Microsoft.Kiota.sln
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET
@@ -30,10 +30,10 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore ${{ env.solutionName }}
       - name: Build
-        run: dotnet build ${{ env.solutionName }} --no-restore -c Release /p:UseSharedCompilation=false
+        run: dotnet build ${{ env.solutionName }} --no-restore /p:UseSharedCompilation=false
       - name: Test for net462
-        run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal -c Release --framework net462
+        run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal --framework net462
       - name: Test for net8.0 and collect coverage
-        run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal -c Release /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=opencover --framework net8.0
+        run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=opencover --framework net8.0
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

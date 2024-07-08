@@ -28,6 +28,12 @@ $delaySign.'#text' = "true"
 $signAssembly = $doc.SelectSingleNode("//SignAssembly");
 $signAssembly.'#text' = "true"
 
+# Set the AssemblyOriginatorKeyFile to an absolute path to resolve any path resolution issues.
+# Assumption: The key file is in the same directory as the project file.
+$dirName = [System.IO.Path]::GetDirectoryName([System.IO.Path]::GetFullPath($projectPath))
+$assemblyOriginatorKeyFile = $doc.SelectSingleNode("//AssemblyOriginatorKeyFile");
+$assemblyOriginatorKeyFile.'#text' = Join-Path $dirName $assemblyOriginatorKeyFile.'#text'
+
 $doc.Save($projectPath);
 
-Write-Host "Updated the .csproj file so that we can sign the built assemblies." -ForegroundColor Green
+Write-Host "Updated the project file so that we can sign the built assemblies." -ForegroundColor Green

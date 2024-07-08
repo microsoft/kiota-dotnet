@@ -1,11 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <IsPackable>false</IsPackable>
-    <TargetFrameworks>net462;net8.0</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
-    <OutputType>Library</OutputType>
+    <TargetFrameworks>net8.0;net462</TargetFrameworks>
     <IsTestProject>true</IsTestProject>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,8 +12,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
-    <!-- We need Microsoft.TestPlatform.ObjectModel for net framework execution in linux
-    environments https://github.com/microsoft/vstest/issues/2469-->
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.10.0" />
     <PackageReference Include="Moq" Version="4.20.70" />
     <PackageReference Include="xunit" Version="2.8.1" />
@@ -30,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Microsoft.Kiota.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\serialization\json\Microsoft.Kiota.Serialization.Json.csproj" />
   </ItemGroup>
 
 </Project>

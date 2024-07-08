@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Source Generator project to assembly info as source such as package version.</Description>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <IsAnalyzerProject>true</IsAnalyzerProject>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <Target Name="DoSthAfterPublish1" AfterTargets="Publish">
+    <Copy SourceFiles="..\Kiota.Builder\Kiota.Builder.csproj" />
+  </Target>
+
+</Project>
