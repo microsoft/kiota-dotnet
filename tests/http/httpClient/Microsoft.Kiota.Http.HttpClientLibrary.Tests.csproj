@@ -1,13 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net8.0;net462</TargetFrameworks>
-    <IsPackable>false</IsPackable>
-    <LangVersion>latest</LangVersion>
-    <OutputType>Library</OutputType>
-    <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\src\35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
-    <DelaySign>false</DelaySign>
+    <IsTestProject>true</IsTestProject>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,6 +28,5 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\http\httpClient\Microsoft.Kiota.Http.HttpClientLibrary.csproj" />
   </ItemGroup>
-
 
 </Project>

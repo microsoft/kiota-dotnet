@@ -1,9 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>Source Generator project to assembly info as source such as package version.</Description>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <IsAnalyzerProject>true</IsAnalyzerProject>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

@@ -12,11 +12,9 @@ pr:
     include:
       - main
 
-
 variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  ProductBinPath: '$(Build.SourcesDirectory)\src\bin\$(BuildConfiguration)'
 
 resources:
   repositories:
@@ -24,7 +22,6 @@ resources:
     type: git
     name: 1ESPipelineTemplates/1ESPipelineTemplates
     ref: refs/tags/release
-
 
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
@@ -54,7 +51,7 @@ extends:
             inputs:
               targetType: filePath
               filePath: 'scripts\EnableSigning.ps1'
-              arguments: '-projectPath "$(Build.SourcesDirectory)/src/Microsoft.Kiota.Abstractions.csproj"'
+              arguments: '-projectPath "$(Build.SourcesDirectory)/Directory.Build.props"'
               pwsh: true
             enabled: true
               
@@ -67,25 +64,25 @@ extends:
 
           # Build the Product project
           - task: DotNetCoreCLI@2
-            displayName: 'Build Microsoft.Kiota.Abstractions'
+            displayName: 'Build projects in Microsoft.Kiota'
             inputs:
-              projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.Abstractions.sln'
+              projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.sln'
               arguments: '--configuration $(BuildConfiguration) --no-incremental'
 
           # Run the Unit test
           - task: DotNetCoreCLI@2
-            displayName: 'Test Microsoft.Kiota.Abstractions'
+            displayName: 'Test projects in Microsoft.Kiota'
             inputs:
               command: test
-              projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.Abstractions.sln'
+              projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.sln'
               arguments: '--configuration $(BuildConfiguration) --no-build --framework net8.0'
 
-          - task: EsrpCodeSigning@2
+          - task: EsrpCodeSigning@3
             displayName: 'ESRP DLL Strong Name'
             inputs:
               ConnectedServiceName: 'microsoftgraph ESRP CodeSign DLL and NuGet (AKV)'
-              FolderPath: $(ProductBinPath)
-              Pattern: '**\*Microsoft.Kiota.Abstractions.dll'
+              FolderPath: src  # This path should already omit test dlls as they exist in the `tests` folder
+              Pattern: '**\*Microsoft.Kiota.*.dll'
               signConfigType: inlineSignParams
               UseMinimatch: true
               inlineOperation: |
@@ -107,14 +104,14 @@ extends:
                 ]
               SessionTimeout: 20
           
-          - task: EsrpCodeSigning@2
+          - task: EsrpCodeSigning@3
             displayName: 'ESRP DLL CodeSigning'
             inputs:
               ConnectedServiceName: 'microsoftgraph ESRP CodeSign DLL and NuGet (AKV)'
-              FolderPath: src
+              FolderPath: src  # This path should already omit test dlls as they exist in the `tests` folder
               signConfigType: inlineSignParams
               UseMinimatch: true
-              Pattern: '**\*Microsoft.Kiota.Abstractions.dll'
+              Pattern: '**\*Microsoft.Kiota.*.dll'
               inlineOperation: |
                 [
                     {
@@ -156,7 +153,7 @@ extends:
               SessionTimeout: 20
 
           # arguments are not parsed in DotNetCoreCLI@2 task for `pack` command, that's why we have a custom pack command here
-          - pwsh: dotnet pack $env:BUILD_SOURCESDIRECTORY/src/Microsoft.Kiota.Abstractions.csproj /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg --no-build --output $env:BUILD_ARTIFACTSTAGINGDIRECTORY --configuration $env:BUILD_CONFIGURATION
+          - pwsh: dotnet pack /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg --no-build --output $env:BUILD_ARTIFACTSTAGINGDIRECTORY --configuration $env:BUILD_CONFIGURATION
             env:
               BUILD_CONFIGURATION: $(BuildConfiguration)
             displayName: Dotnet pack
@@ -167,10 +164,10 @@ extends:
             inputs:
               targetType: 'filePath'
               filePath: $(System.DefaultWorkingDirectory)\scripts\ValidateProjectVersionUpdated.ps1
-              arguments: '-projectPath "$(Build.SourcesDirectory)/src/Microsoft.Kiota.Abstractions.csproj" -packageName "Microsoft.Kiota.Abstractions"'
+              arguments: '-projectPath "$(Build.SourcesDirectory)/Directory.Build.props" -packageName "Microsoft.Kiota.Abstractions"'
               pwsh: true
 
-          - task: EsrpCodeSigning@2
+          - task: EsrpCodeSigning@3
             displayName: 'ESRP CodeSigning Nuget Packages'
             inputs:
               ConnectedServiceName: 'microsoftgraph ESRP CodeSign DLL and NuGet (AKV)'

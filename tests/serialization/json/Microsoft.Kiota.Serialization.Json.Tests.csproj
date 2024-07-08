@@ -1,10 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net8.0;net462</TargetFrameworks>
-    <IsPackable>false</IsPackable>
-    <LangVersion>latest</LangVersion>
-    <OutputType>Library</OutputType>
+    <IsTestProject>true</IsTestProject>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

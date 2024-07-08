@@ -1,13 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net8.0;net462</TargetFrameworks>
-    <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
-    <IsPackable>false</IsPackable>
-    <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\src\35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
-    <DelaySign>false</DelaySign>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
   <ItemGroup>
