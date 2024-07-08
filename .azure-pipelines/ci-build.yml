@@ -54,7 +54,16 @@ extends:
               arguments: '-projectPath "$(Build.SourcesDirectory)/Directory.Build.props"'
               pwsh: true
             enabled: true
-              
+
+          - task: PowerShell@2
+            displayName: 'Validate project version has been incremented'
+            condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
+            inputs:
+              targetType: 'filePath'
+              filePath: $(System.DefaultWorkingDirectory)\scripts\ValidateProjectVersionUpdated.ps1
+              arguments: '-projectPath "$(Build.SourcesDirectory)/Directory.Build.props" -packageName "Microsoft.Kiota.Abstractions"'
+              pwsh: true
+
           # Install the nuget tool.
           - task: NuGetToolInstaller@1
             displayName: 'Install Nuget dependency manager'
@@ -158,15 +167,6 @@ extends:
               BUILD_CONFIGURATION: $(BuildConfiguration)
             displayName: Dotnet pack
 
-          - task: PowerShell@2
-            displayName: 'Validate project version has been incremented'
-            condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
-            inputs:
-              targetType: 'filePath'
-              filePath: $(System.DefaultWorkingDirectory)\scripts\ValidateProjectVersionUpdated.ps1
-              arguments: '-projectPath "$(Build.SourcesDirectory)/Directory.Build.props" -packageName "Microsoft.Kiota.Abstractions"'
-              pwsh: true
-
           - task: EsrpCodeSigning@3
             displayName: 'ESRP CodeSigning Nuget Packages'
             inputs:
@@ -212,7 +212,7 @@ extends:
       condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
       dependsOn: build
       jobs:
-        - deployment: deploy_dotnet_abstractions
+        - deployment: deploy_dotnet_kiota_libs
           dependsOn: []
           environment: nuget-org
           strategy:
@@ -240,10 +240,10 @@ extends:
                     pwsh: true
                     arguments: '-packageDirPath "$(Pipeline.Workspace)/"'
                 - task: 1ES.PublishNuget@1
-                  displayName: 'NuGet push'
+                  displayName: 'Push Nuget for Kiota libraries'
                   inputs:
                     command: push
-                    packagesToPush: '$(Pipeline.Workspace)/Microsoft.Kiota.Abstractions.*.nupkg'
+                    packagesToPush: '$(Pipeline.Workspace)/Microsoft.Kiota.*.nupkg'
                     packageParentPath: '$(Pipeline.Workspace)'
                     nuGetFeedType: external
                     publishFeedCredentials: 'Kiota Nuget Connection'

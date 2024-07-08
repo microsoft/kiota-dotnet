@@ -22,7 +22,7 @@ Param(
 
 Write-Host "Get the NuGet package version and set it in the global variable: VERSION_STRING" -ForegroundColor Magenta
 
-$nugetPackageName = (Get-ChildItem (Join-Path $packageDirPath *.nupkg) -Exclude *.symbols.nupkg).Name
+$nugetPackageName = Get-ChildItem (Join-Path $packageDirPath "Microsoft.Kiota.Abstractions*.nupkg")
 
 Write-Host "Found NuGet package: $nugetPackageName" -ForegroundColor Magenta
 

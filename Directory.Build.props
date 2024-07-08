@@ -1,9 +1,8 @@
 <Project>
   <!-- Common default project properties for ALL projects-->
   <PropertyGroup>
-    <VersionPrefix>2.0.0</VersionPrefix>
-    <VersionSuffix>
-    </VersionSuffix>
+    <VersionPrefix>1.9.8</VersionPrefix>
+    <VersionSuffix>preview</VersionSuffix>
     <!-- This is overidden in test projects by setting to true-->
     <IsTestProject>false</IsTestProject>
     <!-- This is overidden in test projects by setting to true-->
