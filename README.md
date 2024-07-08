@@ -1,12 +1,14 @@
 # Kiota Libraries for dotnet
 
-[![Build, Test, CodeQl](https://github.com/microsoft/kiota-abstractions-dotnet/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/microsoft/kiota-abstractions-dotnet/actions/workflows/build-and-test.yml)
+The Kiota abstractions libraries define the basic constructs for Kiota projects needed once an SDK has been generated from an OpenAPI definition.
 
-The Kiota abstractions libraries define the basic constructs Kiota projects need once an SDK has been generated from an OpenAPI definition.
-
-A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to the libraries to build and run by providing default implementations for serialization and http transport.
+A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to the libraries to build and execute by providing default implementations for serialization, authentication and http transport.
 
 Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README.md).
+
+## Build Status
+
+[![Build, Test, CodeQl](https://github.com/microsoft/kiota-abstractions-dotnet/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/microsoft/kiota-abstractions-dotnet/actions/workflows/build-and-test.yml)
 
 ## Libraries
 
@@ -19,6 +21,10 @@ Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README
 | [Serialization - FORM](./src/serialization/form/README.md) | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Form?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Form/) |
 | [Serialization - TEXT](./src/serialization/text/README.md) | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Text?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Text/) |
 | [Serialization - MULTIPART](./src/serialization/multipart/README.md) | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Multipart?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Multipart/) |
+
+## Release notes
+
+The Kiota Libraries releases notes are available from [Roadmap](CHANGELOG.md)
 
 ## Debugging
 
