@@ -1,6 +1,6 @@
 # Kiota Libraries for dotnet
 
-The Kiota abstractions libraries define the basic constructs for Kiota projects needed once an SDK has been generated from an OpenAPI definition.
+The Kiota libraries define the basic constructs for Kiota projects needed once an SDK has been generated from an OpenAPI definition and provide default implementations.
 
 A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to the libraries to build and execute by providing default implementations for serialization, authentication and http transport.
 
