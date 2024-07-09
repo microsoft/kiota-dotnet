@@ -1,12 +1,24 @@
 version: 2
 updates:
 - package-ecosystem: nuget
-  directory: "/"
+  directories:
+    - "**/*"
   schedule:
     interval: daily
   open-pull-requests-limit: 10
   labels:
     - dependencies
+  groups:
+    xunit:
+      patterns:
+        - xunit*
+    coverlet:
+      patterns:
+        - coverlet*
+    mstest:
+      patterns:
+        - Microsoft.NET.Test.Sdk
+        - Microsoft.TestPlatform.ObjectModel
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
