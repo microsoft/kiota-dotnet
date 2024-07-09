@@ -72,10 +72,10 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// <param name="contentType">The content type of the parse node.</param>
         /// <param name="cancellationToken">The cancellation token for the task</param>
         /// <returns>A parse node.</returns>
-        public async Task<IParseNode> GetRootParseNodeAsync(string contentType, Stream content, 
+        public async Task<IParseNode> GetRootParseNodeAsync(string contentType, Stream content,
             CancellationToken cancellationToken = default)
         {
-            if (_concrete is not IAsyncParseNodeFactory asyncConcrete)
+            if(_concrete is not IAsyncParseNodeFactory asyncConcrete)
             {
                 throw new Exception("IAsyncParseNodeFactory is required for async operations");
             }

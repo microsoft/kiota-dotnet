@@ -30,7 +30,7 @@ namespace Microsoft.Kiota.Serialization.Json
         {
             _kiotaJsonSerializationContext = kiotaJsonSerializationContext;
         }
-        
+
         /// <summary>
         /// The valid content type for json
         /// </summary>

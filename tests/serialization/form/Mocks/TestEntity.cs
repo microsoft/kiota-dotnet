@@ -56,7 +56,7 @@ public class TestEntity : IParsable, IAdditionalDataHolder
     {
         _ = writer ?? throw new ArgumentNullException(nameof(writer));
         writer.WriteStringValue("id", Id);
-        writer.WriteEnumValue<TestEnum>("numbers",Numbers);
+        writer.WriteEnumValue<TestEnum>("numbers", Numbers);
         writer.WriteDateTimeOffsetValue("createdDateTime", CreatedDateTime);
         writer.WriteStringValue("officeLocation", OfficeLocation);
         writer.WriteTimeSpanValue("workDuration", WorkDuration);
@@ -66,7 +66,8 @@ public class TestEntity : IParsable, IAdditionalDataHolder
         writer.WriteCollectionOfPrimitiveValues<string>("deviceNames", DeviceNames);
         writer.WriteAdditionalData(AdditionalData);
     }
-    public static TestEntity CreateFromDiscriminator(IParseNode parseNode) {
+    public static TestEntity CreateFromDiscriminator(IParseNode parseNode)
+    {
         return new TestEntity();
     }
 }

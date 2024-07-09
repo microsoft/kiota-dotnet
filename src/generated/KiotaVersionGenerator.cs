@@ -17,12 +17,14 @@ public class KiotaVersionGenerator : ISourceGenerator
         var projectDirectory = Path.GetDirectoryName(mainSyntaxTree.FilePath);
 
         var version = "unknown";
-        try {
+        try
+        {
             XmlDocument csproj = new XmlDocument();
             projectDirectory = Path.Combine(projectDirectory, "..", "..", "..", "..", "Directory.Build.props");
             csproj.Load(projectDirectory);
             version = csproj.GetElementsByTagName("VersionPrefix")[0].InnerText;
-        } catch (Exception e)
+        }
+        catch(Exception e)
         {
             throw new FileNotFoundException($"KiotaVersionGenerator expanded in an invalid project, missing 'Directory.Build.props' file in the following directory {projectDirectory}", e);
         }

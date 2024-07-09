@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 {
-    public class CompressionHandlerTests: IDisposable
+    public class CompressionHandlerTests : IDisposable
     {
         private readonly MockRedirectHandler _testHttpMessageHandler;
         private readonly CompressionHandler _compressionHandler;

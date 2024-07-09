@@ -34,7 +34,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 HttpMethod = Method.GET,
                 URI = new Uri("http://localhost"),
             };
-            requestInfo.AddRequestOptions(new [] {
+            requestInfo.AddRequestOptions(new[] {
                 new UserAgentHandlerOption
                 {
                     Enabled = false
@@ -49,7 +49,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 
             // Assert the request stays the same
             Assert.Empty(response.RequestMessage?.Headers!);
-            Assert.Equal(requestMessage,response.RequestMessage);
+            Assert.Equal(requestMessage, response.RequestMessage);
         }
         [Fact]
         public async Task EnabledUserAgentHandlerAddsHeaderValue()
@@ -74,7 +74,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             Assert.Equal(response.RequestMessage?.Headers!.UserAgent.First().Product.Name, defaultOption.ProductName, StringComparer.OrdinalIgnoreCase);
             Assert.Equal(response.RequestMessage?.Headers!.UserAgent.First().Product.Version, defaultOption.ProductVersion, StringComparer.OrdinalIgnoreCase);
             Assert.Equal(response.RequestMessage?.Headers!.UserAgent.ToString(), $"{defaultOption.ProductName}/{defaultOption.ProductVersion}", StringComparer.OrdinalIgnoreCase);
-            Assert.Equal(requestMessage,response.RequestMessage);
+            Assert.Equal(requestMessage, response.RequestMessage);
         }
 
         [Fact]

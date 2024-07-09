@@ -123,7 +123,7 @@ public class AuthenticationTests
     {
         // Test through the constructor
         // Arrange
-        var urlStrings = commaSeparatedHosts.Split(new char [] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+        var urlStrings = commaSeparatedHosts.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
         // Assert constructor throws
         var exception = Assert.Throws<ArgumentException>(() => new AllowedHostsValidator(urlStrings));

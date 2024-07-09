@@ -29,6 +29,8 @@ jobs:
           languages: csharp
       - name: Restore dependencies
         run: dotnet restore ${{ env.solutionName }}
+      - name: Check formatting
+        run: dotnet format ${{ env.solutionName }} --verify-no-changes
       - name: Build
         run: dotnet build ${{ env.solutionName }} --no-restore /p:UseSharedCompilation=false
       - name: Test for net462

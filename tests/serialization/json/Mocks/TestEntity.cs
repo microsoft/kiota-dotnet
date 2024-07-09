@@ -62,8 +62,8 @@ namespace Microsoft.Kiota.Serialization.Json.Tests.Mocks
         {
             _ = writer ?? throw new ArgumentNullException(nameof(writer));
             writer.WriteStringValue("id", Id);
-            writer.WriteEnumValue<TestEnum>("numbers",Numbers);
-            writer.WriteEnumValue<TestNamingEnum>("testNamingEnum",TestNamingEnum);
+            writer.WriteEnumValue<TestEnum>("numbers", Numbers);
+            writer.WriteEnumValue<TestNamingEnum>("testNamingEnum", TestNamingEnum);
             writer.WriteDateTimeOffsetValue("createdDateTime", CreatedDateTime);
             writer.WriteStringValue("officeLocation", OfficeLocation);
             writer.WriteTimeSpanValue("workDuration", WorkDuration);
@@ -73,7 +73,8 @@ namespace Microsoft.Kiota.Serialization.Json.Tests.Mocks
             writer.WriteTimeValue("endWorkTime", EndWorkTime);
             writer.WriteAdditionalData(AdditionalData);
         }
-        public static TestEntity CreateFromDiscriminator(IParseNode parseNode) {
+        public static TestEntity CreateFromDiscriminator(IParseNode parseNode)
+        {
             var discriminatorValue = parseNode.GetChildNode("@odata.type")?.GetStringValue();
             return discriminatorValue switch
             {

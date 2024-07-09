@@ -440,7 +440,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             var colleagueSubscriptions = GetSubscriptionsPropertyFromBackingStore(testUser.Colleagues[0].BackingStore);
             Assert.Single(colleagueSubscriptions);// only one subscription to be invoked for the collection "colleagues"
         }
-        
+
         [Fact]
         public void TestsBackingStoreNestedInvocationCounts()
         {
@@ -463,8 +463,8 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             }
             testUser.Colleagues = colleagues; // invocation site 2
             testUser.BackingStore.InitializationCompleted = true; // initialize
-            
-            Assert.Equal(2,invocationCount);// only called twice
+
+            Assert.Equal(2, invocationCount);// only called twice
         }
 
         /// <summary>

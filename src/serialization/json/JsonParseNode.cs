@@ -9,9 +9,9 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Xml;
-using Microsoft.Kiota.Abstractions.Serialization;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Extensions;
+using Microsoft.Kiota.Abstractions.Serialization;
 
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -84,7 +84,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the int value from the json node
         /// </summary>
         /// <returns>A int value</returns>
-        public int? GetIntValue() => _jsonNode.ValueKind == JsonValueKind.Number 
+        public int? GetIntValue() => _jsonNode.ValueKind == JsonValueKind.Number
             ? _jsonNode.Deserialize(_jsonSerializerContext.Int32)
             : null;
 
@@ -147,14 +147,14 @@ namespace Microsoft.Kiota.Serialization.Json
             if(_jsonNode.ValueKind != JsonValueKind.String)
                 return null;
 
-            if(_jsonNode.TryGetDateTimeOffset(out var dateTimeOffset)) 
+            if(_jsonNode.TryGetDateTimeOffset(out var dateTimeOffset))
                 return dateTimeOffset;
 
             var dateTimeOffsetStr = _jsonNode.GetString();
             if(string.IsNullOrEmpty(dateTimeOffsetStr))
                 return null;
-            
-            if (DateTimeOffset.TryParse(dateTimeOffsetStr, out dateTimeOffset))
+
+            if(DateTimeOffset.TryParse(dateTimeOffsetStr, out dateTimeOffset))
                 return dateTimeOffset;
 
             return _jsonNode.Deserialize(_jsonSerializerContext.DateTimeOffset);
@@ -186,7 +186,7 @@ namespace Microsoft.Kiota.Serialization.Json
 
             if(DateTime.TryParse(dateString, out var result))
                 return new Date(result);
-            
+
             return _jsonNode.Deserialize(_jsonSerializerContext.Date);
         }
 
@@ -202,7 +202,7 @@ namespace Microsoft.Kiota.Serialization.Json
 
             if(DateTime.TryParse(dateString, out var result))
                 return new Time(result);
-            
+
             return _jsonNode.Deserialize(_jsonSerializerContext.Time);
         }
 
@@ -220,7 +220,7 @@ namespace Microsoft.Kiota.Serialization.Json
             if(string.IsNullOrEmpty(rawValue)) return null;
 
             rawValue = ToEnumRawName<T>(rawValue!);
-            if (typeof(T).IsDefined(typeof(FlagsAttribute)))
+            if(typeof(T).IsDefined(typeof(FlagsAttribute)))
             {
                 ReadOnlySpan<char> valueSpan = rawValue.AsSpan();
                 int value = 0;
@@ -249,7 +249,8 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <returns>A collection of objects</returns>
         public IEnumerable<T> GetCollectionOfObjectValues<T>(ParsableFactory<T> factory) where T : IParsable
         {
-            if (_jsonNode.ValueKind == JsonValueKind.Array) {
+            if(_jsonNode.ValueKind == JsonValueKind.Array)
+            {
                 var enumerator = _jsonNode.EnumerateArray();
                 while(enumerator.MoveNext())
                 {
@@ -272,7 +273,8 @@ namespace Microsoft.Kiota.Serialization.Json
         public IEnumerable<T?> GetCollectionOfEnumValues<T>() where T : struct, Enum
 #endif
         {
-            if (_jsonNode.ValueKind == JsonValueKind.Array) {
+            if(_jsonNode.ValueKind == JsonValueKind.Array)
+            {
                 var enumerator = _jsonNode.EnumerateArray();
                 while(enumerator.MoveNext())
                 {
@@ -289,7 +291,8 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Gets the byte array value of the node.
         /// </summary>
         /// <returns>The byte array value of the node.</returns>
-        public byte[]? GetByteArrayValue() {
+        public byte[]? GetByteArrayValue()
+        {
             var rawValue = _jsonNode.GetString();
             if(string.IsNullOrEmpty(rawValue))
                 return null;
@@ -308,7 +311,8 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <returns>A collection of objects</returns>
         public IEnumerable<T> GetCollectionOfPrimitiveValues<T>()
         {
-            if (_jsonNode.ValueKind == JsonValueKind.Array) {
+            if(_jsonNode.ValueKind == JsonValueKind.Array)
+            {
                 var genericType = typeof(T);
                 foreach(var collectionValue in _jsonNode.EnumerateArray())
                 {
@@ -355,7 +359,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <returns>The collection of untyped values.</returns>
         private IEnumerable<UntypedNode> GetCollectionOfUntypedValues(JsonElement jsonNode)
         {
-            if (jsonNode.ValueKind == JsonValueKind.Array)
+            if(jsonNode.ValueKind == JsonValueKind.Array)
             {
                 foreach(var collectionValue in jsonNode.EnumerateArray())
                 {
@@ -492,7 +496,7 @@ namespace Microsoft.Kiota.Serialization.Json
                 holder.AdditionalData ??= new Dictionary<string, object>();
                 itemAdditionalData = holder.AdditionalData;
             }
-            var fieldDeserializers = item.GetFieldDeserializers();  
+            var fieldDeserializers = item.GetFieldDeserializers();
 
             foreach(var fieldValue in _jsonNode.EnumerateObject())
             {
@@ -509,7 +513,7 @@ namespace Microsoft.Kiota.Serialization.Json
                         OnAfterAssignFieldValues = OnAfterAssignFieldValues
                     });
                 }
-                else if (itemAdditionalData != null)
+                else if(itemAdditionalData != null)
                 {
                     Debug.WriteLine($"found additional property {fieldValue.Name} to deserialize");
                     IDictionaryExtensions.TryAdd(itemAdditionalData, fieldValue.Name, TryGetAnything(fieldValue.Value)!);
@@ -562,7 +566,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <returns>An instance of <see cref="IParseNode"/></returns>
         public IParseNode? GetChildNode(string identifier)
         {
-            if(_jsonNode.ValueKind == JsonValueKind.Object && _jsonNode.TryGetProperty(identifier ?? throw new ArgumentNullException(nameof(identifier)), out var jsonElement)) 
+            if(_jsonNode.ValueKind == JsonValueKind.Object && _jsonNode.TryGetProperty(identifier ?? throw new ArgumentNullException(nameof(identifier)), out var jsonElement))
             {
                 return new JsonParseNode(jsonElement, _jsonSerializerContext)
                 {
@@ -573,16 +577,16 @@ namespace Microsoft.Kiota.Serialization.Json
 
             return default;
         }
-        
+
 #if NET5_0_OR_GREATER
         private static string ToEnumRawName<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(string value) where T : struct, Enum
 #else
         private static string ToEnumRawName<T>(string value) where T : struct, Enum
 #endif
         {
-            foreach (var field in typeof(T).GetFields())
+            foreach(var field in typeof(T).GetFields())
             {
-                if (field.GetCustomAttribute<EnumMemberAttribute>() is {} attr && value.Equals(attr.Value, StringComparison.Ordinal))
+                if(field.GetCustomAttribute<EnumMemberAttribute>() is { } attr && value.Equals(attr.Value, StringComparison.Ordinal))
                 {
                     return field.Name;
                 }

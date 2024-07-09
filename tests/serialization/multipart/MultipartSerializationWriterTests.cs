@@ -1,12 +1,12 @@
-using Xunit;
 using System;
-using System.IO;
 using System.Collections.Generic;
-using Microsoft.Kiota.Serialization.Multipart.Tests.Mocks;
-using Microsoft.Kiota.Abstractions.Serialization;
+using System.IO;
 using Microsoft.Kiota.Abstractions;
+using Microsoft.Kiota.Abstractions.Serialization;
 using Microsoft.Kiota.Serialization.Json;
+using Microsoft.Kiota.Serialization.Multipart.Tests.Mocks;
 using Moq;
+using Xunit;
 
 namespace Microsoft.Kiota.Serialization.Multipart.Tests;
 public class MultipartSerializationWriterTests

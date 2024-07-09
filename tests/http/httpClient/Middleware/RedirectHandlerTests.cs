@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 {
-    public class RedirectHandlerTests: IDisposable
+    public class RedirectHandlerTests : IDisposable
     {
         private readonly MockRedirectHandler _testHttpMessageHandler;
         private readonly RedirectHandler _redirectHandler;
@@ -59,7 +59,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         public void RedirectHandler_RedirectOptionConstructor()
         {
             // Assert
-            using RedirectHandler redirect = new RedirectHandler(new RedirectHandlerOption { MaxRedirect = 2, AllowRedirectOnSchemeChange = true});
+            using RedirectHandler redirect = new RedirectHandler(new RedirectHandlerOption { MaxRedirect = 2, AllowRedirectOnSchemeChange = true });
             Assert.Null(redirect.InnerHandler);
             Assert.NotNull(redirect.RedirectOption);
             Assert.Equal(2, redirect.RedirectOption.MaxRedirect);

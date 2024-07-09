@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Moq;
-using Xunit;
 using Azure.Core;
 using Microsoft.Kiota.Abstractions;
+using Moq;
+using Xunit;
 
 namespace Microsoft.Kiota.Authentication.Azure.Tests;
 public class AzureIdentityAuthenticationProviderTests
@@ -110,10 +110,11 @@ public class AzureIdentityAuthenticationProviderTests
     {
         var mockTokenCredential = new Mock<TokenCredential>();
         mockTokenCredential.Setup(credential => credential.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>()))
-                            .Returns<TokenRequestContext, CancellationToken>((context, cToken) => {
-            Assert.NotNull(context.Claims);
-            return new ValueTask<AccessToken>(new AccessToken(string.Empty, DateTimeOffset.Now));
-        });
+                            .Returns<TokenRequestContext, CancellationToken>((context, cToken) =>
+                            {
+                                Assert.NotNull(context.Claims);
+                                return new ValueTask<AccessToken>(new AccessToken(string.Empty, DateTimeOffset.Now));
+                            });
         var azureIdentityAuthenticationProvider = new AzureIdentityAuthenticationProvider(mockTokenCredential.Object, scopes: "User.Read");
         var testRequest = new RequestInformation()
         {
@@ -123,7 +124,7 @@ public class AzureIdentityAuthenticationProviderTests
         Assert.Empty(testRequest.Headers); // header collection is empty
 
         // Act
-        await azureIdentityAuthenticationProvider.AuthenticateRequestAsync(testRequest, new() { {"claims", "eyJhY2Nlc3NfdG9rZW4iOnsibmJmIjp7ImVzc2VudGlhbCI6dHJ1ZSwgInZhbHVlIjoiMTY1MjgxMzUwOCJ9fX0="}});
+        await azureIdentityAuthenticationProvider.AuthenticateRequestAsync(testRequest, new() { { "claims", "eyJhY2Nlc3NfdG9rZW4iOnsibmJmIjp7ImVzc2VudGlhbCI6dHJ1ZSwgInZhbHVlIjoiMTY1MjgxMzUwOCJ9fX0=" } });
         mockTokenCredential.Verify(x => x.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 }
