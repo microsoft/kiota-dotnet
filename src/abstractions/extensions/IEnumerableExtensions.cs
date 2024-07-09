@@ -22,9 +22,9 @@ namespace Microsoft.Kiota.Abstractions.Extensions
         /// <returns>A <see cref="List{T}"/> containing the elements of the enumerable, or <c>null</c> if the input is <c>null</c>.</returns>
         public static List<T>? AsList<T>(this IEnumerable<T>? e)
         {
-            if (e is null) return null;
+            if(e is null) return null;
 
-            if (e is List<T> list) return list;
+            if(e is List<T> list) return list;
 
             return new List<T>(e);
         }
@@ -37,13 +37,13 @@ namespace Microsoft.Kiota.Abstractions.Extensions
         /// <returns>An array containing the elements of the enumerable, or <c>null</c> if the input is <c>null</c>.</returns>
         public static T[]? AsArray<T>(this IEnumerable<T>? e)
         {
-            if (e is null) return null;
+            if(e is null) return null;
 
-            if (e is T[] array) return array;
+            if(e is T[] array) return array;
 
             T[]? result = null;
 
-            if (e is ICollection<T> collection)
+            if(e is ICollection<T> collection)
             {
                 // Allocate an array with the exact size
                 result = AllocateOnHeap(collection.Count);
@@ -53,13 +53,13 @@ namespace Microsoft.Kiota.Abstractions.Extensions
 
             // First pass to count the elements
             int count = 0;
-            foreach (var item in e) count++;
+            foreach(var item in e) count++;
 
             result = AllocateOnHeap(count);
 
             // Second pass to copy the elements
             count = 0;
-            foreach (var item in e) result[count++] = item;
+            foreach(var item in e) result[count++] = item;
             return result;
 
             static T[] AllocateOnHeap(int count)

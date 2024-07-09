@@ -15,5 +15,5 @@ public class MockEntity : IParsable
     {
 
     }
-    public static MockEntity Factory (IParseNode parseNode) => new MockEntity();
+    public static MockEntity Factory(IParseNode parseNode) => new MockEntity();
 }

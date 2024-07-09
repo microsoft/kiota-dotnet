@@ -4,21 +4,21 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Kiota.Abstractions;
-using Microsoft.Kiota.Abstractions.Serialization;
-using Microsoft.Kiota.Abstractions.Store;
-using Microsoft.Kiota.Abstractions.Authentication;
-using System.Threading;
 using System.Net;
-using Microsoft.Kiota.Abstractions.Extensions;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Kiota.Abstractions;
+using Microsoft.Kiota.Abstractions.Authentication;
+using Microsoft.Kiota.Abstractions.Extensions;
+using Microsoft.Kiota.Abstractions.Serialization;
+using Microsoft.Kiota.Abstractions.Store;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary
 {
@@ -397,8 +397,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             var statusCodeAsInt = (int)response.StatusCode;
             var statusCodeAsString = statusCodeAsInt.ToString();
             var responseHeadersDictionary = new Dictionary<string, IEnumerable<string>>(StringComparer.OrdinalIgnoreCase);
-			foreach (var header in response.Headers)
-    			responseHeadersDictionary[header.Key] = header.Value;
+            foreach(var header in response.Headers)
+                responseHeadersDictionary[header.Key] = header.Value;
             ParsableFactory<IParsable>? errorFactory;
             if(errorMapping == null ||
                 !errorMapping.TryGetValue(statusCodeAsString, out errorFactory) &&
@@ -528,7 +528,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
 
                 if(authHeader is not null)
                 {
-                    var authHeaderParameters = authHeader.Parameter?.Split(new[]{','}, StringSplitOptions.RemoveEmptyEntries);
+                    var authHeaderParameters = authHeader.Parameter?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
                     string? rawResponseClaims = null;
                     if(authHeaderParameters != null)

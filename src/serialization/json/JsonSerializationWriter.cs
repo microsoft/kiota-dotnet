@@ -3,16 +3,16 @@
 // ------------------------------------------------------------------------------
 
 using System;
-using System.IO;
-using System.Text.Json;
-using Microsoft.Kiota.Abstractions.Serialization;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Microsoft.Kiota.Abstractions.Extensions;
-using Microsoft.Kiota.Abstractions;
-using System.Xml;
 using System.Text;
+using System.Text.Json;
+using System.Xml;
+using Microsoft.Kiota.Abstractions;
+using Microsoft.Kiota.Abstractions.Extensions;
+using Microsoft.Kiota.Abstractions.Serialization;
 
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -208,7 +208,7 @@ namespace Microsoft.Kiota.Serialization.Json
         {
             if(!string.IsNullOrEmpty(key) && value.HasValue)
                 writer.WritePropertyName(key!);
-            if(value.HasValue) 
+            if(value.HasValue)
                 JsonSerializer.Serialize(writer, value.Value, TypeConstants.GuidType, _kiotaJsonSerializationContext);
         }
 
@@ -278,7 +278,7 @@ namespace Microsoft.Kiota.Serialization.Json
                 writer.WritePropertyName(key!);
             if(value.HasValue)
             {
-                if (typeof(T).IsDefined(typeof(FlagsAttribute)))
+                if(typeof(T).IsDefined(typeof(FlagsAttribute)))
                 {
                     var values =
 #if NET5_0_OR_GREATER
@@ -287,11 +287,11 @@ namespace Microsoft.Kiota.Serialization.Json
                         (T[])Enum.GetValues(typeof(T));
 #endif
                     StringBuilder valueNames = new StringBuilder();
-                    foreach (var x in values)
+                    foreach(var x in values)
                     {
                         if(value.Value.HasFlag(x) && GetEnumName(x) is string valueName)
                         {
-                            if (valueNames.Length > 0)
+                            if(valueNames.Length > 0)
                                 valueNames.Append(",");
                             valueNames.Append(valueName);
                         }
@@ -328,7 +328,7 @@ namespace Microsoft.Kiota.Serialization.Json
         public void WriteCollectionOfObjectValues<T>(string? key, IEnumerable<T>? values) where T : IParsable
         {
             if(values != null)
-            { 
+            {
                 // empty array is meaningful
                 if(!string.IsNullOrEmpty(key))
                     writer.WritePropertyName(key!);
@@ -383,9 +383,9 @@ namespace Microsoft.Kiota.Serialization.Json
             {
                 // until interface exposes WriteUntypedValue()
                 var serializingUntypedNode = value is UntypedNode;
-                if(!serializingUntypedNode && !string.IsNullOrEmpty(key)) 
+                if(!serializingUntypedNode && !string.IsNullOrEmpty(key))
                     writer.WritePropertyName(key!);
-                if(value != null) 
+                if(value != null)
                     OnBeforeObjectSerialization?.Invoke(value);
 
                 if(serializingUntypedNode)
@@ -414,7 +414,7 @@ namespace Microsoft.Kiota.Serialization.Json
                     }
                     if(!serializingScalarValue)
                         writer.WriteEndObject();
-                }                
+                }
                 if(value != null) OnAfterObjectSerialization?.Invoke(value);
             }
         }
@@ -590,7 +590,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <param name="value">The untyped object.</param>
         private void WriteUntypedObject(string? key, UntypedObject? value)
         {
-            if (value != null)
+            if(value != null)
             {
                 if(!string.IsNullOrEmpty(key)) writer.WritePropertyName(key!);
                 writer.WriteStartObject();
@@ -607,7 +607,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <param name="array">The collection of untyped values.</param>
         private void WriteUntypedArray(string? key, UntypedArray? array)
         {
-            if (array != null)
+            if(array != null)
             {
                 if(!string.IsNullOrEmpty(key)) writer.WritePropertyName(key!);
                 writer.WriteStartArray();

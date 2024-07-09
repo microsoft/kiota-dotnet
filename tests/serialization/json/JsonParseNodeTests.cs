@@ -123,12 +123,12 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             Assert.True(testEntity.AdditionalData.ContainsKey("mobilePhone"));
             Assert.Equal("Auditor", testEntity.AdditionalData["jobTitle"]);
             Assert.Equal("48d31887-5fad-4d73-a9f5-3c356e68a038", testEntity.Id);
-            Assert.Equal(TestEnum.One | TestEnum.Two, testEntity.Numbers ); // Unknown enum value is not included
-            Assert.Equal(TestNamingEnum.Item2SubItem1, testEntity.TestNamingEnum ); // correct value is chosen
+            Assert.Equal(TestEnum.One | TestEnum.Two, testEntity.Numbers); // Unknown enum value is not included
+            Assert.Equal(TestNamingEnum.Item2SubItem1, testEntity.TestNamingEnum); // correct value is chosen
             Assert.Equal(TimeSpan.FromHours(1), testEntity.WorkDuration); // Parses timespan values
-            Assert.Equal(new Time(8,0,0).ToString(),testEntity.StartWorkTime.ToString());// Parses time values
+            Assert.Equal(new Time(8, 0, 0).ToString(), testEntity.StartWorkTime.ToString());// Parses time values
             Assert.Equal(new Time(17, 0, 0).ToString(), testEntity.EndWorkTime.ToString());// Parses time values
-            Assert.Equal(new Date(2017,9,4).ToString(), testEntity.BirthDay.ToString());// Parses date values
+            Assert.Equal(new Date(2017, 9, 4).ToString(), testEntity.BirthDay.ToString());// Parses date values
         }
         [Fact]
         public void GetsFieldFromDerivedType()
@@ -195,14 +195,14 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
             using var jsonDocument = JsonDocument.Parse(json);
             var rootParseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
-            
+
             // Act
             var entity = rootParseNode.GetObjectValue(_ => new ConverterTestEntity());
-            
+
             // Assert
             Assert.Equal(id, entity.Id);
         }
-        
+
         [Fact]
         public void ParseGuidWithoutConverter()
         {
@@ -213,10 +213,10 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
             using var jsonDocument = JsonDocument.Parse(json);
             var rootParseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
-            
+
             // Act
             var entity = rootParseNode.GetObjectValue(_ => new ConverterTestEntity());
-            
+
             // Assert
             Assert.Equal(id, entity.Id);
         }

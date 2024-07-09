@@ -61,7 +61,7 @@ public class IEnumerableExtensionsTests
         IEnumerable<int> enumerable = new int[] { 1, 2, 3 };
         var resultArray = enumerable.AsArray();
         // We expect a new array only if the input is not already an array
-        if (enumerable is not int[])
+        if(enumerable is not int[])
         {
             Assert.NotSame(enumerable, resultArray);
         }

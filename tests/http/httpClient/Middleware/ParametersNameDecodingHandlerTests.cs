@@ -18,7 +18,8 @@ public class ParametersDecodingHandlerTests
     private readonly HttpClientRequestAdapter requestAdapter;
     public ParametersDecodingHandlerTests()
     {
-        decodingHandler = new ParametersNameDecodingHandler{
+        decodingHandler = new ParametersNameDecodingHandler
+        {
             InnerHandler = new FakeSuccessHandler()
         };
         this._invoker = new HttpMessageInvoker(decodingHandler);
@@ -70,7 +71,7 @@ public class ParametersDecodingHandlerTests
             HttpMethod = Method.GET,
             URI = new Uri(original)
         };
-        requestInfo.AddRequestOptions(new []
+        requestInfo.AddRequestOptions(new[]
         {
             new ParametersNameDecodingOption
             {

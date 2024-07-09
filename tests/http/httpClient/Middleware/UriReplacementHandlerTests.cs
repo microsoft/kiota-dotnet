@@ -10,7 +10,8 @@ using Xunit;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware;
 
-public class UriReplacementOptionTests {
+public class UriReplacementOptionTests
+{
     [Fact]
     public void Does_Nothing_When_Url_Replacement_Is_Disabled()
     {
@@ -40,7 +41,7 @@ public class UriReplacementOptionTests {
     public void Replaces_Key_In_Path_With_Value()
     {
         var uri = new Uri("http://localhost/test");
-        var option = new UriReplacementHandlerOption(true, new Dictionary<string, string>{{"test", ""}});
+        var option = new UriReplacementHandlerOption(true, new Dictionary<string, string> { { "test", "" } });
 
         Assert.True(option.IsEnabled());
         Assert.Equal("http://localhost/", option.Replace(uri)!.ToString());
@@ -64,7 +65,7 @@ public class UriReplacementHandlerTests
         var client = new HttpClient(handler);
         await client.SendAsync(msg);
 
-        mockReplacement.Verify(static x=> x.Replace(It.IsAny<Uri>()), Times.Once());
+        mockReplacement.Verify(static x => x.Replace(It.IsAny<Uri>()), Times.Once());
     }
 
     [Fact]
@@ -83,7 +84,7 @@ public class UriReplacementHandlerTests
         var client = new HttpClient(handler);
         await client.SendAsync(msg);
 
-        mockReplacement.Verify(static x=> x.Replace(It.IsAny<Uri>()), Times.Once());
+        mockReplacement.Verify(static x => x.Replace(It.IsAny<Uri>()), Times.Once());
     }
 
     /// <summary>

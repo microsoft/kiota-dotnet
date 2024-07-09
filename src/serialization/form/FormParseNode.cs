@@ -1,8 +1,8 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Xml;
-using System;
-using System.Collections.Generic;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -26,15 +26,15 @@ public class FormParseNode : IParseNode
         Fields = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         char[] pairDelimiter = new char[] { '=' };
         string[] pairs = rawValue.Split(new char[] { '&' }, StringSplitOptions.RemoveEmptyEntries);
-        foreach (string pair in pairs)
+        foreach(string pair in pairs)
         {
             string[] keyValue = pair.Split(pairDelimiter, StringSplitOptions.RemoveEmptyEntries);
-            if (keyValue.Length == 2)
+            if(keyValue.Length == 2)
             {
                 string key = SanitizeKey(keyValue[0]);
                 string value = keyValue[1].Trim();
 
-                if (Fields.ContainsKey(key))
+                if(Fields.ContainsKey(key))
                 {
                     Fields[key] += $",{value}";
                 }
@@ -46,8 +46,9 @@ public class FormParseNode : IParseNode
         }
     }
 
-    private static string SanitizeKey(string key) {
-        if (string.IsNullOrEmpty(key)) return key;
+    private static string SanitizeKey(string key)
+    {
+        if(string.IsNullOrEmpty(key)) return key;
         return Uri.UnescapeDataString(key.Trim());
     }
     /// <inheritdoc/>
@@ -57,7 +58,8 @@ public class FormParseNode : IParseNode
     /// <inheritdoc/>
     public bool? GetBoolValue() => bool.TryParse(DecodedValue, out var result) && result;
     /// <inheritdoc/>
-    public byte[]? GetByteArrayValue() {
+    public byte[]? GetByteArrayValue()
+    {
         var rawValue = DecodedValue;
         if(string.IsNullOrEmpty(rawValue)) return null;
         return Convert.FromBase64String(rawValue);
@@ -65,8 +67,9 @@ public class FormParseNode : IParseNode
     /// <inheritdoc/>
     public byte? GetByteValue() => byte.TryParse(DecodedValue, out var result) ? result : null;
     /// <inheritdoc/>
-    public IParseNode? GetChildNode(string identifier) => Fields.TryGetValue(SanitizeKey(identifier), out var value) ? 
-        new FormParseNode(value){
+    public IParseNode? GetChildNode(string identifier) => Fields.TryGetValue(SanitizeKey(identifier), out var value) ?
+        new FormParseNode(value)
+        {
             OnBeforeAssignFieldValues = OnBeforeAssignFieldValues,
             OnAfterAssignFieldValues = OnAfterAssignFieldValues
         } : null;
@@ -94,7 +97,7 @@ public class FormParseNode : IParseNode
     public IEnumerable<T> GetCollectionOfPrimitiveValues<T>()
     {
         var genericType = typeof(T);
-        var primitiveValueCollection = DecodedValue.Split(new[] { ',' } , StringSplitOptions.RemoveEmptyEntries);
+        var primitiveValueCollection = DecodedValue.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
         foreach(var collectionValue in primitiveValueCollection)
         {
             var currentParseNode = new FormParseNode(collectionValue)
@@ -149,7 +152,8 @@ public class FormParseNode : IParseNode
     /// <inheritdoc/>
     public long? GetLongValue() => long.TryParse(DecodedValue, out var result) ? result : null;
     /// <inheritdoc/>
-    public T GetObjectValue<T>(ParsableFactory<T> factory) where T : IParsable {
+    public T GetObjectValue<T>(ParsableFactory<T> factory) where T : IParsable
+    {
         var item = factory(this);
         OnBeforeAssignFieldValues?.Invoke(item);
         AssignFieldValues(item);
@@ -181,7 +185,7 @@ public class FormParseNode : IParseNode
                     OnAfterAssignFieldValues = OnAfterAssignFieldValues
                 });
             }
-            else if (itemAdditionalData != null)
+            else if(itemAdditionalData != null)
             {
                 Debug.WriteLine($"found additional property {fieldValue.Key} to deserialize");
                 IDictionaryExtensions.TryAdd(itemAdditionalData, fieldValue.Key, fieldValue.Value);
@@ -200,7 +204,8 @@ public class FormParseNode : IParseNode
     public string GetStringValue() => DecodedValue;
 
     /// <inheritdoc/>
-    public TimeSpan? GetTimeSpanValue() {
+    public TimeSpan? GetTimeSpanValue()
+    {
         var rawString = DecodedValue;
         if(string.IsNullOrEmpty(rawString))
             return null;
@@ -218,7 +223,7 @@ public class FormParseNode : IParseNode
     IEnumerable<T?> IParseNode.GetCollectionOfEnumValues<T>()
 #endif
     {
-        foreach (var v in DecodedValue.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+        foreach(var v in DecodedValue.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             yield return GetEnumValueInternal<T>(v);
     }
 
@@ -230,12 +235,12 @@ public class FormParseNode : IParseNode
     {
         return GetEnumValueInternal<T>(DecodedValue);
     }
-    
+
     private static T? GetEnumValueInternal<T>(string rawValue) where T : struct, Enum
     {
         if(string.IsNullOrEmpty(rawValue))
             return null;
-        if (typeof(T).IsDefined(typeof(FlagsAttribute)))
+        if(typeof(T).IsDefined(typeof(FlagsAttribute)))
         {
             ReadOnlySpan<char> valueSpan = rawValue.AsSpan();
             int value = 0;

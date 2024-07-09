@@ -8,7 +8,8 @@ namespace Microsoft.Kiota.Authentication.Azure;
 /// <summary>
 /// Holds the tracing, metrics and logging configuration for the authentication provider
 /// </summary>
-public class ObservabilityOptions {
+public class ObservabilityOptions
+{
     private static readonly Lazy<string> _name = new Lazy<string>(() => typeof(ObservabilityOptions).Namespace!);
     /// <summary>
     /// Gets the observability name to use for the tracer

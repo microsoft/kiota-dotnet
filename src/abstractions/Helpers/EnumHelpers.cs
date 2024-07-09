@@ -135,7 +135,7 @@ namespace Microsoft.Kiota.Abstractions.Helpers
             }
             return result;
 
-            
+
         }
 
 #if NET5_0_OR_GREATER

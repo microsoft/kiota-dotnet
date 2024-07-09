@@ -10,7 +10,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary;
 /// <summary>
 /// Holds the tracing, metrics and logging configuration for the request adapter
 /// </summary>
-public class ObservabilityOptions : IRequestOption {
+public class ObservabilityOptions : IRequestOption
+{
     /// <summary>
     /// Gets or sets a value indicating whether to include attributes which could contain EUII information.
     /// </summary>

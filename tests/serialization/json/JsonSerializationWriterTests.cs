@@ -38,24 +38,24 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             };
             using var jsonSerializerWriter = new JsonSerializationWriter();
             // Act
-            jsonSerializerWriter.WriteObjectValue(string.Empty,testEntity);
+            jsonSerializerWriter.WriteObjectValue(string.Empty, testEntity);
             // Get the json string from the stream.
             var serializedStream = jsonSerializerWriter.GetSerializedContent();
             using var reader = new StreamReader(serializedStream, Encoding.UTF8);
             var serializedJsonString = reader.ReadToEnd();
-            
+
             // Assert
             var expectedString = "{" +
                                  "\"id\":\"48d31887-5fad-4d73-a9f5-3c356e68a038\"," +
-                                 "\"workDuration\":\"PT1H\","+    // Serializes timespans
+                                 "\"workDuration\":\"PT1H\"," +    // Serializes timespans
                                  "\"birthDay\":\"2017-09-04\"," + // Serializes dates
-                                 "\"heightInMetres\":1.80,"+
+                                 "\"heightInMetres\":1.80," +
                                  "\"startWorkTime\":\"08:00:00\"," + //Serializes times
                                  "\"mobilePhone\":null," +
                                  "\"accountEnabled\":false," +
                                  "\"jobTitle\":\"Author\"," +
                                  "\"createdDateTime\":\"0001-01-01T00:00:00+00:00\"," +
-                                 "\"weightInKgs\":51.80,"+
+                                 "\"weightInKgs\":51.80," +
                                  "\"businessPhones\":[\"\\u002B1 412 555 0109\"]," +
                                  "\"endDateTime\":\"2023-03-14T00:00:00+00:00\"," +
                                  "\"manager\":{\"id\":\"48d31887-5fad-4d73-a9f5-3c356e68a038\"}" +
@@ -130,7 +130,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                     {"manager", new TestEntity{Id = "48d31887-5fad-4d73-a9f5-3c356e68a038"}}, // write nested object value
                 }
             };
-            var entityList = new List<TestEntity>() { testEntity};
+            var entityList = new List<TestEntity>() { testEntity };
             using var jsonSerializerWriter = new JsonSerializationWriter();
             // Act
             jsonSerializerWriter.WriteCollectionOfObjectValues(string.Empty, entityList);
@@ -220,12 +220,12 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             var serializedStream = jsonSerializerWriter.GetSerializedContent();
             using var reader = new StreamReader(serializedStream, Encoding.UTF8);
             var serializedJsonString = reader.ReadToEnd();
-            
+
             // Assert
             var expectedString = $"{{\"id\":\"{id:N}\"}}";
             Assert.Equal(expectedString, serializedJsonString);
         }
-        
+
         [Fact]
         public void WriteGuidUsingNoConverter()
         {
@@ -241,7 +241,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             var serializedStream = jsonSerializerWriter.GetSerializedContent();
             using var reader = new StreamReader(serializedStream, Encoding.UTF8);
             var serializedJsonString = reader.ReadToEnd();
-            
+
             // Assert
             var expectedString = $"{{\"id\":\"{id:D}\"}}";
             Assert.Equal(expectedString, serializedJsonString);

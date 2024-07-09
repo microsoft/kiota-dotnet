@@ -44,7 +44,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 
             // Assert the request stays the same
             Assert.Empty(response.RequestMessage?.Headers!);
-            Assert.Equal(requestMessage,response.RequestMessage);
+            Assert.Equal(requestMessage, response.RequestMessage);
         }
 
         [Fact]
@@ -60,7 +60,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             {
                 TelemetryConfigurator = (httpRequestMessage) =>
                 {
-                    httpRequestMessage.Headers.Add("SdkVersion","x.x.x");
+                    httpRequestMessage.Headers.Add("SdkVersion", "x.x.x");
                     return httpRequestMessage;
                 }
             };

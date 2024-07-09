@@ -11,7 +11,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
     /// <summary>
     /// The redirect request option class
     /// </summary>
-    public class RedirectHandlerOption: IRequestOption
+    public class RedirectHandlerOption : IRequestOption
     {
         private const int DefaultMaxRedirect = 5;
         private const int MaxMaxRedirect = 20;

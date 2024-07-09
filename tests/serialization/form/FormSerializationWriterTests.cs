@@ -37,16 +37,16 @@ public class FormSerializationWriterTests
         };
         using var formSerializerWriter = new FormSerializationWriter();
         // Act
-        formSerializerWriter.WriteObjectValue(string.Empty,testEntity);
+        formSerializerWriter.WriteObjectValue(string.Empty, testEntity);
         // Get the string from the stream.
         var serializedStream = formSerializerWriter.GetSerializedContent();
         using var reader = new StreamReader(serializedStream, Encoding.UTF8);
         var serializedFormString = reader.ReadToEnd();
-        
+
         // Assert
-        var expectedString =    "id=48d31887-5fad-4d73-a9f5-3c356e68a038&" +
-                                "numbers=one%2Ctwo&"+   // serializes enums
-                                "workDuration=PT1H&"+    // Serializes timespans
+        var expectedString = "id=48d31887-5fad-4d73-a9f5-3c356e68a038&" +
+                                "numbers=one%2Ctwo&" +   // serializes enums
+                                "workDuration=PT1H&" +    // Serializes timespans
                                 "birthDay=2017-09-04&" + // Serializes dates
                                 "startWorkTime=08%3A00%3A00&" + //Serializes times
                                 "deviceNames=device1&deviceNames=device2&" + // Serializes collection of scalars using the same key
@@ -106,6 +106,6 @@ public class FormSerializationWriterTests
         using var formSerializerWriter = new FormSerializationWriter();
         // Act
         var exception = Assert.Throws<InvalidOperationException>(() => formSerializerWriter.WriteObjectValue(string.Empty, testEntity));
-        Assert.Equal("Form serialization does not support nested objects.",exception.Message);
+        Assert.Equal("Form serialization does not support nested objects.", exception.Message);
     }
 }

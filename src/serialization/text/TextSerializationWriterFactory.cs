@@ -6,7 +6,8 @@ namespace Microsoft.Kiota.Serialization.Text;
 /// <summary>
 /// The <see cref="ISerializationWriterFactory"/> implementation for the text content type
 /// </summary>
-public class TextSerializationWriterFactory : ISerializationWriterFactory {
+public class TextSerializationWriterFactory : ISerializationWriterFactory
+{
     /// <inheritdoc />
     public string ValidContentType { get; } = "text/plain";
 

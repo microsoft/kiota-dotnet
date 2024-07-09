@@ -16,7 +16,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         public void GetsWriterForJsonContentType()
         {
             var jsonWriter = _jsonSerializationFactory.GetSerializationWriter(_jsonSerializationFactory.ValidContentType);
-            
+
             // Assert
             Assert.NotNull(jsonWriter);
             Assert.IsAssignableFrom<JsonSerializationWriter>(jsonWriter);

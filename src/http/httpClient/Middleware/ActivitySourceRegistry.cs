@@ -13,7 +13,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware;
 /// </summary>
 internal class ActivitySourceRegistry
 {
-    private readonly ConcurrentDictionary<string, ActivitySource> _activitySources = new (StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, ActivitySource> _activitySources = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// The default instance of the registry

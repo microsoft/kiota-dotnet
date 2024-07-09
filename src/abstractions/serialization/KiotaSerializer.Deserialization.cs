@@ -236,7 +236,7 @@ public static partial class KiotaSerializer
     /// <param name="serializedRepresentation">The serialized representation of the objects.</param>
     /// <param name="parsableFactory">The factory to create the object.</param>
     /// <param name="cancellationToken">The cancellation token for the task</param>
-    public static async Task<IEnumerable<T>> DeserializeCollectionAsync<T>(string contentType, string serializedRepresentation, 
+    public static async Task<IEnumerable<T>> DeserializeCollectionAsync<T>(string contentType, string serializedRepresentation,
         ParsableFactory<T> parsableFactory, CancellationToken cancellationToken = default) where T : IParsable
     {
         if(string.IsNullOrEmpty(serializedRepresentation)) throw new ArgumentNullException(nameof(serializedRepresentation));
