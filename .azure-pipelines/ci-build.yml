@@ -256,7 +256,9 @@ extends:
                     tag: 'v$(VERSION_STRING)'
                     title: '$(VERSION_STRING)'
                     releaseNotesSource: inline
-                    assets: '!**/**'
+                    assets: |
+                      !**/**
+                      $(Pipeline.Workspace)/Microsoft.Kiota.*.*nupkg
                     changeLogType: issueBased
                     isPreRelease : '$(IS_PRE_RELEASE)'
                     addChangeLog : true 
