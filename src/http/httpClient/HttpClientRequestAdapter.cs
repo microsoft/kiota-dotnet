@@ -508,6 +508,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// The key for the event raised by tracing when an authentication challenge is received
         /// </summary>
         public const string AuthenticateChallengedEventKey = "com.microsoft.kiota.authenticate_challenge_received";
+        private static readonly char[] ComaSplitSeparator = [','];
 
         private async Task<HttpResponseMessage> RetryCAEResponseIfRequired(HttpResponseMessage response, RequestInformation requestInfo, CancellationToken cancellationToken, string? claims, Activity? activityForAttributes)
         {
@@ -528,7 +529,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
 
                 if(authHeader is not null)
                 {
-                    var authHeaderParameters = authHeader.Parameter?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    var authHeaderParameters = authHeader.Parameter?.Split(ComaSplitSeparator, StringSplitOptions.RemoveEmptyEntries);
 
                     string? rawResponseClaims = null;
                     if(authHeaderParameters != null)

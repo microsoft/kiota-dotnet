@@ -70,28 +70,30 @@ public class ParametersNameDecodingHandler : DelegatingHandler
             activity?.Dispose();
         }
     }
+    private static readonly char[] EntriesSeparator = ['&'];
+    private static readonly char[] ParameterSeparator = ['='];
 
     internal static string? DecodeUriEncodedString(string? original, char[] charactersToDecode)
     {
-        if(string.IsNullOrEmpty(original) || charactersToDecode == null || charactersToDecode.Length == 0)
+        // for some reason static analysis is not picking up the fact that string.IsNullOrEmpty is already checking for null
+        if(original is null || original.Length == 0 || charactersToDecode == null || charactersToDecode.Length == 0)
             return original;
 
         var symbolsToReplace = new List<(string, string)>();
         foreach(var character in charactersToDecode)
         {
             var symbol = ($"%{Convert.ToInt32(character):X}", character.ToString());
-            if(original?.Contains(symbol.Item1) ?? false)
+            if(original.Contains(symbol.Item1))
             {
                 symbolsToReplace.Add(symbol);
             }
         }
 
         var encodedParameterValues = new List<string>();
-        var parts = original?.TrimStart('?').Split(new[] { '&' }, StringSplitOptions.RemoveEmptyEntries);
-        if(parts is null) return original;
+        var parts = original.TrimStart('?').Split(EntriesSeparator, StringSplitOptions.RemoveEmptyEntries);
         foreach(var part in parts)
         {
-            var parameter = part.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries)[0];
+            var parameter = part.Split(ParameterSeparator, StringSplitOptions.RemoveEmptyEntries)[0];
             if(parameter.Contains("%")) // only pull out params with `%` (encoded)
             {
                 encodedParameterValues.Add(parameter);
@@ -108,7 +110,7 @@ public class ParametersNameDecodingHandler : DelegatingHandler
                     updatedParameterName = updatedParameterName.Replace(symbolToReplace.Item1, symbolToReplace.Item2);
                 }
             }
-            original = original?.Replace(parameter, updatedParameterName);
+            original = original.Replace(parameter, updatedParameterName);
         }
 
         return original;

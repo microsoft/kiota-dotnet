@@ -17,6 +17,8 @@ public class FormParseNode : IParseNode
     private readonly string RawValue;
     private string DecodedValue => Uri.UnescapeDataString(RawValue);
     private readonly Dictionary<string, string> Fields;
+    private static readonly char[] pairDelimiter = ['='];
+    private static readonly char[] entriesDelimiter = ['&'];
     /// <summary>Initializes a new instance of the <see cref="FormParseNode"/> class.</summary>
     /// <param name="rawValue">The raw value to parse.</param>
     /// <exception cref="ArgumentNullException">Thrown when the <paramref name="rawValue"/> is null.</exception>
@@ -24,8 +26,7 @@ public class FormParseNode : IParseNode
     {
         RawValue = rawValue ?? throw new ArgumentNullException(nameof(rawValue));
         Fields = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        char[] pairDelimiter = new char[] { '=' };
-        string[] pairs = rawValue.Split(new char[] { '&' }, StringSplitOptions.RemoveEmptyEntries);
+        string[] pairs = rawValue.Split(entriesDelimiter, StringSplitOptions.RemoveEmptyEntries);
         foreach(string pair in pairs)
         {
             string[] keyValue = pair.Split(pairDelimiter, StringSplitOptions.RemoveEmptyEntries);
@@ -89,6 +90,7 @@ public class FormParseNode : IParseNode
     private static readonly Type timeSpanType = typeof(TimeSpan?);
     private static readonly Type dateType = typeof(Date?);
     private static readonly Type timeType = typeof(Time?);
+    private static readonly char[] ComaSeparator = [','];
 
     /// <summary>
     /// Get the collection of primitives of type <typeparam name="T"/>from the form node
@@ -97,7 +99,7 @@ public class FormParseNode : IParseNode
     public IEnumerable<T> GetCollectionOfPrimitiveValues<T>()
     {
         var genericType = typeof(T);
-        var primitiveValueCollection = DecodedValue.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+        var primitiveValueCollection = DecodedValue.Split(ComaSeparator, StringSplitOptions.RemoveEmptyEntries);
         foreach(var collectionValue in primitiveValueCollection)
         {
             var currentParseNode = new FormParseNode(collectionValue)
@@ -223,7 +225,7 @@ public class FormParseNode : IParseNode
     IEnumerable<T?> IParseNode.GetCollectionOfEnumValues<T>()
 #endif
     {
-        foreach(var v in DecodedValue.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+        foreach(var v in DecodedValue.Split(ComaSeparator, StringSplitOptions.RemoveEmptyEntries))
             yield return GetEnumValueInternal<T>(v);
     }
 
