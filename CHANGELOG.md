@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.9] - 2024-07-11
+
+- Fix enum deserialization for SendPrimitiveAsync and 
+
 ## [1.9.8] - 2024-07-08
 
 - Migrated source of various libraries to mono repository at <https://github.com/microsoft/kiota-dotnet>.

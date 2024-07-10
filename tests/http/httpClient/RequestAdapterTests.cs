@@ -537,7 +537,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             }
         }
         [Fact]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Trimming", "IL2066:The generic parameter of type or method has a DynamicallyAccessedMembersAttribute, but the value used for it can not be statically analyzed.", Justification = "<Pending>")]
         public async Task SendPrimitiveHandleEnumIfValueIsString()
         {
             var mockHandler = new Mock<HttpMessageHandler>();
@@ -570,7 +569,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         }
 
         [Fact]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Trimming", "IL2066:The generic parameter of type or method has a DynamicallyAccessedMembersAttribute, but the value used for it can not be statically analyzed.", Justification = "<Pending>")]
         public async Task SendPrimitiveHandleEnumIfValueIsInteger()
         {
             var mockHandler = new Mock<HttpMessageHandler>();
@@ -603,7 +601,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         }
 
         [Fact]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Trimming", "IL2066:The generic parameter of type or method has a DynamicallyAccessedMembersAttribute, but the value used for it can not be statically analyzed.", Justification = "<Pending>")]
         public async Task SendPrimitiveHandleEnumIfValueIsFromEnumMember()
         {
             var mockHandler = new Mock<HttpMessageHandler>();
@@ -636,7 +633,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         }
 
         [Fact]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Trimming", "IL2066:The generic parameter of type or method has a DynamicallyAccessedMembersAttribute, but the value used for it can not be statically analyzed.", Justification = "<Pending>")]
         public async Task SendPrimitiveReturnsNullIfValueCannotBeParsedToEnum()
         {
             var mockHandler = new Mock<HttpMessageHandler>();
@@ -669,7 +665,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         }
 
         [Fact]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Trimming", "IL2066:The generic parameter of type or method has a DynamicallyAccessedMembersAttribute, but the value used for it can not be statically analyzed.", Justification = "<Pending>")]
         public async Task SendPrimitiveHandleEnumFlagsIfValuesAreStrings()
         {
             var mockHandler = new Mock<HttpMessageHandler>();
@@ -702,7 +697,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         }
 
         [Fact]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Trimming", "IL2066:The generic parameter of type or method has a DynamicallyAccessedMembersAttribute, but the value used for it can not be statically analyzed.", Justification = "<Pending>")]
         public async Task SendPrimitiveHandleEnumFlagsIfValuesAreIntegers()
         {
             var mockHandler = new Mock<HttpMessageHandler>();
@@ -735,7 +729,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         }
 
         [Fact]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Trimming", "IL2066:The generic parameter of type or method has a DynamicallyAccessedMembersAttribute, but the value used for it can not be statically analyzed.", Justification = "<Pending>")]
         public async Task SendPrimitiveHandleEnumFlagsIfValuesAreFromEnumMember()
         {
             var mockHandler = new Mock<HttpMessageHandler>();
@@ -768,7 +761,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         }
 
         [Fact]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Trimming", "IL2066:The generic parameter of type or method has a DynamicallyAccessedMembersAttribute, but the value used for it can not be statically analyzed.", Justification = "<Pending>")]
         public async Task SendPrimitiveReturnsNullIfFlagValueCannotBeParsedToEnum()
         {
             var mockHandler = new Mock<HttpMessageHandler>();
