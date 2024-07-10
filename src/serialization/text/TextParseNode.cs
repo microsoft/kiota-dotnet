@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Xml;
 using Microsoft.Kiota.Abstractions;
+using Microsoft.Kiota.Abstractions.Helpers;
 using Microsoft.Kiota.Abstractions.Serialization;
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -78,5 +79,5 @@ public class TextParseNode : IParseNode
 #else
     public T? GetEnumValue<T>() where T : struct, Enum
 #endif
-    => Enum.TryParse<T>(Text, true, out var result) ? result : null;
+    => EnumHelpers.GetEnumValue<T>(Text!);
 }

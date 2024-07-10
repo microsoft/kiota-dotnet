@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Xml;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Extensions;
+using Microsoft.Kiota.Abstractions.Helpers;
 using Microsoft.Kiota.Abstractions.Serialization;
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -226,7 +227,7 @@ public class FormParseNode : IParseNode
 #endif
     {
         foreach(var v in DecodedValue.Split(ComaSeparator, StringSplitOptions.RemoveEmptyEntries))
-            yield return GetEnumValueInternal<T>(v);
+            yield return EnumHelpers.GetEnumValue<T>(v);
     }
 
 #if NET5_0_OR_GREATER
@@ -235,33 +236,6 @@ public class FormParseNode : IParseNode
     T? IParseNode.GetEnumValue<T>()
 #endif
     {
-        return GetEnumValueInternal<T>(DecodedValue);
-    }
-
-    private static T? GetEnumValueInternal<T>(string rawValue) where T : struct, Enum
-    {
-        if(string.IsNullOrEmpty(rawValue))
-            return null;
-        if(typeof(T).IsDefined(typeof(FlagsAttribute)))
-        {
-            ReadOnlySpan<char> valueSpan = rawValue.AsSpan();
-            int value = 0;
-            while(valueSpan.Length > 0)
-            {
-                int commaIndex = valueSpan.IndexOf(',');
-                ReadOnlySpan<char> valueNameSpan = commaIndex < 0 ? valueSpan : valueSpan.Slice(0, commaIndex);
-#if NET6_0_OR_GREATER
-                if(Enum.TryParse<T>(valueNameSpan, true, out var result))
-#else
-                if(Enum.TryParse<T>(valueNameSpan.ToString(), true, out var result))
-#endif
-                    value |= (int)(object)result;
-                valueSpan = commaIndex < 0 ? ReadOnlySpan<char>.Empty : valueSpan.Slice(commaIndex + 1);
-            }
-            return (T)(object)value;
-        }
-        else if(Enum.TryParse<T>(rawValue, out var result))
-            return result;
-        return null;
+        return EnumHelpers.GetEnumValue<T>(DecodedValue);
     }
 }

@@ -19,6 +19,7 @@ using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
 using Microsoft.Kiota.Abstractions.Store;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware;
+using Microsoft.Kiota.Abstractions.Helpers;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary
 {
@@ -301,6 +302,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                         else if(modelType == typeof(Date?))
                         {
                             result = rootNode.GetDateValue();
+                        }
+                        else if(
+                            Nullable.GetUnderlyingType(modelType) is { IsEnum: true } underlyingType &&
+                            rootNode.GetStringValue() is { Length: > 0 } rawValue)
+                        {
+                            result = EnumHelpers.GetEnumValue(underlyingType, rawValue);
                         }
                         else throw new InvalidOperationException("error handling the response, unexpected type");
                         SetResponseType(result, span);

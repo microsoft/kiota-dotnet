@@ -11,6 +11,7 @@ using System.Text.Json;
 using System.Xml;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Extensions;
+using Microsoft.Kiota.Abstractions.Helpers;
 using Microsoft.Kiota.Abstractions.Serialization;
 
 #if NET5_0_OR_GREATER
@@ -217,29 +218,7 @@ namespace Microsoft.Kiota.Serialization.Json
 #endif
         {
             var rawValue = _jsonNode.GetString();
-            if(string.IsNullOrEmpty(rawValue)) return null;
-
-            rawValue = ToEnumRawName<T>(rawValue!);
-            if(typeof(T).IsDefined(typeof(FlagsAttribute)))
-            {
-                ReadOnlySpan<char> valueSpan = rawValue.AsSpan();
-                int value = 0;
-                while(valueSpan.Length > 0)
-                {
-                    int commaIndex = valueSpan.IndexOf(',');
-                    ReadOnlySpan<char> valueNameSpan = commaIndex < 0 ? valueSpan : valueSpan.Slice(0, commaIndex);
-#if NET6_0_OR_GREATER
-                    if(Enum.TryParse<T>(valueNameSpan, true, out var result))
-#else
-                    if(Enum.TryParse<T>(valueNameSpan.ToString(), true, out var result))
-#endif
-                        value |= (int)(object)result;
-                    valueSpan = commaIndex < 0 ? ReadOnlySpan<char>.Empty : valueSpan.Slice(commaIndex + 1);
-                }
-                return (T)(object)value;
-            }
-            else
-                return Enum.TryParse<T>(rawValue, true, out var result) ? result : null;
+            return EnumHelpers.GetEnumValue<T>(rawValue!);
         }
 
         /// <summary>
@@ -347,6 +326,11 @@ namespace Microsoft.Kiota.Serialization.Json
                         yield return (T)(object)currentParseNode.GetDateValue()!;
                     else if(genericType == TypeConstants.TimeType)
                         yield return (T)(object)currentParseNode.GetTimeValue()!;
+                    else if(Nullable.GetUnderlyingType(genericType) is { IsEnum: true } underlyingType &&
+                            currentParseNode.GetStringValue() is { Length: > 0 } rawValue)
+                    {
+                        yield return (T)EnumHelpers.GetEnumValue(underlyingType, rawValue)!;
+                    }
                     else
                         throw new InvalidOperationException($"unknown type for deserialization {genericType.FullName}");
                 }

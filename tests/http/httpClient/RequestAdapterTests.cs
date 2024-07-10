@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -535,5 +536,289 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 Assert.Contains("The server returned an unexpected status code and no error factory is registered for this code", apiException.Message);
             }
         }
+        [Fact]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Trimming", "IL2066:The generic parameter of type or method has a DynamicallyAccessedMembersAttribute, but the value used for it can not be statically analyzed.", Justification = "<Pending>")]
+        public async Task SendPrimitiveHandleEnumIfValueIsString()
+        {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("Value1")
+                });
+
+            var mockParseNode = new Mock<IParseNode>();
+            mockParseNode.Setup(x => x.GetStringValue())
+            .Returns("Value1");
+
+            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(mockParseNode.Object));
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                URI = new Uri("https://example.com")
+            };
+
+            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo);
+
+            Assert.Equal(TestEnum.Value1, response);
+        }
+
+        [Fact]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Trimming", "IL2066:The generic parameter of type or method has a DynamicallyAccessedMembersAttribute, but the value used for it can not be statically analyzed.", Justification = "<Pending>")]
+        public async Task SendPrimitiveHandleEnumIfValueIsInteger()
+        {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("1")
+                });
+
+            var mockParseNode = new Mock<IParseNode>();
+            mockParseNode.Setup(x => x.GetStringValue())
+            .Returns("1");
+
+            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(mockParseNode.Object));
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                URI = new Uri("https://example.com")
+            };
+
+            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo);
+
+            Assert.Equal(TestEnum.Value2, response);
+        }
+
+        [Fact]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Trimming", "IL2066:The generic parameter of type or method has a DynamicallyAccessedMembersAttribute, but the value used for it can not be statically analyzed.", Justification = "<Pending>")]
+        public async Task SendPrimitiveHandleEnumIfValueIsFromEnumMember()
+        {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("Value__3")
+                });
+
+            var mockParseNode = new Mock<IParseNode>();
+            mockParseNode.Setup(x => x.GetStringValue())
+            .Returns("Value__3");
+
+            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(mockParseNode.Object));
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                URI = new Uri("https://example.com")
+            };
+
+            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo);
+
+            Assert.Equal(TestEnum.Value3, response);
+        }
+
+        [Fact]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Trimming", "IL2066:The generic parameter of type or method has a DynamicallyAccessedMembersAttribute, but the value used for it can not be statically analyzed.", Justification = "<Pending>")]
+        public async Task SendPrimitiveReturnsNullIfValueCannotBeParsedToEnum()
+        {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("Value0")
+                });
+
+            var mockParseNode = new Mock<IParseNode>();
+            mockParseNode.Setup(x => x.GetStringValue())
+            .Returns("Value0");
+
+            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(mockParseNode.Object));
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                URI = new Uri("https://example.com")
+            };
+
+            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo);
+
+            Assert.Null(response);
+        }
+
+        [Fact]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Trimming", "IL2066:The generic parameter of type or method has a DynamicallyAccessedMembersAttribute, but the value used for it can not be statically analyzed.", Justification = "<Pending>")]
+        public async Task SendPrimitiveHandleEnumFlagsIfValuesAreStrings()
+        {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("Value1,Value3")
+                });
+
+            var mockParseNode = new Mock<IParseNode>();
+            mockParseNode.Setup(x => x.GetStringValue())
+            .Returns("Value1,Value3");
+
+            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(mockParseNode.Object));
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                URI = new Uri("https://example.com")
+            };
+
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo);
+
+            Assert.Equal(TestEnumWithFlags.Value1 | TestEnumWithFlags.Value3, response);
+        }
+
+        [Fact]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Trimming", "IL2066:The generic parameter of type or method has a DynamicallyAccessedMembersAttribute, but the value used for it can not be statically analyzed.", Justification = "<Pending>")]
+        public async Task SendPrimitiveHandleEnumFlagsIfValuesAreIntegers()
+        {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("1,2")
+                });
+
+            var mockParseNode = new Mock<IParseNode>();
+            mockParseNode.Setup(x => x.GetStringValue())
+            .Returns("1,2");
+
+            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(mockParseNode.Object));
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                URI = new Uri("https://example.com")
+            };
+
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo);
+
+            Assert.Equal(TestEnumWithFlags.Value1 | TestEnumWithFlags.Value2, response);
+        }
+
+        [Fact]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Trimming", "IL2066:The generic parameter of type or method has a DynamicallyAccessedMembersAttribute, but the value used for it can not be statically analyzed.", Justification = "<Pending>")]
+        public async Task SendPrimitiveHandleEnumFlagsIfValuesAreFromEnumMember()
+        {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("Value__3,Value__2")
+                });
+
+            var mockParseNode = new Mock<IParseNode>();
+            mockParseNode.Setup(x => x.GetStringValue())
+            .Returns("Value__3,Value__2");
+
+            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(mockParseNode.Object));
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                URI = new Uri("https://example.com")
+            };
+
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo);
+
+            Assert.Equal(TestEnumWithFlags.Value2 | TestEnumWithFlags.Value3, response);
+        }
+
+        [Fact]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Trimming", "IL2066:The generic parameter of type or method has a DynamicallyAccessedMembersAttribute, but the value used for it can not be statically analyzed.", Justification = "<Pending>")]
+        public async Task SendPrimitiveReturnsNullIfFlagValueCannotBeParsedToEnum()
+        {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("Value0")
+                });
+
+            var mockParseNode = new Mock<IParseNode>();
+            mockParseNode.Setup(x => x.GetStringValue())
+            .Returns("Value0");
+
+            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(mockParseNode.Object));
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                URI = new Uri("https://example.com")
+            };
+
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo);
+
+            Assert.Null(response);
+        }
+    }
+
+    public enum TestEnum
+    {
+        [EnumMember(Value = "Value__1")]
+        Value1,
+        [EnumMember(Value = "Value__2")]
+        Value2,
+        [EnumMember(Value = "Value__3")]
+        Value3
+    }
+
+    [Flags]
+    public enum TestEnumWithFlags
+    {
+        [EnumMember(Value = "Value__1")]
+        Value1 = 0x01,
+        [EnumMember(Value = "Value__2")]
+        Value2 = 0x02,
+        [EnumMember(Value = "Value__3")]
+        Value3 = 0x04
     }
 }
