@@ -79,5 +79,5 @@ public class TextParseNode : IParseNode
 #else
     public T? GetEnumValue<T>() where T : struct, Enum
 #endif
-    => EnumHelpers.GetEnumValue<T>(Text!);
+    => Text is null ? null : EnumHelpers.GetEnumValue<T>(Text);
 }
