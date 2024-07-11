@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PublishTrimmed>true</PublishTrimmed>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\abstractions\Microsoft.Kiota.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\authentication\azure\Microsoft.Kiota.Authentication.Azure.csproj" />
+    <ProjectReference Include="..\..\..\src\http\httpClient\Microsoft.Kiota.Http.HttpClientLibrary.csproj" />
+    <ProjectReference Include="..\..\..\src\serialization\form\Microsoft.Kiota.Serialization.Form.csproj" />
+    <ProjectReference Include="..\..\..\src\serialization\json\Microsoft.Kiota.Serialization.Json.csproj" />
+    <ProjectReference Include="..\..\..\src\serialization\multipart\Microsoft.Kiota.Serialization.Multipart.csproj" />
+    <ProjectReference Include="..\..\..\src\serialization\text\Microsoft.Kiota.Serialization.Text.csproj" />
+    <TrimmerRootAssembly Include="Microsoft.Kiota.Abstractions" />
+    <TrimmerRootAssembly Include="Microsoft.Kiota.Authentication.Azure" />
+    <TrimmerRootAssembly Include="Microsoft.Kiota.Http.HttpClientLibrary" />
+    <TrimmerRootAssembly Include="Microsoft.Kiota.Serialization.Form" />
+    <TrimmerRootAssembly Include="Microsoft.Kiota.Serialization.Json" />
+    <TrimmerRootAssembly Include="Microsoft.Kiota.Serialization.Text" />
+  </ItemGroup>
+
+</Project>
