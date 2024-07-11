@@ -91,6 +91,7 @@ public class MultipartBody : IParsable
     private readonly Dictionary<string, Part> _parts = new Dictionary<string, Part>(StringComparer.OrdinalIgnoreCase);
     /// <inheritdoc />
     public IDictionary<string, Action<IParseNode>> GetFieldDeserializers() => throw new NotImplementedException();
+    private const char DoubleQuote = '"';
     /// <inheritdoc />
     public void Serialize(ISerializationWriter writer)
     {
@@ -123,13 +124,13 @@ public class MultipartBody : IParsable
                 contentDispositionBuilder.Clear();
                 contentDispositionBuilder.Append("form-data; name=\"");
                 contentDispositionBuilder.Append(part.Name);
-                contentDispositionBuilder.Append("\"");
+                contentDispositionBuilder.Append(DoubleQuote);
 
                 if(part.FileName != null)
                 {
                     contentDispositionBuilder.Append("; filename=\"");
                     contentDispositionBuilder.Append(part.FileName);
-                    contentDispositionBuilder.Append("\"");
+                    contentDispositionBuilder.Append(DoubleQuote);
                 }
 
                 writer.WriteStringValue("Content-Disposition", contentDispositionBuilder.ToString());
@@ -176,12 +177,9 @@ public class MultipartBody : IParsable
         AddNewLine(writer);
         writer.WriteStringValue(string.Empty, $"--{Boundary}--");
     }
-    private void AddNewLine(ISerializationWriter writer)
-    {
-        writer.WriteStringValue(string.Empty, string.Empty);
-    }
+    private static void AddNewLine(ISerializationWriter writer) => writer.WriteStringValue(string.Empty, string.Empty);
 
-    private void WriteSerializedContent(ISerializationWriter writer, ISerializationWriter partWriter)
+    private static void WriteSerializedContent(ISerializationWriter writer, ISerializationWriter partWriter)
     {
         using var partContent = partWriter.GetSerializedContent();
         if(partContent.CanSeek)
@@ -191,19 +189,11 @@ public class MultipartBody : IParsable
         writer.WriteByteArrayValue(string.Empty, ms.ToArray());
     }
 
-    private class Part
+    private sealed class Part(string name, object content, string contentType, string? fileName)
     {
-        public Part(string name, object content, string contentType, string? fileName)
-        {
-            this.Name = name;
-            this.Content = content;
-            this.ContentType = contentType;
-            this.FileName = fileName;
-        }
-
-        public string Name { get; }
-        public object Content { get; }
-        public string ContentType { get; }
-        public string? FileName { get; }
+        public string Name { get; } = name;
+        public object Content { get; } = content;
+        public string ContentType { get; } = contentType;
+        public string? FileName { get; } = fileName;
     }
 }
