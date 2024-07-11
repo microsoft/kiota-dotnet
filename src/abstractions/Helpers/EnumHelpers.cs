@@ -93,7 +93,7 @@ namespace Microsoft.Kiota.Abstractions.Helpers
                 {
                     int commaIndex = rawValue.IndexOf(',');
                     var valueName = commaIndex < 0 ? rawValue : rawValue.Substring(0, commaIndex);
-                    if(TryGetFieldValueName(type, valueName, out var value))
+                    if(Nullable.GetUnderlyingType(type) is { IsEnum: true } underlyingType && TryGetFieldValueName(underlyingType, valueName, out var value))
                     {
                         valueName = value;
                     }
@@ -114,7 +114,7 @@ namespace Microsoft.Kiota.Abstractions.Helpers
             }
             else
             {
-                if(TryGetFieldValueName(type, rawValue, out var value))
+                if(Nullable.GetUnderlyingType(type) is { IsEnum: true } underlyingType && TryGetFieldValueName(underlyingType, rawValue, out var value))
                 {
                     rawValue = value;
                 }

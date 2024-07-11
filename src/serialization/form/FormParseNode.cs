@@ -97,7 +97,11 @@ public class FormParseNode : IParseNode
     /// Get the collection of primitives of type <typeparam name="T"/>from the form node
     /// </summary>
     /// <returns>A collection of objects</returns>
+#if NET5_0_OR_GREATER
+    public IEnumerable<T> GetCollectionOfPrimitiveValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>()
+#else
     public IEnumerable<T> GetCollectionOfPrimitiveValues<T>()
+#endif
     {
         var genericType = typeof(T);
         var primitiveValueCollection = DecodedValue.Split(ComaSeparator, StringSplitOptions.RemoveEmptyEntries);

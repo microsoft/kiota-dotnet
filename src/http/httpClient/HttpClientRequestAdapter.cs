@@ -124,7 +124,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <param name="errorMapping">The error factories mapping to use in case of a failed request.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use for cancelling the request.</param>
         /// <returns>The deserialized primitive response model collection.</returns>
+#if NET5_0_OR_GREATER
+        public async Task<IEnumerable<ModelType>?> SendPrimitiveCollectionAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] ModelType>(RequestInformation requestInfo, Dictionary<string, ParsableFactory<IParsable>>? errorMapping = default, CancellationToken cancellationToken = default)
+#else
         public async Task<IEnumerable<ModelType>?> SendPrimitiveCollectionAsync<ModelType>(RequestInformation requestInfo, Dictionary<string, ParsableFactory<IParsable>>? errorMapping = default, CancellationToken cancellationToken = default)
+#endif
         {
             using var span = startTracingSpan(requestInfo, nameof(SendPrimitiveCollectionAsync));
             var response = await GetHttpResponseMessage(requestInfo, cancellationToken, span).ConfigureAwait(false);
@@ -205,7 +209,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <param name="errorMapping">The error factories mapping to use in case of a failed request.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use for cancelling the request.</param>
         /// <returns>The deserialized primitive response model.</returns>
+#if NET5_0_OR_GREATER
+        public async Task<ModelType?> SendPrimitiveAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] ModelType>(RequestInformation requestInfo, Dictionary<string, ParsableFactory<IParsable>>? errorMapping = default, CancellationToken cancellationToken = default)
+#else
         public async Task<ModelType?> SendPrimitiveAsync<ModelType>(RequestInformation requestInfo, Dictionary<string, ParsableFactory<IParsable>>? errorMapping = default, CancellationToken cancellationToken = default)
+#endif
         {
             using var span = startTracingSpan(requestInfo, nameof(SendPrimitiveAsync));
             var modelType = typeof(ModelType);
@@ -295,11 +303,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                         {
                             result = rootNode.GetDateValue();
                         }
-                        else if(
-                            Nullable.GetUnderlyingType(modelType) is { IsEnum: true } underlyingType &&
-                            rootNode.GetStringValue() is { Length: > 0 } rawValue)
+                        else if(rootNode.GetStringValue() is { Length: > 0 } rawValue)
                         {
-                            result = EnumHelpers.GetEnumValue(underlyingType, rawValue);
+                            result = EnumHelpers.GetEnumValue(modelType, rawValue);
                         }
                         else throw new InvalidOperationException("error handling the response, unexpected type");
                         SetResponseType(result, span);

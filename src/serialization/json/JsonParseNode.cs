@@ -288,7 +288,11 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the collection of primitives of type <typeparam name="T"/>from the json node
         /// </summary>
         /// <returns>A collection of objects</returns>
+#if NET5_0_OR_GREATER
+        public IEnumerable<T> GetCollectionOfPrimitiveValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>()
+#else
         public IEnumerable<T> GetCollectionOfPrimitiveValues<T>()
+#endif
         {
             if(_jsonNode.ValueKind == JsonValueKind.Array)
             {
@@ -326,10 +330,9 @@ namespace Microsoft.Kiota.Serialization.Json
                         yield return (T)(object)currentParseNode.GetDateValue()!;
                     else if(genericType == TypeConstants.TimeType)
                         yield return (T)(object)currentParseNode.GetTimeValue()!;
-                    else if(Nullable.GetUnderlyingType(genericType) is { IsEnum: true } underlyingType &&
-                            currentParseNode.GetStringValue() is { Length: > 0 } rawValue)
+                    else if(currentParseNode.GetStringValue() is { Length: > 0 } rawValue)
                     {
-                        yield return (T)EnumHelpers.GetEnumValue(underlyingType, rawValue)!;
+                        yield return (T)EnumHelpers.GetEnumValue(genericType, rawValue)!;
                     }
                     else
                         throw new InvalidOperationException($"unknown type for deserialization {genericType.FullName}");

@@ -39,7 +39,11 @@ public class TextParseNode : IParseNode
     /// <inheritdoc />
     public IEnumerable<T> GetCollectionOfObjectValues<T>(ParsableFactory<T> factory) where T : IParsable => throw new InvalidOperationException(NoStructuredDataMessage);
     /// <inheritdoc />
+#if NET5_0_OR_GREATER
+    public IEnumerable<T> GetCollectionOfPrimitiveValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>()=> throw new InvalidOperationException(NoStructuredDataMessage);
+#else
     public IEnumerable<T> GetCollectionOfPrimitiveValues<T>() => throw new InvalidOperationException(NoStructuredDataMessage);
+#endif
     /// <inheritdoc />
     public DateTimeOffset? GetDateTimeOffsetValue() => DateTimeOffset.TryParse(Text, out var result) ? result : null;
     /// <inheritdoc />
