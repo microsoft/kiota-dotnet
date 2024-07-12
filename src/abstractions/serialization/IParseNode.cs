@@ -95,7 +95,11 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// Gets the collection of primitive values of the node.
         /// </summary>
         /// <returns>The collection of primitive values.</returns>
+#if NET5_0_OR_GREATER
+        IEnumerable<T> GetCollectionOfPrimitiveValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>();
+#else
         IEnumerable<T> GetCollectionOfPrimitiveValues<T>();
+#endif
         /// <summary>
         /// Gets the collection of enum values of the node.
         /// </summary>

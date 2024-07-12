@@ -432,7 +432,11 @@ namespace Microsoft.Kiota.Serialization.Json
                 WriteAnyValue(dataValue.Key, dataValue.Value);
         }
 
+#if NET5_0_OR_GREATER
+        private void WriteNonParsableObjectValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(string? key,T value)
+#else
         private void WriteNonParsableObjectValue<T>(string? key, T value)
+#endif
         {
             if(!string.IsNullOrEmpty(key))
                 writer.WritePropertyName(key!);
@@ -440,7 +444,7 @@ namespace Microsoft.Kiota.Serialization.Json
             if(value == null)
                 writer.WriteNullValue();
             else
-                foreach(var oProp in value.GetType().GetProperties())
+                foreach(var oProp in typeof(T).GetProperties())
                     WriteAnyValue(oProp.Name, oProp.GetValue(value));
             writer.WriteEndObject();
         }
