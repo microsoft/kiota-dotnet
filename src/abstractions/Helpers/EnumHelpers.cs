@@ -86,46 +86,48 @@ namespace Microsoft.Kiota.Abstractions.Helpers
             {
                 return null;
             }
-            if(type.IsDefined(typeof(FlagsAttribute)))
+            Type enumType = (Nullable.GetUnderlyingType(type) is { IsEnum: true } underlyingType) ? underlyingType : type;
+            if(enumType.IsDefined(typeof(FlagsAttribute)))
             {
                 int intValue = 0;
                 while(rawValue.Length > 0)
                 {
                     int commaIndex = rawValue.IndexOf(',');
                     var valueName = commaIndex < 0 ? rawValue : rawValue.Substring(0, commaIndex);
-                    if(Nullable.GetUnderlyingType(type) is { IsEnum: true } underlyingType && TryGetFieldValueName(underlyingType, valueName, out var value))
+                    if(TryGetFieldValueName(enumType, valueName, out var value))
                     {
                         valueName = value;
                     }
 #if NET5_0_OR_GREATER
-                    if(Enum.TryParse(type, valueName, true, out var enumPartResult))
+                    if(Enum.TryParse(enumType, valueName, true, out var enumPartResult))
                         intValue |= (int)enumPartResult!;
 #else
                     try
                     {
-                        intValue |= (int)Enum.Parse(type, valueName, true);
+                        intValue |= (int)Enum.Parse(enumType, valueName, true);
                     }
                     catch { }
 #endif
 
                     rawValue = commaIndex < 0 ? string.Empty : rawValue.Substring(commaIndex + 1);
                 }
-                result = intValue > 0 ? Enum.Parse(type, intValue.ToString(), true) : null;
+                result = intValue > 0 ? Enum.Parse(enumType, intValue.ToString(), true) : null;
             }
             else
             {
-                if(Nullable.GetUnderlyingType(type) is { IsEnum: true } underlyingType && TryGetFieldValueName(underlyingType, rawValue, out var value))
+                
+                if(TryGetFieldValueName(enumType, rawValue, out var value))
                 {
                     rawValue = value;
                 }
 
 #if NET5_0_OR_GREATER
-                Enum.TryParse(type, rawValue, true, out object? enumResult);
+                Enum.TryParse(enumType, rawValue, true, out object? enumResult);
                 result = enumResult;
 #else
                 try
                 {
-                    result = Enum.Parse(type, rawValue, true);
+                    result = Enum.Parse(enumType, rawValue, true);
                 }
                 catch
                 {

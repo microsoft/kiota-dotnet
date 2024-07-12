@@ -298,6 +298,18 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         {
             using var jsonDocument = JsonDocument.Parse(TestCollectionOfEnumsJson);
             var rootParseNode = new JsonParseNode(jsonDocument.RootElement);
+            var values = rootParseNode.GetCollectionOfPrimitiveValues<TestNamingEnum>().ToArray();
+            // Assert
+            Assert.NotEmpty(values);
+            Assert.Equal(TestNamingEnum.Item2SubItem1, values[0]);
+            Assert.Equal(TestNamingEnum.Item3SubItem1, values[1]);
+        }
+
+        [Fact]
+        public void GetCollectionOfNullableEnumValuesFromJson()
+        {
+            using var jsonDocument = JsonDocument.Parse(TestCollectionOfEnumsJson);
+            var rootParseNode = new JsonParseNode(jsonDocument.RootElement);
             var values = rootParseNode.GetCollectionOfPrimitiveValues<TestNamingEnum?>().ToArray();
             // Assert
             Assert.NotEmpty(values);

@@ -71,9 +71,25 @@ namespace Microsoft.Kiota.Abstractions.Tests
         }
 
         [Fact]
+        public void NullableEnumIsParsedIfValueIsInteger()
+        {
+            var result = EnumHelpers.GetEnumValue(typeof(TestEnum?), "0");
+
+            Assert.Equal(TestEnum.First, result);
+        }
+
+        [Fact]
         public void EnumWithFlagsIsParsedIfValuesAreIntegers()
         {
             var result = EnumHelpers.GetEnumValue(typeof(TestEnumWithFlags), "1,2");
+
+            Assert.Equal(TestEnumWithFlags.Value1 | TestEnumWithFlags.Value2, result);
+        }
+
+        [Fact]
+        public void NullableEnumWithFlagsIsParsedIfValuesAreIntegers()
+        {
+            var result = EnumHelpers.GetEnumValue(typeof(TestEnumWithFlags?), "1,2");
 
             Assert.Equal(TestEnumWithFlags.Value1 | TestEnumWithFlags.Value2, result);
         }
@@ -87,9 +103,25 @@ namespace Microsoft.Kiota.Abstractions.Tests
         }
 
         [Fact]
+        public void NullableEnumIsParsedIfValueIsString()
+        {
+            var result = EnumHelpers.GetEnumValue(typeof(TestEnum?), "First");
+
+            Assert.Equal(TestEnum.First, result);
+        }
+
+        [Fact]
         public void EnumWithFlagsIsParsedIfValuesAreStrings()
         {
             var result = EnumHelpers.GetEnumValue(typeof(TestEnumWithFlags), "Value1,Value3");
+
+            Assert.Equal(TestEnumWithFlags.Value1 | TestEnumWithFlags.Value3, result);
+        }
+
+        [Fact]
+        public void NullableEnumWithFlagsIsParsedIfValuesAreStrings()
+        {
+            var result = EnumHelpers.GetEnumValue(typeof(TestEnumWithFlags?), "Value1,Value3");
 
             Assert.Equal(TestEnumWithFlags.Value1 | TestEnumWithFlags.Value3, result);
         }
@@ -103,6 +135,14 @@ namespace Microsoft.Kiota.Abstractions.Tests
         }
 
         [Fact]
+        public void NullableEnumIsParsedIfValueIsFromEnumMember()
+        {
+            var result = EnumHelpers.GetEnumValue(typeof(TestEnum?), "Value_2");
+
+            Assert.Equal(TestEnum.Second, result);
+        }
+
+        [Fact]
         public void EnumWithFlagsIsParsedIfValuesAreFromEnumMember()
         {
             var result = EnumHelpers.GetEnumValue(typeof(TestEnumWithFlags), "Value__2,Value__3");
@@ -111,9 +151,25 @@ namespace Microsoft.Kiota.Abstractions.Tests
         }
 
         [Fact]
+        public void NullableEnumWithFlagsIsParsedIfValuesAreFromEnumMember()
+        {
+            var result = EnumHelpers.GetEnumValue(typeof(TestEnumWithFlags?), "Value__2,Value__3");
+
+            Assert.Equal(TestEnumWithFlags.Value2 | TestEnumWithFlags.Value3, result);
+        }
+
+        [Fact]
         public void IfEnumIsNotParsedThenNullIsReturned()
         {
             var result = EnumHelpers.GetEnumValue(typeof(TestEnum), "Value_5");
+
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void IfNullableEnumIsNotParsedThenNullIsReturned()
+        {
+            var result = EnumHelpers.GetEnumValue(typeof(TestEnum?), "Value_5");
 
             Assert.Null(result);
         }
