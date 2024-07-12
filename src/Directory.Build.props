@@ -9,7 +9,7 @@
     <RepositoryUrl>https://github.com/microsoft/kiota-dotnet</RepositoryUrl>
     <PackageProjectUrl>https://aka.ms/kiota/docs</PackageProjectUrl>
     <PackageReleaseNotes>
-        https://github.com/microsoft/kiota-dotnet/releases
+      https://github.com/microsoft/kiota-dotnet/releases
     </PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -17,9 +17,6 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <Deterministic>true</Deterministic>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <SignAssembly>false</SignAssembly>
-    <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>$(NoWarn);NU5048;NETSDK1138</NoWarn>
     <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)','net5.0'))">true</IsTrimmable>
