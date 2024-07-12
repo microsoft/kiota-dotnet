@@ -115,7 +115,6 @@ namespace Microsoft.Kiota.Abstractions.Helpers
             }
             else
             {
-                
                 if(TryGetFieldValueName(enumType, rawValue, out var value))
                 {
                     rawValue = value;
@@ -136,8 +135,6 @@ namespace Microsoft.Kiota.Abstractions.Helpers
 #endif
             }
             return result;
-
-
         }
 
 #if NET5_0_OR_GREATER

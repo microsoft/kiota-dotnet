@@ -1,14 +1,5 @@
 <Project>
-  <PropertyGroup>
-    <VersionPrefix>1.9.9</VersionPrefix>
-    <VersionSuffix></VersionSuffix>
-    <!-- This is overidden in test projects by setting to true-->
-    <IsTestProject>false</IsTestProject>
-    <!-- This is overidden in test projects by setting to true-->
-    <IsAnalyzerProject>false</IsAnalyzerProject>
-    <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   <!-- Common project properties for PACKAGED projects TO BE RELEASED-->
   <PropertyGroup Condition="('$(IsTestProject)' != 'true') and ('$(IsAnalyzerProject)' != 'true')">
     <Authors>Microsoft</Authors>
