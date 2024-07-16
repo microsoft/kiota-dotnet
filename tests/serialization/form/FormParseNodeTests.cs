@@ -1,9 +1,15 @@
-﻿using Microsoft.Kiota.Abstractions;
+﻿using System.Globalization;
+using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Serialization.Form.Tests.Mocks;
 
 namespace Microsoft.Kiota.Serialization.Form.Tests;
 public class FormParseNodeTests
 {
+    public FormParseNodeTests()
+    {
+        Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("cs-CZ");
+    }
+
     private const string TestUserForm = "displayName=Megan+Bowen&" +
                                         "numbers=one,two,thirtytwo&" +
                                         "givenName=Megan&" +
@@ -126,5 +132,215 @@ public class FormParseNodeTests
         var imaginaryNode = rootParseNode.GetChildNode("imaginaryNode");
         // Assert
         Assert.Null(imaginaryNode);
+    }
+
+    [Fact]
+    public void FormParseNode_GetBoolValue()
+    {
+        // Arrange
+        var text = "true";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetBoolValue();
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetByteArrayValue()
+    {
+        // Arrange
+        var text = "dGV4dA==";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetByteArrayValue();
+
+        // Assert
+        Assert.Equal(new byte []{ 0x74, 0x65, 0x78, 0x74 }, result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetByteValue()
+    {
+        // Arrange
+        var text = "1";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetByteValue();
+
+        // Assert
+        Assert.Equal((byte)1, result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetDateTimeOffsetValue()
+    {
+        // Arrange
+        var text = "2021-11-30T12:24:36+03:00";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetDateTimeOffsetValue();
+
+        // Assert
+        Assert.Equal(new DateTimeOffset(2021, 11, 30, 12, 24, 36, TimeSpan.FromHours(3)), result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetDateValue()
+    {
+        // Arrange
+        var text = "2021-11-30";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetDateValue();
+
+        // Assert
+        Assert.Equal(new Date(2021, 11, 30), result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetTimeSpanValue()
+    {
+        // Arrange
+        var text = "P756DT4H6M8.01S";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetTimeSpanValue();
+
+        // Assert
+        Assert.Equal(new TimeSpan(756, 4, 6, 8, 10), result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetTimeValue()
+    {
+        // Arrange
+        var text = "12:24:36";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetTimeValue();
+
+        // Assert
+        Assert.Equal(new Time(12, 24, 36), result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetGuidValue()
+    {
+        // Arrange
+        var text = "f4b3b8f4-6f4d-4f1f-8f4d-8f4b3b8f4d1f";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetGuidValue();
+
+        // Assert
+        Assert.Equal(new Guid("f4b3b8f4-6f4d-4f1f-8f4d-8f4b3b8f4d1f"), result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetIntValue()
+    {
+        // Arrange
+        var text = "1";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetIntValue();
+
+        // Assert
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetLongValue()
+    {
+        // Arrange
+        var text = "1";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetLongValue();
+
+        // Assert
+        Assert.Equal(1L, result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetSbyteValue()
+    {
+        // Arrange
+        var text = "1";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetSbyteValue();
+
+        // Assert
+        Assert.Equal((sbyte)1, result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetStringValue()
+    {
+        // Arrange
+        var text = "text";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetStringValue();
+
+        // Assert
+        Assert.Equal("text", result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetDecimalValue()
+    {
+        // Arrange
+        var text = "1.1";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetDecimalValue();
+
+        // Assert
+        Assert.Equal(1.1m, result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetDoubleValue()
+    {
+        // Arrange
+        var text = "1.1";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetDoubleValue();
+
+        // Assert
+        Assert.Equal(1.1, result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetFloatValue()
+    {
+        // Arrange
+        var text = "1.1";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetFloatValue();
+
+        // Assert
+        Assert.Equal(1.1f, result);
     }
 }

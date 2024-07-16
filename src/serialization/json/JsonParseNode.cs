@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.Json;
@@ -155,7 +156,7 @@ namespace Microsoft.Kiota.Serialization.Json
             if(string.IsNullOrEmpty(dateTimeOffsetStr))
                 return null;
 
-            if(DateTimeOffset.TryParse(dateTimeOffsetStr, out dateTimeOffset))
+            if(DateTimeOffset.TryParse(dateTimeOffsetStr, CultureInfo.InvariantCulture, DateTimeStyles.None, out dateTimeOffset))
                 return dateTimeOffset;
 
             return _jsonNode.Deserialize(_jsonSerializerContext.DateTimeOffset);
@@ -185,7 +186,7 @@ namespace Microsoft.Kiota.Serialization.Json
             if(string.IsNullOrEmpty(dateString))
                 return null;
 
-            if(DateTime.TryParse(dateString, out var result))
+            if(DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result))
                 return new Date(result);
 
             return _jsonNode.Deserialize(_jsonSerializerContext.Date);
@@ -201,7 +202,7 @@ namespace Microsoft.Kiota.Serialization.Json
             if(string.IsNullOrEmpty(dateString))
                 return null;
 
-            if(DateTime.TryParse(dateString, out var result))
+            if(DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result))
                 return new Time(result);
 
             return _jsonNode.Deserialize(_jsonSerializerContext.Time);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Xml;
 using Microsoft.Kiota.Abstractions;
@@ -143,21 +144,21 @@ public class FormParseNode : IParseNode
         }
     }
     /// <inheritdoc/>
-    public DateTimeOffset? GetDateTimeOffsetValue() => DateTimeOffset.TryParse(DecodedValue, out var result) ? result : null;
+    public DateTimeOffset? GetDateTimeOffsetValue() => DateTimeOffset.TryParse(DecodedValue, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result) ? result : null;
     /// <inheritdoc/>
-    public Date? GetDateValue() => DateTime.TryParse(DecodedValue, out var result) ? new Date(result) : null;
+    public Date? GetDateValue() => DateTime.TryParse(DecodedValue, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result) ? new Date(result) : null;
     /// <inheritdoc/>
-    public decimal? GetDecimalValue() => decimal.TryParse(DecodedValue, out var result) ? result : null;
+    public decimal? GetDecimalValue() => decimal.TryParse(DecodedValue, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     /// <inheritdoc/>
-    public double? GetDoubleValue() => double.TryParse(DecodedValue, out var result) ? result : null;
+    public double? GetDoubleValue() => double.TryParse(DecodedValue, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     /// <inheritdoc/>
-    public float? GetFloatValue() => float.TryParse(DecodedValue, out var result) ? result : null;
+    public float? GetFloatValue() => float.TryParse(DecodedValue, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     /// <inheritdoc/>
     public Guid? GetGuidValue() => Guid.TryParse(DecodedValue, out var result) ? result : null;
     /// <inheritdoc/>
-    public int? GetIntValue() => int.TryParse(DecodedValue, out var result) ? result : null;
+    public int? GetIntValue() => int.TryParse(DecodedValue, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     /// <inheritdoc/>
-    public long? GetLongValue() => long.TryParse(DecodedValue, out var result) ? result : null;
+    public long? GetLongValue() => long.TryParse(DecodedValue, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     /// <inheritdoc/>
     public T GetObjectValue<T>(ParsableFactory<T> factory) where T : IParsable
     {
@@ -205,7 +206,7 @@ public class FormParseNode : IParseNode
     }
 
     /// <inheritdoc/>
-    public sbyte? GetSbyteValue() => sbyte.TryParse(DecodedValue, out var result) ? result : null;
+    public sbyte? GetSbyteValue() => sbyte.TryParse(DecodedValue, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
 
     /// <inheritdoc/>
     public string GetStringValue() => DecodedValue;
@@ -222,7 +223,7 @@ public class FormParseNode : IParseNode
     }
 
     /// <inheritdoc/>
-    public Time? GetTimeValue() => DateTime.TryParse(DecodedValue, out var result) ? new Time(result) : null;
+    public Time? GetTimeValue() => DateTime.TryParse(DecodedValue, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result) ? new Time(result) : null;
 
 #if NET5_0_OR_GREATER
     IEnumerable<T?> IParseNode.GetCollectionOfEnumValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>()

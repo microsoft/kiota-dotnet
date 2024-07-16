@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Serialization;
 using Microsoft.Kiota.Serialization.Json.Tests.Converters;
@@ -13,6 +15,11 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
 {
     public class JsonSerializationWriterTests
     {
+        public JsonSerializationWriterTests()
+        {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("cs-CZ");
+        }
+
         [Fact]
         public void WritesSampleObjectValue()
         {
@@ -322,6 +329,312 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                 "{\"created\":\"2023-07-26T10:51:26Z\",\"label\":\"Keyword2\",\"termGuid\":\"2cae6c6a-9bb8-4a78-afff-81b88e735fef\",\"wssId\":6442450942}]," +
                 "\"extra\":{\"createdDateTime\":\"2024-01-15T00:00:00\\u002B00:00\"}}";
             Assert.Equal(expectedString, serializedJsonString);
+        }
+
+        [Fact]
+        public void WritesStringValue()
+        {
+            // Arrange
+            var value = "This is a string value";
+
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteStringValue(null, value);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("\"This is a string value\"", serializedString);
+        }
+
+        [Fact]
+        public void StreamIsReadableAfterDispose()
+        {
+            // Arrange
+            var value = "This is a string value";
+
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteStringValue(null, value);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            // Dispose the writer
+            jsonSerializationWriter.Dispose();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("\"This is a string value\"", serializedString);
+        }
+
+        [Fact]
+        public void WriteBoolValue_IsWrittenCorrectly()
+        {
+            // Arrange
+            var value = true;
+
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteBoolValue(null, value);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("true", serializedString);
+        }
+
+        [Fact]
+        public void WriteByteArrayValue_IsWrittenCorrectly()
+        {
+            // Arrange
+            var value = new byte[] { 2, 4, 6 };
+
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteByteArrayValue(null, value);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("\"AgQG\"", serializedString);
+        }
+
+        [Fact]
+        public void WriteByteValue_IsWrittenCorrectly()
+        {
+            // Arrange
+            byte value = 5;
+
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteByteValue(null, value);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("5", serializedString);
+        }
+
+        [Fact]
+        public void WriteDateTimeOffsetValue_IsWrittenCorrectly()
+        {
+            // Arrange
+            var value = new DateTimeOffset(2024, 11, 30, 15, 35, 45, 987, TimeSpan.FromHours(3));
+
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteDateTimeOffsetValue(null, value);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("\"2024-11-30T15:35:45.987+03:00\"", serializedString);
+        }
+
+        [Fact]
+        public void WriteDateValue_IsWrittenCorrectly()
+        {
+            // Arrange
+            var value = new Date(2024, 11, 30);
+
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteDateValue(null, value);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("\"2024-11-30\"", serializedString);
+        }
+
+        [Fact]
+        public void WriteDecimalValue_IsWrittenCorrectly()
+        {
+            // Arrange
+            var value = 36.8m;
+
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteDecimalValue(null, value);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("36.8", serializedString);
+        }
+
+        [Fact]
+        public void WriteDoubleValue_IsWrittenCorrectly()
+        {
+            // Arrange
+            var value = 36.8d;
+
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteDoubleValue(null, value);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("36.8", serializedString);
+        }
+
+        [Fact]
+        public void WriteFloatValue_IsWrittenCorrectly()
+        {
+            // Arrange
+            var value = 36.8f;
+
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteFloatValue(null, value);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("36.8", serializedString);
+        }
+
+        [Fact]
+        public void WriteGuidValue_IsWrittenCorrectly()
+        {
+            // Arrange
+            var value = new Guid("3adeb301-58f1-45c5-b820-ae5f4af13c89");
+
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteGuidValue(null, value);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("\"3adeb301-58f1-45c5-b820-ae5f4af13c89\"", serializedString);
+        }
+
+        [Fact]
+        public void WriteIntegerValue_IsWrittenCorrectly()
+        {
+            // Arrange
+            var value = 25;
+
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteIntValue(null, value);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("25", serializedString);
+        }
+
+        [Fact]
+        public void WriteLongValue_IsWrittenCorrectly()
+        {
+            // Arrange
+            var value = long.MaxValue;
+
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteLongValue(null, value);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("9223372036854775807", serializedString);
+        }
+
+        [Fact]
+        public void WriteNullValue_IsWrittenCorrectly()
+        {
+            // Arrange
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteNullValue(null);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("null", serializedString);
+        }
+
+        [Fact]
+        public void WriteSByteValue_IsWrittenCorrectly()
+        {
+            // Arrange
+            var value = sbyte.MaxValue;
+
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteSbyteValue(null, value);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("127", serializedString);
+        }
+
+        [Fact]
+        public void WriteTimeValue_IsWrittenCorrectly()
+        {
+            // Arrange
+            var value = new Time(23, 46, 59);
+
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteTimeValue(null, value);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("\"23:46:59\"", serializedString);
+        }
+
+        [Fact]
+        public void WriteTimeSpanValue_IsWrittenCorrectly()
+        {
+            // Arrange
+            var value = new TimeSpan(756, 4, 6, 8, 10);
+
+            using var jsonSerializationWriter = new JsonSerializationWriter();
+
+            // Act
+            jsonSerializationWriter.WriteTimeSpanValue(null, value);
+            var contentStream = jsonSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("\"P756DT4H6M8.01S\"", serializedString);
         }
     }
 }

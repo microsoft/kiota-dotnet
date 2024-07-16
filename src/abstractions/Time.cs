@@ -3,13 +3,14 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.Security;
 
 namespace Microsoft.Kiota.Abstractions
 {
     /// <summary>
     /// Model to represent only the date component of a DateTime
     /// </summary>
-    public struct Time
+    public struct Time:IEquatable<Time>
     {
 #if NET6_0_OR_GREATER
         /// <summary>
@@ -26,6 +27,29 @@ namespace Microsoft.Kiota.Abstractions
         /// <returns>A new <see cref="TimeOnly"/> structure whose hours, minutes, seconds and milliseconds are equal to those of the supplied time.</returns>
         public static implicit operator TimeOnly(Time time) => new(time.DateTime.Hour, time.DateTime.Minute, time.DateTime.Second, time.DateTime.Millisecond);
 #endif
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
+        public bool Equals(Time other) => (Hour, Minute, Second) == (other.Hour, other.Minute, other.Second);
+
+        /// <inheritdoc />
+        public override bool Equals(object? o) => (o is Time other) && Equals(other);
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+#if NET6_0_OR_GREATER
+            return HashCode.Combine(Hour, Minute, Second);
+#else
+            int hash = 17;
+            hash = hash * 23 + Hour.GetHashCode();
+            hash = hash * 23 + Minute.GetHashCode();
+            hash = hash * 23 + Second.GetHashCode();
+            return hash;
+#endif
+        }
         /// <summary>
         /// Create a new Time from hours, minutes, and seconds.
         /// </summary>

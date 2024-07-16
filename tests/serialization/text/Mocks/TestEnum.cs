@@ -5,8 +5,8 @@ namespace Microsoft.Kiota.Serialization.Text.Tests.Mocks
     public enum TestEnum
     {
         [EnumMember(Value = "Value_1")]
-        First,
+        FirstItem,
         [EnumMember(Value = "Value_2")]
-        Second,
+        SecondItem,
     }
 }
