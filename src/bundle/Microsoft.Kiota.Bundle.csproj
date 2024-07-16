@@ -11,7 +11,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\abstractions\Microsoft.Kiota.Abstractions.csproj" />
-    <ProjectReference Include="..\authentication\azure\Microsoft.Kiota.Authentication.Azure.csproj" />
     <ProjectReference Include="..\http\httpClient\Microsoft.Kiota.Http.HttpClientLibrary.csproj" />
     <ProjectReference Include="..\serialization\form\Microsoft.Kiota.Serialization.Form.csproj" />
     <ProjectReference Include="..\serialization\json\Microsoft.Kiota.Serialization.Json.csproj" />
