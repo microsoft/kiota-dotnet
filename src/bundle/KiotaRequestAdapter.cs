@@ -32,7 +32,7 @@ namespace Microsoft.Kiota
             SetupDefaults();
         }
 
-        private static void SetupDefaults() 
+        private static void SetupDefaults()
         {
             // Setup the default serializers/deserializers
             ApiClientBuilder.RegisterDefaultSerializer<JsonSerializationWriterFactory>();

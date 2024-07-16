@@ -1,8 +1,8 @@
-﻿using Xunit;
-using Moq;
-using System;
+﻿using System;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Abstractions.Serialization;
+using Moq;
+using Xunit;
 
 namespace Microsoft.Kiota.Bundle.Tests
 {
