@@ -14,6 +14,7 @@ using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Helpers;
 using Microsoft.Kiota.Abstractions.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -149,17 +150,11 @@ namespace Microsoft.Kiota.Serialization.Json
             if(_jsonNode.ValueKind != JsonValueKind.String)
                 return null;
 
-            if(_jsonNode.TryGetDateTimeOffset(out var dateTimeOffset))
+            if(TryGetUsingTypeInfo(_jsonNode, _jsonSerializerContext.DateTimeOffset, out var dateTimeOffset))
                 return dateTimeOffset;
-
-            var dateTimeOffsetStr = _jsonNode.GetString();
-            if(string.IsNullOrEmpty(dateTimeOffsetStr))
-                return null;
-
-            if(DateTimeOffset.TryParse(dateTimeOffsetStr, CultureInfo.InvariantCulture, DateTimeStyles.None, out dateTimeOffset))
-                return dateTimeOffset;
-
-            return _jsonNode.Deserialize(_jsonSerializerContext.DateTimeOffset);
+            else if(DateTimeOffset.TryParse(_jsonNode.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.None, out var dto))
+                return dto;
+            else return null;
         }
 
         /// <summary>
@@ -581,6 +576,20 @@ namespace Microsoft.Kiota.Serialization.Json
             }
 
             return value;
+        }
+
+        private static bool TryGetUsingTypeInfo<T>(JsonElement currentElement, JsonTypeInfo<T>? typeInfo, out T? deserializedValue)
+        {
+            try
+            {
+                deserializedValue = currentElement.Deserialize(typeInfo!);
+                return true;
+            }
+            catch(Exception)
+            {
+                deserializedValue = default;
+                return false;
+            }
         }
     }
 }

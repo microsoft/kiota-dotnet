@@ -28,7 +28,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                                             "    \"testNamingEnum\":\"Item2:SubItem1\"," +
                                             "    \"givenName\": \"Megan\",\r\n" +
                                             "    \"accountEnabled\": true,\r\n" +
-                                            "    \"createdDateTime\": \"2017 -07-29T03:07:25Z\",\r\n" +
+                                            "    \"createdDateTime\": \"2017-07-29T03:07:25Z\",\r\n" +
                                             "    \"jobTitle\": \"Auditor\",\r\n" +
                                             "    \"mail\": \"MeganB@M365x214355.onmicrosoft.com\",\r\n" +
                                             "    \"mobilePhone\": null,\r\n" +
@@ -54,7 +54,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                                             "    \"testNamingEnum\":\"Item2:SubItem1\"," +
                                             "    \"givenName\": \"Megan\",\r\n" +
                                             "    \"accountEnabled\": true,\r\n" +
-                                            "    \"createdDateTime\": \"2017 -07-29T03:07:25Z\",\r\n" +
+                                            "    \"createdDateTime\": \"2017-07-29T03:07:25Z\",\r\n" +
                                             "    \"jobTitle\": \"Auditor\",\r\n" +
                                             "    \"mail\": \"MeganB@M365x214355.onmicrosoft.com\",\r\n" +
                                             "    \"mobilePhone\": null,\r\n" +
