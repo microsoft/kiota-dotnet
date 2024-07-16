@@ -44,7 +44,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Kiota.Serializati
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Kiota.Serialization.Text.Tests", "tests\serialization\text\Microsoft.Kiota.Serialization.Text.Tests.csproj", "{5F6AC278-C4A4-4EED-A7D3-1750A4D6FD15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Kiota.Trimming.Validation", "tests\trimming\Microsoft.Kiota.Trimming.Validation\Microsoft.Kiota.Trimming.Validation.csproj", "{13992912-662D-4A3B-9354-DD49DB1AC2D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Kiota.Trimming.Validation", "tests\trimming\Microsoft.Kiota.Trimming.Validation\Microsoft.Kiota.Trimming.Validation.csproj", "{13992912-662D-4A3B-9354-DD49DB1AC2D5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Kiota.Bundle", "src\bundle\Microsoft.Kiota.Bundle.csproj", "{3F1F2EF2-8C57-4FC2-9722-68FAE551D19E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Kiota.Bundle.Tests", "tests\bundle\Microsoft.Kiota.Bundle.Tests.csproj", "{A1155A75-88FB-4C21-AA96-240A0E69FF1A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -116,6 +120,14 @@ Global
 		{13992912-662D-4A3B-9354-DD49DB1AC2D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13992912-662D-4A3B-9354-DD49DB1AC2D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13992912-662D-4A3B-9354-DD49DB1AC2D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F1F2EF2-8C57-4FC2-9722-68FAE551D19E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F1F2EF2-8C57-4FC2-9722-68FAE551D19E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F1F2EF2-8C57-4FC2-9722-68FAE551D19E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F1F2EF2-8C57-4FC2-9722-68FAE551D19E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1155A75-88FB-4C21-AA96-240A0E69FF1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1155A75-88FB-4C21-AA96-240A0E69FF1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1155A75-88FB-4C21-AA96-240A0E69FF1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1155A75-88FB-4C21-AA96-240A0E69FF1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
