@@ -12,7 +12,7 @@ using Microsoft.Kiota.Serialization.Json;
 using Microsoft.Kiota.Serialization.Multipart;
 using Microsoft.Kiota.Serialization.Text;
 
-namespace Microsoft.Kiota
+namespace Microsoft.Kiota.Bundle
 {
     /// <summary>
     /// The <see cref="IRequestAdapter"/> implementation that derived from <see cref="HttpClientRequestAdapter"/> with registrations configured.
