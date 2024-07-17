@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.10] - 2024-07-18
+
+- Fix DateTime serialization and deserialization
+
 ## [1.9.9] - 2024-07-12
 
 - Fix enum deserialization for SendPrimitiveAsync and SendPrimitiveCollectionAsync
