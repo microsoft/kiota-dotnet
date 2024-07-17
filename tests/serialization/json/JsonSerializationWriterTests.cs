@@ -492,7 +492,11 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             var serializedString = reader.ReadToEnd();
 
             // Assert
+#if NET462
+            Assert.Equal("36.799999999999997", serializedString);
+#else
             Assert.Equal("36.8", serializedString);
+#endif
         }
 
         [Fact]
@@ -510,7 +514,11 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             var serializedString = reader.ReadToEnd();
 
             // Assert
+#if NET462
+            Assert.Equal("36.7999992", serializedString);
+#else
             Assert.Equal("36.8", serializedString);
+#endif
         }
 
         [Fact]
