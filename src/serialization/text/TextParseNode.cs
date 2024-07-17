@@ -46,9 +46,9 @@ public class TextParseNode : IParseNode
     public IEnumerable<T> GetCollectionOfPrimitiveValues<T>() => throw new InvalidOperationException(NoStructuredDataMessage);
 #endif
     /// <inheritdoc />
-    public DateTimeOffset? GetDateTimeOffsetValue() => DateTimeOffset.TryParse(Text, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result) ? result : null;
+    public DateTimeOffset? GetDateTimeOffsetValue() => DateTimeOffset.TryParse(Text, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? result : null;
     /// <inheritdoc />
-    public Date? GetDateValue() => DateTime.TryParse(Text, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result) ? new Date(result) : null;
+    public Date? GetDateValue() => DateTime.TryParse(Text, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? new Date(result) : null;
     /// <inheritdoc />
     public decimal? GetDecimalValue() => decimal.TryParse(Text, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     /// <inheritdoc />
@@ -70,7 +70,7 @@ public class TextParseNode : IParseNode
     /// <inheritdoc />
     public TimeSpan? GetTimeSpanValue() => string.IsNullOrEmpty(Text) ? null : XmlConvert.ToTimeSpan(Text);
     /// <inheritdoc />
-    public Time? GetTimeValue() => DateTime.TryParse(Text, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result) ? new Time(result) : null;
+    public Time? GetTimeValue() => DateTime.TryParse(Text, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? new Time(result) : null;
     /// <inheritdoc />
 #if NET5_0_OR_GREATER
     public IEnumerable<T?> GetCollectionOfEnumValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>() where T : struct, Enum

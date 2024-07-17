@@ -157,9 +157,8 @@ public class FormParseNodeTests
 
         // Act
         var result = parseNode.GetByteArrayValue();
-
         // Assert
-        Assert.Equal(new byte []{ 0x74, 0x65, 0x78, 0x74 }, result);
+        Assert.Equal([0x74, 0x65, 0x78, 0x74], result);
     }
 
     [Fact]
@@ -342,5 +341,61 @@ public class FormParseNodeTests
 
         // Assert
         Assert.Equal(1.1f, result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetEnumFromInteger()
+    {
+        // Arange
+        var text = "8";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetEnumValue<TestEnum>();
+
+        // Assert
+        Assert.Equal(TestEnum.Eight, result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetEnumFromString()
+    {
+        // Arange
+        var text = "Sixteen";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetEnumValue<TestEnum>();
+
+        // Assert
+        Assert.Equal(TestEnum.Sixteen, result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetEnumsFromInteger()
+    {
+        // Arange
+        var text = "8,16";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetCollectionOfEnumValues<TestEnum>();
+
+        // Assert
+        Assert.Equal([TestEnum.Eight, TestEnum.Sixteen], result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetEnumsFromString()
+    {
+        // Arange
+        var text = "Sixteen,Eight";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetCollectionOfEnumValues<TestEnum>();
+
+        // Assert
+        Assert.Equal([TestEnum.Sixteen, TestEnum.Eight], result);
     }
 }

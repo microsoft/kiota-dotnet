@@ -78,7 +78,7 @@ namespace Microsoft.Kiota.Serialization.Text.Tests
             var parseNode = new TextParseNode(text);
 
             var result = parseNode.GetByteValue();
-            
+
             Assert.Equal((byte)1, result);
         }
 

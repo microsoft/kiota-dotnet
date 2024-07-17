@@ -3,14 +3,13 @@
 // ------------------------------------------------------------------------------
 
 using System;
-using System.Security;
 
 namespace Microsoft.Kiota.Abstractions
 {
     /// <summary>
     /// Model to represent only the date component of a DateTime
     /// </summary>
-    public struct Time:IEquatable<Time>
+    public struct Time : IEquatable<Time>
     {
 #if NET6_0_OR_GREATER
         /// <summary>
@@ -32,7 +31,7 @@ namespace Microsoft.Kiota.Abstractions
         /// </summary>
         /// <param name="other">An object to compare with this object.</param>
         /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
-        public bool Equals(Time other) => (Hour, Minute, Second) == (other.Hour, other.Minute, other.Second);
+        public bool Equals(Time other) => Hour == other.Hour && Minute == other.Minute && Second == other.Second;
 
         /// <inheritdoc />
         public override bool Equals(object? o) => (o is Time other) && Equals(other);

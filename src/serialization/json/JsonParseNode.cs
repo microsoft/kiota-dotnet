@@ -9,12 +9,12 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using System.Xml;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Helpers;
 using Microsoft.Kiota.Abstractions.Serialization;
-using System.Text.Json.Serialization.Metadata;
 
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -152,7 +152,7 @@ namespace Microsoft.Kiota.Serialization.Json
 
             if(TryGetUsingTypeInfo(_jsonNode, _jsonSerializerContext.DateTimeOffset, out var dateTimeOffset))
                 return dateTimeOffset;
-            else if(DateTimeOffset.TryParse(_jsonNode.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.None, out var dto))
+            else if(DateTimeOffset.TryParse(_jsonNode.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dto))
                 return dto;
             else return null;
         }
@@ -181,7 +181,7 @@ namespace Microsoft.Kiota.Serialization.Json
             if(string.IsNullOrEmpty(dateString))
                 return null;
 
-            if(DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result))
+            if(DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result))
                 return new Date(result);
 
             return _jsonNode.Deserialize(_jsonSerializerContext.Date);
@@ -197,7 +197,7 @@ namespace Microsoft.Kiota.Serialization.Json
             if(string.IsNullOrEmpty(dateString))
                 return null;
 
-            if(DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result))
+            if(DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result))
                 return new Time(result);
 
             return _jsonNode.Deserialize(_jsonSerializerContext.Time);

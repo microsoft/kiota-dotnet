@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
 using System.Xml;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Extensions;
@@ -144,9 +143,9 @@ public class FormParseNode : IParseNode
         }
     }
     /// <inheritdoc/>
-    public DateTimeOffset? GetDateTimeOffsetValue() => DateTimeOffset.TryParse(DecodedValue, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result) ? result : null;
+    public DateTimeOffset? GetDateTimeOffsetValue() => DateTimeOffset.TryParse(DecodedValue, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? result : null;
     /// <inheritdoc/>
-    public Date? GetDateValue() => DateTime.TryParse(DecodedValue, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result) ? new Date(result) : null;
+    public Date? GetDateValue() => DateTime.TryParse(DecodedValue, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? new Date(result) : null;
     /// <inheritdoc/>
     public decimal? GetDecimalValue() => decimal.TryParse(DecodedValue, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     /// <inheritdoc/>
@@ -223,22 +222,24 @@ public class FormParseNode : IParseNode
     }
 
     /// <inheritdoc/>
-    public Time? GetTimeValue() => DateTime.TryParse(DecodedValue, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result) ? new Time(result) : null;
+    public Time? GetTimeValue() => DateTime.TryParse(DecodedValue, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? new Time(result) : null;
 
+    /// <inheritdoc/>
 #if NET5_0_OR_GREATER
-    IEnumerable<T?> IParseNode.GetCollectionOfEnumValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>()
+    public IEnumerable<T?> GetCollectionOfEnumValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>() where T : struct, Enum
 #else
-    IEnumerable<T?> IParseNode.GetCollectionOfEnumValues<T>()
+    public IEnumerable<T?> GetCollectionOfEnumValues<T>() where T : struct, Enum
 #endif
     {
         foreach(var v in DecodedValue.Split(ComaSeparator, StringSplitOptions.RemoveEmptyEntries))
             yield return EnumHelpers.GetEnumValue<T>(v);
     }
 
+    /// <inheritdoc/>
 #if NET5_0_OR_GREATER
-    T? IParseNode.GetEnumValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>()
+    public T? GetEnumValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>() where T : struct, Enum
 #else
-    T? IParseNode.GetEnumValue<T>()
+    public T? GetEnumValue<T>() where T : struct, Enum
 #endif
     {
         return EnumHelpers.GetEnumValue<T>(DecodedValue);
