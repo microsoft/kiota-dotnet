@@ -22,8 +22,8 @@ public class JsonTimeConverter : JsonConverter<Time>
         => WriteInternal(writer, value);
 
     private static Time ReadInternal(ref Utf8JsonReader reader)
-        => new Time(DateTime.ParseExact(reader.GetString()!, "HH__mm__ss", CultureInfo.InvariantCulture));
+        => new Time(DateTime.ParseExact(reader.GetString(), "HH__mm__ss", CultureInfo.InvariantCulture));
 
     private static void WriteInternal(Utf8JsonWriter writer, Time value)
-        => writer.WriteStringValue($"{value.Hour}__{value.Minute}__{value.Second}");
+        => writer.WriteStringValue(value.ToString());
 }

@@ -10,6 +10,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests.Converters;
 /// </summary>
 public class JsonDateTimeOffsetConverter : JsonConverter<DateTimeOffset>
 {
+    private const string Format = "dd__MM__yyyyTHH_mm_ssZ";
     /// <inheritdoc />
     public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         => reader.TokenType == JsonTokenType.Null
@@ -21,8 +22,8 @@ public class JsonDateTimeOffsetConverter : JsonConverter<DateTimeOffset>
         => WriteInternal(writer, value);
 
     private static DateTimeOffset ReadInternal(ref Utf8JsonReader reader)
-        => DateTimeOffset.ParseExact(reader.GetString()!, "dd__MM__yyyyTHH_mm_ssZ", CultureInfo.InvariantCulture);
+        => DateTimeOffset.ParseExact(reader.GetString(), Format, CultureInfo.InvariantCulture);
 
     private static void WriteInternal(Utf8JsonWriter writer, DateTimeOffset value)
-        => writer.WriteStringValue(value.ToString("dd__MM__yyyyTHH_mm_ssZ"));
+        => writer.WriteStringValue(value.ToString(Format));
 }
