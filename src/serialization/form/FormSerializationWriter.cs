@@ -86,6 +86,9 @@ public class FormSerializationWriter : ISerializationWriter
             case IEnumerable<object> coll:
                 WriteCollectionOfPrimitiveValues(key, coll);
                 break;
+            case byte[] coll:
+                WriteByteArrayValue(key, coll);
+                break;
             case IParsable:
                 throw new InvalidOperationException("Form serialization does not support nested objects.");
             default:

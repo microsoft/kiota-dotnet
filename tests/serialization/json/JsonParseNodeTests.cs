@@ -322,5 +322,215 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             Assert.Equal(TestNamingEnum.Item2SubItem1, values[0]);
             Assert.Equal(TestNamingEnum.Item3SubItem1, values[1]);
         }
+
+        [Fact]
+        public void GetDateValue_ReturnNullWhenValueKindIsNotString()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("{\"startDate\":\"2024-07-31\"}");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetDateValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetDateValue_ReturnNullWhenDateParseFails()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"2024-13-32\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetDateValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetDateValue_ReturnDateWhenCustomConverterIsUsed()
+        {
+            // Arrange
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new JsonDateConverter() }
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+
+            using var jsonDocument = JsonDocument.Parse("\"31---07---2024\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
+
+            // Act
+            var result = parseNode.GetDateValue();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(31, result.Value.Day);
+            Assert.Equal(7, result.Value.Month);
+            Assert.Equal(2024, result.Value.Year);
+        }
+
+        [Fact]
+        public void GetDateValue_ReturnCorrectDate()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"2024-07-31\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetDateValue();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(31, result.Value.Day);
+            Assert.Equal(7, result.Value.Month);
+            Assert.Equal(2024, result.Value.Year);
+        }
+
+        [Fact]
+        public void GetTimeValue_ReturnNullWhenValueKindIsNotString()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("{\"startTime\":\"12:34:56\"}");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetTimeValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetTimeValue_ReturnNullWhenTimeParseFails()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"12:60:56\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetTimeValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetTimeValue_ReturnTimeWhenCustomConverterIsUsed()
+        {
+            // Arrange
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new JsonTimeConverter() }
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+
+            using var jsonDocument = JsonDocument.Parse("\"12__34__56\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
+
+            // Act
+            var result = parseNode.GetTimeValue();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(12, result.Value.Hour);
+            Assert.Equal(34, result.Value.Minute);
+            Assert.Equal(56, result.Value.Second);
+        }
+
+        [Fact]
+        public void GetTimeValue_ReturnTime()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"12:34:56\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetTimeValue();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(12, result.Value.Hour);
+            Assert.Equal(34, result.Value.Minute);
+            Assert.Equal(56, result.Value.Second);
+        }
+
+        [Fact]
+        public void GetDateTimeOffsetValue_ReturnNullWhenValueKindIsNotString()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("{\"startDateTime\":\"2024-07-31\"}");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetDateTimeOffsetValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetDateTimeOffsetValue_ReturnNullWhenDateTimeOffsetParseFails()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"2024-13-32T12:34:56Z\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetDateTimeOffsetValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetDateTimeOffsetValue_ReturnDateTimeOffsetWhenCustomConverterIsUsed()
+        {
+            // Arrange
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new JsonDateTimeOffsetConverter() }
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+
+            using var jsonDocument = JsonDocument.Parse("\"31__07__2024T12_34_56Z\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
+
+            // Act
+            var result = parseNode.GetDateTimeOffsetValue();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(31, result.Value.Day);
+            Assert.Equal(7, result.Value.Month);
+            Assert.Equal(2024, result.Value.Year);
+            Assert.Equal(12, result.Value.Hour);
+            Assert.Equal(34, result.Value.Minute);
+            Assert.Equal(56, result.Value.Second);
+        }
+
+        [Fact]
+        public void GetDateTimeOffsetValue_ReturnCorrectDateTimeOffset()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"2024-07-31T12:34:56Z\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetDateTimeOffsetValue();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(31, result.Value.Day);
+            Assert.Equal(7, result.Value.Month);
+            Assert.Equal(2024, result.Value.Year);
+            Assert.Equal(12, result.Value.Hour);
+            Assert.Equal(34, result.Value.Minute);
+            Assert.Equal(56, result.Value.Second);
+        }
     }
 }
