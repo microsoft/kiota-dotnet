@@ -5,9 +5,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using System.Xml;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Extensions;
@@ -148,17 +150,11 @@ namespace Microsoft.Kiota.Serialization.Json
             if(_jsonNode.ValueKind != JsonValueKind.String)
                 return null;
 
-            if(_jsonNode.TryGetDateTimeOffset(out var dateTimeOffset))
+            if(TryGetUsingTypeInfo(_jsonNode, _jsonSerializerContext.DateTimeOffset, out var dateTimeOffset))
                 return dateTimeOffset;
-
-            var dateTimeOffsetStr = _jsonNode.GetString();
-            if(string.IsNullOrEmpty(dateTimeOffsetStr))
-                return null;
-
-            if(DateTimeOffset.TryParse(dateTimeOffsetStr, out dateTimeOffset))
-                return dateTimeOffset;
-
-            return _jsonNode.Deserialize(_jsonSerializerContext.DateTimeOffset);
+            else if(DateTimeOffset.TryParse(_jsonNode.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dto))
+                return dto;
+            else return null;
         }
 
         /// <summary>
@@ -181,14 +177,14 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <returns>A <see cref="Date"/> value</returns>
         public Date? GetDateValue()
         {
-            var dateString = _jsonNode.GetString();
-            if(string.IsNullOrEmpty(dateString))
+            if(_jsonNode.ValueKind != JsonValueKind.String)
                 return null;
 
-            if(DateTime.TryParse(dateString, out var result))
-                return new Date(result);
-
-            return _jsonNode.Deserialize(_jsonSerializerContext.Date);
+            if(TryGetUsingTypeInfo(_jsonNode, _jsonSerializerContext.Date, out var date))
+                return date;
+            else if(DateTime.TryParse(_jsonNode.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dt))
+                return new Date(dt);
+            else return null;
         }
 
         /// <summary>
@@ -197,14 +193,14 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <returns>A <see cref="Time"/> value</returns>
         public Time? GetTimeValue()
         {
-            var dateString = _jsonNode.GetString();
-            if(string.IsNullOrEmpty(dateString))
+            if(_jsonNode.ValueKind != JsonValueKind.String)
                 return null;
 
-            if(DateTime.TryParse(dateString, out var result))
+            if(TryGetUsingTypeInfo(_jsonNode, _jsonSerializerContext.Time, out var time))
+                return time;
+            if(DateTime.TryParse(_jsonNode.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result))
                 return new Time(result);
-
-            return _jsonNode.Deserialize(_jsonSerializerContext.Time);
+            else return null;
         }
 
         /// <summary>
@@ -580,6 +576,20 @@ namespace Microsoft.Kiota.Serialization.Json
             }
 
             return value;
+        }
+
+        private static bool TryGetUsingTypeInfo<T>(JsonElement currentElement, JsonTypeInfo<T>? typeInfo, out T? deserializedValue)
+        {
+            try
+            {
+                deserializedValue = currentElement.Deserialize(typeInfo!);
+                return true;
+            }
+            catch(Exception)
+            {
+                deserializedValue = default;
+                return false;
+            }
         }
     }
 }

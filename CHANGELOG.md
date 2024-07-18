@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Adds Kiota bundle package to provide default adapter with registrations setup. [#290](https://github.com/microsoft/kiota-dotnet/issues/290)
 
+## [1.9.10] - 2024-07-18
+
+- Fix DateTime serialization and deserialization
+
 ## [1.9.9] - 2024-07-12
 
 - Fix enum deserialization for SendPrimitiveAsync and SendPrimitiveCollectionAsync

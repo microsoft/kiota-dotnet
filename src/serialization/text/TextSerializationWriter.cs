@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Xml;
 using Microsoft.Kiota.Abstractions;
@@ -59,33 +60,33 @@ public class TextSerializationWriter : ISerializationWriter, IDisposable
     /// <inheritdoc />
     public void WriteByteArrayValue(string? key, byte[]? value) => WriteStringValue(key, value?.Length > 0 ? Convert.ToBase64String(value) : string.Empty);
     /// <inheritdoc />
-    public void WriteByteValue(string? key, byte? value) => WriteStringValue(key, value?.ToString());
+    public void WriteByteValue(string? key, byte? value) => WriteStringValue(key, value?.ToString(CultureInfo.InvariantCulture));
     /// <inheritdoc />
     public void WriteCollectionOfObjectValues<T>(string? key, IEnumerable<T>? values) where T : IParsable => throw new InvalidOperationException(TextParseNode.NoStructuredDataMessage);
     /// <inheritdoc />
     public void WriteCollectionOfPrimitiveValues<T>(string? key, IEnumerable<T>? values) => throw new InvalidOperationException(TextParseNode.NoStructuredDataMessage);
     /// <inheritdoc />
-    public void WriteDateTimeOffsetValue(string? key, DateTimeOffset? value) => WriteStringValue(key, value.HasValue ? value.Value.ToString() : null);
+    public void WriteDateTimeOffsetValue(string? key, DateTimeOffset? value) => WriteStringValue(key, value.HasValue ? value.Value.ToString("o", CultureInfo.InvariantCulture) : null);
     /// <inheritdoc />
     public void WriteDateValue(string? key, Date? value) => WriteStringValue(key, value?.ToString());
     /// <inheritdoc />
-    public void WriteDecimalValue(string? key, decimal? value) => WriteStringValue(key, value?.ToString());
+    public void WriteDecimalValue(string? key, decimal? value) => WriteStringValue(key, value?.ToString(CultureInfo.InvariantCulture));
     /// <inheritdoc />
-    public void WriteDoubleValue(string? key, double? value) => WriteStringValue(key, value?.ToString());
+    public void WriteDoubleValue(string? key, double? value) => WriteStringValue(key, value?.ToString(CultureInfo.InvariantCulture));
     /// <inheritdoc />
-    public void WriteFloatValue(string? key, float? value) => WriteStringValue(key, value?.ToString());
+    public void WriteFloatValue(string? key, float? value) => WriteStringValue(key, value?.ToString(CultureInfo.InvariantCulture));
     /// <inheritdoc />
     public void WriteGuidValue(string? key, Guid? value) => WriteStringValue(key, value?.ToString());
     /// <inheritdoc />
-    public void WriteIntValue(string? key, int? value) => WriteStringValue(key, value?.ToString());
+    public void WriteIntValue(string? key, int? value) => WriteStringValue(key, value?.ToString(CultureInfo.InvariantCulture));
     /// <inheritdoc />
-    public void WriteLongValue(string? key, long? value) => WriteStringValue(key, value?.ToString());
+    public void WriteLongValue(string? key, long? value) => WriteStringValue(key, value?.ToString(CultureInfo.InvariantCulture));
     /// <inheritdoc />
     public void WriteNullValue(string? key) => WriteStringValue(key, "null");
     /// <inheritdoc />
     public void WriteObjectValue<T>(string? key, T? value, params IParsable?[] additionalValuesToMerge) where T : IParsable => throw new InvalidOperationException(TextParseNode.NoStructuredDataMessage);
     /// <inheritdoc />
-    public void WriteSbyteValue(string? key, sbyte? value) => WriteStringValue(key, value?.ToString());
+    public void WriteSbyteValue(string? key, sbyte? value) => WriteStringValue(key, value?.ToString(CultureInfo.InvariantCulture));
     /// <inheritdoc />
     public void WriteStringValue(string? key, string? value)
     {

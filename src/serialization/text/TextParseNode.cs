@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Xml;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Helpers;
@@ -45,31 +46,31 @@ public class TextParseNode : IParseNode
     public IEnumerable<T> GetCollectionOfPrimitiveValues<T>() => throw new InvalidOperationException(NoStructuredDataMessage);
 #endif
     /// <inheritdoc />
-    public DateTimeOffset? GetDateTimeOffsetValue() => DateTimeOffset.TryParse(Text, out var result) ? result : null;
+    public DateTimeOffset? GetDateTimeOffsetValue() => DateTimeOffset.TryParse(Text, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? result : null;
     /// <inheritdoc />
-    public Date? GetDateValue() => DateTime.TryParse(Text, out var result) ? new Date(result) : null;
+    public Date? GetDateValue() => DateTime.TryParse(Text, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? new Date(result) : null;
     /// <inheritdoc />
-    public decimal? GetDecimalValue() => decimal.TryParse(Text, out var result) ? result : null;
+    public decimal? GetDecimalValue() => decimal.TryParse(Text, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     /// <inheritdoc />
-    public double? GetDoubleValue() => double.TryParse(Text, out var result) ? result : null;
+    public double? GetDoubleValue() => double.TryParse(Text, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     /// <inheritdoc />
-    public float? GetFloatValue() => float.TryParse(Text, out var result) ? result : null;
+    public float? GetFloatValue() => float.TryParse(Text, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     /// <inheritdoc />
     public Guid? GetGuidValue() => Guid.TryParse(Text, out var result) ? result : null;
     /// <inheritdoc />
-    public int? GetIntValue() => int.TryParse(Text, out var result) ? result : null;
+    public int? GetIntValue() => int.TryParse(Text, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     /// <inheritdoc />
-    public long? GetLongValue() => long.TryParse(Text, out var result) ? result : null;
+    public long? GetLongValue() => long.TryParse(Text, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     /// <inheritdoc />
     public T GetObjectValue<T>(ParsableFactory<T> factory) where T : IParsable => throw new InvalidOperationException(NoStructuredDataMessage);
     /// <inheritdoc />
-    public sbyte? GetSbyteValue() => sbyte.TryParse(Text, out var result) ? result : null;
+    public sbyte? GetSbyteValue() => sbyte.TryParse(Text, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     /// <inheritdoc />
     public string? GetStringValue() => Text;
     /// <inheritdoc />
     public TimeSpan? GetTimeSpanValue() => string.IsNullOrEmpty(Text) ? null : XmlConvert.ToTimeSpan(Text);
     /// <inheritdoc />
-    public Time? GetTimeValue() => DateTime.TryParse(Text, out var result) ? new Time(result) : null;
+    public Time? GetTimeValue() => DateTime.TryParse(Text, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? new Time(result) : null;
     /// <inheritdoc />
 #if NET5_0_OR_GREATER
     public IEnumerable<T?> GetCollectionOfEnumValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>() where T : struct, Enum
