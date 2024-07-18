@@ -86,12 +86,14 @@ public class FormSerializationWriter : ISerializationWriter
             case IEnumerable<object> coll:
                 WriteCollectionOfPrimitiveValues(key, coll);
                 break;
+            case byte[] coll:
+                WriteByteArrayValue(key, coll);
+                break;
             case IParsable:
                 throw new InvalidOperationException("Form serialization does not support nested objects.");
             default:
                 WriteStringValue(key, value.ToString());// works for Date and String types
                 break;
-
         }
     }
 
@@ -134,7 +136,7 @@ public class FormSerializationWriter : ISerializationWriter
     public void WriteDateTimeOffsetValue(string? key, DateTimeOffset? value)
     {
         if(value.HasValue)
-            WriteStringValue(key, value.Value.ToString("o"));
+            WriteStringValue(key, value.Value.ToString("o", CultureInfo.InvariantCulture));
     }
     /// <inheritdoc/>
     public void WriteDateValue(string? key, Date? value)
