@@ -1,6 +1,7 @@
 # Kiota Bundle Library for dotnet
 
-The Kiota Bundle Library for dotnet is the dotnet library providing default implementations for client setup.
+The Kiota Bundle Library for dotnet is the dotnet library providing default implementations for client setup. 
+The package provides a request adapter implementation with defaults serialization libraries setup fo use with a generated Kiota client.
 
 Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README.md).
 

@@ -20,13 +20,13 @@ namespace Microsoft.Kiota.Bundle
     public class KiotaRequestAdapter : HttpClientRequestAdapter
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="KiotaRequestAdapter"/> class.
         /// </summary>
-        /// <param name="authenticationProvider"></param>
-        /// <param name="parseNodeFactory"></param>
-        /// <param name="serializationWriterFactory"></param>
-        /// <param name="httpClient"></param>
-        /// <param name="observabilityOptions"></param>
+        /// <param name="authenticationProvider">The authentication provider.</param>
+        /// <param name="parseNodeFactory">The parse node factory.</param>
+        /// <param name="serializationWriterFactory">The serialization writer factory.</param>
+        /// <param name="httpClient">The native HTTP client.</param>
+        /// <param name="observabilityOptions">The observability options.</param>
         public KiotaRequestAdapter(IAuthenticationProvider authenticationProvider, IParseNodeFactory? parseNodeFactory = null, ISerializationWriterFactory? serializationWriterFactory = null, HttpClient? httpClient = null, ObservabilityOptions? observabilityOptions = null) : base(authenticationProvider, parseNodeFactory, serializationWriterFactory, httpClient, observabilityOptions)
         {
             SetupDefaults();
