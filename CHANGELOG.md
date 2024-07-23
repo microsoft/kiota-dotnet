@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.11] - 2024-07-22
+
+- Obsoletes custom decompression handler in favor of native client capabilities.
+
 ## [1.9.10] - 2024-07-18
 
 - Fix DateTime serialization and deserialization

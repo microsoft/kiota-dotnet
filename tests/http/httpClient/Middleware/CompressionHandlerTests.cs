@@ -12,6 +12,7 @@ using Xunit;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 {
+    [Obsolete("kiota clients now rely on the HttpClientHandler to handle decompression")]
     public class CompressionHandlerTests : IDisposable
     {
         private readonly MockRedirectHandler _testHttpMessageHandler;

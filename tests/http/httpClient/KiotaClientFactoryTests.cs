@@ -132,7 +132,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         public void CreateWithCustomMiddlewarePipelineReturnsHttpClient()
         {
             var handlers = KiotaClientFactory.CreateDefaultHandlers();
+#pragma warning disable CS0618 // Type or member is obsolete
             handlers.Add(new CompressionHandler());
+#pragma warning restore CS0618 // Type or member is obsolete
             var client = KiotaClientFactory.Create(handlers);
             Assert.IsType<HttpClient>(client);
         }
