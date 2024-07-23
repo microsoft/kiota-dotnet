@@ -16,6 +16,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
     /// <summary>
     /// A <see cref="DelegatingHandler"/> implementation that handles compression.
     /// </summary>
+    [Obsolete("kiota clients now rely on the HttpClientHandler to handle decompression")]
     public class CompressionHandler : DelegatingHandler
     {
         internal const string GZip = "gzip";
