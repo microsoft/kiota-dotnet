@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Abstractions.Serialization;
-using Moq;
 using Xunit;
 
 namespace Microsoft.Kiota.Bundle.Tests
@@ -11,7 +10,7 @@ namespace Microsoft.Kiota.Bundle.Tests
         [Fact]
         public void ThrowsArgumentNullExceptionOnNullAuthenticationProvider()
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => new KiotaRequestAdapter(null!));
+            var exception = Assert.Throws<ArgumentNullException>(() => new DefaultRequestAdapter(null!));
             Assert.Equal("authenticationProvider", exception.ParamName);
         }
 
@@ -19,7 +18,7 @@ namespace Microsoft.Kiota.Bundle.Tests
         public void SerializersAreRegisteredAsExpected()
         {
             // setup
-            KiotaRequestAdapter requestAdapter = new KiotaRequestAdapter(new AnonymousAuthenticationProvider());
+            _ = new DefaultRequestAdapter(new AnonymousAuthenticationProvider());
 
             // validate
             var serializerCount = SerializationWriterFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories.Count;
