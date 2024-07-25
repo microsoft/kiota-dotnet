@@ -375,14 +375,13 @@ namespace Microsoft.Kiota.Serialization.Json
             {
                 if(!string.IsNullOrEmpty(key))
                     writer.WritePropertyName(key!);
-                var type = values.GetType();
-                if(!type.IsGenericType || type.GetGenericArguments()[0] != typeof(string))
-                    throw new InvalidOperationException($"error serialization additional data value with key {key}, unsupported type {type}");
 
                 writer.WriteStartObject();
                 foreach(DictionaryEntry entry in values)
                 {
-                    WriteAnyValue((string)entry.Key, entry.Value);
+                    if(entry.Key is not string keyStr)
+                        throw new InvalidOperationException($"error serialization additional data value with key {key}, unsupported type {values.GetType()}");
+                    WriteAnyValue(keyStr, entry.Value);
                 }
                 writer.WriteEndObject();
             }
