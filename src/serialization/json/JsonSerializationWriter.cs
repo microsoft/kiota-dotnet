@@ -444,7 +444,7 @@ namespace Microsoft.Kiota.Serialization.Json
             if(value == null)
                 writer.WriteNullValue();
             else
-                foreach(var oProp in typeof(T).GetProperties())
+                foreach(var oProp in value.GetType().GetProperties())
                     WriteAnyValue(oProp.Name, oProp.GetValue(value));
             writer.WriteEndObject();
         }
