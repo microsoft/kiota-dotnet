@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Std.UriTemplate" Version="1.0.3" />
+    <PackageReference Include="Std.UriTemplate" Version="1.0.5" />
   </ItemGroup>
 
   <!-- NET 5 target to be removed on next major version-->
