@@ -13,6 +13,7 @@ using System.Xml;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
+using System.Collections;
 
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -360,6 +361,33 @@ namespace Microsoft.Kiota.Serialization.Json
             }
         }
         /// <summary>
+        /// Writes the specified dictionary to the stream with an optional given key.
+        /// </summary>
+        /// <param name="key">The key to be used for the written value. May be null.</param>
+        /// <param name="values">The dictionary of values to be written.</param>
+#if NET5_0_OR_GREATER
+        public void WriteDictionaryValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(string? key, T values) where T : IDictionary
+#else
+        public void WriteDictionaryValue<T>(string? key, T values) where T : IDictionary
+#endif
+        {
+            if(values != null)
+            {
+                if(!string.IsNullOrEmpty(key))
+                    writer.WritePropertyName(key!);
+                var type = values.GetType();
+                if(!type.IsGenericType || type.GetGenericArguments()[0] != typeof(string))
+                    throw new InvalidOperationException($"error serialization additional data value with key {key}, unsupported type {type}");
+
+                writer.WriteStartObject();
+                foreach(DictionaryEntry entry in values)
+                {
+                    WriteAnyValue((string)entry.Key, entry.Value);
+                }
+                writer.WriteEndObject();
+            }
+        }
+        /// <summary>
         /// Writes the specified byte array as a base64 string to the stream with an optional given key.
         /// </summary>
         /// <param name="key">The key to be used for the written value. May be null.</param>
@@ -511,6 +539,9 @@ namespace Microsoft.Kiota.Serialization.Json
                     if(!string.IsNullOrEmpty(key))
                         writer.WritePropertyName(key!);
                     jsonElement.WriteTo(writer);
+                    break;
+                case IDictionary dictionary:
+                    WriteDictionaryValue(key, dictionary);
                     break;
                 case object o:
                     WriteNonParsableObjectValue(key, o);
