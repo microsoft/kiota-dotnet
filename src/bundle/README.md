@@ -5,7 +5,7 @@ The package provides a request adapter implementation with defaults serializatio
 
 Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README.md).
 
-## Using the Abstractions Library
+## Using the BundleLibrary
 
 ```shell
 dotnet add package Microsoft.Kiota.Bundle
