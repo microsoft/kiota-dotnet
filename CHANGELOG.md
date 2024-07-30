@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.12] - 2024-07-30
+
+- Fix non IParasable object serialization.
+- Add basic support for serializing dictionary values in AdditionalData.
+
 ## [1.9.11] - 2024-07-22
 
 - Obsoletes custom decompression handler in favor of native client capabilities.
