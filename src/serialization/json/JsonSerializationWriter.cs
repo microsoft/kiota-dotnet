@@ -380,7 +380,7 @@ namespace Microsoft.Kiota.Serialization.Json
                 foreach(DictionaryEntry entry in values)
                 {
                     if(entry.Key is not string keyStr)
-                        throw new InvalidOperationException($"error serialization additional data value with key {key}, unsupported type {values.GetType()}");
+                        throw new InvalidOperationException($"Error serializing dictionary value with key {key}, only string keyed dictionaries are supported.");
                     WriteAnyValue(keyStr, entry.Value);
                 }
                 writer.WriteEndObject();
@@ -549,7 +549,7 @@ namespace Microsoft.Kiota.Serialization.Json
                     WriteNullValue(key);
                     break;
                 default:
-                    throw new InvalidOperationException($"error serialization additional data value with key {key}, unknown type {value?.GetType()}");
+                    throw new InvalidOperationException($"Error serializing additional data value with key {key}, unknown type {value?.GetType()}");
             }
         }
 

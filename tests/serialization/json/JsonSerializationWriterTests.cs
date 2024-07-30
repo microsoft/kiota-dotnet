@@ -169,6 +169,24 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         }
 
         [Fact]
+        public void DoesntWriteUnsupportedTypes_NonStringKeyedDictionary()
+        {
+            // Arrange
+            var testEntity = new TestEntity()
+            {
+                AdditionalData = new Dictionary<string, object>
+                {
+                    {"nonStringKeyedDictionary", new Dictionary<int, string>{{ 1, "one" }, { 2, "two" }}}
+                }
+            };
+
+            using var jsonSerializerWriter = new JsonSerializationWriter();
+            // Act & Assert
+            var exception = Assert.Throws<InvalidOperationException>(() => jsonSerializerWriter.WriteObjectValue(string.Empty, testEntity));
+            Assert.Equal("Error serializing dictionary value with key nonStringKeyedDictionary, only string keyed dictionaries are supported.", exception.Message);
+        }
+
+        [Fact]
         public void WritesEnumValuesAsCamelCasedIfNotEscaped()
         {
             // Arrange
