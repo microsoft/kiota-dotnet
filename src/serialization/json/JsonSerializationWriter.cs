@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -13,7 +14,6 @@ using System.Xml;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
-using System.Collections;
 
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -345,7 +345,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <param name="key">The key to be used for the written value. May be null.</param>
         /// <param name="values">The enum values to be written.</param>
 #if NET5_0_OR_GREATER
-        public void WriteCollectionOfEnumValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)]T>(string? key, IEnumerable<T?>? values) where T : struct, Enum
+        public void WriteCollectionOfEnumValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(string? key, IEnumerable<T?>? values) where T : struct, Enum
 #else
         public void WriteCollectionOfEnumValues<T>(string? key, IEnumerable<T?>? values) where T : struct, Enum
 #endif
@@ -366,9 +366,9 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <param name="key">The key to be used for the written value. May be null.</param>
         /// <param name="values">The dictionary of values to be written.</param>
 #if NET5_0_OR_GREATER
-        public void WriteDictionaryValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(string? key, T values) where T : IDictionary
+        private void WriteDictionaryValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(string? key, T values) where T : IDictionary
 #else
-        public void WriteDictionaryValue<T>(string? key, T values) where T : IDictionary
+        private void WriteDictionaryValue<T>(string? key, T values) where T : IDictionary
 #endif
         {
             if(values != null)
@@ -460,7 +460,7 @@ namespace Microsoft.Kiota.Serialization.Json
         }
 
 #if NET5_0_OR_GREATER
-        private void WriteNonParsableObjectValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(string? key,T value)
+        private void WriteNonParsableObjectValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(string? key, T value)
 #else
         private void WriteNonParsableObjectValue<T>(string? key, T value)
 #endif
