@@ -25,11 +25,12 @@ public static partial class KiotaSerializer
     /// <typeparam name="T">Type of the object to serialize</typeparam>
     /// <param name="contentType">Content type to serialize the object to </param>
     /// <param name="value">The object to serialize.</param>
+    /// <param name="useBackingStore">Backing store keeps track of changes, setting this to false will give you the full item.</param>
     /// <returns>The serialized representation as a stream.</returns>
-    public static Stream SerializeAsStream<T>(string contentType, T value) where T : IParsable
+    public static Stream SerializeAsStream<T>(string contentType, T value, bool useBackingStore = true) where T : IParsable
     {
         using var writer = GetSerializationWriter(contentType, value);
-        writer.WriteObjectValue(string.Empty, value);
+        writer.WriteObjectValue(useBackingStore ? string.Empty : null, value);
         return writer.GetSerializedContent();
     }
     /// <summary>
