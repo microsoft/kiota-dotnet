@@ -41,8 +41,12 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                     {"businessPhones", new List<string>() {"+1 412 555 0109"}}, // write collection of primitives value
                     {"endDateTime", new DateTime(2023,03,14,0,0,0,DateTimeKind.Utc) }, // ensure the DateTime doesn't crash
                     {"manager", new TestEntity{Id = "48d31887-5fad-4d73-a9f5-3c356e68a038"}}, // write nested object value
+                    {"anonymousObject", new {Value1 = true, Value2 = "", Value3 = new List<string>{ "Value3.1", "Value3.2"}}}, // write nested object value
+                    {"dictionaryString", new Dictionary<string, string>{{"91bbe8e2-09b2-482b-a90e-00f8d7e81636", "b7992f48-a51b-41a1-ace5-4cebb7f111d0"}, { "ed64c116-2776-4012-94d1-a348b9d241bd", "55e1b4d0-2959-4c71-89b5-385ba5338a1c" }, }}, // write a Dictionary
+                    {"dictionaryTestEntity", new Dictionary<string, TestEntity>{{ "dd476fc9-7e97-4a4e-8d40-6c3de7432eb3", new TestEntity { Id = "dd476fc9-7e97-4a4e-8d40-6c3de7432eb3" } }, { "ffa5c351-7cf5-43df-9b55-e12455cf6eb2", new TestEntity { Id = "ffa5c351-7cf5-43df-9b55-e12455cf6eb2" } }, }}, // write a Dictionary
                 }
             };
+
             using var jsonSerializerWriter = new JsonSerializationWriter();
             // Act
             jsonSerializerWriter.WriteObjectValue(string.Empty, testEntity);
@@ -65,7 +69,10 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                                  "\"weightInKgs\":51.80," +
                                  "\"businessPhones\":[\"\\u002B1 412 555 0109\"]," +
                                  "\"endDateTime\":\"2023-03-14T00:00:00+00:00\"," +
-                                 "\"manager\":{\"id\":\"48d31887-5fad-4d73-a9f5-3c356e68a038\"}" +
+                                 "\"manager\":{\"id\":\"48d31887-5fad-4d73-a9f5-3c356e68a038\"}," +
+                                 "\"anonymousObject\":{\"Value1\":true,\"Value2\":\"\",\"Value3\":[\"Value3.1\",\"Value3.2\"]}," +
+                                 "\"dictionaryString\":{\"91bbe8e2-09b2-482b-a90e-00f8d7e81636\":\"b7992f48-a51b-41a1-ace5-4cebb7f111d0\",\"ed64c116-2776-4012-94d1-a348b9d241bd\":\"55e1b4d0-2959-4c71-89b5-385ba5338a1c\"}," +
+                                 "\"dictionaryTestEntity\":{\"dd476fc9-7e97-4a4e-8d40-6c3de7432eb3\":{\"id\":\"dd476fc9-7e97-4a4e-8d40-6c3de7432eb3\"},\"ffa5c351-7cf5-43df-9b55-e12455cf6eb2\":{\"id\":\"ffa5c351-7cf5-43df-9b55-e12455cf6eb2\"}}" +
                                  "}";
             Assert.Equal(expectedString, serializedJsonString);
         }
@@ -159,6 +166,24 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                                  "\"manager\":{\"id\":\"48d31887-5fad-4d73-a9f5-3c356e68a038\"}" +
                                  "}]";
             Assert.Equal(expectedString, serializedJsonString);
+        }
+
+        [Fact]
+        public void DoesntWriteUnsupportedTypes_NonStringKeyedDictionary()
+        {
+            // Arrange
+            var testEntity = new TestEntity()
+            {
+                AdditionalData = new Dictionary<string, object>
+                {
+                    {"nonStringKeyedDictionary", new Dictionary<int, string>{{ 1, "one" }, { 2, "two" }}}
+                }
+            };
+
+            using var jsonSerializerWriter = new JsonSerializationWriter();
+            // Act & Assert
+            var exception = Assert.Throws<InvalidOperationException>(() => jsonSerializerWriter.WriteObjectValue(string.Empty, testEntity));
+            Assert.Equal("Error serializing dictionary value with key nonStringKeyedDictionary, only string keyed dictionaries are supported.", exception.Message);
         }
 
         [Fact]
