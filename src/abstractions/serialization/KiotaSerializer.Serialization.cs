@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Kiota.Abstractions.Store;
+
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
 #endif
@@ -29,9 +31,21 @@ public static partial class KiotaSerializer
     /// <returns>The serialized representation as a stream.</returns>
     public static Stream SerializeAsStream<T>(string contentType, T value, bool serializeOnlyChangedValues = true) where T : IParsable
     {
+        bool restoreInitializationCompleted = false;
+        if(!serializeOnlyChangedValues && value is IBackedModel backedModel)
+        {
+            // reset the initialization completed flag to ensure all properties are serialized
+            restoreInitializationCompleted = backedModel.BackingStore.InitializationCompleted;
+            backedModel.BackingStore.InitializationCompleted = false;
+        }
         using var writer = GetSerializationWriter(contentType, value);
-        writer.WriteObjectValue(serializeOnlyChangedValues ? string.Empty : null, value);
-        return writer.GetSerializedContent();
+        writer.WriteObjectValue(null, value);
+        var stream = writer.GetSerializedContent();
+        if(restoreInitializationCompleted)
+        {
+            (value as IBackedModel)!.BackingStore.InitializationCompleted = true;
+        }
+        return stream;
     }
     /// <summary>
     /// Serializes the given object into a string based on the content type.
@@ -69,9 +83,21 @@ public static partial class KiotaSerializer
     /// <returns>The serialized representation as a stream.</returns>
     public static Stream SerializeAsStream<T>(string contentType, IEnumerable<T> value, bool serializeOnlyChangedValues = true) where T : IParsable
     {
+        bool resetInitializationCompleted = false;
+        if(!serializeOnlyChangedValues && value is IBackedModel backedModel)
+        {
+            // reset the initialization completed flag to ensure all properties are serialized
+            backedModel.BackingStore.InitializationCompleted = false;
+            resetInitializationCompleted = true;
+        }
         using var writer = GetSerializationWriter(contentType, value);
-        writer.WriteCollectionOfObjectValues(serializeOnlyChangedValues ? string.Empty : null, value);
-        return writer.GetSerializedContent();
+        writer.WriteCollectionOfObjectValues(null, value);
+        var stream = writer.GetSerializedContent();
+        if(resetInitializationCompleted)
+        {
+            (value as IBackedModel)!.BackingStore.InitializationCompleted = true;
+        }
+        return stream;
     }
     /// <summary>
     /// Serializes the given object into a string based on the content type.
