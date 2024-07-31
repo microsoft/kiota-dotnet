@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Sdk Name="Microsoft.DotNet.PackageValidation" Version="1.0.0-preview.7.21379.12" />
+
+  <PropertyGroup>
+    <Description>Kiota Bundle package providing default implementations for client setup.</Description>
+    <AssemblyTitle>Kiota Bundle package for dotnet</AssemblyTitle>
+    <!-- NET 5 target to be removed on next major version-->
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0;net6.0;net8.0</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\abstractions\Microsoft.Kiota.Abstractions.csproj" />
+    <ProjectReference Include="..\http\httpClient\Microsoft.Kiota.Http.HttpClientLibrary.csproj" />
+    <ProjectReference Include="..\serialization\form\Microsoft.Kiota.Serialization.Form.csproj" />
+    <ProjectReference Include="..\serialization\json\Microsoft.Kiota.Serialization.Json.csproj" />
+    <ProjectReference Include="..\serialization\multipart\Microsoft.Kiota.Serialization.Multipart.csproj" />
+    <ProjectReference Include="..\serialization\text\Microsoft.Kiota.Serialization.Text.csproj" />
+  </ItemGroup>
+
+</Project>
