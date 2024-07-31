@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -344,7 +345,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <param name="key">The key to be used for the written value. May be null.</param>
         /// <param name="values">The enum values to be written.</param>
 #if NET5_0_OR_GREATER
-        public void WriteCollectionOfEnumValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)]T>(string? key, IEnumerable<T?>? values) where T : struct, Enum
+        public void WriteCollectionOfEnumValues<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(string? key, IEnumerable<T?>? values) where T : struct, Enum
 #else
         public void WriteCollectionOfEnumValues<T>(string? key, IEnumerable<T?>? values) where T : struct, Enum
 #endif
@@ -357,6 +358,32 @@ namespace Microsoft.Kiota.Serialization.Json
                 foreach(var item in values)
                     WriteEnumValue<T>(null, item);
                 writer.WriteEndArray();
+            }
+        }
+        /// <summary>
+        /// Writes the specified dictionary to the stream with an optional given key.
+        /// </summary>
+        /// <param name="key">The key to be used for the written value. May be null.</param>
+        /// <param name="values">The dictionary of values to be written.</param>
+#if NET5_0_OR_GREATER
+        private void WriteDictionaryValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(string? key, T values) where T : IDictionary
+#else
+        private void WriteDictionaryValue<T>(string? key, T values) where T : IDictionary
+#endif
+        {
+            if(values != null)
+            {
+                if(!string.IsNullOrEmpty(key))
+                    writer.WritePropertyName(key!);
+
+                writer.WriteStartObject();
+                foreach(DictionaryEntry entry in values)
+                {
+                    if(entry.Key is not string keyStr)
+                        throw new InvalidOperationException($"Error serializing dictionary value with key {key}, only string keyed dictionaries are supported.");
+                    WriteAnyValue(keyStr, entry.Value);
+                }
+                writer.WriteEndObject();
             }
         }
         /// <summary>
@@ -433,7 +460,7 @@ namespace Microsoft.Kiota.Serialization.Json
         }
 
 #if NET5_0_OR_GREATER
-        private void WriteNonParsableObjectValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(string? key,T value)
+        private void WriteNonParsableObjectValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(string? key, T value)
 #else
         private void WriteNonParsableObjectValue<T>(string? key, T value)
 #endif
@@ -444,7 +471,7 @@ namespace Microsoft.Kiota.Serialization.Json
             if(value == null)
                 writer.WriteNullValue();
             else
-                foreach(var oProp in typeof(T).GetProperties())
+                foreach(var oProp in value.GetType().GetProperties())
                     WriteAnyValue(oProp.Name, oProp.GetValue(value));
             writer.WriteEndObject();
         }
@@ -512,6 +539,9 @@ namespace Microsoft.Kiota.Serialization.Json
                         writer.WritePropertyName(key!);
                     jsonElement.WriteTo(writer);
                     break;
+                case IDictionary dictionary:
+                    WriteDictionaryValue(key, dictionary);
+                    break;
                 case object o:
                     WriteNonParsableObjectValue(key, o);
                     break;
@@ -519,7 +549,7 @@ namespace Microsoft.Kiota.Serialization.Json
                     WriteNullValue(key);
                     break;
                 default:
-                    throw new InvalidOperationException($"error serialization additional data value with key {key}, unknown type {value?.GetType()}");
+                    throw new InvalidOperationException($"Error serializing additional data value with key {key}, unknown type {value?.GetType()}");
             }
         }
 
