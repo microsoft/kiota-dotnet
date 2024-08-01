@@ -40,8 +40,9 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get a valid <see cref="ISerializationWriter"/> for the content type
         /// </summary>
         /// <param name="contentType">The content type to search for</param>
+        /// <param name="serializeOnlyChangedValues">By default a backing store is used, and you'll only get changed properties</param>
         /// <returns>A <see cref="ISerializationWriter"/> instance for json writing</returns>
-        public ISerializationWriter GetSerializationWriter(string contentType)
+        public ISerializationWriter GetSerializationWriter(string contentType, bool serializeOnlyChangedValues = true)
         {
             if(string.IsNullOrEmpty(contentType))
                 throw new ArgumentNullException(nameof(contentType));

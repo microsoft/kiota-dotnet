@@ -30,7 +30,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Serialization
             using var testStream = new MemoryStream(Encoding.UTF8.GetBytes("test input"));
             var mockSerializationWriterFactory = new Mock<ISerializationWriterFactory>();
             var mockSerializationWriter = new Mock<ISerializationWriter>();
-            mockSerializationWriterFactory.Setup(serializationWriterFactory => serializationWriterFactory.GetSerializationWriter(streamContentType)).Returns(mockSerializationWriter.Object);
+            mockSerializationWriterFactory.Setup(serializationWriterFactory => serializationWriterFactory.GetSerializationWriter(streamContentType, It.IsAny<bool>())).Returns(mockSerializationWriter.Object);
             _serializationWriterFactoryRegistry.ContentTypeAssociatedFactories.TryAdd(streamContentType, mockSerializationWriterFactory.Object);
             // Act
             var serializationWriter = _serializationWriterFactoryRegistry.GetSerializationWriter(streamContentType);
@@ -45,7 +45,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Serialization
             var applicationJsonContentType = "application/json";
             var mockSerializationWriterFactory = new Mock<ISerializationWriterFactory>();
             var mockSerializationWriter = new Mock<ISerializationWriter>();
-            mockSerializationWriterFactory.Setup(serializationWriterFactory => serializationWriterFactory.GetSerializationWriter(applicationJsonContentType)).Returns(mockSerializationWriter.Object);
+            mockSerializationWriterFactory.Setup(serializationWriterFactory => serializationWriterFactory.GetSerializationWriter(applicationJsonContentType, It.IsAny<bool>())).Returns(mockSerializationWriter.Object);
             _serializationWriterFactoryRegistry.ContentTypeAssociatedFactories.TryAdd(applicationJsonContentType, mockSerializationWriterFactory.Object);
             // Act
             var serializationWriter = _serializationWriterFactoryRegistry.GetSerializationWriter("application/vnd+json");

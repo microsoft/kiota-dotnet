@@ -15,7 +15,11 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// The valid content type for the <see cref="SerializationWriterProxyFactory"/>
         /// </summary>
         public string ValidContentType { get { return _concrete.ValidContentType; } }
-        private readonly ISerializationWriterFactory _concrete;
+
+        /// <summary>
+        /// The concrete factory to wrap.
+        /// </summary>
+        protected readonly ISerializationWriterFactory _concrete;
         private readonly Action<IParsable> _onBefore;
         private readonly Action<IParsable> _onAfter;
         private readonly Action<IParsable, ISerializationWriter> _onStartSerialization;
@@ -40,8 +44,9 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// Creates a new <see cref="ISerializationWriter" /> instance for the given content type.
         /// </summary>
         /// <param name="contentType">The content type for which a serialization writer should be created.</param>
+        /// <param name="serializeOnlyChangedValues">By default a backing store is used, and you'll only get changed properties</param>
         /// <returns>A new <see cref="ISerializationWriter" /> instance for the given content type.</returns>
-        public ISerializationWriter GetSerializationWriter(string contentType)
+        public virtual ISerializationWriter GetSerializationWriter(string contentType, bool serializeOnlyChangedValues = true)
         {
             var writer = _concrete.GetSerializationWriter(contentType);
             var originalBefore = writer.OnBeforeObjectSerialization;
