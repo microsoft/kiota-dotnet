@@ -7,12 +7,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using System.Xml;
 using Microsoft.Kiota.Abstractions;
-using Microsoft.Kiota.Abstractions.Extensions;
+using Microsoft.Kiota.Abstractions.Helpers;
 using Microsoft.Kiota.Abstractions.Serialization;
 
 #if NET5_0_OR_GREATER
@@ -49,7 +48,11 @@ namespace Microsoft.Kiota.Serialization.Json
         public JsonSerializationWriter(KiotaJsonSerializationContext kiotaJsonSerializationContext)
         {
             _kiotaJsonSerializationContext = kiotaJsonSerializationContext;
-            writer = new Utf8JsonWriter(_stream);
+            writer = new Utf8JsonWriter(_stream, new JsonWriterOptions
+            {
+                Encoder = kiotaJsonSerializationContext.Options.Encoder,
+                Indented = kiotaJsonSerializationContext.Options.WriteIndented
+            });
         }
 
         /// <summary>
@@ -290,7 +293,7 @@ namespace Microsoft.Kiota.Serialization.Json
                     StringBuilder valueNames = new StringBuilder();
                     foreach(var x in values)
                     {
-                        if(value.Value.HasFlag(x) && GetEnumName(x) is string valueName)
+                        if(value.Value.HasFlag(x) && EnumHelpers.GetEnumStringValue(x) is string valueName)
                         {
                             if(valueNames.Length > 0)
                                 valueNames.Append(",");
@@ -299,7 +302,7 @@ namespace Microsoft.Kiota.Serialization.Json
                     }
                     WriteStringValue(null, valueNames.ToString());
                 }
-                else WriteStringValue(null, GetEnumName(value.Value));
+                else WriteStringValue(null, EnumHelpers.GetEnumStringValue(value.Value));
             }
         }
 
@@ -559,22 +562,7 @@ namespace Microsoft.Kiota.Serialization.Json
             writer.Dispose();
             GC.SuppressFinalize(this);
         }
-#if NET5_0_OR_GREATER
-        private static string? GetEnumName<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(T value) where T : struct, Enum
-#else
-        private static string? GetEnumName<T>(T value) where T : struct, Enum
-#endif
-        {
-            var type = typeof(T);
 
-            if(Enum.GetName(type, value) is not { } name)
-                throw new ArgumentException($"Invalid Enum value {value} for enum of type {type}");
-
-            if(type.GetField(name)?.GetCustomAttribute<EnumMemberAttribute>() is { } attribute)
-                return attribute.Value;
-
-            return name.ToFirstCharacterLowerCase();
-        }
         /// <summary>
         /// Writes a untyped value for the specified key.
         /// </summary>

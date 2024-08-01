@@ -41,12 +41,12 @@ namespace Microsoft.Kiota.Serialization.Text.Tests
         [Fact]
         public void TextParseNode_GetEnumFromEnumMember()
         {
-            var text = "Value_2";
+            var text = "Item2:SubItem1";
             var parseNode = new TextParseNode(text);
 
-            var result = parseNode.GetEnumValue<TestEnum>();
+            var result = parseNode.GetEnumValue<TestNamingEnum>();
 
-            Assert.Equal(TestEnum.SecondItem, result);
+            Assert.Equal(TestNamingEnum.Item2SubItem1, result);
         }
 
         [Fact]

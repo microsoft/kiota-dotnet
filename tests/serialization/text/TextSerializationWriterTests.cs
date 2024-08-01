@@ -350,7 +350,26 @@ namespace Microsoft.Kiota.Serialization.Text.Tests
             var serializedString = reader.ReadToEnd();
 
             // Assert
-            Assert.Equal("firstItem", serializedString);
+            Assert.Equal("FirstItem", serializedString);
+        }
+
+
+        [Fact]
+        public void WriteEnumValueWithAttribute_IsWrittenCorrectly()
+        {
+            // Arrange
+            var value = TestNamingEnum.Item2SubItem1;
+
+            using var formSerializationWriter = new TextSerializationWriter();
+
+            // Act
+            formSerializationWriter.WriteEnumValue<TestNamingEnum>(null, value);
+            var contentStream = formSerializationWriter.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Equal("Item2:SubItem1", serializedString);
         }
 
         [Fact]

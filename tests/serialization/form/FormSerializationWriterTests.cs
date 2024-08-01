@@ -51,7 +51,7 @@ public class FormSerializationWriterTests
 
         // Assert
         var expectedString = "id=48d31887-5fad-4d73-a9f5-3c356e68a038&" +
-                                "numbers=one%2Ctwo&" +   // serializes enums
+                                "numbers=One%2CTwo&" +   // serializes enums
                                 "workDuration=PT1H&" +    // Serializes timespans
                                 "birthDay=2017-09-04&" + // Serializes dates
                                 "startWorkTime=08%3A00%3A00&" + //Serializes times
@@ -432,7 +432,25 @@ public class FormSerializationWriterTests
         var serializedString = reader.ReadToEnd();
 
         // Assert
-        Assert.Equal("prop1=sixteen", serializedString);
+        Assert.Equal("prop1=Sixteen", serializedString);
+    }
+
+    [Fact]
+    public void WriteEnumValueWithAttribute_IsWrittenCorrectly()
+    {
+        // Arrange
+        var value = TestNamingEnum.Item2SubItem1;
+
+        using var formSerializationWriter = new FormSerializationWriter();
+
+        // Act
+        formSerializationWriter.WriteEnumValue<TestNamingEnum>("prop1", value);
+        var contentStream = formSerializationWriter.GetSerializedContent();
+        using var reader = new StreamReader(contentStream, Encoding.UTF8);
+        var serializedString = reader.ReadToEnd();
+
+        // Assert
+        Assert.Equal("prop1=Item2%3ASubItem1", serializedString);
     }
 
     [Fact]
@@ -450,6 +468,6 @@ public class FormSerializationWriterTests
         var serializedString = reader.ReadToEnd();
 
         // Assert
-        Assert.Equal("prop1=sixteen%2Ctwo", serializedString);
+        Assert.Equal("prop1=Sixteen%2CTwo", serializedString);
     }
 }
