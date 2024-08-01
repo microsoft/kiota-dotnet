@@ -13,7 +13,7 @@ public class MultipartSerializationWriterFactory : ISerializationWriterFactory
     /// <inheritdoc/>
     public string ValidContentType => "multipart/form-data";
     /// <inheritdoc/>
-    public ISerializationWriter GetSerializationWriter(string contentType, bool serializeOnlyChangedValues = true)
+    public ISerializationWriter GetSerializationWriter(string contentType)
     {
         if(string.IsNullOrEmpty(contentType))
             throw new ArgumentNullException(nameof(contentType));

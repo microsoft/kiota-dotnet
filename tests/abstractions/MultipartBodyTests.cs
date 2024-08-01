@@ -25,7 +25,7 @@ public class MultipartBodyTests
         jsonWriterMock.Setup(w => w.GetSerializedContent()).Returns(ms);
 
         serializationFactoryMock
-            .Setup(r => r.GetSerializationWriter("application/json", true))
+            .Setup(r => r.GetSerializationWriter("application/json"))
             .Returns(jsonWriterMock.Object);
 
         requestAdapterMock
@@ -67,7 +67,7 @@ public class MultipartBodyTests
         jsonWriterMock.Setup(w => w.GetSerializedContent()).Returns(ms);
 
         serializationFactoryMock
-            .Setup(r => r.GetSerializationWriter("application/json", It.IsAny<bool>()))
+            .Setup(r => r.GetSerializationWriter("application/json"))
             .Returns(jsonWriterMock.Object);
 
         requestAdapterMock

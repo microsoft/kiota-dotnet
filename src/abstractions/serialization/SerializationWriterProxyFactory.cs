@@ -44,9 +44,8 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// Creates a new <see cref="ISerializationWriter" /> instance for the given content type.
         /// </summary>
         /// <param name="contentType">The content type for which a serialization writer should be created.</param>
-        /// <param name="serializeOnlyChangedValues">By default a backing store is used, and you'll only get changed properties</param>
         /// <returns>A new <see cref="ISerializationWriter" /> instance for the given content type.</returns>
-        public virtual ISerializationWriter GetSerializationWriter(string contentType, bool serializeOnlyChangedValues = true)
+        public ISerializationWriter GetSerializationWriter(string contentType)
         {
             var writer = _concrete.GetSerializationWriter(contentType);
             var originalBefore = writer.OnBeforeObjectSerialization;

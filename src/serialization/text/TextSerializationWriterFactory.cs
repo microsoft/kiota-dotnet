@@ -12,7 +12,7 @@ public class TextSerializationWriterFactory : ISerializationWriterFactory
     public string ValidContentType { get; } = "text/plain";
 
     /// <inheritdoc />
-    public ISerializationWriter GetSerializationWriter(string contentType, bool serializeOnlyChangedValues = true)
+    public ISerializationWriter GetSerializationWriter(string contentType)
     {
         if(string.IsNullOrEmpty(contentType))
             throw new ArgumentNullException(nameof(contentType));

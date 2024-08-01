@@ -422,7 +422,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             var requestAdapterMock = new Mock<IRequestAdapter>();
             var serializationWriterMock = new Mock<ISerializationWriter>();
             var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
-            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>(), It.IsAny<bool>())).Returns(serializationWriterMock.Object);
+            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(serializationWriterMock.Object);
             requestAdapterMock.SetupGet(x => x.SerializationWriterFactory).Returns(serializationWriterFactoryMock.Object);
             var requestInfo = new RequestInformation
             {
@@ -442,7 +442,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             var requestAdapterMock = new Mock<IRequestAdapter>();
             var serializationWriterMock = new Mock<ISerializationWriter>();
             var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
-            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>(), It.IsAny<bool>())).Returns(serializationWriterMock.Object);
+            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(serializationWriterMock.Object);
             requestAdapterMock.SetupGet(x => x.SerializationWriterFactory).Returns(serializationWriterFactoryMock.Object);
             var requestInfo = new RequestInformation
             {
@@ -462,7 +462,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             var requestAdapterMock = new Mock<IRequestAdapter>();
             var serializationWriterMock = new Mock<ISerializationWriter>();
             var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
-            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>(), It.IsAny<bool>())).Returns(serializationWriterMock.Object);
+            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(serializationWriterMock.Object);
             requestAdapterMock.SetupGet(x => x.SerializationWriterFactory).Returns(serializationWriterFactoryMock.Object);
             var requestInfo = new RequestInformation
             {
@@ -482,7 +482,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             var requestAdapterMock = new Mock<IRequestAdapter>();
             var serializationWriterMock = new Mock<ISerializationWriter>();
             var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
-            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>(), It.IsAny<bool>())).Returns(serializationWriterMock.Object);
+            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(serializationWriterMock.Object);
             requestAdapterMock.SetupGet(x => x.SerializationWriterFactory).Returns(serializationWriterFactoryMock.Object);
             var requestInfo = new RequestInformation
             {
@@ -524,7 +524,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             var requestAdapterMock = new Mock<IRequestAdapter>();
             var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
             var serializationWriterMock = new Mock<ISerializationWriter>();
-            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>(), It.IsAny<bool>())).Returns(serializationWriterMock.Object);
+            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(serializationWriterMock.Object);
             requestAdapterMock.SetupGet(x => x.SerializationWriterFactory).Returns(serializationWriterFactoryMock.Object);
             // Given
             var multipartBody = new MultipartBody

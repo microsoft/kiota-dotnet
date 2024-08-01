@@ -34,9 +34,8 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// Get the relevant <see cref="ISerializationWriter"/> instance for the given content type
         /// </summary>
         /// <param name="contentType">The content type in use</param>
-        /// <param name="serializeOnlyChangedValues">By default a backing store is used, and you'll only get changed properties</param>
         /// <returns>A <see cref="ISerializationWriter"/> instance to parse the content</returns>
-        public ISerializationWriter GetSerializationWriter(string contentType, bool serializeOnlyChangedValues = true)
+        public ISerializationWriter GetSerializationWriter(string contentType)
         {
             if(string.IsNullOrEmpty(contentType))
                 throw new ArgumentNullException(nameof(contentType));
@@ -48,6 +47,47 @@ namespace Microsoft.Kiota.Abstractions.Serialization
             var cleanedContentType = ParseNodeFactoryRegistry.contentTypeVendorCleanupRegex.Replace(vendorSpecificContentType, string.Empty);
             if(ContentTypeAssociatedFactories.TryGetValue(cleanedContentType, out var factory))
                 return factory.GetSerializationWriter(cleanedContentType);
+
+            throw new InvalidOperationException($"Content type {cleanedContentType} does not have a factory registered to be parsed");
+        }
+
+        /// <summary>
+        /// Get the relevant <see cref="ISerializationWriter"/> instance for the given content type
+        /// </summary>
+        /// <param name="contentType">The content type in use</param>
+        /// <param name="serializeOnlyChangedValues">If <see langword="true"/> will only return changed values, otherwise will return the full object </param>
+        /// <returns>A <see cref="ISerializationWriter"/> instance to parse the content</returns>
+        public ISerializationWriter GetSerializationWriter(string contentType, bool serializeOnlyChangedValues)
+        {
+            if(serializeOnlyChangedValues)
+                return GetSerializationWriter(contentType);
+
+            var factory = GetSerializationWriterFactory(contentType);
+            if(factory is Store.BackingStoreSerializationWriterProxyFactory backingStoreFactory)
+                return backingStoreFactory.GetSerializationWriter(contentType, false);
+
+            return factory.GetSerializationWriter(contentType);
+        }
+
+        /// <summary>
+        /// Get the relevant <see cref="ISerializationWriterFactory"/> instance for the given content type
+        /// </summary>
+        /// <param name="contentType">The content type in use</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
+        private ISerializationWriterFactory GetSerializationWriterFactory(string contentType)
+        {
+            if(string.IsNullOrEmpty(contentType))
+                throw new ArgumentNullException(nameof(contentType));
+
+            var vendorSpecificContentType = contentType.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[0];
+            if(ContentTypeAssociatedFactories.TryGetValue(vendorSpecificContentType, out var vendorFactory))
+                return vendorFactory;
+
+            var cleanedContentType = ParseNodeFactoryRegistry.contentTypeVendorCleanupRegex.Replace(vendorSpecificContentType, string.Empty);
+            if(ContentTypeAssociatedFactories.TryGetValue(cleanedContentType, out var factory))
+                return factory;
 
             throw new InvalidOperationException($"Content type {cleanedContentType} does not have a factory registered to be parsed");
         }
