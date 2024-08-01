@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading;
 using Microsoft.Kiota.Abstractions;
@@ -258,6 +259,68 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             Assert.Equal(expectedString, serializedJsonString);
         }
 
+        [Fact]
+        public void ForwardsOptionsToWriterFromSerializationContext()
+        {
+            // Arrange
+            var testEntity = new TestEntity
+            {
+                Id = "testId",
+                AdditionalData = new Dictionary<string, object>()
+                {
+                    {"href", "https://graph.microsoft.com/users/{user-id}"},
+                    {"unicodeName", "你好"}
+                }
+            };
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+            using var jsonSerializerWriter = new JsonSerializationWriter(serializationContext);
+
+            // Act
+            jsonSerializerWriter.WriteObjectValue(string.Empty, testEntity);
+            var serializedStream = jsonSerializerWriter.GetSerializedContent();
+            using var reader = new StreamReader(serializedStream, Encoding.UTF8);
+            var serializedJsonString = reader.ReadToEnd();
+
+            // Assert
+            const string expectedString = "{\n  \"id\": \"testId\",\n  \"href\": \"https://graph.microsoft.com/users/{user-id}\",\n  \"unicodeName\": \"你好\"\n}";
+            Assert.Contains("\n", serializedJsonString); // string is indented and not escaped
+            Assert.Contains("你好", serializedJsonString); // string is indented and not escaped
+            Assert.Equal(expectedString, serializedJsonString.Replace("\r", string.Empty)); // string is indented and not escaped
+        }
+
+        [Fact]
+        public void UsesDefaultOptionsToWriterFromSerializationContext()
+        {
+            // Arrange
+            var testEntity = new TestEntity
+            {
+                Id = "testId",
+                AdditionalData = new Dictionary<string, object>()
+                {
+                    {"href", "https://graph.microsoft.com/users/{user-id}"},
+                    {"unicodeName", "你好"}
+                }
+            };
+            using var jsonSerializerWriter = new JsonSerializationWriter(new KiotaJsonSerializationContext());
+
+            // Act
+            jsonSerializerWriter.WriteObjectValue(string.Empty, testEntity);
+            var serializedStream = jsonSerializerWriter.GetSerializedContent();
+            using var reader = new StreamReader(serializedStream, Encoding.UTF8);
+            var serializedJsonString = reader.ReadToEnd();
+
+            // Assert
+            var expectedString = $"{{\"id\":\"testId\",\"href\":\"https://graph.microsoft.com/users/{{user-id}}\",\"unicodeName\":\"\\u4F60\\u597D\"}}";
+            Assert.DoesNotContain("\n", serializedJsonString); // string is not indented and not escaped
+            Assert.DoesNotContain("你好", serializedJsonString); // string is not indented and not escaped
+            Assert.Contains("\\u4F60\\u597D", serializedJsonString); // string is not indented and not escaped
+            Assert.Equal(expectedString, serializedJsonString); // string is indented and not escaped
+        }
         [Fact]
         public void WriteGuidUsingNoConverter()
         {

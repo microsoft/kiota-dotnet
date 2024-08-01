@@ -48,7 +48,11 @@ namespace Microsoft.Kiota.Serialization.Json
         public JsonSerializationWriter(KiotaJsonSerializationContext kiotaJsonSerializationContext)
         {
             _kiotaJsonSerializationContext = kiotaJsonSerializationContext;
-            writer = new Utf8JsonWriter(_stream);
+            writer = new Utf8JsonWriter(_stream, new JsonWriterOptions
+            {
+                Encoder = kiotaJsonSerializationContext.Options.Encoder,
+                Indented = kiotaJsonSerializationContext.Options.WriteIndented
+            });
         }
 
         /// <summary>
