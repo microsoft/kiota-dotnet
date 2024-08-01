@@ -177,7 +177,7 @@ namespace Microsoft.Kiota.Abstractions.Helpers
             if(type.GetField(name)?.GetCustomAttribute<EnumMemberAttribute>() is { } attribute)
                 return attribute.Value;
 
-            return name.ToFirstCharacterLowerCase();
+            return name;
         }
     }
 }

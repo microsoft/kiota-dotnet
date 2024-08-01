@@ -350,7 +350,7 @@ namespace Microsoft.Kiota.Serialization.Text.Tests
             var serializedString = reader.ReadToEnd();
 
             // Assert
-            Assert.Equal("firstItem", serializedString);
+            Assert.Equal("FirstItem", serializedString);
         }
 
 
