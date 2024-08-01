@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Microsoft.Kiota.Abstractions.Extensions;
 
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -153,6 +154,30 @@ namespace Microsoft.Kiota.Abstractions.Helpers
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Gets the enum string representation of the given value. Looks up if there is an <see cref="EnumMemberAttribute"/> and returns the value if found, otherwise returns the enum name in camel case.
+        /// </summary>
+        /// <typeparam name="T">The Enum type</typeparam>
+        /// <param name="value">The enum value</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException">If value is null</exception>
+#if NET5_0_OR_GREATER
+        public static string? GetEnumStringValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(T value) where T : struct, Enum
+#else
+        public static string? GetEnumStringValue<T>(T value) where T : struct, Enum
+#endif
+        {
+            var type = typeof(T);
+
+            if(Enum.GetName(type, value) is not { } name)
+                throw new ArgumentException($"Invalid Enum value {value} for enum of type {type}");
+
+            if(type.GetField(name)?.GetCustomAttribute<EnumMemberAttribute>() is { } attribute)
+                return attribute.Value;
+
+            return name.ToFirstCharacterLowerCase();
         }
     }
 }

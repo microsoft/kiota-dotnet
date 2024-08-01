@@ -436,6 +436,24 @@ public class FormSerializationWriterTests
     }
 
     [Fact]
+    public void WriteEnumValueWithAttribute_IsWrittenCorrectly()
+    {
+        // Arrange
+        var value = TestNamingEnum.Item2SubItem1;
+
+        using var formSerializationWriter = new FormSerializationWriter();
+
+        // Act
+        formSerializationWriter.WriteEnumValue<TestNamingEnum>("prop1", value);
+        var contentStream = formSerializationWriter.GetSerializedContent();
+        using var reader = new StreamReader(contentStream, Encoding.UTF8);
+        var serializedString = reader.ReadToEnd();
+
+        // Assert
+        Assert.Equal("prop1=Item2%3ASubItem1", serializedString);
+    }
+
+    [Fact]
     public void WriteCollectionOfEnumValues_IsWrittenCorrectly()
     {
         // Arrange

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.1] - 2024-08-01
+
+- Cleans up enum serialization to read from attributes for form and text serialization [#284](https://github.com/microsoft/kiota-dotnet/issues/284)
+
 ## [1.10.0] - 2024-07-17
 
 - Adds Kiota bundle package to provide default adapter with registrations setup. [#290](https://github.com/microsoft/kiota-dotnet/issues/290)

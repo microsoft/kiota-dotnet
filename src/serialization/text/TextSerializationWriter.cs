@@ -5,6 +5,7 @@ using System.IO;
 using System.Xml;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Extensions;
+using Microsoft.Kiota.Abstractions.Helpers;
 using Microsoft.Kiota.Abstractions.Serialization;
 
 #if NET5_0_OR_GREATER
@@ -118,5 +119,5 @@ public class TextSerializationWriter : ISerializationWriter, IDisposable
 #else
     public void WriteEnumValue<T>(string? key, T? value) where T : struct, Enum
 #endif
-    => WriteStringValue(key, value.HasValue ? value.Value.ToString().ToFirstCharacterLowerCase() : null);
+    => WriteStringValue(key, value.HasValue ? EnumHelpers.GetEnumStringValue(value.Value) : null);
 }
