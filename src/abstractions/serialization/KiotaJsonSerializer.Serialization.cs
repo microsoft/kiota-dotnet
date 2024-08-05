@@ -4,10 +4,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using System.ComponentModel;
 
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -27,7 +27,7 @@ public static partial class KiotaJsonSerializer
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static Stream SerializeAsStream<T>(T value) where T : IParsable
         => KiotaSerializer.SerializeAsStream(_jsonContentType, value);
-    
+
     /// <summary>
     /// Serializes the given object into a string based on the content type.
     /// </summary>
@@ -48,9 +48,9 @@ public static partial class KiotaJsonSerializer
     /// <returns>The serialized representation as a string.</returns>
     [Obsolete("This method is obsolete, use the extension methods in Microsoft.Kiota.Serialization.Json.IParsableExtensions instead")]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static Task<string> SerializeAsStringAsync<T>(T value, CancellationToken cancellationToken) where T : IParsable 
+    public static Task<string> SerializeAsStringAsync<T>(T value, CancellationToken cancellationToken) where T : IParsable
         => KiotaSerializer.SerializeAsStringAsync(_jsonContentType, value, true, cancellationToken);
-    
+
     /// <summary>
     /// Serializes the given object into a string based on the content type.
     /// </summary>

@@ -21,7 +21,7 @@ public static class IParsableExtensions
     /// <returns>The serialized representation as a stream.</returns>
     public static Stream SerializeAsFormStream<T>(this T value, bool serializeOnlyChangedValues = true) where T : IParsable
         => KiotaSerializer.SerializeAsStream(_formContentType, value, serializeOnlyChangedValues);
-    
+
     /// <summary>
     /// Serializes the given object into a form url encoded string.
     /// </summary>
@@ -32,7 +32,7 @@ public static class IParsableExtensions
     /// <returns>The serialized representation as a string.</returns>
     public static Task<string> SerializeAsFormAsync<T>(this T value, bool serializeOnlyChangedValues = true, CancellationToken cancellationToken = default) where T : IParsable
         => KiotaSerializer.SerializeAsStringAsync(_formContentType, value, serializeOnlyChangedValues, cancellationToken);
-    
+
     /// <summary>
     /// Serializes the given object into stream with form url encoded content type.
     /// </summary>
@@ -42,7 +42,7 @@ public static class IParsableExtensions
     /// <returns>The serialized representation as a stream.</returns>
     public static Stream SerializeAsFormStream<T>(this IEnumerable<T> value, bool serializeOnlyChangedValues = true) where T : IParsable
         => KiotaSerializer.SerializeAsStream(_formContentType, value, serializeOnlyChangedValues);
-    
+
     /// <summary>
     /// Serializes the given object into a form url encoded string.
     /// </summary>
@@ -63,7 +63,7 @@ public static class IParsableExtensions
     /// <returns>The serialized representation as a stream.</returns>
     public static Stream SerializeAsFormStream<T>(this T[] value, bool serializeOnlyChangedValues = true) where T : IParsable
         => KiotaSerializer.SerializeAsStream(_formContentType, value, serializeOnlyChangedValues);
-    
+
     /// <summary>
     /// Serializes the given object into a form url encoded string.
     /// </summary>
@@ -74,5 +74,5 @@ public static class IParsableExtensions
     /// <returns>The serialized representation as a string.</returns>
     public static Task<string> SerializeAsFormAsync<T>(this T[] value, bool serializeOnlyChangedValues = true, CancellationToken cancellationToken = default) where T : IParsable
         => KiotaSerializer.SerializeAsStringAsync(_formContentType, value, serializeOnlyChangedValues, cancellationToken);
-    
+
 }
