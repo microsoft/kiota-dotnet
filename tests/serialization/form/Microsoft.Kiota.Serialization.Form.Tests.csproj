@@ -1,12 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net8.0;net462</TargetFrameworks>
-    <IsTestProject>true</IsTestProject>
-    <ImplicitUsings>true</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="coverlet.msbuild" Version="6.0.2">
       <PrivateAssets>all</PrivateAssets>
@@ -27,7 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\serialization\form\Microsoft.Kiota.Serialization.Form.csproj" />
+    <ProjectReference
+      Include="..\..\..\src\serialization\form\Microsoft.Kiota.Serialization.Form.csproj" />
   </ItemGroup>
 
 </Project>

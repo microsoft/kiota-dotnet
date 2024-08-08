@@ -1,10 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsTestProject>true</IsTestProject>
-    <TargetFrameworks>net8.0;net462</TargetFrameworks>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="coverlet.msbuild" Version="6.0.2">
       <PrivateAssets>all</PrivateAssets>
@@ -29,5 +24,5 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\bundle\Microsoft.Kiota.Bundle.csproj" />
   </ItemGroup>
-	
+
 </Project>

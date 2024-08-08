@@ -1,0 +1,9 @@
+<Project>
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;net462</TargetFrameworks>
+		<IsTestProject>true</IsTestProject>
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>true</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+</Project>
