@@ -1,9 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net462</TargetFrameworks>
-    <IsTestProject>true</IsTestProject>
-    <ImplicitUsings>true</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -27,7 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\serialization\form\Microsoft.Kiota.Serialization.Form.csproj" />
+    <ProjectReference
+      Include="..\..\..\src\serialization\form\Microsoft.Kiota.Serialization.Form.csproj" />
   </ItemGroup>
 
 </Project>

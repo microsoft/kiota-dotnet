@@ -22,6 +22,7 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
 
     private readonly TokenCredential _credential;
     private readonly ActivitySource _activitySource;
+    private readonly bool _isCaeEnabled;
     private readonly HashSet<string> _scopes;
     /// <inheritdoc />
     public AllowedHostsValidator AllowedHostsValidator { get; protected set; }
@@ -33,7 +34,8 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
     /// <param name="allowedHosts">The list of allowed hosts for which to request access tokens.</param>
     /// <param name="scopes">The scopes to request the access token for.</param>
     /// <param name="observabilityOptions">The observability options to use for the authentication provider.</param>
-    public AzureIdentityAccessTokenProvider(TokenCredential credential, string[]? allowedHosts = null, ObservabilityOptions? observabilityOptions = null, params string[] scopes)
+    /// <param name="isCaeEnabled">Whether to enable Conditional Access Evaluation (CAE) for the token request.</param>
+    public AzureIdentityAccessTokenProvider(TokenCredential credential, string[]? allowedHosts = null, ObservabilityOptions? observabilityOptions = null, bool isCaeEnabled = true, params string[] scopes)
     {
         _credential = credential ?? throw new ArgumentNullException(nameof(credential));
 
@@ -45,6 +47,20 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
             _scopes = new(scopes, StringComparer.OrdinalIgnoreCase);
 
         _activitySource = new((observabilityOptions ?? new()).TracerInstrumentationName);
+        _isCaeEnabled = isCaeEnabled;
+    }
+    /// <summary>
+    /// The <see cref="AzureIdentityAccessTokenProvider"/> constructor
+    /// </summary>
+    /// <param name="credential">The credential implementation to use to obtain the access token.</param>
+    /// <param name="allowedHosts">The list of allowed hosts for which to request access tokens.</param>
+    /// <param name="scopes">The scopes to request the access token for.</param>
+    /// <param name="observabilityOptions">The observability options to use for the authentication provider.</param>
+    [Obsolete("This constructor is obsolete and will be removed in a future version. Use the constructor that takes an isCaeEnabled parameter instead.")]
+    public AzureIdentityAccessTokenProvider(TokenCredential credential, string[]? allowedHosts, ObservabilityOptions? observabilityOptions, params string[] scopes) :
+    this(credential, allowedHosts, observabilityOptions, true, scopes)
+    {
+
     }
 
     private const string ClaimsKey = "claims";
@@ -96,7 +112,7 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
             scopes = [$"{uri.Scheme}://{uri.Host}/.default"];
         span?.SetTag("com.microsoft.kiota.authentication.scopes", string.Join(",", scopes));
 
-        var result = await _credential.GetTokenAsync(new TokenRequestContext(scopes, claims: decodedClaim), cancellationToken).ConfigureAwait(false);
+        var result = await _credential.GetTokenAsync(new TokenRequestContext(scopes, claims: decodedClaim, isCaeEnabled: _isCaeEnabled), cancellationToken).ConfigureAwait(false);
         return result.Token;
     }
 
