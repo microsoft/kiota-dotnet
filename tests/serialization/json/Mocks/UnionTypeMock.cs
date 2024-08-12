@@ -7,10 +7,10 @@ namespace Microsoft.Kiota.Serialization.Json.Tests.Mocks;
 
 public class UnionTypeMock : IParsable, IComposedTypeWrapper
 {
-    public TestEntity ComposedType1 { get; set; }
-    public SecondTestEntity ComposedType2 { get; set; }
-    public string StringValue { get; set; }
-    public List<TestEntity> ComposedType3 { get; set; }
+    public TestEntity? ComposedType1 { get; set; }
+    public SecondTestEntity? ComposedType2 { get; set; }
+    public string? StringValue { get; set; }
+    public List<TestEntity>? ComposedType3 { get; set; }
     public static UnionTypeMock CreateFromDiscriminator(IParseNode parseNode)
     {
         var result = new UnionTypeMock();

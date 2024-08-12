@@ -66,7 +66,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <param name="content">The <see cref="Stream"/> containing json to parse.</param>
         /// <param name="cancellationToken">The cancellation token for the task</param>
         /// <returns>An instance of <see cref="IParseNode"/> for json manipulation</returns>
-        public async Task<IParseNode> GetRootParseNodeAsync(string contentType, Stream content,
+        public async Task<IParseNode> GetRootParseNodeAsync(string? contentType, Stream content,
             CancellationToken cancellationToken = default)
         {
             if(string.IsNullOrEmpty(contentType))

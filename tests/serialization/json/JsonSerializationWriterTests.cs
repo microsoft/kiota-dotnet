@@ -24,6 +24,8 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [Fact]
         public void WritesSampleObjectValue()
         {
+            var nullJsonElement = JsonDocument.Parse("null").RootElement;
+
             // Arrange
             var testEntity = new TestEntity()
             {
@@ -34,7 +36,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                 HeightInMetres = 1.80m,
                 AdditionalData = new Dictionary<string, object>
                 {
-                    {"mobilePhone",null}, // write null value
+                    {"mobilePhone",nullJsonElement}, // write null value
                     {"accountEnabled",false}, // write bool value
                     {"jobTitle","Author"}, // write string value
                     {"createdDateTime", DateTimeOffset.MinValue}, // write date value
@@ -129,6 +131,8 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [Fact]
         public void WritesSampleCollectionOfObjectValues()
         {
+            var nullJsonElement = JsonDocument.Parse("null").RootElement;
+
             // Arrange
             var testEntity = new TestEntity()
             {
@@ -137,7 +141,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                 TestNamingEnum = TestNamingEnum.Item2SubItem1,
                 AdditionalData = new Dictionary<string, object>
                 {
-                    {"mobilePhone",null}, // write null value
+                    {"mobilePhone",nullJsonElement}, // write null value
                     {"accountEnabled",false}, // write bool value
                     {"jobTitle","Author"}, // write string value
                     {"createdDateTime", DateTimeOffset.MinValue}, // write date value

@@ -20,7 +20,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests.Mocks
         public override void Serialize(ISerializationWriter writer)
         {
             base.Serialize(writer);
-            writer.WriteDateValue("enrolmentDate", EnrolmentDate.Value);
+            writer.WriteDateValue("enrolmentDate", EnrolmentDate);
         }
     }
 }

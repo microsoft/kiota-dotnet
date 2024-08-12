@@ -42,7 +42,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [Theory]
         [InlineData(null)]
         [InlineData("")]
-        public async Task ThrowsArgumentNullExceptionForNoContentType(string contentType)
+        public async Task ThrowsArgumentNullExceptionForNoContentType(string? contentType)
         {
             using var jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(TestJsonString));
             var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _jsonParseNodeFactory.GetRootParseNodeAsync(contentType, jsonStream));

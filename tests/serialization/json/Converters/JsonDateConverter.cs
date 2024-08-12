@@ -22,7 +22,7 @@ public class JsonDateConverter : JsonConverter<Date>
         => WriteInternal(writer, value);
 
     private static Date ReadInternal(ref Utf8JsonReader reader)
-        => new Date(DateTime.ParseExact(reader.GetString(), "dd---MM---yyyy", CultureInfo.InvariantCulture));
+        => new Date(DateTime.ParseExact(reader.GetString() ?? "", "dd---MM---yyyy", CultureInfo.InvariantCulture));
 
     private static void WriteInternal(Utf8JsonWriter writer, Date value)
         => writer.WriteStringValue(value.ToString());

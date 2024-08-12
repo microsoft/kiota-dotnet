@@ -9,12 +9,12 @@ public class UntypedTestEntity : IParsable, IAdditionalDataHolder
 {
     /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
     public IDictionary<string, object> AdditionalData { get; set; }
-    public string Id { get; set; }
-    public string Title { get; set; }
-    public UntypedNode Location { get; set; }
-    public UntypedNode Keywords { get; set; }
-    public UntypedNode Detail { get; set; }
-    public UntypedNode Table { get; set; }
+    public string? Id { get; set; }
+    public string? Title { get; set; }
+    public UntypedNode? Location { get; set; }
+    public UntypedNode? Keywords { get; set; }
+    public UntypedNode? Detail { get; set; }
+    public UntypedNode? Table { get; set; }
     public UntypedTestEntity()
     {
         AdditionalData = new Dictionary<string, object>();
