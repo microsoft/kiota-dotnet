@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Kiota.Abstractions.Store;
@@ -465,6 +466,21 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             testUser.BackingStore.InitializationCompleted = true; // initialize
 
             Assert.Equal(2, invocationCount);// only called twice
+        }
+        private readonly int[] _testArray = Enumerable.Range(0, 100000000).ToArray();
+        [Fact]
+        public void TestsLargeArrayPerformsWell()
+        {
+            // Arrange
+            var testBackingStore = new InMemoryBackingStore();
+            // Act
+            Assert.Empty(testBackingStore.Enumerate());
+            testBackingStore.Set("email", _testArray);
+            var stopWatch = Stopwatch.StartNew();
+            testBackingStore.InitializationCompleted = true;
+            stopWatch.Stop();
+            // Assert
+            Assert.InRange(stopWatch.ElapsedMilliseconds, 0, 2);
         }
 
         /// <summary>
