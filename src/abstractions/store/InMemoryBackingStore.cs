@@ -206,11 +206,11 @@ namespace Microsoft.Kiota.Abstractions.Store
                 // Call Get<>() on nested properties so that this method may be called recursively to ensure collections are consistent
                 foreach(var item in collectionTuple.Item1)
                 {
-                    if(item is IBackedModel store)
+                    if(item is IBackedModel backedModel)
                     {
-                        foreach(var innerItem in store.BackingStore.Enumerate())
+                        foreach(var innerItem in backedModel.BackingStore.Enumerate())
                         {
-                            store.BackingStore.Get<object>(innerItem.Key);
+                            backedModel.BackingStore.Get<object>(innerItem.Key);
                         }
                     }
                 }
