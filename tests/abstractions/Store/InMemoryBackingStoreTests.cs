@@ -475,12 +475,15 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             var testBackingStore = new InMemoryBackingStore();
             // Act
             Assert.Empty(testBackingStore.Enumerate());
-            testBackingStore.Set("email", _testArray);
             var stopWatch = Stopwatch.StartNew();
+            testBackingStore.Set("email", _testArray);
+            stopWatch.Stop();
+            Assert.InRange(stopWatch.ElapsedMilliseconds, 0, 1);
+            stopWatch.Restart();
             testBackingStore.InitializationCompleted = true;
             stopWatch.Stop();
             // Assert
-            Assert.InRange(stopWatch.ElapsedMilliseconds, 0, 2);
+            Assert.InRange(stopWatch.ElapsedMilliseconds, 0, 1);
         }
 
         /// <summary>
