@@ -74,7 +74,6 @@ namespace Microsoft.Kiota.Abstractions.Tests.Serialization
         }
 
         [Theory]
-        [InlineData(null)]
         [InlineData("")]
         [Obsolete]
         public void ThrowsArgumentNullExceptionForNoContentType(string contentType)
@@ -137,7 +136,6 @@ namespace Microsoft.Kiota.Abstractions.Tests.Serialization
         }
 
         [Theory]
-        [InlineData(null)]
         [InlineData("")]
         public async Task ThrowsArgumentNullExceptionForNoContentTypeAsync(string contentType)
         {

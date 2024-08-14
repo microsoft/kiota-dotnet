@@ -8,7 +8,7 @@ public class IEnumerableExtensionsTests
     [Fact]
     public void AsList_WithNullInput_ReturnsNull()
     {
-        IEnumerable<int> nullEnumerable = null;
+        IEnumerable<int>? nullEnumerable = null;
         var result = nullEnumerable.AsList();
         Assert.Null(result);
     }
@@ -33,7 +33,7 @@ public class IEnumerableExtensionsTests
     [Fact]
     public void AsArray_WithNullInput_ReturnsNull()
     {
-        IEnumerable<int> nullEnumerable = null;
+        IEnumerable<int>? nullEnumerable = null;
         var result = nullEnumerable.AsArray();
         Assert.Null(result);
     }

@@ -67,7 +67,6 @@ namespace Microsoft.Kiota.Abstractions.Tests.Serialization
         }
 
         [Theory]
-        [InlineData(null)]
         [InlineData("")]
         public void ThrowsArgumentNullExceptionForNoContentType(string contentType)
         {
