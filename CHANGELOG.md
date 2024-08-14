@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.11.2] - 2024-08-14
+
+### Changed
+
+- Fixed an additional performance regression with the backing store introduced in version 1.9.2 by #243
+
 ## [1.11.1] - 2024-08-12
 
 ### Changed

@@ -467,7 +467,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
 
             Assert.Equal(2, invocationCount);// only called twice
         }
-        private readonly int[] _testArray = Enumerable.Range(0, 100000000).ToArray();
+        private readonly int[] _testArray = Enumerable.Range(0, 1000000000).ToArray();
         [Fact]
         public void TestsLargeArrayPerformsWell()
         {
@@ -475,8 +475,11 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             var testBackingStore = new InMemoryBackingStore();
             // Act
             Assert.Empty(testBackingStore.Enumerate());
-            testBackingStore.Set("email", _testArray);
             var stopWatch = Stopwatch.StartNew();
+            testBackingStore.Set("email", _testArray);
+            stopWatch.Stop();
+            Assert.InRange(stopWatch.ElapsedMilliseconds, 0, 2);
+            stopWatch.Restart();
             testBackingStore.InitializationCompleted = true;
             stopWatch.Stop();
             // Assert

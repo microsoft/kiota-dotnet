@@ -81,14 +81,13 @@ namespace Microsoft.Kiota.Abstractions.Store
                 // All the list items are dirty as the model has been touched.
                 foreach(var item in collectionValues)
                 {
-                    if(item is IBackedModel model)
+                    // we don't support heterogeneous collections, so we can break if the first item is not a IBackedModel
+                    if(item is not IBackedModel model) break;
+                    model.BackingStore.InitializationCompleted = false;
+                    model.BackingStore.Subscribe((keyString, oldObject, newObject) =>
                     {
-                        model.BackingStore.InitializationCompleted = false;
-                        model.BackingStore.Subscribe((keyString, oldObject, newObject) =>
-                        {
-                            Set(key, value);
-                        }, key); // use property name(key) as subscriptionId to prevent excess subscription creation in the event this is called again
-                    }
+                        Set(key, value);
+                    }, key); // use property name(key) as subscriptionId to prevent excess subscription creation in the event this is called again
                 }
             }
 
