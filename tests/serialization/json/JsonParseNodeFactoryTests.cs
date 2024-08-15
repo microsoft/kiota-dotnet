@@ -45,7 +45,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         public async Task ThrowsArgumentNullExceptionForNoContentType(string? contentType)
         {
             using var jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(TestJsonString));
-            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _jsonParseNodeFactory.GetRootParseNodeAsync(contentType, jsonStream));
+            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _jsonParseNodeFactory.GetRootParseNodeAsync(contentType!, jsonStream));
 
             // Assert
             Assert.NotNull(exception);

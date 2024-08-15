@@ -37,7 +37,7 @@ public class MultipartSerializationWriterFactoryTests
     [InlineData("")]
     public void ThrowsArgumentNullExceptionForNoContentType(string? contentType)
     {
-        var exception = Assert.Throws<ArgumentNullException>(() => _multipartSerializationFactory.GetSerializationWriter(contentType));
+        var exception = Assert.Throws<ArgumentNullException>(() => _multipartSerializationFactory.GetSerializationWriter(contentType!));
 
         // Assert
         Assert.NotNull(exception);

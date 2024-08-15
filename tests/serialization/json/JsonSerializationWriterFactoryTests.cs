@@ -38,7 +38,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [InlineData("")]
         public void ThrowsArgumentNullExceptionForNoContentType(string? contentType)
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => _jsonSerializationFactory.GetSerializationWriter(contentType));
+            var exception = Assert.Throws<ArgumentNullException>(() => _jsonSerializationFactory.GetSerializationWriter(contentType!));
 
             // Assert
             Assert.NotNull(exception);
