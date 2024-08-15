@@ -15,6 +15,26 @@ public class DeserializationHelpersTests
     private const string _jsonContentType = "application/json";
     [Fact]
     [Obsolete]
+    public void DefensiveObject()
+    {
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.Deserialize<TestEntity>(null!, (Stream)null!, null!));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.Deserialize<TestEntity>(_jsonContentType, (Stream)null!, null!));
+        using var stream = new MemoryStream();
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.Deserialize<TestEntity>(_jsonContentType, stream, null!));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.Deserialize<TestEntity>(_jsonContentType, "", null!));
+    }
+    [Fact]
+    [Obsolete]
+    public void DefensiveObjectCollection()
+    {
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.DeserializeCollection<TestEntity>(null!, (Stream)null!, null!));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.DeserializeCollection<TestEntity>(_jsonContentType, (Stream)null!, null!));
+        using var stream = new MemoryStream();
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.DeserializeCollection<TestEntity>(_jsonContentType, stream, null!));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.DeserializeCollection<TestEntity>(_jsonContentType, "", null!));
+    }
+    [Fact]
+    [Obsolete]
     public void DeserializesObjectWithoutReflection()
     {
         var strValue = "{'id':'123'}";
@@ -73,6 +93,26 @@ public class DeserializationHelpersTests
         Assert.NotNull(result);
         Assert.Single(result);
     }
+
+    [Fact]
+    public async Task DefensiveObjectAsync()
+    {
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await KiotaSerializer.DeserializeAsync<TestEntity>(null!, (Stream)null!, null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await KiotaSerializer.DeserializeAsync<TestEntity>(_jsonContentType, (Stream)null!, null!));
+        using var stream = new MemoryStream();
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await KiotaSerializer.DeserializeAsync<TestEntity>(_jsonContentType, stream, null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await KiotaSerializer.DeserializeAsync<TestEntity>(_jsonContentType, "", null!));
+    }
+    [Fact]
+    public async Task DefensiveObjectCollectionAsync()
+    {
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await KiotaSerializer.DeserializeCollectionAsync<TestEntity>(null!, (Stream)null!, null!, default));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await KiotaSerializer.DeserializeCollectionAsync<TestEntity>(_jsonContentType, (Stream)null!, null!));
+        using var stream = new MemoryStream();
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await KiotaSerializer.DeserializeCollectionAsync<TestEntity>(_jsonContentType, stream, null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await KiotaSerializer.DeserializeCollectionAsync<TestEntity>(_jsonContentType, "", null!));
+    }
+
 
     [Fact]
     public async Task DeserializesObjectWithoutReflectionAsync()

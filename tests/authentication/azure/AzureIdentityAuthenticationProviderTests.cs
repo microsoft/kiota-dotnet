@@ -10,6 +10,16 @@ using Xunit;
 namespace Microsoft.Kiota.Authentication.Azure.Tests;
 public class AzureIdentityAuthenticationProviderTests
 {
+    [Fact]
+    public void ConstructorThrowsArgumentNullExceptionOnNullTokenCredential()
+    {
+        // Arrange
+        var exception = Assert.Throws<ArgumentNullException>(() => new AzureIdentityAccessTokenProvider(null!, null));
+
+        // Assert
+        Assert.Equal("credential", exception.ParamName);
+    }
+
     [Theory]
     [InlineData("https://localhost", "")]
     [InlineData("https://graph.microsoft.com", "token")]

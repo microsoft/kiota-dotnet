@@ -22,7 +22,7 @@ public class JsonDateTimeOffsetConverter : JsonConverter<DateTimeOffset>
         => WriteInternal(writer, value);
 
     private static DateTimeOffset ReadInternal(ref Utf8JsonReader reader)
-        => DateTimeOffset.ParseExact(reader.GetString() ?? "", Format, CultureInfo.InvariantCulture);
+        => DateTimeOffset.ParseExact(reader.GetString()!, Format, CultureInfo.InvariantCulture);
 
     private static void WriteInternal(Utf8JsonWriter writer, DateTimeOffset value)
         => writer.WriteStringValue(value.ToString(Format));
