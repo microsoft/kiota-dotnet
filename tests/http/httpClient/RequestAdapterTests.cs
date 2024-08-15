@@ -90,9 +90,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             };
 
             // Act
-            var requestMessage = (await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo))!;
+            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
 
             // Assert
+            Assert.NotNull(requestMessage);
             Assert.NotNull(requestMessage.RequestUri);
             Assert.Contains("http://localhost/me", requestMessage.RequestUri.OriginalString);
         }
@@ -115,9 +116,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             requestAdapter.BaseUrl = "http://localhost";
 
             // Act
-            var requestMessage = (await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo))!;
+            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
 
             // Assert
+            Assert.NotNull(requestMessage);
             Assert.NotNull(requestMessage.RequestUri);
             Assert.Contains("http://localhost/me", requestMessage.RequestUri.OriginalString);// Request generated using adapter baseUrl
         }
@@ -138,9 +140,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             requestInfo.QueryParameters.Add(queryParam, queryParamObject!);
 
             // Act
-            var requestMessage = (await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo))!;
+            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
 
             // Assert
+            Assert.NotNull(requestMessage);
             Assert.NotNull(requestMessage.RequestUri);
             Assert.Contains(expectedString, requestMessage.RequestUri.Query);
         }
@@ -159,9 +162,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             requestInfo.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes("contents")), "application/octet-stream");
 
             // Act
-            var requestMessage = (await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo))!;
+            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
 
             // Assert
+            Assert.NotNull(requestMessage);
             Assert.NotNull(requestMessage.Content);
             // Content length set correctly
             Assert.Equal(26, requestMessage.Content.Headers.ContentLength);

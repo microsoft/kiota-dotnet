@@ -41,7 +41,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 }
             });
             // Act and get a request message
-            var requestMessage = (await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo))!;
+            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+
+            Assert.NotNull(requestMessage);
             Assert.Empty(requestMessage.Headers);
 
             // Act
@@ -62,7 +64,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             };
             var defaultOption = new UserAgentHandlerOption();
             // Act and get a request message
-            var requestMessage = (await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo))!;
+            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+
+            Assert.NotNull(requestMessage);
             Assert.Empty(requestMessage.Headers);
 
             // Act
@@ -88,7 +92,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             };
             var defaultOption = new UserAgentHandlerOption();
             // Act and get a request message
-            var requestMessage = (await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo))!;
+            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+
+            Assert.NotNull(requestMessage);
             Assert.Empty(requestMessage.Headers);
 
             // Act
