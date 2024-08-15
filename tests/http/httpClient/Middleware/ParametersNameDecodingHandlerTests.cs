@@ -43,7 +43,7 @@ public class ParametersDecodingHandlerTests
             URI = new Uri(original)
         };
         // Act and get a request message
-        var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+        var requestMessage = (await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo))!;
 
         // Act
         await _invoker.SendAsync(requestMessage, new CancellationToken());
@@ -82,7 +82,7 @@ public class ParametersDecodingHandlerTests
             }
         });
         // Act and get a request message
-        var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+        var requestMessage = (await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo))!;
 
         // Act
         await _invoker.SendAsync(requestMessage, new CancellationToken());

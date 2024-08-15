@@ -90,7 +90,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             };
 
             // Act
-            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = (await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo))!;
 
             // Assert
             Assert.NotNull(requestMessage.RequestUri);
@@ -115,7 +115,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             requestAdapter.BaseUrl = "http://localhost";
 
             // Act
-            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = (await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo))!;
 
             // Assert
             Assert.NotNull(requestMessage.RequestUri);
@@ -138,7 +138,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             requestInfo.QueryParameters.Add(queryParam, queryParamObject!);
 
             // Act
-            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = (await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo))!;
 
             // Assert
             Assert.NotNull(requestMessage.RequestUri);
@@ -159,7 +159,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             requestInfo.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes("contents")), "application/octet-stream");
 
             // Act
-            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = (await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo))!;
 
             // Assert
             Assert.NotNull(requestMessage.Content);

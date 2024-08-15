@@ -86,6 +86,6 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="requestInfo">The RequestInformation object to use for the HTTP request.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use for cancelling the requests.</param>
         /// <returns>The native HTTP request.</returns>
-        Task<T> ConvertToNativeRequestAsync<T>(RequestInformation requestInfo, CancellationToken cancellationToken = default);
+        Task<T?> ConvertToNativeRequestAsync<T>(RequestInformation requestInfo, CancellationToken cancellationToken = default);
     }
 }

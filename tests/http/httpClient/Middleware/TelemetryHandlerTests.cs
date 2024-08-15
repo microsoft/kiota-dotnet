@@ -36,7 +36,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 URI = new Uri("http://localhost")
             };
             // Act and get a request message
-            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = (await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo))!;
             Assert.Empty(requestMessage.Headers);
 
             // Act
@@ -67,7 +67,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             // Configures the telemetry at the request level
             requestInfo.AddRequestOptions(new IRequestOption[] { telemetryHandlerOption });
             // Act and get a request message
-            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = (await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo))!;
             Assert.Empty(requestMessage.Headers);
 
             // Act
@@ -105,7 +105,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 URI = new Uri("http://localhost")
             };
 
-            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);// get a request message
+            var requestMessage = (await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo))!;// get a request message
             Assert.Empty(requestMessage.Headers);
 
             // Act
