@@ -72,7 +72,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
 
             var clonedRequest = await originalRequest.CloneAsync();
             var originalContents = await originalRequest.Content.ReadAsStringAsync();
-            var clonedRequestContents = await clonedRequest.Content?.ReadAsStringAsync();
+            var clonedRequestContents = await clonedRequest.Content!.ReadAsStringAsync();
 
             Assert.NotNull(clonedRequest);
             Assert.Equal(originalRequest.Method, clonedRequest.Method);
@@ -93,8 +93,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
             var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
 
             var clonedRequest = await originalRequest.CloneAsync();
-            var originalContents = await originalRequest.Content.ReadAsStringAsync();
-            var clonedRequestContents = await clonedRequest.Content?.ReadAsStringAsync();
+            var originalContents = await originalRequest.Content!.ReadAsStringAsync();
+            var clonedRequestContents = await clonedRequest.Content!.ReadAsStringAsync();
 
             Assert.NotNull(clonedRequest);
             Assert.Equal(originalRequest.Method, clonedRequest.Method);

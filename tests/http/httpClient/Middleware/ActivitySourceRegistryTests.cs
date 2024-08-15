@@ -10,7 +10,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware.Registries
         public void Defensive()
         {
             Assert.Throws<ArgumentNullException>(() => ActivitySourceRegistry.DefaultInstance.GetOrCreateActivitySource(""));
-            Assert.Throws<ArgumentNullException>(() => ActivitySourceRegistry.DefaultInstance.GetOrCreateActivitySource(null));
+            Assert.Throws<ArgumentNullException>(() => ActivitySourceRegistry.DefaultInstance.GetOrCreateActivitySource(null!));
         }
 
         [Fact]

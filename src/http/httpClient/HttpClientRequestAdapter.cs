@@ -571,7 +571,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             IDictionaryExtensions.AddOrReplace(requestInfo.PathParameters, "baseurl", BaseUrl!);
         }
         /// <inheritdoc/>
-        public async Task<T?> ConvertToNativeRequestAsync<T>(RequestInformation requestInfo, CancellationToken cancellationToken = default)
+        public async Task<T> ConvertToNativeRequestAsync<T>(RequestInformation requestInfo, CancellationToken cancellationToken = default)
         {
             await authProvider.AuthenticateRequestAsync(requestInfo, null, cancellationToken).ConfigureAwait(false);
             if(GetRequestMessageFromRequestInformation(requestInfo, null) is T result)

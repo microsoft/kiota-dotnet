@@ -46,7 +46,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <param name="handlers">The <see cref="DelegatingHandler"/> instances to create the <see cref="DelegatingHandler"/> from.</param>
         /// <param name="finalHandler">The final <see cref="HttpMessageHandler"/> in the http pipeline. Can be configured for proxies, auto-decompression and auto-redirects</param>
         /// <returns>The <see cref="HttpClient"/> with the custom handlers.</returns>
-        public static HttpClient Create(IList<DelegatingHandler> handlers, HttpMessageHandler? finalHandler = null)
+        public static HttpClient Create(IList<DelegatingHandler>? handlers, HttpMessageHandler? finalHandler = null)
         {
             if(handlers == null || handlers.Count == 0)
                 return Create(finalHandler);
