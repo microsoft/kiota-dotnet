@@ -175,7 +175,8 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             var rootParseNode = new JsonParseNode(jsonDocument.RootElement);
             // Act to get business phones list
             var phonesListChildNode = rootParseNode.GetChildNode("businessPhones");
-            var phonesList = phonesListChildNode!.GetCollectionOfPrimitiveValues<string>().ToArray();
+            Assert.NotNull(phonesListChildNode);
+            var phonesList = phonesListChildNode.GetCollectionOfPrimitiveValues<string>().ToArray();
             // Assert
             Assert.NotEmpty(phonesList);
             Assert.Equal("+1 412 555 0109", phonesList[0]);
