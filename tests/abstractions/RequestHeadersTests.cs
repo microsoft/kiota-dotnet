@@ -10,17 +10,17 @@ public class RequestHeadersTests
     public void Defensive()
     {
         var instance = new RequestHeaders();
-        Assert.Throws<ArgumentNullException>(() => instance.Add(null, "value"));
-        Assert.Throws<ArgumentNullException>(() => instance.Add("name", (string[])null));
+        Assert.Throws<ArgumentNullException>(() => instance.Add(null!, "value"));
+        Assert.Throws<ArgumentNullException>(() => instance.Add("name", (string[])null!));
         instance.Add("name", Array.Empty<string>());
         instance.Add("name", new List<string>());
         instance.Add(new KeyValuePair<string, IEnumerable<string>>("name", Array.Empty<string>()));
-        Assert.Throws<ArgumentNullException>(() => instance[null]);
-        Assert.Throws<ArgumentNullException>(() => instance.Remove(null));
-        Assert.Throws<ArgumentNullException>(() => instance.Remove(null, "value"));
-        Assert.Throws<ArgumentNullException>(() => instance.Remove("name", null));
-        Assert.Throws<ArgumentNullException>(() => instance.AddAll(null));
-        instance.ContainsKey(null);
+        Assert.Throws<ArgumentNullException>(() => instance[null!]);
+        Assert.Throws<ArgumentNullException>(() => instance.Remove(null!));
+        Assert.Throws<ArgumentNullException>(() => instance.Remove(null!, "value"));
+        Assert.Throws<ArgumentNullException>(() => instance.Remove("name", null!));
+        Assert.Throws<ArgumentNullException>(() => instance.AddAll(null!));
+        instance.ContainsKey(null!);
     }
     [Fact]
     public void AddsToNonExistent()

@@ -16,14 +16,14 @@ public class SerializationHelpersTests
     [Fact]
     public void DefensiveObject()
     {
-        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.SerializeAsStream(null, (TestEntity)null));
-        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.SerializeAsStream(_jsonContentType, (TestEntity)null));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.SerializeAsStream(null!, (TestEntity)null!));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.SerializeAsStream(_jsonContentType, (TestEntity)null!));
     }
     [Fact]
     public void DefensiveObjectCollection()
     {
-        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.SerializeAsStream(null, (IEnumerable<TestEntity>)null));
-        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.SerializeAsStream(_jsonContentType, (IEnumerable<TestEntity>)null));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.SerializeAsStream(null!, (IEnumerable<TestEntity>)null!));
+        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.SerializeAsStream(_jsonContentType, (IEnumerable<TestEntity>)null!));
     }
     [Fact]
     public async Task SerializesObject()

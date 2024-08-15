@@ -8,7 +8,7 @@ public class TestEntity : IParsable, IAdditionalDataHolder
     /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
     public IDictionary<string, object> AdditionalData { get; set; }
     /// <summary>Read-only.</summary>
-    public string Id { get; set; }
+    public string? Id { get; set; }
     /// <summary>Read-only.</summary>
     public TimeSpan? WorkDuration { get; set; }
     /// <summary>Read-only.</summary>
@@ -20,7 +20,7 @@ public class TestEntity : IParsable, IAdditionalDataHolder
     /// <summary>Read-only.</summary>
     public DateTimeOffset? CreatedDateTime { get; set; }
     /// <summary>Read-only.</summary>
-    public string OfficeLocation { get; set; }
+    public string? OfficeLocation { get; set; }
     /// <summary>
     /// Instantiates a new entity and sets the default values.
     /// </summary>

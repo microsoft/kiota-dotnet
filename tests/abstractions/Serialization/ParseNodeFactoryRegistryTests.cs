@@ -77,12 +77,12 @@ namespace Microsoft.Kiota.Abstractions.Tests.Serialization
         [InlineData(null)]
         [InlineData("")]
         [Obsolete]
-        public void ThrowsArgumentNullExceptionForNoContentType(string contentType)
+        public void ThrowsArgumentNullExceptionForNoContentType(string? contentType)
         {
             // Arrange
             using var testStream = new MemoryStream(Encoding.UTF8.GetBytes("test input"));
             // Act
-            var exception = Assert.Throws<ArgumentNullException>(() => _parseNodeFactoryRegistry.GetRootParseNode(contentType, testStream));
+            var exception = Assert.Throws<ArgumentNullException>(() => _parseNodeFactoryRegistry.GetRootParseNode(contentType!, testStream));
             // Assert
             Assert.NotNull(exception);
             Assert.Equal("contentType", exception.ParamName);
@@ -139,12 +139,12 @@ namespace Microsoft.Kiota.Abstractions.Tests.Serialization
         [Theory]
         [InlineData(null)]
         [InlineData("")]
-        public async Task ThrowsArgumentNullExceptionForNoContentTypeAsync(string contentType)
+        public async Task ThrowsArgumentNullExceptionForNoContentTypeAsync(string? contentType)
         {
             // Arrange
             using var testStream = new MemoryStream(Encoding.UTF8.GetBytes("test input"));
             // Act
-            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _parseNodeFactoryRegistry.GetRootParseNodeAsync(contentType, testStream));
+            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _parseNodeFactoryRegistry.GetRootParseNodeAsync(contentType!, testStream));
             // Assert
             Assert.NotNull(exception);
             Assert.Equal("contentType", exception.ParamName);

@@ -54,7 +54,7 @@ public class HeadersInspectionHandlerTests : IDisposable
         Assert.Equal("test", option.ResponseHeaders["test"].First());
         Assert.Empty(option.RequestHeaders);
     }
-    private HttpMessageInvoker GetMessageInvoker(HeadersInspectionHandlerOption option = null)
+    private HttpMessageInvoker GetMessageInvoker(HeadersInspectionHandlerOption? option = null)
     {
         var messageHandler = new MockRedirectHandler();
         _disposables.Add(messageHandler);

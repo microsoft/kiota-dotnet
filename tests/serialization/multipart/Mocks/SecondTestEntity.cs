@@ -7,7 +7,7 @@ namespace Microsoft.Kiota.Serialization.Multipart.Tests.Mocks;
 
 public class SecondTestEntity : IParsable
 {
-    public string DisplayName { get; set; }
+    public string? DisplayName { get; set; }
     public int? Id { get; set; } // intentionally conflicts with the Id property of the TestEntity class
     public long? FailureRate { get; set; }
     public IDictionary<string, Action<IParseNode>> GetFieldDeserializers()

@@ -42,6 +42,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             });
             // Act and get a request message
             var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+
+            Assert.NotNull(requestMessage);
             Assert.Empty(requestMessage.Headers);
 
             // Act
@@ -63,6 +65,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             var defaultOption = new UserAgentHandlerOption();
             // Act and get a request message
             var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+
+            Assert.NotNull(requestMessage);
             Assert.Empty(requestMessage.Headers);
 
             // Act
@@ -70,9 +74,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 
             // Assert
             Assert.Single(response.RequestMessage?.Headers!);
-            Assert.Single(response.RequestMessage?.Headers!.UserAgent);
-            Assert.Equal(response.RequestMessage?.Headers!.UserAgent.First().Product.Name, defaultOption.ProductName, StringComparer.OrdinalIgnoreCase);
-            Assert.Equal(response.RequestMessage?.Headers!.UserAgent.First().Product.Version, defaultOption.ProductVersion, StringComparer.OrdinalIgnoreCase);
+            Assert.Single(response.RequestMessage?.Headers!.UserAgent!);
+            Assert.Equal(response.RequestMessage?.Headers!.UserAgent.First().Product?.Name, defaultOption.ProductName, StringComparer.OrdinalIgnoreCase);
+            Assert.Equal(response.RequestMessage?.Headers!.UserAgent.First().Product?.Version, defaultOption.ProductVersion, StringComparer.OrdinalIgnoreCase);
             Assert.Equal(response.RequestMessage?.Headers!.UserAgent.ToString(), $"{defaultOption.ProductName}/{defaultOption.ProductVersion}", StringComparer.OrdinalIgnoreCase);
             Assert.Equal(requestMessage, response.RequestMessage);
         }
@@ -89,6 +93,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             var defaultOption = new UserAgentHandlerOption();
             // Act and get a request message
             var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+
+            Assert.NotNull(requestMessage);
             Assert.Empty(requestMessage.Headers);
 
             // Act
@@ -97,7 +103,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 
             // Assert
             Assert.Single(response.RequestMessage?.Headers!);
-            Assert.Single(response.RequestMessage?.Headers!.UserAgent);
+            Assert.Single(response.RequestMessage?.Headers!.UserAgent!);
             Assert.Equal(response.RequestMessage?.Headers!.UserAgent.ToString(), $"{defaultOption.ProductName}/{defaultOption.ProductVersion}", StringComparer.OrdinalIgnoreCase);
         }
 

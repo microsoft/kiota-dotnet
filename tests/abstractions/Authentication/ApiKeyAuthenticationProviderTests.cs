@@ -10,12 +10,13 @@ public class ApiKeyAuthenticationProviderTests
     [Fact]
     public async Task DefensiveProgramming()
     {
-        Assert.Throws<ArgumentNullException>(() => new ApiKeyAuthenticationProvider(null, "param", ApiKeyAuthenticationProvider.KeyLocation.Header));
-        Assert.Throws<ArgumentNullException>(() => new ApiKeyAuthenticationProvider("key", null, ApiKeyAuthenticationProvider.KeyLocation.Header));
+        Assert.Throws<ArgumentNullException>(() => new ApiKeyAuthenticationProvider(null!, "param", ApiKeyAuthenticationProvider.KeyLocation.Header));
+        Assert.Throws<ArgumentNullException>(() => new ApiKeyAuthenticationProvider("key", null!, ApiKeyAuthenticationProvider.KeyLocation.Header));
 
         var value = new ApiKeyAuthenticationProvider("key", "param", ApiKeyAuthenticationProvider.KeyLocation.Header);
-        await Assert.ThrowsAsync<ArgumentNullException>(() => value.AuthenticateRequestAsync(null));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => value.AuthenticateRequestAsync(null!));
     }
+
     [Fact]
     public async Task AddsInHeader()
     {

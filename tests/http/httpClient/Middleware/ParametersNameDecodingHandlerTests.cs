@@ -44,6 +44,7 @@ public class ParametersDecodingHandlerTests
         };
         // Act and get a request message
         var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+        Assert.NotNull(requestMessage);
 
         // Act
         await _invoker.SendAsync(requestMessage, new CancellationToken());
@@ -83,6 +84,7 @@ public class ParametersDecodingHandlerTests
         });
         // Act and get a request message
         var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+        Assert.NotNull(requestMessage);
 
         // Act
         await _invoker.SendAsync(requestMessage, new CancellationToken());
