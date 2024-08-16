@@ -396,8 +396,14 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <param name="value">The byte array to be written.</param>
         public void WriteByteArrayValue(string? key, byte[]? value)
         {
-            if(value != null)//empty array is meaningful
-                WriteStringValue(key, value.Length > 0 ? Convert.ToBase64String(value) : string.Empty);
+            //empty array is meaningful
+            if(value != null)
+            {
+                if(string.IsNullOrEmpty(key))
+                    writer.WriteBase64StringValue(value);
+                else
+                    writer.WriteBase64String(key!, value);
+            }
         }
 
         /// <summary>
