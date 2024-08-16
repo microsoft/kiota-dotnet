@@ -268,10 +268,9 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <returns>The byte array value of the node.</returns>
         public byte[]? GetByteArrayValue()
         {
-            var rawValue = _jsonNode.GetString();
-            if(string.IsNullOrEmpty(rawValue))
-                return null;
-            return Convert.FromBase64String(rawValue);
+            if(_jsonNode.ValueKind is JsonValueKind.String && _jsonNode.TryGetBytesFromBase64(out var result))
+                return result;
+            return null;
         }
         /// <summary>
         /// Gets the untyped value of the node
