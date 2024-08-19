@@ -14,12 +14,12 @@ namespace Microsoft.Kiota.Serialization.Json.Tests.Mocks
 
         public IBackingStore BackingStore { get; private set; }
 
-        public string Id
+        public string? Id
         {
             get { return BackingStore?.Get<string>("id"); }
             set { BackingStore?.Set("id", value); }
         }
-        public string Name
+        public string? Name
         {
             get { return BackingStore?.Get<string>("name"); }
             set { BackingStore?.Set("name", value); }
