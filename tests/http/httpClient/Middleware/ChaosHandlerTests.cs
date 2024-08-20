@@ -25,7 +25,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             var request = new HttpRequestMessage();
 
             // Act
-            Dictionary<HttpStatusCode, object> responses = new Dictionary<HttpStatusCode, object>();
+            Dictionary<HttpStatusCode, object?> responses = new Dictionary<HttpStatusCode, object?>();
 
             // Make calls until all known failures have been triggered
             while(responses.Count < 3)
@@ -67,7 +67,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             var request = new HttpRequestMessage();
 
             // Act
-            Dictionary<HttpStatusCode, object> responses = new Dictionary<HttpStatusCode, object>();
+            Dictionary<HttpStatusCode, object?> responses = new Dictionary<HttpStatusCode, object?>();
 
             // Make calls until all known failures have been triggered
             while(responses.Count < 5)
@@ -98,7 +98,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 {
                     return ChaosHandler.Create429TooManyRequestsResponse(new TimeSpan(0, 0, 5));
                 }
-                return null;
+                return null!;
             };
 
             var handler = new ChaosHandler(new ChaosHandlerOption

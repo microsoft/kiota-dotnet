@@ -14,7 +14,7 @@ public class AzureIdentityAuthenticationProviderTests
     public void ConstructorThrowsArgumentNullExceptionOnNullTokenCredential()
     {
         // Arrange
-        var exception = Assert.Throws<ArgumentNullException>(() => new AzureIdentityAccessTokenProvider(null, null));
+        var exception = Assert.Throws<ArgumentNullException>(() => new AzureIdentityAccessTokenProvider(null!, null));
 
         // Assert
         Assert.Equal("credential", exception.ParamName);

@@ -32,7 +32,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         [Fact]
         public void ThrowsArgumentNullExceptionOnNullAuthenticationProvider()
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => new HttpClientRequestAdapter(null));
+            var exception = Assert.Throws<ArgumentNullException>(() => new HttpClientRequestAdapter(null!));
             Assert.Equal("authenticationProvider", exception.ParamName);
         }
 
@@ -93,6 +93,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
 
             // Assert
+            Assert.NotNull(requestMessage);
             Assert.NotNull(requestMessage.RequestUri);
             Assert.Contains("http://localhost/me", requestMessage.RequestUri.OriginalString);
         }
@@ -118,6 +119,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
 
             // Assert
+            Assert.NotNull(requestMessage);
             Assert.NotNull(requestMessage.RequestUri);
             Assert.Contains("http://localhost/me", requestMessage.RequestUri.OriginalString);// Request generated using adapter baseUrl
         }
@@ -127,7 +129,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         [InlineData("count", true, "count=true")]
         [InlineData("skip", 10, "skip=10")]
         [InlineData("skip", null, "")]// query parameter no placed
-        public async Task GetRequestMessageFromRequestInformationSetsQueryParametersCorrectlyWithSelect(string queryParam, object queryParamObject, string expectedString)
+        public async Task GetRequestMessageFromRequestInformationSetsQueryParametersCorrectlyWithSelect(string queryParam, object? queryParamObject, string expectedString)
         {
             // Arrange
             var requestInfo = new RequestInformation
@@ -135,12 +137,13 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 HttpMethod = Method.GET,
                 UrlTemplate = "http://localhost/me{?top,skip,search,filter,count,orderby,select}"
             };
-            requestInfo.QueryParameters.Add(queryParam, queryParamObject);
+            requestInfo.QueryParameters.Add(queryParam, queryParamObject!);
 
             // Act
             var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
 
             // Assert
+            Assert.NotNull(requestMessage);
             Assert.NotNull(requestMessage.RequestUri);
             Assert.Contains(expectedString, requestMessage.RequestUri.Query);
         }
@@ -162,10 +165,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
 
             // Assert
+            Assert.NotNull(requestMessage);
             Assert.NotNull(requestMessage.Content);
             // Content length set correctly
             Assert.Equal(26, requestMessage.Content.Headers.ContentLength);
             // Content range set correctly
+            Assert.NotNull(requestMessage.Content.Headers.ContentRange);
             Assert.Equal("bytes", requestMessage.Content.Headers.ContentRange.Unit);
             Assert.Equal(0, requestMessage.Content.Headers.ContentRange.From);
             Assert.Equal(25, requestMessage.Content.Headers.ContentRange.To);
@@ -173,7 +178,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             Assert.True(requestMessage.Content.Headers.ContentRange.HasRange);
             Assert.True(requestMessage.Content.Headers.ContentRange.HasLength);
             // Content type set correctly
-            Assert.Equal("application/octet-stream", requestMessage.Content.Headers.ContentType.MediaType);
+            Assert.Equal("application/octet-stream", requestMessage.Content.Headers.ContentType?.MediaType);
         }
 
         [Fact]
@@ -197,6 +202,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
 
             var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo);
 
+            Assert.NotNull(response);
             Assert.True(response.CanRead);
             Assert.Equal(4, response.Length);
         }
@@ -227,6 +233,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
 
             var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo);
 
+            Assert.NotNull(response);
             Assert.True(response.CanRead);
             Assert.Equal(4, response.Length);
             var streamReader = new StreamReader(response);
@@ -363,7 +370,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 Content = mockContent,
             });
             var mockParseNode = new Mock<IParseNode>();
-            mockParseNode.Setup<IParsable>(x => x.GetObjectValue(It.IsAny<ParsableFactory<MockEntity>>()))
+            mockParseNode.Setup(x => x.GetObjectValue(It.IsAny<ParsableFactory<MockEntity>>()))
             .Returns(new MockEntity());
             var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
@@ -466,7 +473,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 return responseMessage;
             });
             var mockParseNode = new Mock<IParseNode>();
-            mockParseNode.Setup<IParsable>(x => x.GetObjectValue(It.IsAny<ParsableFactory<IParsable>>()))
+            mockParseNode.Setup(x => x.GetObjectValue(It.IsAny<ParsableFactory<IParsable>>()))
             .Returns(new MockError("A general error occured"));
             var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
@@ -510,7 +517,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 return responseMessage;
             });
             var mockParseNode = new Mock<IParseNode>();
-            mockParseNode.Setup<IParsable>(x => x.GetObjectValue(It.IsAny<ParsableFactory<IParsable>>()))
+            mockParseNode.Setup(x => x.GetObjectValue(It.IsAny<ParsableFactory<IParsable>>()))
             .Returns(new MockError("A general error occured: " + statusCode.ToString()));
             var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))

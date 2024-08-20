@@ -11,7 +11,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Mocks
         private readonly Action<HttpRequestMessage> requestMessageDelegate;
         private readonly Dictionary<string, HttpResponseMessage> responseMessages;
 
-        public TestHttpMessageHandler(Action<HttpRequestMessage> requestMessage = null)
+        public TestHttpMessageHandler(Action<HttpRequestMessage>? requestMessage = null)
         {
             this.requestMessageDelegate = requestMessage ?? DefaultRequestHandler;
             this.responseMessages = new Dictionary<string, HttpResponseMessage>();
@@ -26,7 +26,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Mocks
         {
             requestMessageDelegate(request);
 
-            if(this.responseMessages.TryGetValue(request.RequestUri.ToString(), out HttpResponseMessage responseMessage))
+            if(this.responseMessages.TryGetValue(request.RequestUri!.ToString(), out HttpResponseMessage? responseMessage))
             {
                 responseMessage.RequestMessage = request;
                 return Task.FromResult(responseMessage);

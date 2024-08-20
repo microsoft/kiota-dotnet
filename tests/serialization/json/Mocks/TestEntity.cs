@@ -10,7 +10,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests.Mocks
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
         /// <summary>Read-only.</summary>
-        public string Id { get; set; }
+        public string? Id { get; set; }
         /// <summary>Read-only.</summary>
         public TestEnum? Numbers { get; set; }
         /// <summary>Read-only.</summary>
@@ -28,7 +28,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests.Mocks
         /// <summary>Read-only.</summary>
         public decimal? HeightInMetres { get; set; }
         /// <summary>Read-only.</summary>
-        public string OfficeLocation { get; set; }
+        public string? OfficeLocation { get; set; }
         /// <summary>
         /// Instantiates a new entity and sets the default values.
         /// </summary>

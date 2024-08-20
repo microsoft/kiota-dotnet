@@ -11,39 +11,39 @@ namespace Microsoft.Kiota.Abstractions.Tests.Mocks
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData
         {
-            get { return BackingStore?.Get<IDictionary<string, object>>("additionalData"); }
+            get { return BackingStore.Get<IDictionary<string, object>>("additionalData")!; }
             set { BackingStore?.Set("additionalData", value); }
         }
         /// <summary>Stores model information.</summary>
         public IBackingStore BackingStore { get; private set; }
         /// <summary>The id property</summary>
-        public string Id
+        public string? Id
         {
-            get { return BackingStore?.Get<string>("id"); }
+            get { return BackingStore.Get<string>("id"); }
             set { BackingStore?.Set("id", value); }
         }
         /// <summary>The OdataType property</summary>
-        public string OdataType
+        public string? OdataType
         {
-            get { return BackingStore?.Get<string>("@odata.type"); }
+            get { return BackingStore.Get<string>("@odata.type"); }
             set { BackingStore?.Set("@odata.type", value); }
         }
         /// <summary>The telephone numbers for the user. NOTE: Although this is a string collection, only one number can be set for this property. Read-only for users synced from on-premises directory. Returned by default. Supports $filter (eq, not, ge, le, startsWith).</summary>
-        public List<string> BusinessPhones
+        public List<string>? BusinessPhones
         {
-            get { return BackingStore?.Get<List<string>>("businessPhones"); }
+            get { return BackingStore.Get<List<string>>("businessPhones"); }
             set { BackingStore?.Set("businessPhones", value); }
         }
         /// <summary>The user or contact that is this user&apos;s manager. Read-only. (HTTP Methods: GET, PUT, DELETE.). Supports $expand.</summary>
-        public TestEntity Manager
+        public TestEntity? Manager
         {
-            get { return BackingStore?.Get<TestEntity>("manager"); }
+            get { return BackingStore.Get<TestEntity>("manager"); }
             set { BackingStore?.Set("manager", value); }
         }
         /// <summary>The user or contact that is this user& works with.</summary>
-        public List<TestEntity> Colleagues
+        public List<TestEntity>? Colleagues
         {
-            get { return BackingStore?.Get<List<TestEntity>>("colleagues"); }
+            get { return BackingStore.Get<List<TestEntity>>("colleagues"); }
             set { BackingStore?.Set("colleagues", value); }
         }
         /// <summary>
@@ -61,7 +61,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Mocks
         public IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
         {
             return new Dictionary<string, Action<IParseNode>> {
-                {"businessPhones", n => { BusinessPhones = n.GetCollectionOfPrimitiveValues<string>()?.ToList(); } },
+                {"businessPhones", n => { BusinessPhones = n.GetCollectionOfPrimitiveValues<string>().ToList(); } },
                 {"id", n => { Id = n.GetStringValue(); } },
                 {"manager", n => { Manager = n.GetObjectValue<TestEntity>(TestEntity.CreateFromDiscriminatorValue); } },
                 {"@odata.type", n => { OdataType = n.GetStringValue(); } },

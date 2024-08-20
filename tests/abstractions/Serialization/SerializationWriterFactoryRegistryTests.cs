@@ -69,10 +69,10 @@ namespace Microsoft.Kiota.Abstractions.Tests.Serialization
         [Theory]
         [InlineData(null)]
         [InlineData("")]
-        public void ThrowsArgumentNullExceptionForNoContentType(string contentType)
+        public void ThrowsArgumentNullExceptionForNoContentType(string? contentType)
         {
             // Act
-            var exception = Assert.Throws<ArgumentNullException>(() => _serializationWriterFactoryRegistry.GetSerializationWriter(contentType));
+            var exception = Assert.Throws<ArgumentNullException>(() => _serializationWriterFactoryRegistry.GetSerializationWriter(contentType!));
             // Assert
             Assert.NotNull(exception);
             Assert.Equal("contentType", exception.ParamName);

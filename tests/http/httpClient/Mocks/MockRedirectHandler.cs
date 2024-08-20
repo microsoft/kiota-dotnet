@@ -6,11 +6,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Mocks
 {
     public class MockRedirectHandler : HttpMessageHandler
     {
-        private HttpResponseMessage Response1
+        private HttpResponseMessage? Response1
         {
             get; set;
         }
-        private HttpResponseMessage Response2
+        private HttpResponseMessage? Response2
         {
             get; set;
         }
@@ -22,18 +22,18 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Mocks
             if(!_response1Sent)
             {
                 _response1Sent = true;
-                Response1.RequestMessage = request;
+                Response1!.RequestMessage = request;
                 return await Task.FromResult(Response1);
             }
             else
             {
                 _response1Sent = false;
-                Response2.RequestMessage = request;
+                Response2!.RequestMessage = request;
                 return await Task.FromResult(Response2);
             }
         }
 
-        public void SetHttpResponse(HttpResponseMessage response1, HttpResponseMessage response2 = null)
+        public void SetHttpResponse(HttpResponseMessage? response1, HttpResponseMessage? response2 = null)
         {
             this._response1Sent = false;
             this.Response1 = response1;

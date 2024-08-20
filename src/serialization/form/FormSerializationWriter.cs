@@ -11,6 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 #endif
 using System;
 using System.Collections.Generic;
+using Microsoft.Kiota.Abstractions.Helpers;
 
 namespace Microsoft.Kiota.Serialization.Form;
 /// <summary>Represents a serialization writer that can be used to write a form url encoded string.</summary>
@@ -247,13 +248,13 @@ public class FormSerializationWriter : ISerializationWriter
         StringBuilder? valueNames = null;
         foreach(var x in values)
         {
-            if(x.HasValue && Enum.GetName(typeof(T), x.Value) is string valueName)
+            if(x.HasValue && EnumHelpers.GetEnumStringValue(x.Value) is string valueName)
             {
                 if(valueNames == null)
                     valueNames = new StringBuilder();
                 else
                     valueNames.Append(",");
-                valueNames.Append(valueName.ToFirstCharacterLowerCase());
+                valueNames.Append(valueName);
             }
         }
 
@@ -281,16 +282,16 @@ public class FormSerializationWriter : ISerializationWriter
                 StringBuilder valueNames = new StringBuilder();
                 foreach(var x in values)
                 {
-                    if(value.Value.HasFlag(x) && Enum.GetName(typeof(T), x) is string valueName)
+                    if(value.Value.HasFlag(x) && EnumHelpers.GetEnumStringValue(x) is string valueName)
                     {
                         if(valueNames.Length > 0)
                             valueNames.Append(",");
-                        valueNames.Append(valueName.ToFirstCharacterLowerCase());
+                        valueNames.Append(valueName);
                     }
                 }
                 WriteStringValue(key, valueNames.ToString());
             }
-            else WriteStringValue(key, value.Value.ToString().ToFirstCharacterLowerCase());
+            else WriteStringValue(key, EnumHelpers.GetEnumStringValue(value.Value));
         }
     }
 }

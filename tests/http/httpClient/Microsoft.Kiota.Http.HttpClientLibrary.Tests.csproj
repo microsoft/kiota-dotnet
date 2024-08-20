@@ -1,11 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net8.0;net462</TargetFrameworks>
-    <IsTestProject>true</IsTestProject>
-    <Nullable>disable</Nullable>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="coverlet.msbuild" Version="6.0.2">
       <PrivateAssets>all</PrivateAssets>
@@ -26,7 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\http\httpClient\Microsoft.Kiota.Http.HttpClientLibrary.csproj" />
+    <ProjectReference
+      Include="..\..\..\src\http\httpClient\Microsoft.Kiota.Http.HttpClientLibrary.csproj" />
   </ItemGroup>
 
 </Project>

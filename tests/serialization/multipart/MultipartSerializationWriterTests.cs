@@ -23,7 +23,7 @@ public class MultipartSerializationWriterTests
             BirthDay = new Date(2017, 9, 4),
             AdditionalData = new Dictionary<string, object>
             {
-                {"mobilePhone",null}, // write null value
+                {"mobilePhone", new UntypedNull()}, // write null value
                 {"accountEnabled",false}, // write bool value
                 {"jobTitle","Author"}, // write string value
                 {"createdDateTime", DateTimeOffset.MinValue}, // write date value
@@ -68,7 +68,7 @@ public class MultipartSerializationWriterTests
             BirthDay = new Date(2017, 9, 4),
             AdditionalData = new Dictionary<string, object>
             {
-                {"mobilePhone",null}, // write null value
+                {"mobilePhone", new UntypedNull()}, // write null value
                 {"accountEnabled",false}, // write bool value
                 {"jobTitle","Author"}, // write string value
                 {"createdDateTime", DateTimeOffset.MinValue}, // write date value
@@ -106,7 +106,7 @@ public class MultipartSerializationWriterTests
             BirthDay = new Date(2017, 9, 4),
             AdditionalData = new Dictionary<string, object>
             {
-                {"mobilePhone",null}, // write null value
+                {"mobilePhone", new UntypedNull()}, // write null value
                 {"accountEnabled",false}, // write bool value
                 {"jobTitle","Author"}, // write string value
                 {"createdDateTime", DateTimeOffset.MinValue}, // write date value

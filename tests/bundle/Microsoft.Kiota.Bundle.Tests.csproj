@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\abstractions\Microsoft.Kiota.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\bundle\Microsoft.Kiota.Bundle.csproj" />
   </ItemGroup>
 
 </Project>

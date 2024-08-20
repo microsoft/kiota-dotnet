@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Kiota.Abstractions.Serialization;
 using Microsoft.Kiota.Abstractions.Store;
 using Microsoft.Kiota.Abstractions.Tests.Mocks;
 using Xunit;
@@ -86,7 +88,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
                 Id = "84c747c1-d2c0-410d-ba50-fc23e0b4abbe",
                 AdditionalData = new Dictionary<string, object>
                 {
-                    { "extensionData" , null }
+                    { "extensionData" , new UntypedNull() }
                 }
             };
             testUser.BackingStore.InitializationCompleted = true;
@@ -95,7 +97,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             {
                 "+1 234 567 891"
             };
-            testUser.AdditionalData.Add("anotherExtension", null);
+            testUser.AdditionalData.Add("anotherExtension", new UntypedNull());
             // Assert by retrieving only changed values
             testUser.BackingStore.ReturnOnlyChangedValues = true;
             var changedValues = testUser.BackingStore.Enumerate().ToDictionary(x => x.Key, y => y.Value);
@@ -374,7 +376,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             };
             testUser.BackingStore.InitializationCompleted = testUser.Colleagues[0].BackingStore.InitializationCompleted = true;
             // Act on the data by making a change in the nested Ibackedmodel collection item
-            testUser.Colleagues[0].BusinessPhones.Add("+9 876 543 219");
+            testUser.Colleagues[0].BusinessPhones?.Add("+9 876 543 219");
             // Assert by retrieving only changed values
             testUser.BackingStore.ReturnOnlyChangedValues = true;
             testUser.Colleagues.First().BackingStore.ReturnOnlyChangedValues = true; //serializer will do this. 
@@ -382,7 +384,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             Assert.NotEmpty(changedValues);
             Assert.Single(changedValues);
             Assert.Equal("colleagues", changedValues.First().Key);//Backingstore should detect manager property changed
-            var changedNestedValues = testUser.Colleagues[0].BackingStore.Enumerate().ToDictionary(x => x.Key, y => y.Value);
+            var changedNestedValues = testUser.Colleagues[0].BackingStore.Enumerate().ToDictionary(x => x.Key, y => y.Value!);
             Assert.Equal(4, changedNestedValues.Count);
             Assert.True(changedNestedValues.ContainsKey("id"));
             Assert.True(changedNestedValues.ContainsKey("businessPhones"));
@@ -421,7 +423,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             // Assert by retrieving only changed values
             testUser.BackingStore.ReturnOnlyChangedValues = true;
             testUser.Colleagues[0].BackingStore.ReturnOnlyChangedValues = true; //serializer will do this. 
-            var changedValues = testUser.BackingStore.Enumerate().ToDictionary(x => x.Key, y => y.Value);
+            var changedValues = testUser.BackingStore.Enumerate().ToDictionary(x => x.Key, y => y.Value!);
             Assert.NotEmpty(changedValues);
             Assert.Single(changedValues);
             Assert.Equal("colleagues", changedValues.First().Key);//Backingstore should detect manager property changed
@@ -429,7 +431,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             Assert.Equal(2, colleagues.Count);
             Assert.Equal("2fe22fe5-1132-42cf-90f9-1dc17e325a74", colleagues[0].Id);
             Assert.Equal("2fe22fe5-1132-42cf-90f9-1dc17e325a74", colleagues[1].Id);
-            var changedNestedValues = testUser.Colleagues[0].BackingStore.Enumerate().ToDictionary(x => x.Key, y => y.Value);
+            var changedNestedValues = testUser.Colleagues[0].BackingStore.Enumerate().ToDictionary(x => x.Key, y => y.Value!);
             Assert.Equal(4, changedNestedValues.Count);
             Assert.True(changedNestedValues.ContainsKey("id"));
             Assert.True(changedNestedValues.ContainsKey("businessPhones"));
@@ -466,6 +468,24 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
 
             Assert.Equal(2, invocationCount);// only called twice
         }
+        private readonly int[] _testArray = Enumerable.Range(0, 100000000).ToArray();
+        [Fact]
+        public void TestsLargeArrayPerformsWell()
+        {
+            // Arrange
+            var testBackingStore = new InMemoryBackingStore();
+            // Act
+            Assert.Empty(testBackingStore.Enumerate());
+            var stopWatch = Stopwatch.StartNew();
+            testBackingStore.Set("email", _testArray);
+            stopWatch.Stop();
+            Assert.InRange(stopWatch.ElapsedMilliseconds, 0, 1);
+            stopWatch.Restart();
+            testBackingStore.InitializationCompleted = true;
+            stopWatch.Stop();
+            // Assert
+            Assert.InRange(stopWatch.ElapsedMilliseconds, 0, 1);
+        }
 
         /// <summary>
         /// Helper function to pull out the private `subscriptions` collection property from the InMemoryBackingStore class
@@ -475,10 +495,10 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
         private static IDictionary<string, Action<string, object, object>> GetSubscriptionsPropertyFromBackingStore(IBackingStore backingStore)
         {
             if(backingStore is not InMemoryBackingStore inMemoryBackingStore)
-                return default;
+                return new Dictionary<string, Action<string, object, object>>();
 
-            var subscriptionsFieldInfo = typeof(InMemoryBackingStore).GetField("subscriptions", BindingFlags.NonPublic | BindingFlags.Instance);
-            return (IDictionary<string, Action<string, object, object>>)subscriptionsFieldInfo?.GetValue(inMemoryBackingStore);
+            var subscriptionsFieldInfo = typeof(InMemoryBackingStore).GetField("subscriptions", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            return (IDictionary<string, Action<string, object, object>>)subscriptionsFieldInfo.GetValue(inMemoryBackingStore)!;
         }
     }
 }

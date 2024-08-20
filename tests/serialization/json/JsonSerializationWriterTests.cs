@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading;
 using Microsoft.Kiota.Abstractions;
@@ -33,7 +34,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                 HeightInMetres = 1.80m,
                 AdditionalData = new Dictionary<string, object>
                 {
-                    {"mobilePhone",null}, // write null value
+                    {"mobilePhone", new UntypedNull()}, // write null value
                     {"accountEnabled",false}, // write bool value
                     {"jobTitle","Author"}, // write string value
                     {"createdDateTime", DateTimeOffset.MinValue}, // write date value
@@ -80,7 +81,6 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [Fact]
         public void WritesSampleObjectValueWithJsonElementAdditionalData()
         {
-            var nullJsonElement = JsonDocument.Parse("null").RootElement;
             var arrayJsonElement = JsonDocument.Parse("[\"+1 412 555 0109\"]").RootElement;
             var objectJsonElement = JsonDocument.Parse("{\"id\":\"48d31887-5fad-4d73-a9f5-3c356e68a038\"}").RootElement;
 
@@ -93,7 +93,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                 BirthDay = new Date(2017, 9, 4),
                 AdditionalData = new Dictionary<string, object>
                 {
-                    {"mobilePhone", nullJsonElement}, // write null value
+                    {"mobilePhone", new UntypedNull()}, // write null value
                     {"accountEnabled",false}, // write bool value
                     {"jobTitle","Author"}, // write string value
                     {"createdDateTime", DateTimeOffset.MinValue}, // write date value
@@ -136,7 +136,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                 TestNamingEnum = TestNamingEnum.Item2SubItem1,
                 AdditionalData = new Dictionary<string, object>
                 {
-                    {"mobilePhone",null}, // write null value
+                    {"mobilePhone", new UntypedNull()}, // write null value
                     {"accountEnabled",false}, // write bool value
                     {"jobTitle","Author"}, // write string value
                     {"createdDateTime", DateTimeOffset.MinValue}, // write date value
@@ -156,7 +156,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             // Assert
             var expectedString = "[{" +
                                  "\"id\":\"48d31887-5fad-4d73-a9f5-3c356e68a038\"," +
-                                 "\"numbers\":\"one,two\"," +
+                                 "\"numbers\":\"One,Two\"," +
                                  "\"testNamingEnum\":\"Item2:SubItem1\"," +
                                  "\"mobilePhone\":null," +
                                  "\"accountEnabled\":false," +
@@ -205,7 +205,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
 
             // Assert
             var expectedString = "[{" +
-                                 "\"testNamingEnum\":\"item1\"" + // Camel Cased
+                                 "\"testNamingEnum\":\"Item1\"" + // Camel Cased
                                  "}]";
             Assert.Equal(expectedString, serializedJsonString);
         }
@@ -258,6 +258,68 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             Assert.Equal(expectedString, serializedJsonString);
         }
 
+        [Fact]
+        public void ForwardsOptionsToWriterFromSerializationContext()
+        {
+            // Arrange
+            var testEntity = new TestEntity
+            {
+                Id = "testId",
+                AdditionalData = new Dictionary<string, object>()
+                {
+                    {"href", "https://graph.microsoft.com/users/{user-id}"},
+                    {"unicodeName", "你好"}
+                }
+            };
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+            using var jsonSerializerWriter = new JsonSerializationWriter(serializationContext);
+
+            // Act
+            jsonSerializerWriter.WriteObjectValue(string.Empty, testEntity);
+            var serializedStream = jsonSerializerWriter.GetSerializedContent();
+            using var reader = new StreamReader(serializedStream, Encoding.UTF8);
+            var serializedJsonString = reader.ReadToEnd();
+
+            // Assert
+            const string expectedString = "{\n  \"id\": \"testId\",\n  \"href\": \"https://graph.microsoft.com/users/{user-id}\",\n  \"unicodeName\": \"你好\"\n}";
+            Assert.Contains("\n", serializedJsonString); // string is indented and not escaped
+            Assert.Contains("你好", serializedJsonString); // string is indented and not escaped
+            Assert.Equal(expectedString, serializedJsonString.Replace("\r", string.Empty)); // string is indented and not escaped
+        }
+
+        [Fact]
+        public void UsesDefaultOptionsToWriterFromSerializationContext()
+        {
+            // Arrange
+            var testEntity = new TestEntity
+            {
+                Id = "testId",
+                AdditionalData = new Dictionary<string, object>()
+                {
+                    {"href", "https://graph.microsoft.com/users/{user-id}"},
+                    {"unicodeName", "你好"}
+                }
+            };
+            using var jsonSerializerWriter = new JsonSerializationWriter(new KiotaJsonSerializationContext());
+
+            // Act
+            jsonSerializerWriter.WriteObjectValue(string.Empty, testEntity);
+            var serializedStream = jsonSerializerWriter.GetSerializedContent();
+            using var reader = new StreamReader(serializedStream, Encoding.UTF8);
+            var serializedJsonString = reader.ReadToEnd();
+
+            // Assert
+            var expectedString = $"{{\"id\":\"testId\",\"href\":\"https://graph.microsoft.com/users/{{user-id}}\",\"unicodeName\":\"\\u4F60\\u597D\"}}";
+            Assert.DoesNotContain("\n", serializedJsonString); // string is not indented and not escaped
+            Assert.DoesNotContain("你好", serializedJsonString); // string is not indented and not escaped
+            Assert.Contains("\\u4F60\\u597D", serializedJsonString); // string is not indented and not escaped
+            Assert.Equal(expectedString, serializedJsonString); // string is indented and not escaped
+        }
         [Fact]
         public void WriteGuidUsingNoConverter()
         {

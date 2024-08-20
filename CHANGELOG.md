@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.11.3] - 2024-08-16
+
+### Changed
+
+- Replaced Convert.FromBase64 by System.Text.Json GetBytesFromBase64 to improve performance (10x improvement).
+
+## [1.11.2] - 2024-08-14
+
+### Changed
+
+- Fixed an additional performance regression with the backing store introduced in version 1.9.2 by #243
+
+## [1.11.1] - 2024-08-12
+
+### Changed
+
+- Fixed a performance regression with the backing store introduced in version 1.9.2 by #243
+
+## [1.11.0] - 2024-08-08
+
+- Enabled Continuous Access evaluation by default.
+
+## [1.10.1] - 2024-08-01
+
+- Cleans up enum serialization to read from attributes for form and text serialization [#284](https://github.com/microsoft/kiota-dotnet/issues/284)
+- Pass relevant `JsonWriterOptions` from the `KiotaJsonSerializationContext.Options` to the `Utf8JsonWriter` when writing json to enable customization. [#281](https://github.com/microsoft/kiota-dotnet/issues/281)
+
+## [1.10.0] - 2024-07-17
+
+- Adds Kiota bundle package to provide default adapter with registrations setup. [#290](https://github.com/microsoft/kiota-dotnet/issues/290)
+
 ## [1.9.12] - 2024-07-30
 
 - Fix non IParasable object serialization.

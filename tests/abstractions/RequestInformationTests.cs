@@ -803,7 +803,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
     {
         /// <summary>Select properties to be returned</summary>\
         [QueryParameter("%24select")]
-        public string[] Select { get; set; }
+        public string[]? Select { get; set; }
         /// <summary>Unique id of the request</summary>
         [QueryParameter("%24requestId")]
         public Guid RequestId { get; set; }
@@ -812,25 +812,25 @@ namespace Microsoft.Kiota.Abstractions.Tests
         public bool? Count { get; set; }
         /// <summary>Expand related entities</summary>
         [QueryParameter("%24filter")]
-        public string Filter { get; set; }
+        public string? Filter { get; set; }
         /// <summary>Order items by property values</summary>
         [QueryParameter("%24orderby")]
-        public string[] Orderby { get; set; }
+        public string[]? Orderby { get; set; }
         /// <summary>Search items by search phrases</summary>
         [QueryParameter("%24search")]
-        public string Search { get; set; }
+        public string? Search { get; set; }
         /// <summary>Restrict to TenantId</summary>
-        public string TenantId { get; set; }
+        public string? TenantId { get; set; }
         /// <summary>Which Dataset to use</summary>
         [QueryParameter("dataset")]
         public TestEnum DataSet { get; set; }
         /// <summary>Which Dataset to use</summary>
         [QueryParameter("datasets")]
-        public TestEnum[] DataSets { get; set; }
+        public TestEnum[]? DataSets { get; set; }
 
         [QueryParameter("item")]
-        public object Item { get; set; }
+        public object? Item { get; set; }
         [QueryParameter("items")]
-        public object[] Items { get; set; }
+        public object[]? Items { get; set; }
     }
 }

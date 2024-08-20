@@ -81,14 +81,13 @@ namespace Microsoft.Kiota.Abstractions.Store
                 // All the list items are dirty as the model has been touched.
                 foreach(var item in collectionValues)
                 {
-                    if(item is IBackedModel model)
+                    // we don't support heterogeneous collections, so we can break if the first item is not a IBackedModel
+                    if(item is not IBackedModel model) break;
+                    model.BackingStore.InitializationCompleted = false;
+                    model.BackingStore.Subscribe((keyString, oldObject, newObject) =>
                     {
-                        model.BackingStore.InitializationCompleted = false;
-                        model.BackingStore.Subscribe((keyString, oldObject, newObject) =>
-                        {
-                            Set(key, value);
-                        }, key); // use property name(key) as subscriptionId to prevent excess subscription creation in the event this is called again
-                    }
+                        Set(key, value);
+                    }, key); // use property name(key) as subscriptionId to prevent excess subscription creation in the event this is called again
                 }
             }
 
@@ -206,12 +205,12 @@ namespace Microsoft.Kiota.Abstractions.Store
                 // Call Get<>() on nested properties so that this method may be called recursively to ensure collections are consistent
                 foreach(var item in collectionTuple.Item1)
                 {
-                    if(item is IBackedModel store)
+                    if(item is not IBackedModel backedModel) break;
+                    // there are no mixed collections if the first element is not a IBackedModel, not need to iterate over the collection
+
+                    foreach(var innerItem in backedModel.BackingStore.Enumerate())
                     {
-                        foreach(var innerItem in store.BackingStore.Enumerate())
-                        {
-                            store.BackingStore.Get<object>(innerItem.Key);
-                        }
+                        backedModel.BackingStore.Get<object>(innerItem.Key);
                     }
                 }
 

@@ -35,6 +35,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
             requestInfo.AddRequestOptions(new IRequestOption[] { redirectHandlerOption });
             // Act and get a request message
             var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            Assert.NotNull(requestMessage);
+
             var extractedOption = requestMessage.GetRequestOption<RedirectHandlerOption>();
             // Assert
             Assert.NotNull(extractedOption);
@@ -51,6 +53,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
                 URI = new Uri("http://localhost")
             };
             var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            Assert.NotNull(originalRequest);
+
             HttpRequestMessage clonedRequest = await originalRequest.CloneAsync();
 
             Assert.NotNull(clonedRequest);
@@ -68,11 +72,13 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
                 URI = new Uri("http://localhost")
             };
             var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            Assert.NotNull(originalRequest);
+
             originalRequest.Content = new StringContent("contents");
 
             var clonedRequest = await originalRequest.CloneAsync();
             var originalContents = await originalRequest.Content.ReadAsStringAsync();
-            var clonedRequestContents = await clonedRequest.Content?.ReadAsStringAsync();
+            var clonedRequestContents = await clonedRequest.Content!.ReadAsStringAsync();
 
             Assert.NotNull(clonedRequest);
             Assert.Equal(originalRequest.Method, clonedRequest.Method);
@@ -91,10 +97,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
             };
             requestInfo.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes("contents")), "application/octet-stream");
             var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            Assert.NotNull(originalRequest);
 
             var clonedRequest = await originalRequest.CloneAsync();
-            var originalContents = await originalRequest.Content.ReadAsStringAsync();
-            var clonedRequestContents = await clonedRequest.Content?.ReadAsStringAsync();
+            var originalContents = await originalRequest.Content!.ReadAsStringAsync();
+            var clonedRequestContents = await clonedRequest.Content!.ReadAsStringAsync();
 
             Assert.NotNull(clonedRequest);
             Assert.Equal(originalRequest.Method, clonedRequest.Method);
@@ -117,6 +124,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
             };
             requestInfo.AddRequestOptions(new IRequestOption[] { redirectHandlerOption });
             var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            Assert.NotNull(originalRequest);
+
             originalRequest.Content = new StringContent("contents");
 
             var clonedRequest = await originalRequest.CloneAsync();
@@ -144,6 +153,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
                 URI = new Uri("http://localhost")
             };
             var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            Assert.NotNull(originalRequest);
+
             // Act
             var response = originalRequest.IsBuffered();
             // Assert
@@ -159,6 +170,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
                 URI = new Uri("http://localhost")
             };
             var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            Assert.NotNull(originalRequest);
+
             // Act
             var response = originalRequest.IsBuffered();
             // Assert
@@ -176,6 +189,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
                 Content = new MemoryStream(data)
             };
             var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            Assert.NotNull(originalRequest);
+
             // Act
             var response = originalRequest.IsBuffered();
             // Assert

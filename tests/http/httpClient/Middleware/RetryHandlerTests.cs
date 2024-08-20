@@ -220,9 +220,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 // Assert
                 Assert.IsType<AggregateException>(exception);
                 var aggregateException = exception as AggregateException;
-                Assert.StartsWith("Too many retries performed.", aggregateException.Message);
+                Assert.StartsWith("Too many retries performed.", aggregateException!.Message);
                 Assert.All(aggregateException.InnerExceptions, innerexception => Assert.IsType<ApiException>(innerexception));
-                Assert.All(aggregateException.InnerExceptions, innerexception => Assert.True((innerexception as ApiException).ResponseStatusCode == (int)statusCode));
+                Assert.All(aggregateException.InnerExceptions, innerexception => Assert.True((innerexception as ApiException)!.ResponseStatusCode == (int)statusCode));
                 Assert.False(httpRequestMessage.Headers.TryGetValues(RetryAttempt, out _), "Don't set Retry-Attempt Header");
             }
         }
@@ -417,7 +417,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 Assert.IsType<AggregateException>(exception);
                 var aggregateException = exception as AggregateException;
                 Assert.True(isExceptionExpected);
-                Assert.StartsWith("Too many retries performed.", aggregateException.Message);
+                Assert.StartsWith("Too many retries performed.", aggregateException!.Message);
                 Assert.Equal(1 + expectedMaxRetry, aggregateException.InnerExceptions.Count);
                 Assert.All(aggregateException.InnerExceptions, innerexception => Assert.Contains(expectedStatusCode.ToString(), innerexception.Message));
             }
@@ -436,7 +436,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             });
         }
 
-        private string Message
+        private string? Message
         {
             get;
             set;
