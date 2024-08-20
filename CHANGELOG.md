@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.12.0] - 2024-08-20
+
+### Changed
+
+- Improved serialization helper methods to take boolean parameter to override the BackingStore functionality. [#310](https://github.com/microsoft/kiota-dotnet/issues/310)
+
 ## [1.11.3] - 2024-08-16
 
 ### Changed
