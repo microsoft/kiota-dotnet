@@ -79,7 +79,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
             {
                 throw new Exception("IAsyncParseNodeFactory is required for async operations");
             }
-            var node = await asyncConcrete.GetRootParseNodeAsync(contentType, content).ConfigureAwait(false);
+            var node = await asyncConcrete.GetRootParseNodeAsync(contentType, content, cancellationToken).ConfigureAwait(false);
             WireParseNode(node);
             return node;
         }

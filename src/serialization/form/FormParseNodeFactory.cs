@@ -39,7 +39,11 @@ public class FormParseNodeFactory : IAsyncParseNodeFactory
             throw new ArgumentNullException(nameof(content));
 
         using var reader = new StreamReader(content);
+#if NET7_0_OR_GREATER
+        var rawValue = await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+#else
         var rawValue = await reader.ReadToEndAsync().ConfigureAwait(false);
+#endif
         return new FormParseNode(rawValue);
     }
 }
