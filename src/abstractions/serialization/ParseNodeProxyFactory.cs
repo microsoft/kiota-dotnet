@@ -27,7 +27,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// <param name="concrete">The concrete factory to wrap.</param>
         /// <param name="onBefore">The callback to invoke before the deserialization of any model object.</param>
         /// <param name="onAfter">The callback to invoke after the deserialization of any model object.</param>
-        public ParseNodeProxyFactory(IParseNodeFactory concrete, Action<IParsable> onBefore, Action<IParsable> onAfter)
+        protected ParseNodeProxyFactory(IParseNodeFactory concrete, Action<IParsable> onBefore, Action<IParsable> onAfter)
         {
             _concrete = concrete ?? throw new ArgumentNullException(nameof(concrete));
             _onBefore = onBefore;
