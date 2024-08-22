@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.12.1] - 2024-08-21
+
+### Changed
+
+- Fixed a bug where the cancellation token would not be passed to the ParseNodeFactory.
+
 ## [1.12.0] - 2024-08-20
 
 ### Changed
