@@ -63,6 +63,45 @@ namespace Microsoft.Kiota.Abstractions.Tests
         }
 
         [Fact]
+        public void EnableBackingStoreForParseNodeFactoryMultipleCallsDoesNotDoubleWrap()
+        {
+            // Arrange
+            //it is not normal to test a private field, but it is the purpose of the test
+            var concreteFieldInfo = typeof(ParseNodeProxyFactory)
+                                        .GetField("_concrete", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+
+            var parseNodeRegistry = new ParseNodeFactoryRegistry();
+            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            parseNodeRegistry.ContentTypeAssociatedFactories.TryAdd(StreamContentType, mockParseNodeFactory.Object);
+
+            Assert.IsNotType<BackingStoreParseNodeFactory>(parseNodeRegistry.ContentTypeAssociatedFactories[StreamContentType]);
+
+            // Act
+            var firstResult = ApiClientBuilder.EnableBackingStoreForParseNodeFactory(parseNodeRegistry);
+            var secondResult = ApiClientBuilder.EnableBackingStoreForParseNodeFactory(firstResult);
+            var thirdResult = ApiClientBuilder.EnableBackingStoreForParseNodeFactory(secondResult);
+
+
+            //make sure the original was not modifed
+            Assert.IsNotType<BackingStoreParseNodeFactory>(parseNodeRegistry);
+
+            // Assert the type has changed due to backing store enabling
+            Assert.IsType<BackingStoreParseNodeFactory>(firstResult);
+
+            //make sure the second call returned the original wrapper
+            Assert.Equal(firstResult, secondResult);
+            Assert.Equal(firstResult, thirdResult);
+
+            //make sure what is in the registry is a BackingStore
+            var factory = parseNodeRegistry.ContentTypeAssociatedFactories[StreamContentType];
+            Assert.IsType<BackingStoreParseNodeFactory>(factory);
+
+            //make sure the concrete version of the factory is the same as the orginal
+            Assert.Equal(mockParseNodeFactory.Object, concreteFieldInfo!.GetValue(factory));
+        }
+
+        [Fact]
         public void EnableBackingStoreForParseNodeFactoryAlsoEnablesForDefaultInstance()
         {
             // Arrange
@@ -79,6 +118,39 @@ namespace Microsoft.Kiota.Abstractions.Tests
             // Assert the type has changed due to backing store enabling for the default instance as well.
             Assert.IsType<BackingStoreParseNodeFactory>(parseNodeRegistry.ContentTypeAssociatedFactories[StreamContentType]);
             Assert.IsType<BackingStoreParseNodeFactory>(ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[StreamContentType]);
+        }
+
+        [Fact]
+        public void EnableBackingStoreForParseNodeFactoryAlsoEnablesForDefaultInstanceMultipleCallsDoesNotDoubleWrap()
+        {
+            // Arrange
+            var parseNodeRegistry = new ParseNodeFactoryRegistry();
+            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            parseNodeRegistry.ContentTypeAssociatedFactories.TryAdd(StreamContentType, mockParseNodeFactory.Object);
+            ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories.TryAdd(StreamContentType, mockParseNodeFactory.Object);
+
+            Assert.IsNotType<BackingStoreParseNodeFactory>(parseNodeRegistry.ContentTypeAssociatedFactories[StreamContentType]);
+
+            // Act
+            var firstResult = ApiClientBuilder.EnableBackingStoreForParseNodeFactory(parseNodeRegistry);
+            var secondResult = ApiClientBuilder.EnableBackingStoreForParseNodeFactory(firstResult);
+            var thirdResult = ApiClientBuilder.EnableBackingStoreForParseNodeFactory(secondResult);
+
+
+            //make sure the original was not modifed
+            Assert.IsNotType<BackingStoreParseNodeFactory>(parseNodeRegistry);
+
+            // Assert the type has changed due to backing store enabling
+            Assert.IsType<BackingStoreParseNodeFactory>(firstResult);
+
+            //make sure the second call returned the original wrapper
+            Assert.Equal(firstResult, secondResult);
+            Assert.Equal(firstResult, thirdResult);
+
+            //make sure what is in the registry is a BackingStore, it will be a new object so we can only check the type
+            var factory = ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[StreamContentType];
+            Assert.IsType<BackingStoreParseNodeFactory>(factory);
+
         }
     }
 }

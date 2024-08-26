@@ -1,7 +1,7 @@
 <Project>
   <!-- Common default project properties for ALL projects-->
   <PropertyGroup>
-    <VersionPrefix>1.12.1</VersionPrefix>
+    <VersionPrefix>1.12.2</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <!-- This is overidden in test projects by setting to true-->
     <IsTestProject>false</IsTestProject>

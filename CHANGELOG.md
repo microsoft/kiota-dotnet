@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.12.2] - 2024-08-23
+
+### Changed
+
+- Fixed a bug where calls to ApiClientBuilder.EnableBackingStoreForParseNodeFactory and ApiClientBuilder.EnableBackingStoreForSerializationWriterFactory would enable a BackingStore around BackingStores. [#2563] (https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/2563) [#2588] (https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/2588)
+
 ## [1.12.1] - 2024-08-21
 
 ### Changed

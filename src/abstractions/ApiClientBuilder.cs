@@ -50,6 +50,9 @@ namespace Microsoft.Kiota.Abstractions
                 if(registry != SerializationWriterFactoryRegistry.DefaultInstance)// if the registry is the default instance, we already enabled it above. No need to do it twice
                     EnableBackingStoreForSerializationRegistry(SerializationWriterFactoryRegistry.DefaultInstance);
             }
+            if(result is BackingStoreSerializationWriterProxyFactory)
+                //We are already enabled so use it.
+                return result;
             else
                 result = new BackingStoreSerializationWriterProxyFactory(original);
 
@@ -69,6 +72,9 @@ namespace Microsoft.Kiota.Abstractions
                 if(registry != ParseNodeFactoryRegistry.DefaultInstance)// if the registry is the default instance, we already enabled it above. No need to do it twice
                     EnableBackingStoreForParseNodeRegistry(ParseNodeFactoryRegistry.DefaultInstance);
             }
+            if(result is BackingStoreParseNodeFactory)
+                //We are already enabled so use it.
+                return result;
             else
                 result = new BackingStoreParseNodeFactory(original);
 
@@ -80,7 +86,7 @@ namespace Microsoft.Kiota.Abstractions
             var keysToUpdate = new List<string>();
             foreach(var entry in registry.ContentTypeAssociatedFactories)
             {
-                if(entry.Value is not (BackingStoreSerializationWriterProxyFactory or SerializationWriterFactoryRegistry))
+                if(entry.Value is not BackingStoreParseNodeFactory)
                 {
                     keysToUpdate.Add(entry.Key);
                 }
@@ -97,7 +103,7 @@ namespace Microsoft.Kiota.Abstractions
             var keysToUpdate = new List<string>();
             foreach(var entry in registry.ContentTypeAssociatedFactories)
             {
-                if(entry.Value is not (BackingStoreSerializationWriterProxyFactory or SerializationWriterFactoryRegistry))
+                if(entry.Value is not BackingStoreSerializationWriterProxyFactory)
                 {
                     keysToUpdate.Add(entry.Key);
                 }
