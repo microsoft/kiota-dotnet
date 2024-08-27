@@ -431,7 +431,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             Message = message;
             await Task.Run(async () =>
             {
-                await RetryHandler.Delay(response, count, delay, out _, new CancellationToken());
+                await RetryHandler.DelayAsync(response, count, delay, out _, new CancellationToken());
                 Message += " Work " + count;
             });
         }
