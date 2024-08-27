@@ -10,8 +10,7 @@
   </PropertyGroup>
 
   <!-- NET 5 target to be removed on next major version-->
-  <ItemGroup
-    Condition="'$(TargetFramework)' == 'net5.0' or '$(TargetFramework)'== 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1' or '$(TargetFramework)' == 'net462'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0' or '$(TargetFramework)'== 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1' or '$(TargetFramework)' == 'net462'">
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="[6.0,9.0)" />
     <!-- suppressed because of this CVE https://github.com/advisories/GHSA-hh2w-p6rv-4g7w 
      The target application is the one which will resolve the correct version
@@ -25,7 +24,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\abstractions\Microsoft.Kiota.Abstractions.csproj" />
-    <ProjectReference Include="..\..\generated\KiotaGenerated.csproj" OutputItemType="Analyzer"
-      ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\generated\KiotaGenerated.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 </Project>
