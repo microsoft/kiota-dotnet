@@ -109,7 +109,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 retryActivity?.SetTag("http.status_code", response.StatusCode);
 
                 // Call Delay method to get delay time from response's Retry-After header or by exponential backoff
-                Task delay = RetryHandler.Delay(response, retryCount, retryOption.Delay, out double delayInSeconds, cancellationToken);
+                Task delay = RetryHandler.DelayAsync(response, retryCount, retryOption.Delay, out double delayInSeconds, cancellationToken);
 
                 // If client specified a retries time limit, let's honor it
                 if(retryOption.RetriesTimeLimit > TimeSpan.Zero)
@@ -176,7 +176,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
         /// <param name="delayInSeconds"></param>
         /// <param name="cancellationToken">The cancellationToken for the Http request</param>
         /// <returns>The <see cref="Task"/> for delay operation.</returns>
-        internal static Task Delay(HttpResponseMessage response, int retryCount, int delay, out double delayInSeconds, CancellationToken cancellationToken)
+        internal static Task DelayAsync(HttpResponseMessage response, int retryCount, int delay, out double delayInSeconds, CancellationToken cancellationToken)
         {
             delayInSeconds = delay;
             if(response.Headers.TryGetValues(RetryAfter, out IEnumerable<string>? values))
