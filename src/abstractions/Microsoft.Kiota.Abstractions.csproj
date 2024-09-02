@@ -14,7 +14,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Std.UriTemplate" Version="1.0.5" />
+    <PackageReference Include="Std.UriTemplate" Version="1.0.6" />
   </ItemGroup>
 
   <!-- NET 5 target to be removed on next major version-->
