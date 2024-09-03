@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
@@ -57,6 +58,7 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
     /// <param name="scopes">The scopes to request the access token for.</param>
     /// <param name="observabilityOptions">The observability options to use for the authentication provider.</param>
     [Obsolete("This constructor is obsolete and will be removed in a future version. Use the constructor that takes an isCaeEnabled parameter instead.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public AzureIdentityAccessTokenProvider(TokenCredential credential, string[]? allowedHosts, ObservabilityOptions? observabilityOptions, params string[] scopes) :
     this(credential, allowedHosts, observabilityOptions, true, scopes)
     {

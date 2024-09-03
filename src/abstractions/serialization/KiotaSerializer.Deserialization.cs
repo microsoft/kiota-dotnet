@@ -4,10 +4,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
 #endif
@@ -24,6 +26,7 @@ public static partial class KiotaSerializer
     /// <param name="parsableFactory">The factory to create the object.</param>
     /// <param name="serializedRepresentation">The serialized representation of the object.</param>
     [Obsolete("Use DeserializeAsync instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static T? Deserialize<T>(string contentType, string serializedRepresentation, ParsableFactory<T> parsableFactory) where T : IParsable
     {
         if(string.IsNullOrEmpty(serializedRepresentation)) throw new ArgumentNullException(nameof(serializedRepresentation));
@@ -49,6 +52,7 @@ public static partial class KiotaSerializer
     /// <param name="stream">The stream to deserialize.</param>
     /// <param name="parsableFactory">The factory to create the object.</param>
     [Obsolete("Use DeserializeAsync instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static T? Deserialize<T>(string contentType, Stream stream, ParsableFactory<T> parsableFactory) where T : IParsable
     {
         if(string.IsNullOrEmpty(contentType)) throw new ArgumentNullException(nameof(contentType));
@@ -63,6 +67,7 @@ public static partial class KiotaSerializer
     /// <param name="contentType">The content type of the stream.</param>
     /// <param name="stream">The stream to deserialize.</param>
     [Obsolete("Use DeserializeAsync instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
 #if NET5_0_OR_GREATER
     public static T? Deserialize<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string contentType, Stream stream) where T : IParsable
 #else
@@ -86,6 +91,7 @@ public static partial class KiotaSerializer
     /// <param name="contentType">The content type of the stream.</param>
     /// <param name="serializedRepresentation">The serialized representation of the object.</param>
     [Obsolete("Use DeserializeAsync instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
 #if NET5_0_OR_GREATER
     public static T? Deserialize<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string contentType, string serializedRepresentation) where T : IParsable
 #else
@@ -100,6 +106,7 @@ public static partial class KiotaSerializer
     /// <param name="stream">The stream to deserialize.</param>
     /// <param name="parsableFactory">The factory to create the object.</param>
     [Obsolete("Use DeserializeCollectionAsync instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static IEnumerable<T> DeserializeCollection<T>(string contentType, Stream stream, ParsableFactory<T> parsableFactory) where T : IParsable
     {
         if(string.IsNullOrEmpty(contentType)) throw new ArgumentNullException(nameof(contentType));
@@ -115,6 +122,7 @@ public static partial class KiotaSerializer
     /// <param name="serializedRepresentation">The serialized representation of the objects.</param>
     /// <param name="parsableFactory">The factory to create the object.</param>
     [Obsolete("Use DeserializeCollectionAsync instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static IEnumerable<T> DeserializeCollection<T>(string contentType, string serializedRepresentation, ParsableFactory<T> parsableFactory) where T : IParsable
     {
         if(string.IsNullOrEmpty(serializedRepresentation)) throw new ArgumentNullException(nameof(serializedRepresentation));
@@ -127,6 +135,7 @@ public static partial class KiotaSerializer
     /// <param name="contentType">The content type of the stream.</param>
     /// <param name="stream">The stream to deserialize.</param>
     [Obsolete("Use DeserializeCollectionAsync instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
 #if NET5_0_OR_GREATER
     public static IEnumerable<T> DeserializeCollection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string contentType, Stream stream) where T : IParsable
 #else
@@ -139,6 +148,7 @@ public static partial class KiotaSerializer
     /// <param name="contentType">The content type of the stream.</param>
     /// <param name="serializedRepresentation">The serialized representation of the object.</param>
     [Obsolete("Use DeserializeCollectionAsync instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
 #if NET5_0_OR_GREATER
     public static IEnumerable<T> DeserializeCollection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string contentType, string serializedRepresentation) where T : IParsable
 #else

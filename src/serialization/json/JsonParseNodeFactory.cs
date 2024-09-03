@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Text.Json;
 using System.Threading;
@@ -47,6 +48,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <param name="content">The <see cref="Stream"/> containing json to parse.</param>
         /// <returns>An instance of <see cref="IParseNode"/> for json manipulation</returns> 
         [Obsolete("Use GetRootParseNodeAsync instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public IParseNode GetRootParseNode(string contentType, Stream content)
         {
             if(string.IsNullOrEmpty(contentType))

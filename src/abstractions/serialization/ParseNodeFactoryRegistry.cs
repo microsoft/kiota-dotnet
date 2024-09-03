@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -43,6 +44,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// <param name="content">The <see cref="Stream"/> to parse</param>
         /// <returns></returns>
         [Obsolete("Use GetRootParseNodeAsync instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public IParseNode GetRootParseNode(string contentType, Stream content)
         {
             if(string.IsNullOrEmpty(contentType))

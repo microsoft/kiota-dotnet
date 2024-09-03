@@ -5,12 +5,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
+
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
 #endif
@@ -316,6 +318,7 @@ namespace Microsoft.Kiota.Abstractions
         /// </summary>
         /// <param name="content">The binary stream to set as a body.</param>
         [Obsolete("Use SetStreamContent and pass the content type instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public void SetStreamContent(Stream content) => SetStreamContent(content, BinaryContentType);
 
         /// <summary>

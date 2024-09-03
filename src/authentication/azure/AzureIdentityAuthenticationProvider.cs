@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.ComponentModel;
 using Azure.Core;
 using Microsoft.Kiota.Abstractions.Authentication;
 
@@ -32,6 +33,7 @@ public class AzureIdentityAuthenticationProvider : BaseBearerTokenAuthentication
     /// <param name="scopes">The scopes to request the access token for.</param>
     /// <param name="observabilityOptions">The observability options to use for the authentication provider.</param>
     [Obsolete("This constructor is obsolete and will be removed in a future version. Use the constructor that takes an isCaeEnabled parameter instead.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public AzureIdentityAuthenticationProvider(TokenCredential credential, string[]? allowedHosts, ObservabilityOptions? observabilityOptions, params string[] scopes)
         : this(credential, allowedHosts, observabilityOptions, true, scopes)
     {
