@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Net.Http;
@@ -17,6 +18,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
     /// A <see cref="DelegatingHandler"/> implementation that handles compression.
     /// </summary>
     [Obsolete("kiota clients now rely on the HttpClientHandler to handle decompression")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class CompressionHandler : DelegatingHandler
     {
         internal const string GZip = "gzip";

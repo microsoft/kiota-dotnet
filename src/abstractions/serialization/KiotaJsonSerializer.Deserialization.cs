@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.ComponentModel;
+
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
 #endif
@@ -25,6 +27,7 @@ public static partial class KiotaJsonSerializer
     /// <param name="parsableFactory">The factory to create the object.</param>
     /// <param name="serializedRepresentation">The serialized representation of the object.</param>
     [Obsolete("Use DeserializeAsync instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static T? Deserialize<T>(string serializedRepresentation, ParsableFactory<T> parsableFactory) where T : IParsable
         => KiotaSerializer.Deserialize(_jsonContentType, serializedRepresentation, parsableFactory);
     /// <summary>
@@ -33,6 +36,7 @@ public static partial class KiotaJsonSerializer
     /// <param name="stream">The stream to deserialize.</param>
     /// <param name="parsableFactory">The factory to create the object.</param>
     [Obsolete("Use DeserializeAsync instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static T? Deserialize<T>(Stream stream, ParsableFactory<T> parsableFactory) where T : IParsable
     => KiotaSerializer.Deserialize(_jsonContentType, stream, parsableFactory);
     /// <summary>
@@ -40,6 +44,7 @@ public static partial class KiotaJsonSerializer
     /// </summary>
     /// <param name="stream">The stream to deserialize.</param>
     [Obsolete("Use DeserializeAsync instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
 #if NET5_0_OR_GREATER
     public static T? Deserialize<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(Stream stream) where T : IParsable
 #else
@@ -51,6 +56,7 @@ public static partial class KiotaJsonSerializer
     /// </summary>
     /// <param name="serializedRepresentation">The serialized representation of the object.</param>
     [Obsolete("Use DeserializeAsync instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
 #if NET5_0_OR_GREATER
     public static T? Deserialize<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string serializedRepresentation) where T : IParsable
 #else
@@ -63,6 +69,7 @@ public static partial class KiotaJsonSerializer
     /// <param name="stream">The stream to deserialize.</param>
     /// <param name="parsableFactory">The factory to create the object.</param>
     [Obsolete("Use DeserializeCollectionAsync instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static IEnumerable<T> DeserializeCollection<T>(Stream stream, ParsableFactory<T> parsableFactory) where T : IParsable
     => KiotaSerializer.DeserializeCollection(_jsonContentType, stream, parsableFactory);
     /// <summary>
@@ -71,6 +78,7 @@ public static partial class KiotaJsonSerializer
     /// <param name="serializedRepresentation">The serialized representation of the objects.</param>
     /// <param name="parsableFactory">The factory to create the object.</param>
     [Obsolete("Use DeserializeCollectionAsync instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static IEnumerable<T> DeserializeCollection<T>(string serializedRepresentation, ParsableFactory<T> parsableFactory) where T : IParsable
     => KiotaSerializer.DeserializeCollection(_jsonContentType, serializedRepresentation, parsableFactory);
     /// <summary>
@@ -78,6 +86,7 @@ public static partial class KiotaJsonSerializer
     /// </summary>
     /// <param name="stream">The stream to deserialize.</param>
     [Obsolete("Use DeserializeCollectionAsync instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
 #if NET5_0_OR_GREATER
     public static IEnumerable<T> DeserializeCollection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(Stream stream) where T : IParsable
 #else
@@ -89,6 +98,7 @@ public static partial class KiotaJsonSerializer
     /// </summary>
     /// <param name="serializedRepresentation">The serialized representation of the object.</param>
     [Obsolete("Use DeserializeCollectionAsync instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
 #if NET5_0_OR_GREATER
     public static IEnumerable<T> DeserializeCollection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string serializedRepresentation) where T : IParsable
 #else

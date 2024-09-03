@@ -45,6 +45,7 @@ public static partial class KiotaSerializer
     /// <param name="value">The object to serialize.</param>
     /// <returns>The serialized representation as a string.</returns>
     [Obsolete("This method is obsolete, use the async method instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static string SerializeAsString<T>(string contentType, T value) where T : IParsable
     {
         using var stream = SerializeAsStream(contentType, value);
@@ -97,6 +98,7 @@ public static partial class KiotaSerializer
     /// <param name="value">The object to serialize.</param>
     /// <returns>The serialized representation as a string.</returns>
     [Obsolete("This method is obsolete, use the async method instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static string SerializeAsString<T>(string contentType, IEnumerable<T> value) where T : IParsable
     {
         using var stream = SerializeAsStream(contentType, value);

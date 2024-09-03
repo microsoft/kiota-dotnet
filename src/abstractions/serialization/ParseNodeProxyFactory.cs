@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,6 +41,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// <param name="contentType">The content type of the parse node.</param>
         /// <returns>A parse node.</returns>
         [Obsolete("Use GetRootParseNodeAsync instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public IParseNode GetRootParseNode(string contentType, Stream content)
         {
             var node = _concrete.GetRootParseNode(contentType, content);
