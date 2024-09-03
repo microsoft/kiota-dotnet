@@ -253,9 +253,9 @@ namespace Microsoft.Kiota.Abstractions.Store
 
         private void ForwardReturnOnlyChangedValuesToNestedInstances()
         {
-            foreach(var item in store)
+            foreach(var item in store.Values)
             {
-                if(item.Value.Item2 is Tuple<ICollection, int> collectionTuple)
+                if(item.Item2 is Tuple<ICollection, int> collectionTuple)
                 {
                     foreach(var collectionItem in collectionTuple.Item1)
                     {
@@ -263,7 +263,7 @@ namespace Microsoft.Kiota.Abstractions.Store
                         backedModel.BackingStore.ReturnOnlyChangedValues = _returnOnlyChangedValues;
                     }
                 }
-                else if(item.Value.Item2 is IBackedModel backedModel)
+                else if(item.Item2 is IBackedModel backedModel)
                 {
                     backedModel.BackingStore.ReturnOnlyChangedValues = _returnOnlyChangedValues;
                 }
