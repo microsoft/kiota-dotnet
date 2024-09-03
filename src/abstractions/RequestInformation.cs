@@ -5,13 +5,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
-using System.ComponentModel;
 
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
