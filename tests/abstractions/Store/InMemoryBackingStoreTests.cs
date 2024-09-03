@@ -487,6 +487,44 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
             Assert.InRange(stopWatch.ElapsedMilliseconds, 0, 1);
         }
 
+        [Fact]
+        public void TestsLargeObjectReadPerformsWell()
+        {
+            // Arrange dummy user with many child objects
+            var testUser = new TestEntity
+            {
+                Id = "84c747c1-d2c0-410d-ba50-fc23e0b4abbe",
+                Colleagues = Enumerable.Range(1, 100)
+                    .Select(_ => new TestEntity
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        BusinessPhones = new List<string>
+                        {
+                            "+1 234 567 891"
+                        },
+                        Colleagues = Enumerable.Range(1, 100)
+                            .Select(_ => new TestEntity
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                BusinessPhones = new List<string>
+                                {
+                                    "+1 234 567 891"
+                                }
+                            })
+                            .ToList()
+                    })
+                    .ToList()
+            };
+
+            // Act on the data by reading a property
+            var stopWatch = Stopwatch.StartNew();
+            _ = testUser.Colleagues[0];
+            stopWatch.Stop();
+
+            // Assert
+            Assert.InRange(stopWatch.ElapsedMilliseconds, 0, 1);
+        }
+
         /// <summary>
         /// Helper function to pull out the private `subscriptions` collection property from the InMemoryBackingStore class
         /// </summary>
