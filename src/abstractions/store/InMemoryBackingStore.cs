@@ -15,10 +15,21 @@ namespace Microsoft.Kiota.Abstractions.Store
     public class InMemoryBackingStore : IBackingStore
     {
         private bool isInitializationComplete = true;
+        private bool _returnOnlyChangedValues = false;
+
         /// <summary>
         /// Determines whether the backing store should only return changed values when queried.
         /// </summary>
-        public bool ReturnOnlyChangedValues { get; set; }
+        public bool ReturnOnlyChangedValues
+        {
+            get => _returnOnlyChangedValues;
+
+            set
+            {
+                _returnOnlyChangedValues = value;
+                ForwardReturnOnlyChangedValuesToNestedInstances();
+            }
+        }
         private readonly ConcurrentDictionary<string, Tuple<bool, object?>> store = new();
         private readonly ConcurrentDictionary<string, Action<string, object?, object?>> subscriptions = new();
 
@@ -34,7 +45,10 @@ namespace Microsoft.Kiota.Abstractions.Store
 
             if(store.TryGetValue(key, out var result))
             {
-                EnsureCollectionPropertyIsConsistent(key, result.Item2);
+                if(ReturnOnlyChangedValues)
+                {
+                    EnsureCollectionPropertyIsConsistent(key, result.Item2);
+                }
                 var resultObject = result.Item2;
                 if(resultObject is Tuple<ICollection, int> collectionTuple)
                 {
@@ -128,6 +142,14 @@ namespace Microsoft.Kiota.Abstractions.Store
         /// <returns>A collection of strings containing keys changed to null </returns>
         public IEnumerable<string> EnumerateKeysForValuesChangedToNull()
         {
+            if(ReturnOnlyChangedValues) // refresh the state of collection properties if they've changed in size.
+            {
+                foreach(var item in store)
+                {
+                    EnsureCollectionPropertyIsConsistent(item.Key, item.Value.Item2);
+                }
+            }
+
             foreach(var item in store)
             {
                 if(item.Value.Item1 && item.Value.Item2 == null)
@@ -225,6 +247,25 @@ namespace Microsoft.Kiota.Abstractions.Store
                 foreach(var item in backedModel.BackingStore.Enumerate())
                 {
                     backedModel.BackingStore.Get<object>(item.Key);
+                }
+            }
+        }
+
+        private void ForwardReturnOnlyChangedValuesToNestedInstances()
+        {
+            foreach(var item in store.Values)
+            {
+                if(item.Item2 is Tuple<ICollection, int> collectionTuple)
+                {
+                    foreach(var collectionItem in collectionTuple.Item1)
+                    {
+                        if(collectionItem is not IBackedModel backedModel) break;
+                        backedModel.BackingStore.ReturnOnlyChangedValues = _returnOnlyChangedValues;
+                    }
+                }
+                else if(item.Item2 is IBackedModel backedModel)
+                {
+                    backedModel.BackingStore.ReturnOnlyChangedValues = _returnOnlyChangedValues;
                 }
             }
         }

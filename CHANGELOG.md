@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [1.12.4] - 2024-09-05
+
+### Changed
+
+- Improves performance of the InMemoryBackingStore when reading properties. [#347](https://github.com/microsoft/kiota-dotnet/issues/347)
+
 ## [1.12.3] - 2024-09-03
 
 ### Changed
