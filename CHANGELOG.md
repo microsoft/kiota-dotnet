@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.0] - 2024-09-25
+
+### Changed
+
+- Adds extension methods for make serializing easier [#338](https://github.com/microsoft/kiota-dotnet/issues/338).
 
 ## [1.12.4] - 2024-09-05
 
