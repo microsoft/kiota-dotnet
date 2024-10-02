@@ -12,16 +12,16 @@ Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README
 
 ## Libraries
 
-| Library                                                              | Nuget Release                                                                                                                                                                              |
+| Library                                                              | NuGet Release                                                                                                                                                                              |
 |----------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Abstractions](./src/abstractions/README.md)                         | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Abstractions?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Abstractions/)                       |
-| [Authentication - Azure](./src/authentication/azure/README.md)       | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Authentication.Azure?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Authentication.Azure/)       |
-| [Http - HttpClientLibrary](./src/http/httpClient/README.md)          | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Http.HttpClientLibrary?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Http.HttpClientLibrary/)   |
-| [Serialization - JSON](./src/serialization/json/README.md)           | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Json?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Json/)           |
-| [Serialization - FORM](./src/serialization/form/README.md)           | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Form?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Form/)           |
-| [Serialization - TEXT](./src/serialization/text/README.md)           | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Text?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Text/)           |
-| [Serialization - MULTIPART](./src/serialization/multipart/README.md) | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Serialization.Multipart?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Multipart/) |
-| [Bundle](./src/bundle/README.md)                                     | [![NuGet Version](https://buildstats.info/nuget/Microsoft.Kiota.Bundle?includePreReleases=true)](https://www.nuget.org/packages/Microsoft.Kiota.Bundle/)                                   |
+| [Abstractions](./src/abstractions/README.md)                         | [![NuGet Version](https://img.shields.io/nuget/vpre/Microsoft.Kiota.Abstractions?label=Latest&logo=nuget)](https://www.nuget.org/packages/Microsoft.Kiota.Abstractions/)                       |
+| [Authentication - Azure](./src/authentication/azure/README.md)       | [![NuGet Version](https://img.shields.io/nuget/vpre/Microsoft.Kiota.Authentication.Azure?label=Latest&logo=nuget)](https://www.nuget.org/packages/Microsoft.Kiota.Authentication.Azure/)       |
+| [Http - HttpClientLibrary](./src/http/httpClient/README.md)          | [![NuGet Version](https://img.shields.io/nuget/vpre/Microsoft.Kiota.Http.HttpClientLibrary?label=Latest&logo=nuget)](https://www.nuget.org/packages/Microsoft.Kiota.Http.HttpClientLibrary/)   |
+| [Serialization - JSON](./src/serialization/json/README.md)           | [![NuGet Version](https://img.shields.io/nuget/vpre/Microsoft.Kiota.Serialization.Json?label=Latest&logo=nuget)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Json/)           |
+| [Serialization - FORM](./src/serialization/form/README.md)           | [![NuGet Version](https://img.shields.io/nuget/vpre/Microsoft.Kiota.Serialization.Form?label=Latest&logo=nuget)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Form/)           |
+| [Serialization - TEXT](./src/serialization/text/README.md)           | [![NuGet Version](https://img.shields.io/nuget/vpre/Microsoft.Kiota.Serialization.Text?label=Latest&logo=nuget)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Text/)           |
+| [Serialization - MULTIPART](./src/serialization/multipart/README.md) | [![NuGet Version](https://img.shields.io/nuget/vpre/Microsoft.Kiota.Serialization.Multipart?label=Latest&logo=nuget)](https://www.nuget.org/packages/Microsoft.Kiota.Serialization.Multipart/) |
+| [Bundle](./src/bundle/README.md)                                     | [![NuGet Version](https://img.shields.io/nuget/vpre/Microsoft.Kiota.Bundle?label=Latest&logo=nuget)](https://www.nuget.org/packages/Microsoft.Kiota.Bundle/)                                   |
 
 ## Release notes
 
