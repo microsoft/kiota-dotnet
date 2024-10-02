@@ -12,7 +12,7 @@ Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README
 
 ## Libraries
 
-| Library                                                              | Nuget Release                                                                                                                                                                              |
+| Library                                                              | NuGet Release                                                                                                                                                                              |
 |----------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Abstractions](./src/abstractions/README.md)                         | [![NuGet Version](https://img.shields.io/nuget/vpre/Microsoft.Kiota.Abstractions?label=Latest&logo=nuget)](https://www.nuget.org/packages/Microsoft.Kiota.Abstractions/)                       |
 | [Authentication - Azure](./src/authentication/azure/README.md)       | [![NuGet Version](https://img.shields.io/nuget/vpre/Microsoft.Kiota.Authentication.Azure?label=Latest&logo=nuget)](https://www.nuget.org/packages/Microsoft.Kiota.Authentication.Azure/)       |
