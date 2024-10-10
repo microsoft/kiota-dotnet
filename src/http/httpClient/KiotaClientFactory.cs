@@ -62,6 +62,30 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         }
 
         /// <summary>
+        /// Initializes the <see cref="HttpClient"/> with the default configuration and authentication middleware using the <see cref="IAuthenticationProvider"/> if provided.
+        /// </summary>
+        /// <param name="authenticationProvider"></param>
+        /// <param name="optionsForHandlers"></param>
+        /// <param name="finalHandler"></param>
+        /// <returns></returns>
+        public static HttpClient Create(BaseBearerTokenAuthenticationProvider authenticationProvider, IRequestOption[]? optionsForHandlers = null, HttpMessageHandler? finalHandler = null)
+        {
+            var defaultHandlersEnumerable = CreateDefaultHandlers(optionsForHandlers);
+            defaultHandlersEnumerable.Add(new AuthorizationHandler(authenticationProvider));
+            int count = 0;
+            foreach(var _ in defaultHandlersEnumerable) count++;
+
+            var defaultHandlersArray = new DelegatingHandler[count];
+            int index = 0;
+            foreach(var handler2 in defaultHandlersEnumerable)
+            {
+                defaultHandlersArray[index++] = handler2;
+            }
+            var handler = ChainHandlersCollectionAndGetFirstLink(finalHandler ?? GetDefaultHttpMessageHandler(), defaultHandlersArray);
+            return handler != null ? new HttpClient(handler) : new HttpClient();
+        }
+
+        /// <summary>
         /// Creates a default set of middleware to be used by the <see cref="HttpClient"/>.
         /// </summary>
         /// <returns>A list of the default handlers used by the client.</returns>

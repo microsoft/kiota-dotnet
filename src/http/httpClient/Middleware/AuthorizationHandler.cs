@@ -24,7 +24,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
     {
 
         private const string AuthorizationHeader = "Authorization";
-        private BaseBearerTokenAuthenticationProvider authenticationProvider;
+        private readonly BaseBearerTokenAuthenticationProvider authenticationProvider;
 
         /// <summary>
         ///  Constructs an <see cref="AuthorizationHandler"/>

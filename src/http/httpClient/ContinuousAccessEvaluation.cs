@@ -9,9 +9,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
     /// <summary>
     /// Process continuous access evaluation
     /// </summary>
-    internal class ContinuousAccessEvaluation
+    static internal class ContinuousAccessEvaluation
     {
-
         internal const string ClaimsKey = "claims";
         internal const string BearerAuthenticationScheme = "Bearer";
         private static readonly char[] ComaSplitSeparator = [','];
