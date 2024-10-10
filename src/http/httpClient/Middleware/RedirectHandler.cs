@@ -82,7 +82,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                     {
                         using var redirectActivity = activitySource?.StartActivity($"{nameof(RedirectHandler)}_{nameof(SendAsync)} - redirect {redirectCount}");
                         redirectActivity?.SetTag("com.microsoft.kiota.handler.redirect.count", redirectCount);
-                        redirectActivity?.SetTag("http.status_code", response.StatusCode);
+                        redirectActivity?.SetTag("http.response.status_code", response.StatusCode);
                         // Drain response content to free responses.
                         if(response.Content != null)
                         {

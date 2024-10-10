@@ -106,7 +106,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 exceptions.Add(await GetInnerExceptionAsync(response).ConfigureAwait(false));
                 using var retryActivity = activitySource?.StartActivity($"{nameof(RetryHandler)}_{nameof(SendAsync)} - attempt {retryCount}");
                 retryActivity?.SetTag("http.retry_count", retryCount);
-                retryActivity?.SetTag("http.status_code", response.StatusCode);
+                retryActivity?.SetTag("http.response.status_code", response.StatusCode);
 
                 // Call Delay method to get delay time from response's Retry-After header or by exponential backoff
                 Task delay = RetryHandler.DelayAsync(response, retryCount, retryOption.Delay, out double delayInSeconds, cancellationToken);
