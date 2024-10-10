@@ -78,7 +78,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             var decodedUriTemplate = ParametersNameDecodingHandler.DecodeUriEncodedString(requestInfo.UrlTemplate, charactersToDecodeForUriTemplate);
             var telemetryPathValue = string.IsNullOrEmpty(decodedUriTemplate) ? string.Empty : queryParametersCleanupRegex.Replace(decodedUriTemplate, string.Empty);
             var span = activitySource?.StartActivity($"{methodName} - {telemetryPathValue}");
-            span?.SetTag("http.uri_template", decodedUriTemplate);
+            span?.SetTag("url.uri_template", decodedUriTemplate);
             return span;
         }
         /// <summary>
@@ -519,7 +519,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 using var contentLengthEnumerator = contentLengthValues.GetEnumerator();
                 if(contentLengthEnumerator.MoveNext() && int.TryParse(contentLengthEnumerator.Current, out var contentLength))
                 {
-                    activityForAttributes?.SetTag("http.response_content_length", contentLength);
+                    activityForAttributes?.SetTag("http.response.body.size", contentLength);
                 }
             }
             if(response.Headers.TryGetValues("Content-Type", out var contentTypeValues))
@@ -527,11 +527,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 using var contentTypeEnumerator = contentTypeValues.GetEnumerator();
                 if(contentTypeEnumerator.MoveNext())
                 {
-                    activityForAttributes?.SetTag("http.response_content_type", contentTypeEnumerator.Current);
+                    activityForAttributes?.SetTag("http.response.header.content-type", contentTypeEnumerator.Current);
                 }
             }
-            activityForAttributes?.SetTag("http.status_code", (int)response.StatusCode);
-            activityForAttributes?.SetTag("http.flavor", $"{response.Version.Major}.{response.Version.Minor}");
+            activityForAttributes?.SetTag("http.response.status_code", (int)response.StatusCode);
+            activityForAttributes?.SetTag("network.protocol.name", $"{response.Version.Major}.{response.Version.Minor}");
 
             return await RetryCAEResponseIfRequiredAsync(response, requestInfo, cancellationToken, claims, activityForAttributes).ConfigureAwait(false);
         }
@@ -612,12 +612,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         {
             using var span = activitySource?.StartActivity(nameof(GetRequestMessageFromRequestInformation));
             SetBaseUrlForRequestInformation(requestInfo);// this method can also be called from a different context so ensure the baseUrl is added.
-            activityForAttributes?.SetTag("http.method", requestInfo.HttpMethod.ToString());
+            activityForAttributes?.SetTag("http.request.method", requestInfo.HttpMethod.ToString());
             var requestUri = requestInfo.URI;
-            activityForAttributes?.SetTag("http.host", requestUri.Host);
-            activityForAttributes?.SetTag("http.scheme", requestUri.Scheme);
+            activityForAttributes?.SetTag("url.scheme", requestUri.Host);
+            activityForAttributes?.SetTag("server.address", requestUri.Scheme);
             if(obsOptions.IncludeEUIIAttributes)
-                activityForAttributes?.SetTag("http.uri", requestUri.ToString());
+                activityForAttributes?.SetTag("url.full", requestUri.ToString());
             var message = new HttpRequestMessage
             {
                 Method = new HttpMethod(requestInfo.HttpMethod.ToString().ToUpperInvariant()),
@@ -653,13 +653,13 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 {
                     var contentLenEnumerator = contentLenValues.GetEnumerator();
                     if(contentLenEnumerator.MoveNext() && int.TryParse(contentLenEnumerator.Current, out var contentLenValueInt))
-                        activityForAttributes?.SetTag("http.request_content_length", contentLenValueInt);
+                        activityForAttributes?.SetTag("http.request.body.size", contentLenValueInt);
                 }
                 if(message.Content.Headers.TryGetValues("Content-Type", out var contentTypeValues))
                 {
                     var contentTypeEnumerator = contentTypeValues.GetEnumerator();
                     if(contentTypeEnumerator.MoveNext())
-                        activityForAttributes?.SetTag("http.request_content_type", contentTypeEnumerator.Current);
+                        activityForAttributes?.SetTag("http.request.header.content-type", contentTypeEnumerator.Current);
                 }
             }
             return message;
