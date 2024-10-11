@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.1] - 2024-10-10
+
+### Changed
+
+- Updated HTTP span attributes to comply with updated OpenTelemetry semantic conventions. [#344](https://github.com/microsoft/kiota-dotnet/issues/344)
+
 ## [1.13.0] - 2024-09-25
 
 ### Changed
