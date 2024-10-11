@@ -536,13 +536,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             return await RetryCAEResponseIfRequiredAsync(response, requestInfo, cancellationToken, claims, activityForAttributes).ConfigureAwait(false);
         }
 
-        private static readonly Regex caeValueRegex = new("\"([^\"]*)\"", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 
         /// <summary>
         /// The key for the event raised by tracing when an authentication challenge is received
         /// </summary>
         public const string AuthenticateChallengedEventKey = "com.microsoft.kiota.authenticate_challenge_received";
-        private static readonly char[] ComaSplitSeparator = [','];
 
         private async Task<HttpResponseMessage> RetryCAEResponseIfRequiredAsync(HttpResponseMessage response, RequestInformation requestInfo, CancellationToken cancellationToken, string? claims, Activity? activityForAttributes)
         {
@@ -551,46 +549,16 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 string.IsNullOrEmpty(claims) && // avoid infinite loop, we only retry once
                 (requestInfo.Content?.CanSeek ?? true))
             {
-                AuthenticationHeaderValue? authHeader = null;
-                foreach(var header in response.Headers.WwwAuthenticate)
+                var responseClaims = ContinuousAccessEvaluation.GetClaims(response);
+                if(string.IsNullOrEmpty(responseClaims))
                 {
-                    if(filterAuthHeader(header))
-                    {
-                        authHeader = header;
-                        break;
-                    }
+                    return response;
                 }
-
-                if(authHeader is not null)
-                {
-                    var authHeaderParameters = authHeader.Parameter?.Split(ComaSplitSeparator, StringSplitOptions.RemoveEmptyEntries);
-
-                    string? rawResponseClaims = null;
-                    if(authHeaderParameters != null)
-                    {
-                        foreach(var parameter in authHeaderParameters)
-                        {
-                            var trimmedParameter = parameter.Trim();
-                            if(trimmedParameter.StartsWith(ClaimsKey, StringComparison.OrdinalIgnoreCase))
-                            {
-                                rawResponseClaims = trimmedParameter;
-                                break;
-                            }
-                        }
-                    }
-
-                    if(rawResponseClaims != null &&
-                        caeValueRegex.Match(rawResponseClaims) is Match claimsMatch &&
-                        claimsMatch.Groups.Count > 1 &&
-                        claimsMatch.Groups[1].Value is string responseClaims)
-                    {
-                        span?.AddEvent(new ActivityEvent(AuthenticateChallengedEventKey));
-                        activityForAttributes?.SetTag("http.retry_count", 1);
-                        requestInfo.Content?.Seek(0, SeekOrigin.Begin);
-                        await DrainAsync(response, cancellationToken).ConfigureAwait(false);
-                        return await GetHttpResponseMessageAsync(requestInfo, cancellationToken, activityForAttributes, responseClaims).ConfigureAwait(false);
-                    }
-                }
+                span?.AddEvent(new ActivityEvent(AuthenticateChallengedEventKey));
+                activityForAttributes?.SetTag("http.retry_count", 1);
+                requestInfo.Content?.Seek(0, SeekOrigin.Begin);
+                await DrainAsync(response, cancellationToken).ConfigureAwait(false);
+                return await GetHttpResponseMessageAsync(requestInfo, cancellationToken, activityForAttributes, responseClaims).ConfigureAwait(false);
             }
             return response;
         }
