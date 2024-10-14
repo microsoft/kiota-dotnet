@@ -2,7 +2,7 @@
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------
 
-#if NET8_0_OR_GREATER
+#if NET5_0_OR_GREATER
 
 using System.Threading.Tasks;
 using System.Threading;
@@ -17,7 +17,18 @@ namespace Microsoft.Kiota.Abstractions.Serialization;
 
 public static partial class KiotaSerializer
 {
-    private static bool IsIParsable(this Type? type) => type?.IsAssignableTo(typeof(IParsable)) ?? false;
+#if NET8_0_OR_GREATER
+#else
+    /// <summary>
+    /// Palceholder for .NET &lt; 8
+    /// </summary>
+    private class RequiresDynamicCodeAttribute : Attribute
+    {
+        public RequiresDynamicCodeAttribute(string _) { }
+    }
+
+#endif
+    private static bool IsIParsable(this Type type) => type.IsAssignableTo(typeof(IParsable));
 
     private static class KiotaDeserializationWrapperFactory
     {
@@ -35,14 +46,15 @@ public static partial class KiotaSerializer
                 throw new InvalidOperationException($"Unable to create deserializer for type {targetType}");
         }
     }
+
     private interface IKiotaDeserializationWrapper
     {
         Task<IParsable?> DeserializeAsync(string contentType, Stream stream, CancellationToken cancellationToken = default);
         Task<IParsable?> DeserializeAsync(string contentType, string serializedRepresentation, CancellationToken cancellationToken = default);
         Task<IEnumerable<IParsable>> DeserializeCollectionAsync(string contentType, Stream stream, CancellationToken cancellationToken = default);
         Task<IEnumerable<IParsable>> DeserializeCollectionAsync(string contentType, string serializedRepresentation, CancellationToken cancellationToken = default);
-
     }
+
     private class TypedKiotaDeserializer<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T> : IKiotaDeserializationWrapper where T : IParsable
     {
         public async Task<IParsable?> DeserializeAsync(string contentType, Stream stream, CancellationToken cancellationToken = default) => await KiotaSerializer.DeserializeAsync<T>(contentType, stream, cancellationToken);
@@ -98,6 +110,5 @@ public static partial class KiotaSerializer
     [RequiresDynamicCode("Activator creates an instance of a generic class with the Target Type as the generic type argument.")]
     public static Task<IEnumerable<IParsable>> DeserializeCollectionAsync(Type type, string contentType, string serializedRepresentation, CancellationToken cancellationToken = default)
          => KiotaDeserializationWrapperFactory.Create(type).DeserializeCollectionAsync(contentType, serializedRepresentation, cancellationToken);
-
 }
 #endif

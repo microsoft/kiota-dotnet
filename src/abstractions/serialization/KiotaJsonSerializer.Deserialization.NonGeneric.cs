@@ -2,7 +2,7 @@
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.\
 // ------------------------------------------------------------------------------
 
-#if NET8_0_OR_GREATER
+#if NET5_0_OR_GREATER
 
 using System.Threading.Tasks;
 using System.Threading;
@@ -14,10 +14,20 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Microsoft.Kiota.Abstractions.Serialization;
-
 public static partial class KiotaJsonSerializer
 {
-    private static bool IsIParsable(this Type? type) => type?.IsAssignableTo(typeof(IParsable)) ?? false;
+#if NET8_0_OR_GREATER
+#else
+    /// <summary>
+    /// Palceholder for .NET &lt; 8
+    /// </summary>
+    private class RequiresDynamicCodeAttribute : Attribute
+    {
+        public RequiresDynamicCodeAttribute(string _) { }
+    }
+
+#endif
+    private static bool IsIParsable(this Type type) => type.IsAssignableTo(typeof(IParsable));
 
     private static class KiotaJsonDeserializationWrapperFactory
     {
@@ -42,7 +52,6 @@ public static partial class KiotaJsonSerializer
         Task<IParsable?> DeserializeAsync(string serializedRepresentation, CancellationToken cancellationToken = default);
         Task<IEnumerable<IParsable>> DeserializeCollectionAsync(Stream stream, CancellationToken cancellationToken = default);
         Task<IEnumerable<IParsable>> DeserializeCollectionAsync(string serializedRepresentation, CancellationToken cancellationToken = default);
-
     }
 
     private class KiotaJsonDeserializationWrapper<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T> : IKiotaJsonDeserializationWrapper where T : IParsable
@@ -92,7 +101,5 @@ public static partial class KiotaJsonSerializer
     [RequiresDynamicCode("Activator creates an instance of a generic class with the Target Type as the generic type argument.")]
     public static Task<IEnumerable<IParsable>> DeserializeCollectionAsync(Type targetType, string serializedRepresentation, CancellationToken cancellationToken = default)
          => KiotaJsonDeserializationWrapperFactory.Create(targetType).DeserializeCollectionAsync(serializedRepresentation, cancellationToken);
-
-
 }
 #endif
