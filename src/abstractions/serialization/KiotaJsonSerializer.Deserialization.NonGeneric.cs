@@ -30,7 +30,7 @@ public static partial class KiotaJsonSerializer
 #else
     public static Task<IParsable?> DeserializeAsync(Type targetType, string serializedRepresentation, CancellationToken cancellationToken = default)
 #endif        
-        => KiotaSerializer.KiotaDeserializationWrapperFactory.Create(targetType).DeserializeAsync(_jsonContentType, serializedRepresentation, cancellationToken);
+        => KiotaSerializer.DeserializeAsync(targetType, _jsonContentType, serializedRepresentation, cancellationToken);
 
     /// <summary>
     /// Deserializes the given stream into an object.
@@ -46,7 +46,7 @@ public static partial class KiotaJsonSerializer
 #else
     public static Task<IParsable?> DeserializeAsync(Type targetType, Stream stream, CancellationToken cancellationToken = default)
 #endif
-         => KiotaSerializer.KiotaDeserializationWrapperFactory.Create(targetType).DeserializeAsync(_jsonContentType, stream, cancellationToken);
+         => KiotaSerializer.DeserializeAsync(targetType, _jsonContentType, stream, cancellationToken);
 
     /// <summary>
     /// Deserializes the given stream into a collection of objects based on the content type.
@@ -58,7 +58,7 @@ public static partial class KiotaJsonSerializer
     [RequiresDynamicCode("Activator creates an instance of a generic class with the Target Type as the generic type argument.")]
 #endif
     public static Task<IEnumerable<IParsable>> DeserializeCollectionAsync(Type targetType, Stream stream, CancellationToken cancellationToken = default)
-         => KiotaSerializer.KiotaDeserializationWrapperFactory.Create(targetType).DeserializeCollectionAsync(_jsonContentType, stream, cancellationToken);
+         => KiotaSerializer.DeserializeCollectionAsync(targetType, _jsonContentType, stream, cancellationToken);
 
     /// <summary>
     /// Deserializes the given stream into a collection of objects based on the content type.
@@ -70,5 +70,5 @@ public static partial class KiotaJsonSerializer
     [RequiresDynamicCode("Activator creates an instance of a generic class with the Target Type as the generic type argument.")]
 #endif
     public static Task<IEnumerable<IParsable>> DeserializeCollectionAsync(Type targetType, string serializedRepresentation, CancellationToken cancellationToken = default)
-         => KiotaSerializer.KiotaDeserializationWrapperFactory.Create(targetType).DeserializeCollectionAsync(_jsonContentType, serializedRepresentation, cancellationToken);
+         => KiotaSerializer.DeserializeCollectionAsync(targetType, _jsonContentType, serializedRepresentation, cancellationToken);
 }
