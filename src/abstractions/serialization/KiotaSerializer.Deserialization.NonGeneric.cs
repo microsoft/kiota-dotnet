@@ -26,7 +26,7 @@ public static partial class KiotaSerializer
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool IsIParsable(this Type type) => typeof(IParsable).IsAssignableFrom(type);
 
-    internal static class KiotaDeserializationWrapperFactory
+    static internal class KiotaDeserializationWrapperFactory
     {
         private static readonly ConcurrentDictionary<Type, IKiotaDeserializationWrapper> _deserializers = new ConcurrentDictionary<Type, IKiotaDeserializationWrapper>();
 #if NET7_0_OR_GREATER
@@ -79,7 +79,7 @@ public static partial class KiotaSerializer
     /// <returns></returns>
 
 #if NET7_0_OR_GREATER
-        [RequiresDynamicCode("Activator creates an instance of a generic class with the Target Type as the generic type argument.")]
+    [RequiresDynamicCode("Activator creates an instance of a generic class with the Target Type as the generic type argument.")]
 #endif
 #if NET5_0_OR_GREATER
     public static Task<IParsable?> DeserializeAsync([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type type, string contentType, string serializedRepresentation, CancellationToken cancellationToken = default)
@@ -97,7 +97,7 @@ public static partial class KiotaSerializer
     /// <param name="cancellationToken">The cancellation token for the task</param>
     /// <returns></returns>
 #if NET7_0_OR_GREATER
-        [RequiresDynamicCode("Activator creates an instance of a generic class with the Target Type as the generic type argument.")]
+    [RequiresDynamicCode("Activator creates an instance of a generic class with the Target Type as the generic type argument.")]
 #endif
 #if NET5_0_OR_GREATER
     public static Task<IParsable?> DeserializeAsync([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type type, string contentType, Stream stream, CancellationToken cancellationToken = default)
@@ -114,7 +114,7 @@ public static partial class KiotaSerializer
     /// <param name="stream">The stream to deserialize.</param>
     /// <param name="cancellationToken">The cancellation token for the task</param>
 #if NET7_0_OR_GREATER
-        [RequiresDynamicCode("Activator creates an instance of a generic class with the Target Type as the generic type argument.")]
+    [RequiresDynamicCode("Activator creates an instance of a generic class with the Target Type as the generic type argument.")]
 #endif
     public static Task<IEnumerable<IParsable>> DeserializeCollectionAsync(Type type, string contentType, Stream stream, CancellationToken cancellationToken = default)
          => KiotaDeserializationWrapperFactory.Create(type).DeserializeCollectionAsync(contentType, stream, cancellationToken);
@@ -127,7 +127,7 @@ public static partial class KiotaSerializer
     /// <param name="serializedRepresentation">The serialized representation of the object.</param>
     /// <param name="cancellationToken">The cancellation token for the task</param>
 #if NET7_0_OR_GREATER
-        [RequiresDynamicCode("Activator creates an instance of a generic class with the Target Type as the generic type argument.")]
+    [RequiresDynamicCode("Activator creates an instance of a generic class with the Target Type as the generic type argument.")]
 #endif
     public static Task<IEnumerable<IParsable>> DeserializeCollectionAsync(Type type, string contentType, string serializedRepresentation, CancellationToken cancellationToken = default)
          => KiotaDeserializationWrapperFactory.Create(type).DeserializeCollectionAsync(contentType, serializedRepresentation, cancellationToken);
