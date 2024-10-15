@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Microsoft.Kiota.Abstractions.Tests.Serialization;
 
-public class DeserializationHelpersTests
+public partial class DeserializationHelpersTests
 {
     private const string _jsonContentType = "application/json";
     [Fact]
