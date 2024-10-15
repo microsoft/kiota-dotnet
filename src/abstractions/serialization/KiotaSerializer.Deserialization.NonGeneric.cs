@@ -23,10 +23,10 @@ namespace Microsoft.Kiota.Abstractions.Serialization;
 
 internal interface IKiotaDeserializationWrapper
 {
-    Task<IParsable?> DeserializeAsync(string contentType, Stream stream, CancellationToken cancellationToken = default);
-    Task<IParsable?> DeserializeAsync(string contentType, string serializedRepresentation, CancellationToken cancellationToken = default);
-    Task<IEnumerable<IParsable>> DeserializeCollectionAsync(string contentType, Stream stream, CancellationToken cancellationToken = default);
-    Task<IEnumerable<IParsable>> DeserializeCollectionAsync(string contentType, string serializedRepresentation, CancellationToken cancellationToken = default);
+    Task<IParsable?> DeserializeAsync(string contentType, Stream stream, CancellationToken cancellationToken);
+    Task<IParsable?> DeserializeAsync(string contentType, string serializedRepresentation, CancellationToken cancellationToken);
+    Task<IEnumerable<IParsable>> DeserializeCollectionAsync(string contentType, Stream stream, CancellationToken cancellationToken);
+    Task<IEnumerable<IParsable>> DeserializeCollectionAsync(string contentType, string serializedRepresentation, CancellationToken cancellationToken);
 }
 #if NET5_0_OR_GREATER
 internal class KiotaDeserializationWrapper<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T> : IKiotaDeserializationWrapper where T : IParsable
@@ -34,10 +34,10 @@ internal class KiotaDeserializationWrapper<[DynamicallyAccessedMembers(Dynamical
 internal class KiotaDeserializationWrapper<T> : IKiotaDeserializationWrapper where T : IParsable
 #endif
 {
-    public async Task<IParsable?> DeserializeAsync(string contentType, Stream stream, CancellationToken cancellationToken = default) => await KiotaSerializer.DeserializeAsync<T>(contentType, stream, cancellationToken).ConfigureAwait(false);
-    public async Task<IParsable?> DeserializeAsync(string contentType, string serializedRepresentation, CancellationToken cancellationToken = default) => await KiotaSerializer.DeserializeAsync<T>(contentType, serializedRepresentation, cancellationToken).ConfigureAwait(false);
-    public async Task<IEnumerable<IParsable>> DeserializeCollectionAsync(string contentType, Stream stream, CancellationToken cancellationToken = default) => (await KiotaSerializer.DeserializeCollectionAsync<T>(contentType, stream, cancellationToken).ConfigureAwait(false)).OfType<IParsable>();
-    public async Task<IEnumerable<IParsable>> DeserializeCollectionAsync(string contentType, string serializedRepresentation, CancellationToken cancellationToken = default) => (await KiotaSerializer.DeserializeCollectionAsync<T>(contentType, serializedRepresentation, cancellationToken).ConfigureAwait(false)).OfType<IParsable>();
+    public async Task<IParsable?> DeserializeAsync(string contentType, Stream stream, CancellationToken cancellationToken) => await KiotaSerializer.DeserializeAsync<T>(contentType, stream, cancellationToken).ConfigureAwait(false);
+    public async Task<IParsable?> DeserializeAsync(string contentType, string serializedRepresentation, CancellationToken cancellationToken) => await KiotaSerializer.DeserializeAsync<T>(contentType, serializedRepresentation, cancellationToken).ConfigureAwait(false);
+    public async Task<IEnumerable<IParsable>> DeserializeCollectionAsync(string contentType, Stream stream, CancellationToken cancellationToken) => (await KiotaSerializer.DeserializeCollectionAsync<T>(contentType, stream, cancellationToken).ConfigureAwait(false)).OfType<IParsable>();
+    public async Task<IEnumerable<IParsable>> DeserializeCollectionAsync(string contentType, string serializedRepresentation, CancellationToken cancellationToken) => (await KiotaSerializer.DeserializeCollectionAsync<T>(contentType, serializedRepresentation, cancellationToken).ConfigureAwait(false)).OfType<IParsable>();
 }
 static internal class KiotaDeserializationWrapperFactory
 {
