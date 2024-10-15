@@ -2,12 +2,11 @@
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.\
 // ------------------------------------------------------------------------------
 
-using System.Threading.Tasks;
-using System.Threading;
-using System.IO;
 using System;
-
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -29,7 +28,7 @@ public static partial class KiotaJsonSerializer
 #if NET5_0_OR_GREATER
     public static Task<IParsable?> DeserializeAsync([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type targetType, string serializedRepresentation, CancellationToken cancellationToken = default)
 #else
-    public static Task<IParsable?> DeserializeAsync(Type targetType, string serializedRepresentation , CancellationToken cancellationToken = default)
+    public static Task<IParsable?> DeserializeAsync(Type targetType, string serializedRepresentation, CancellationToken cancellationToken = default)
 #endif        
         => KiotaSerializer.KiotaDeserializationWrapperFactory.Create(targetType).DeserializeAsync(_jsonContentType, serializedRepresentation, cancellationToken);
 
