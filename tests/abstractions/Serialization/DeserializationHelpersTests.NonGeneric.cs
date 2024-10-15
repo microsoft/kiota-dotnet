@@ -1,4 +1,4 @@
-#if NET5_0_OR_GREATER
+
 using Microsoft.Kiota.Abstractions.Serialization;
 using Microsoft.Kiota.Abstractions.Tests.Mocks;
 using Moq;
@@ -74,4 +74,3 @@ public partial class DeserializationHelpersTests
         Assert.Equal("123", first.Id);
     }
 }
-#endif
