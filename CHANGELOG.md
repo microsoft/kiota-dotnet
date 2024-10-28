@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.2] - 2024-10-28
+
+### Changed
+
+- Added Non-Generic Solution to KiotaDeserialization helper method. [#436](https://github.com/microsoft/kiota-dotnet/pull/436)
+
 ## [1.13.1] - 2024-10-10
 
 ### Changed
