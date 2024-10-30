@@ -67,6 +67,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             // Act
             HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
             // Assert
+            Assert.NotNull(response.RequestMessage);
             Assert.True(response.RequestMessage.Headers.Contains("Authorization"));
             Assert.True(response.RequestMessage.Headers.GetValues("Authorization").Count() == 1);
             Assert.Equal($"Bearer {_expectedAccessToken}", response.RequestMessage.Headers.GetValues("Authorization").First());
@@ -86,6 +87,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
 
             // Assert
+            Assert.NotNull(response.RequestMessage);
             Assert.True(response.RequestMessage.Headers.Contains("Authorization"));
             Assert.True(response.RequestMessage.Headers.GetValues("Authorization").Count() == 1);
             Assert.Equal($"Bearer existing", response.RequestMessage.Headers.GetValues("Authorization").First());
@@ -106,6 +108,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
 
             // Assert
+            Assert.NotNull(response.RequestMessage);
             Assert.True(response.RequestMessage.Headers.Contains("Authorization"));
             Assert.True(response.RequestMessage.Headers.GetValues("Authorization").Count() == 1);
             Assert.Equal($"Bearer {_expectedAccessTokenAfterCAE}", response.RequestMessage.Headers.GetValues("Authorization").First());
