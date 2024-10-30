@@ -85,7 +85,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
         }
 
         private async Task AuthenticateRequestAsync(HttpRequestMessage request,
-            Dictionary<string, object>? additionalAuthenticationContext,
+            Dictionary<string, object> additionalAuthenticationContext,
             CancellationToken cancellationToken,
             Activity? activityForAttributes)
         {
@@ -98,8 +98,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
             var accessToken = await accessTokenProvider.GetAuthorizationTokenAsync(
                 request.RequestUri,
                 additionalAuthenticationContext, cancellationToken).ConfigureAwait(false);
-            if(string.IsNullOrEmpty(accessToken)) return;
             activityForAttributes?.SetTag("com.microsoft.kiota.handler.authorization.token_obtained", true);
+            if(string.IsNullOrEmpty(accessToken)) return;
             request.Headers.TryAddWithoutValidation(AuthorizationHeader, $"Bearer {accessToken}");
         }
     }
