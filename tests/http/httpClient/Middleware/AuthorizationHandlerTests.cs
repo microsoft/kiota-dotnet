@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware;
 using Microsoft.Kiota.Http.HttpClientLibrary.Tests.Mocks;
@@ -12,9 +13,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
     public class AuthorizationHandlerTests : IDisposable
     {
         private readonly MockRedirectHandler _testHttpMessageHandler;
-
-        private IAccessTokenProvider _mockAccessTokenProvider;
-
         private readonly string _expectedAccessToken = "token";
 
         private readonly string _expectedAccessTokenAfterCAE = "token2";
@@ -34,14 +32,14 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 It.IsAny<Uri>(),
                 It.IsAny<Dictionary<string, object>>(),
                 It.IsAny<CancellationToken>()
-            )).Returns(new Task<string>(() => _expectedAccessToken))
-            .Returns(new Task<string>(() => _expectedAccessTokenAfterCAE));
+            ).Result).Returns(_expectedAccessToken)
+            .Returns(_expectedAccessTokenAfterCAE);
 
             mockAccessTokenProvider.Setup(x => x.AllowedHostsValidator).Returns(
-                new AllowedHostsValidator(new List<string> { "https://graph.microsoft.com" })
+                new AllowedHostsValidator(new List<string> { "graph.microsoft.com" })
             );
-            this._mockAccessTokenProvider = mockAccessTokenProvider.Object;
-            this._authenticationProvider = new BaseBearerTokenAuthenticationProvider(_mockAccessTokenProvider!);
+            var mockAuthenticationProvider = new Mock<BaseBearerTokenAuthenticationProvider>(mockAccessTokenProvider.Object);
+            this._authenticationProvider = mockAuthenticationProvider.Object;
             this._authorizationHandler = new AuthorizationHandler(_authenticationProvider)
             {
                 InnerHandler = this._testHttpMessageHandler
@@ -98,11 +96,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         {
             // Arrange
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://graph.microsoft.com");
+            httpRequestMessage.Content = new ByteArrayContent(Encoding.UTF8.GetBytes("test"));
 
             HttpResponseMessage httpResponse = new HttpResponseMessage(HttpStatusCode.Unauthorized);
             httpResponse.Headers.WwwAuthenticate.Add(new AuthenticationHeaderValue("Bearer", _claimsChallengeHeaderValue));
 
-            this._testHttpMessageHandler.SetHttpResponse(httpResponse);// set the mock response
+            this._testHttpMessageHandler.SetHttpResponse(httpResponse, new HttpResponseMessage(HttpStatusCode.OK));// set the mock response
 
             // Act
             HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
@@ -112,6 +111,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             Assert.True(response.RequestMessage.Headers.Contains("Authorization"));
             Assert.True(response.RequestMessage.Headers.GetValues("Authorization").Count() == 1);
             Assert.Equal($"Bearer {_expectedAccessTokenAfterCAE}", response.RequestMessage.Headers.GetValues("Authorization").First());
+            Assert.Equal("test", await response.RequestMessage.Content!.ReadAsStringAsync());
         }
     }
 }

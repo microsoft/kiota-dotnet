@@ -44,7 +44,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
-            CancellationToken cancellationToken)
+                CancellationToken cancellationToken)
         {
             if(request == null) throw new ArgumentNullException(nameof(request));
 
@@ -85,22 +85,22 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
         }
 
         private async Task AuthenticateRequestAsync(HttpRequestMessage request,
-            Dictionary<string, object> additionalAuthenticationContext,
-            CancellationToken cancellationToken,
-            Activity? activityForAttributes)
+                Dictionary<string, object> additionalAuthenticationContext,
+                CancellationToken cancellationToken,
+                Activity? activityForAttributes)
         {
             var accessTokenProvider = authenticationProvider.AccessTokenProvider;
             if(request.RequestUri == null || !accessTokenProvider.AllowedHostsValidator.IsUrlHostValid(
-                request.RequestUri))
+                    request.RequestUri))
             {
                 return;
             }
             var accessToken = await accessTokenProvider.GetAuthorizationTokenAsync(
-                request.RequestUri,
-                additionalAuthenticationContext, cancellationToken).ConfigureAwait(false);
+                    request.RequestUri,
+                    additionalAuthenticationContext, cancellationToken).ConfigureAwait(false);
             activityForAttributes?.SetTag("com.microsoft.kiota.handler.authorization.token_obtained", true);
             if(string.IsNullOrEmpty(accessToken)) return;
-            request.Headers.TryAddWithoutValidation(AuthorizationHeader, $"Bearer {accessToken}");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         }
     }
 }
