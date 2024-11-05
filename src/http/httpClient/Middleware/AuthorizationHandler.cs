@@ -46,7 +46,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 CancellationToken cancellationToken)
         {
             if(request == null) throw new ArgumentNullException(nameof(request));
-
             Activity? activity = null;
             if(request.GetRequestOption<ObservabilityOptions>() is { } obsOptions)
             {
@@ -62,7 +61,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                     return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
                 }
                 Dictionary<string, object> additionalAuthenticationContext = new Dictionary<string, object>();
-                await AuthenticateRequestAsync(request, additionalAuthenticationContext, cancellationToken, activity).ConfigureAwait(false);
+                await AuthenticateRequestAsync(request, additionalAuthenticationContext, activity, cancellationToken).ConfigureAwait(false);
                 var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
                 if(response.StatusCode != HttpStatusCode.Unauthorized || response.RequestMessage == null || !response.RequestMessage.IsBuffered())
                     return response;
@@ -73,7 +72,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 activity?.AddEvent(new ActivityEvent("com.microsoft.kiota.handler.authorization.challenge_received"));
                 additionalAuthenticationContext[ContinuousAccessEvaluation.ClaimsKey] = claims;
                 var retryRequest = await response.RequestMessage.CloneAsync(cancellationToken);
-                await AuthenticateRequestAsync(retryRequest, additionalAuthenticationContext, cancellationToken, activity).ConfigureAwait(false);
+                await AuthenticateRequestAsync(retryRequest, additionalAuthenticationContext, activity, cancellationToken).ConfigureAwait(false);
                 activity?.SetTag("http.request.resend_count", 1);
                 return await base.SendAsync(retryRequest, cancellationToken).ConfigureAwait(false);
             }
@@ -85,8 +84,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
 
         private async Task AuthenticateRequestAsync(HttpRequestMessage request,
                 Dictionary<string, object> additionalAuthenticationContext,
-                CancellationToken cancellationToken,
-                Activity? activityForAttributes)
+                Activity? activityForAttributes,
+                CancellationToken cancellationToken)
         {
             var accessTokenProvider = authenticationProvider.AccessTokenProvider;
             if(request.RequestUri == null || !accessTokenProvider.AllowedHostsValidator.IsUrlHostValid(

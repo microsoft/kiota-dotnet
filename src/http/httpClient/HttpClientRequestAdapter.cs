@@ -494,7 +494,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         }
         private const string ClaimsKey = "claims";
         private const string BearerAuthenticationScheme = "Bearer";
-        private static Func<AuthenticationHeaderValue, bool> filterAuthHeader = static x => x.Scheme.Equals(BearerAuthenticationScheme, StringComparison.OrdinalIgnoreCase);
         private async Task<HttpResponseMessage> GetHttpResponseMessageAsync(RequestInformation requestInfo, CancellationToken cancellationToken, Activity? activityForAttributes, string? claims = default, bool isStreamResponse = false)
         {
             using var span = activitySource?.StartActivity(nameof(GetHttpResponseMessageAsync));
