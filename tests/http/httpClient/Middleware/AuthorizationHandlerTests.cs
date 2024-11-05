@@ -13,14 +13,14 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
     public class AuthorizationHandlerTests : IDisposable
     {
         private readonly MockRedirectHandler _testHttpMessageHandler;
-        private readonly string _expectedAccessToken = "token";
+        private const string _expectedAccessToken = "token";
 
-        private readonly string _expectedAccessTokenAfterCAE = "token2";
+        private const string _expectedAccessTokenAfterCAE = "token2";
         private AuthorizationHandler _authorizationHandler;
         private readonly BaseBearerTokenAuthenticationProvider _authenticationProvider;
         private readonly HttpMessageInvoker _invoker;
 
-        private readonly string _claimsChallengeHeaderValue = "authorization_uri=\"https://login.windows.net/common/oauth2/authorize\","
+        private const string _claimsChallengeHeaderValue = "authorization_uri=\"https://login.windows.net/common/oauth2/authorize\","
                 + "error=\"insufficient_claims\","
                 + "claims=\"eyJhY2Nlc3NfdG9rZW4iOnsibmJmIjp7ImVzc2VudGlhbCI6dHJ1ZSwgInZhbHVlIjoiMTYwNDEwNjY1MSJ9fX0=\"";
 

@@ -33,8 +33,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
         /// <exception cref="ArgumentNullException"></exception>
         public AuthorizationHandler(BaseBearerTokenAuthenticationProvider authenticationProvider)
         {
-            if(authenticationProvider == null) throw new ArgumentNullException(nameof(authenticationProvider));
-            this.authenticationProvider = authenticationProvider;
+            this.authenticationProvider = authenticationProvider ?? throw new ArgumentNullException(nameof(authenticationProvider));
         }
 
         /// <summary>
@@ -73,7 +72,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                     return response;
                 activity?.AddEvent(new ActivityEvent("com.microsoft.kiota.handler.authorization.challenge_received"));
                 additionalAuthenticationContext[ContinuousAccessEvaluation.ClaimsKey] = claims;
-                HttpRequestMessage retryRequest = response.RequestMessage;
+                var retryRequest = await response.RequestMessage.CloneAsync(cancellationToken);
                 await AuthenticateRequestAsync(retryRequest, additionalAuthenticationContext, cancellationToken, activity).ConfigureAwait(false);
                 activity?.SetTag("http.request.resend_count", 1);
                 return await base.SendAsync(retryRequest, cancellationToken).ConfigureAwait(false);

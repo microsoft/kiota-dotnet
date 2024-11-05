@@ -72,17 +72,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         {
             var defaultHandlersEnumerable = CreateDefaultHandlers(optionsForHandlers);
             defaultHandlersEnumerable.Add(new AuthorizationHandler(authenticationProvider));
-            int count = 0;
-            foreach(var _ in defaultHandlersEnumerable) count++;
-
-            var defaultHandlersArray = new DelegatingHandler[count];
-            int index = 0;
-            foreach(var handler2 in defaultHandlersEnumerable)
-            {
-                defaultHandlersArray[index++] = handler2;
-            }
-            var handler = ChainHandlersCollectionAndGetFirstLink(finalHandler ?? GetDefaultHttpMessageHandler(), defaultHandlersArray);
-            return handler != null ? new HttpClient(handler) : new HttpClient();
+            return Create(defaultHandlersEnumerable, finalHandler);
         }
 
         /// <summary>
