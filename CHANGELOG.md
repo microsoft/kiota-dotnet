@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.14.0] - 2024-11-06
+
+### Added
+
+- Added `AuthorizationHandler` to authenticate requests and `GraphClientFactory.create(authProvider)` to instantiate
+an HttpClient with the built-in Authorization Handler.
+
 ## [1.13.2] - 2024-10-28
 
 ### Changed
