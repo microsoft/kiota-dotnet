@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -55,6 +56,16 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         }
 
         [Fact]
+        public void AuthorizationHandlerConstructor()
+        {
+            // Arrange
+            BaseBearerTokenAuthenticationProvider? authenticationProvider = null;
+
+            // Assert
+            Assert.Throws<ArgumentNullException>(() => new AuthorizationHandler(authenticationProvider!));
+        }
+
+        [Fact]
         public async Task AuthorizationHandlerShouldAddAuthHeaderIfNotPresent()
         {
             // Arrange
@@ -92,6 +103,24 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         }
 
         [Fact]
+        public async Task AuthorizationHandlerShouldNotAddAuthHeaderIfHostIsNotValid()
+        {
+            // Arrange
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.com");
+
+            HttpResponseMessage httpResponse = new HttpResponseMessage(HttpStatusCode.OK);
+
+            this._testHttpMessageHandler.SetHttpResponse(httpResponse);// set the mock response
+
+            // Act
+            HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
+
+            // Assert
+            Assert.NotNull(response.RequestMessage);
+            Assert.False(response.RequestMessage.Headers.Contains("Authorization"));
+        }
+
+        [Fact]
         public async Task AuthorizationHandlerShouldAttemptCAEClaimsChallenge()
         {
             // Arrange
@@ -112,6 +141,26 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             Assert.True(response.RequestMessage.Headers.GetValues("Authorization").Count() == 1);
             Assert.Equal($"Bearer {_expectedAccessTokenAfterCAE}", response.RequestMessage.Headers.GetValues("Authorization").First());
             Assert.Equal("test", await response.RequestMessage.Content!.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task AuthorizationHandlerShouldReturnInitialResponseIfClaimsHeaderIsEmpty()
+        {
+            // Arrange
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://graph.microsoft.com");
+            httpRequestMessage.Content = new ByteArrayContent(Encoding.UTF8.GetBytes("test"));
+
+            HttpResponseMessage httpResponse = new HttpResponseMessage(HttpStatusCode.Unauthorized);
+            httpResponse.Headers.WwwAuthenticate.Add(new AuthenticationHeaderValue("Bearer", "authorization_uri=\"https://login.windows.net/common/oauth2/authorize\""));
+
+            this._testHttpMessageHandler.SetHttpResponse(httpResponse, new HttpResponseMessage(HttpStatusCode.OK));// set the mock response
+
+            // Act
+            HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.Equal("test", await response.RequestMessage!.Content!.ReadAsStringAsync());
         }
     }
 }
