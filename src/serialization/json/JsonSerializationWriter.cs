@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------
 
@@ -311,7 +311,9 @@ namespace Microsoft.Kiota.Serialization.Json
         /// </summary>
         /// <param name="key">The key of the json node</param>
         /// <param name="values">The primitive collection</param>
-        public void WriteCollectionOfPrimitiveValues<T>(string? key, IEnumerable<T>? values)
+        public void WriteCollectionOfPrimitiveValues<T>(string? key, IEnumerable<T>? values) => WriteCollectionOfPrimitiveValuesInternal(key, values);
+
+        private void WriteCollectionOfPrimitiveValuesInternal(string? key, IEnumerable? values)
         {
             if(values != null)
             { //empty array is meaningful
@@ -525,9 +527,6 @@ namespace Microsoft.Kiota.Serialization.Json
                 case TimeSpan timeSpan:
                     WriteTimeSpanValue(key, timeSpan);
                     break;
-                case IEnumerable<object> coll:
-                    WriteCollectionOfPrimitiveValues(key, coll);
-                    break;
                 case UntypedNode node:
                     WriteUntypedValue(key, node);
                     break;
@@ -550,6 +549,9 @@ namespace Microsoft.Kiota.Serialization.Json
                     break;
                 case IDictionary dictionary:
                     WriteDictionaryValue(key, dictionary);
+                    break;
+                case IEnumerable coll:
+                    WriteCollectionOfPrimitiveValuesInternal(key, coll);
                     break;
                 case object o:
                     WriteNonParsableObjectValue(key, o);
