@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.1] - 2024-11-13
+
+### Added
+
+- Fixes serialization collections of primitives present in additional data. [microsoftgraph/msgraph-sdk-dotnet#2729](https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/2729)
+
 ## [1.15.0] - 2024-11-13
 
 ### Added
