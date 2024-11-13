@@ -22,7 +22,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.x
+          dotnet-version: 9.x
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
@@ -35,7 +35,7 @@ jobs:
         run: dotnet build ${{ env.solutionName }} --no-restore /p:UseSharedCompilation=false
       - name: Test for net462
         run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal --framework net462
-      - name: Test for net8.0 and collect coverage
-        run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=opencover --framework net8.0
+      - name: Test for net9.0 and collect coverage
+        run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=opencover --framework net9.0
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
