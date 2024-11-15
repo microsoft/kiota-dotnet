@@ -18,7 +18,8 @@
   </ItemGroup>
 
   <!-- NET 5 target to be removed on next major version-->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0' or '$(TargetFramework)'== 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1'">
-      <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="[6.0,10.0)" />
+  <ItemGroup
+    Condition="'$(TargetFramework)' == 'net5.0' or '$(TargetFramework)'== 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1'">
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="[6.0,)" />
   </ItemGroup>
 </Project>
