@@ -14,10 +14,7 @@
   <!-- NET 5 target to be removed on next major version-->
   <ItemGroup
     Condition="'$(TargetFramework)' == 'net5.0' or '$(TargetFramework)'== 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1'">
-    <!-- suppressed because of this CVE https://github.com/advisories/GHSA-hh2w-p6rv-4g7w
-     The target application is the one which will resolve the correct version
-     when the version range is updated to > 8.0.4 in the future, remove the nowarn suppression -->
-    <PackageReference Include="System.Text.Json" Version="[6.0,)" NoWarn="NU1903" />
+    <PackageReference Include="System.Text.Json" Version="[6.0,)" />
   </ItemGroup>
 
   <ItemGroup>
