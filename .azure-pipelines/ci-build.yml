@@ -34,6 +34,12 @@ extends:
     - stage: build
       jobs:
         - job: build
+          templateContext:
+            outputs:
+              - output: pipelineArtifact
+                displayName: 'Publish Microsoft.Kiota.*.nupkg and release pipeline scripts'
+                artifactName: Nugets
+                targetPath: $(Build.ArtifactStagingDirectory)
           steps:
 
           - task: UseDotNet@2 # needed for ESRP sign
@@ -226,12 +232,6 @@ extends:
               Contents: 'scripts\**'
               TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
-          - task: 1ES.PublishPipelineArtifact@1
-            displayName: 'Upload Artifact: Nugets'
-            inputs:
-              artifactName: Nugets
-              targetPath: $(Build.ArtifactStagingDirectory)
-
     - stage: deploy
       condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
       dependsOn: build
@@ -239,6 +239,13 @@ extends:
         - deployment: deploy_dotnet_kiota_libs
           dependsOn: []
           environment: nuget-org
+          templateContext:
+            type: releaseJob
+            isProduction: true
+            inputs:
+              - input: pipelineArtifact
+                artifactName: Nugets
+                targetPath: $(Pipeline.Workspace)
           strategy:
             runOnce:
               deploy:
@@ -251,11 +258,6 @@ extends:
                   inputs:
                     versionSpec: '>=6.11.0'
                     checkLatest: true
-                - task: DownloadPipelineArtifact@2
-                  displayName: Download nupkg from artifacts
-                  inputs:
-                    artifact: Nugets
-                    source: current
                 - task: PowerShell@2
                   displayName: 'Extract release information to pipeline'
                   inputs:
