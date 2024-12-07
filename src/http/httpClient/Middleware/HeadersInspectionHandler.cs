@@ -40,7 +40,7 @@ public class HeadersInspectionHandler : DelegatingHandler
         if(request.GetRequestOption<ObservabilityOptions>() is { } obsOptions)
         {
             var activitySource = ActivitySourceRegistry.DefaultInstance.GetOrCreateActivitySource(obsOptions.TracerInstrumentationName);
-            activity = activitySource?.StartActivity($"{nameof(RedirectHandler)}_{nameof(SendAsync)}");
+            activity = activitySource?.StartActivity($"{nameof(HeadersInspectionHandler)}_{nameof(SendAsync)}");
             activity?.SetTag("com.microsoft.kiota.handler.headersInspection.enable", true);
         }
         else
