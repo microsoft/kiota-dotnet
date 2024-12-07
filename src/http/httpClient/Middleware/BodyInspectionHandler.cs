@@ -48,7 +48,7 @@ public class BodyInspectionHandler : DelegatingHandler
                 obsOptions.TracerInstrumentationName
             );
             activity = activitySource?.StartActivity(
-                $"{nameof(RedirectHandler)}_{nameof(SendAsync)}"
+                $"{nameof(BodyInspectionHandler)}_{nameof(SendAsync)}"
             );
             activity?.SetTag("com.microsoft.kiota.handler.bodyInspection.enable", true);
         }
