@@ -85,9 +85,18 @@ public class BodyInspectionHandler : DelegatingHandler
                 return null;
             }
 
+            if (httpContent.Headers.ContentLength == 0)
+            {
+                return Stream.Null;
+            }
+
             var stream = new MemoryStream();
             await httpContent.CopyToAsync(stream);
-            stream.Position = 0;
+
+            if (stream.CanSeek)
+            {
+                stream.Position = 0;
+            }
 
             return stream;
         }
