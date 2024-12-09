@@ -33,6 +33,7 @@ public class BodyInspectionHandlerTests : IDisposable
         // Then
         Assert.NotNull(option.RequestBody);
         Assert.Equal("request test", GetStringFromStream(option.RequestBody!));
+        Assert.Equal("request test", await request.Content.ReadAsStringAsync()); // response from option is separate from "normal" request stream
     }
 
     [Fact]
