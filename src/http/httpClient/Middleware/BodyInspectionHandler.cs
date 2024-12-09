@@ -36,13 +36,13 @@ public class BodyInspectionHandler : DelegatingHandler
         CancellationToken cancellationToken
     )
     {
-        if (request == null)
+        if(request == null)
             throw new ArgumentNullException(nameof(request));
 
         var options = request.GetRequestOption<BodyInspectionHandlerOption>() ?? _defaultOptions;
 
         Activity? activity;
-        if (request.GetRequestOption<ObservabilityOptions>() is { } obsOptions)
+        if(request.GetRequestOption<ObservabilityOptions>() is { } obsOptions)
         {
             var activitySource = ActivitySourceRegistry.DefaultInstance.GetOrCreateActivitySource(
                 obsOptions.TracerInstrumentationName
@@ -58,12 +58,12 @@ public class BodyInspectionHandler : DelegatingHandler
         }
         try
         {
-            if (options.InspectRequestBody)
+            if(options.InspectRequestBody)
             {
                 options.RequestBody = await CopyToStreamAsync(request.Content);
             }
             var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
-            if (options.InspectResponseBody)
+            if(options.InspectResponseBody)
             {
                 options.ResponseBody = await CopyToStreamAsync(response.Content);
             }
@@ -80,12 +80,12 @@ public class BodyInspectionHandler : DelegatingHandler
 #endif
         static async Task<Stream?> CopyToStreamAsync(HttpContent? httpContent)
         {
-            if (httpContent == null)
+            if(httpContent == null)
             {
                 return null;
             }
 
-            if (httpContent.Headers.ContentLength == 0)
+            if(httpContent.Headers.ContentLength == 0)
             {
                 return Stream.Null;
             }
@@ -93,7 +93,7 @@ public class BodyInspectionHandler : DelegatingHandler
             var stream = new MemoryStream();
             await httpContent.CopyToAsync(stream);
 
-            if (stream.CanSeek)
+            if(stream.CanSeek)
             {
                 stream.Position = 0;
             }

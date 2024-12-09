@@ -105,7 +105,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                     userAgentHandlerOption = userAgentOption;
                 else if(headersInspectionHandlerOption == null && option is HeadersInspectionHandlerOption headersInspectionOption)
                     headersInspectionHandlerOption = headersInspectionOption;
-                else if (bodyInspectionHandlerOption == null && option is BodyInspectionHandlerOption bodyInspectionOption)
+                else if(bodyInspectionHandlerOption == null && option is BodyInspectionHandlerOption bodyInspectionOption)
                     bodyInspectionHandlerOption = bodyInspectionOption;
             }
 
