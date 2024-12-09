@@ -89,6 +89,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             ParametersNameDecodingOption? parametersNameDecodingOption = null;
             UserAgentHandlerOption? userAgentHandlerOption = null;
             HeadersInspectionHandlerOption? headersInspectionHandlerOption = null;
+            BodyInspectionHandlerOption? bodyInspectionHandlerOption = null;
 
             foreach(var option in optionsForHandlers)
             {
@@ -102,8 +103,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                     parametersNameDecodingOption = parametersOption;
                 else if(userAgentHandlerOption == null && option is UserAgentHandlerOption userAgentOption)
                     userAgentHandlerOption = userAgentOption;
-                else if(headersInspectionHandlerOption == null && option is HeadersInspectionHandlerOption headersOption)
-                    headersInspectionHandlerOption = headersOption;
+                else if(headersInspectionHandlerOption == null && option is HeadersInspectionHandlerOption headersInspectionOption)
+                    headersInspectionHandlerOption = headersInspectionOption;
+                else if (bodyInspectionHandlerOption == null && option is BodyInspectionHandlerOption bodyInspectionOption)
+                    bodyInspectionHandlerOption = bodyInspectionOption;
             }
 
             return new List<DelegatingHandler>
@@ -114,6 +117,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 parametersNameDecodingOption != null ? new ParametersNameDecodingHandler(parametersNameDecodingOption) : new ParametersNameDecodingHandler(),
                 userAgentHandlerOption != null ? new UserAgentHandler(userAgentHandlerOption) : new UserAgentHandler(),
                 headersInspectionHandlerOption != null ? new HeadersInspectionHandler(headersInspectionHandlerOption) : new HeadersInspectionHandler(),
+                bodyInspectionHandlerOption != null ? new BodyInspectionHandler(bodyInspectionHandlerOption) : new BodyInspectionHandler(),
             };
         }
 
@@ -132,6 +136,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 typeof(ParametersNameDecodingHandler),
                 typeof(UserAgentHandler),
                 typeof(HeadersInspectionHandler),
+                typeof(BodyInspectionHandler),
             };
         }
 
