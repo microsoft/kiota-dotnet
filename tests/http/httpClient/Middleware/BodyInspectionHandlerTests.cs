@@ -37,6 +37,35 @@ public class BodyInspectionHandlerTests : IDisposable
     }
 
     [Fact]
+    public async Task BodyInspectionHandlerGetsRequestBodyStreamWhenRequestIsOctetStream()
+    {
+        var option = new BodyInspectionHandlerOption { InspectRequestBody = true, };
+        using var invoker = GetMessageInvoker(new HttpResponseMessage(), option);
+
+        // When
+        var memoryStream = new MemoryStream();
+        var writer = new StreamWriter(memoryStream);
+        await writer.WriteAsync("request test");
+        await writer.FlushAsync();
+        memoryStream.Seek(0, SeekOrigin.Begin);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost")
+        {
+            Content = new StreamContent(memoryStream)
+        };
+        request.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(
+            "application/octet-stream"
+        );
+
+        var response = await invoker.SendAsync(request, default);
+
+        // Then
+        Assert.NotNull(option.RequestBody);
+        Assert.Equal("request test", GetStringFromStream(option.RequestBody!));
+        Assert.Equal("request test", await request.Content.ReadAsStringAsync()); // response from option is separate from "normal" request stream
+    }
+
+    [Fact]
     public async Task BodyInspectionHandlerGetsNullRequestBodyStreamWhenThereIsNoRequestBody()
     {
         var option = new BodyInspectionHandlerOption { InspectRequestBody = true, };
