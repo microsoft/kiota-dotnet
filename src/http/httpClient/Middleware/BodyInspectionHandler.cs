@@ -60,12 +60,14 @@ public class BodyInspectionHandler : DelegatingHandler
         {
             if(options.InspectRequestBody)
             {
-                options.RequestBody = await CopyToStreamAsync(request.Content, cancellationToken).ConfigureAwait(false);
+                options.RequestBody = await CopyToStreamAsync(request.Content, cancellationToken)
+                    .ConfigureAwait(false);
             }
             var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
             if(options.InspectResponseBody)
             {
-                options.ResponseBody = await CopyToStreamAsync(response.Content, cancellationToken).ConfigureAwait(false);
+                options.ResponseBody = await CopyToStreamAsync(response.Content, cancellationToken)
+                    .ConfigureAwait(false);
             }
 
             return response;
@@ -78,14 +80,12 @@ public class BodyInspectionHandler : DelegatingHandler
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER
         [return: NotNullIfNotNull(nameof(httpContent))]
 #endif
-        static async Task<Stream?> CopyToStreamAsync(HttpContent? httpContent, CancellationToken cancellationToken)
+        static async Task<Stream> CopyToStreamAsync(
+            HttpContent? httpContent,
+            CancellationToken cancellationToken
+        )
         {
-            if(httpContent == null)
-            {
-                return null;
-            }
-
-            if(httpContent.Headers.ContentLength == 0)
+            if(httpContent is null or { Headers.ContentLength: 0 })
             {
                 return Stream.Null;
             }
@@ -97,7 +97,6 @@ public class BodyInspectionHandler : DelegatingHandler
 #else
             await httpContent.CopyToAsync(stream).ConfigureAwait(false);
 #endif
-
 
             if(stream.CanSeek)
             {

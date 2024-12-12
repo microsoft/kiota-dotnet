@@ -26,19 +26,19 @@ public class BodyInspectionHandlerOption : IRequestOption
 
     /// <summary>
     /// Gets the request body stream for the current request. This stream is available
-    /// only if InspectRequestBody is set to true and the request contains a body.
-    /// This stream is not disposed of by kiota, you need to take care of that.
+    /// only if InspectRequestBody is set to true and the request contains a body. Otherwise,
+    /// it's just Stream.Null. This stream is not disposed of by kiota, you need to take care of that.
     /// Note that this stream is a copy of the original request body stream, which has
     /// impact on memory usage. Use adequately.
     /// </summary>
-    public Stream? RequestBody { get; internal set; }
+    public Stream RequestBody { get; internal set; } = Stream.Null;
 
     /// <summary>
     /// Gets the response body stream for the current request. This stream is available
-    /// only if InspectResponseBody is set to true.
-    /// This stream is not disposed of by kiota, you need to take care of that.
+    /// only if InspectResponseBody is set to true and the response contains a body. Otherwise,
+    /// it's just Stream.Null. This stream is not disposed of by kiota, you need to take care of that.
     /// Note that this stream is a copy of the original request body stream, which has
     /// impact on memory usage. Use adequately.
     /// </summary>
-    public Stream? ResponseBody { get; internal set; }
+    public Stream ResponseBody { get; internal set; } = Stream.Null;
 }

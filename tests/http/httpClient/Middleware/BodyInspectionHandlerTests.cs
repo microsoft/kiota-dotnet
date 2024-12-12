@@ -31,7 +31,6 @@ public class BodyInspectionHandlerTests : IDisposable
         var response = await invoker.SendAsync(request, default);
 
         // Then
-        Assert.NotNull(option.RequestBody);
         Assert.Equal("request test", GetStringFromStream(option.RequestBody!));
         Assert.Equal("request test", await request.Content.ReadAsStringAsync()); // response from option is separate from "normal" request stream
     }
@@ -60,7 +59,6 @@ public class BodyInspectionHandlerTests : IDisposable
         var response = await invoker.SendAsync(request, default);
 
         // Then
-        Assert.NotNull(option.RequestBody);
         Assert.Equal("request test", GetStringFromStream(option.RequestBody!));
         Assert.Equal("request test", await request.Content.ReadAsStringAsync()); // response from option is separate from "normal" request stream
     }
@@ -76,7 +74,7 @@ public class BodyInspectionHandlerTests : IDisposable
         var response = await invoker.SendAsync(request, default);
 
         // Then
-        Assert.Null(option.RequestBody);
+        Assert.Same(Stream.Null, option.RequestBody);
     }
 
     [Fact]
@@ -90,13 +88,12 @@ public class BodyInspectionHandlerTests : IDisposable
         var response = await invoker.SendAsync(request, default);
 
         // Then
-        Assert.NotNull(option.ResponseBody);
         Assert.Equal("response test", GetStringFromStream(option.ResponseBody!));
         Assert.Equal("response test", await response.Content.ReadAsStringAsync()); // response from option is separate from "normal" response stream
     }
 
     [Fact]
-    public async Task BodyInspectionHandlerGetsEmptyResponseBodyStreamWhenThereIsNoResponseBody()
+    public async Task BodyInspectionHandlerGetsNullResponseBodyStreamWhenThereIsNoResponseBody()
     {
         var option = new BodyInspectionHandlerOption { InspectResponseBody = true, };
         using var invoker = GetMessageInvoker(new HttpResponseMessage(), option);
@@ -106,8 +103,7 @@ public class BodyInspectionHandlerTests : IDisposable
         var response = await invoker.SendAsync(request, default);
 
         // Then
-        Assert.NotNull(option.ResponseBody);
-        Assert.Equal(string.Empty, GetStringFromStream(option.ResponseBody!));
+        Assert.Same(Stream.Null, option.ResponseBody);
     }
 
     private static HttpResponseMessage CreateHttpResponseWithBody() =>
