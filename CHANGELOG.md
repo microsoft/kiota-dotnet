@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fixed a bug where the client would fail on 301/302 responses with no location headers. [#272](https://github.com/microsoft/kiota-dotnet/issues/272)
+
 ## [1.16.0] - 2024-12-13
 
 ### Added
