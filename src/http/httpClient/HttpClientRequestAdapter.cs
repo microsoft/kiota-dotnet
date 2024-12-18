@@ -424,7 +424,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         private async Task ThrowIfFailedResponseAsync(HttpResponseMessage response, Dictionary<string, ParsableFactory<IParsable>>? errorMapping, Activity? activityForAttributes, CancellationToken cancellationToken)
         {
             using var span = activitySource?.StartActivity(nameof(ThrowIfFailedResponseAsync));
-            if(response.IsSuccessStatusCode) return;
+            if(response.IsSuccessStatusCode || response.StatusCode is HttpStatusCode.Moved or HttpStatusCode.MovedPermanently or HttpStatusCode.Found or HttpStatusCode.Redirect) return;
 
             activityForAttributes?.SetStatus(ActivityStatusCode.Error, "received_error_response");
 
