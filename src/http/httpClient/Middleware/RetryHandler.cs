@@ -105,11 +105,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
             {
                 exceptions.Add(await GetInnerExceptionAsync(response).ConfigureAwait(false));
                 using var retryActivity = activitySource?.StartActivity($"{nameof(RetryHandler)}_{nameof(SendAsync)} - attempt {retryCount}");
-                retryActivity?.SetTag("http.retry_count", retryCount);
+                retryActivity?.SetTag(HttpClientRequestAdapter.RetryCountAttributeName, retryCount);
                 retryActivity?.SetTag("http.response.status_code", response.StatusCode);
 
                 // Call Delay method to get delay time from response's Retry-After header or by exponential backoff
-                Task delay = RetryHandler.DelayAsync(response, retryCount, retryOption.Delay, out double delayInSeconds, cancellationToken);
+                var delay = DelayAsync(response, retryCount, retryOption.Delay, out double delayInSeconds, cancellationToken);
+                retryActivity?.SetTag("http.request.resend_delay", delayInSeconds);
 
                 // If client specified a retries time limit, let's honor it
                 if(retryOption.RetriesTimeLimit > TimeSpan.Zero)
@@ -176,12 +177,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
         /// <param name="delayInSeconds"></param>
         /// <param name="cancellationToken">The cancellationToken for the Http request</param>
         /// <returns>The <see cref="Task"/> for delay operation.</returns>
-        internal static Task DelayAsync(HttpResponseMessage response, int retryCount, int delay, out double delayInSeconds, CancellationToken cancellationToken)
+        static internal Task DelayAsync(HttpResponseMessage response, int retryCount, int delay, out double delayInSeconds, CancellationToken cancellationToken)
         {
             delayInSeconds = delay;
-            if(response.Headers.TryGetValues(RetryAfter, out IEnumerable<string>? values))
+            if(response.Headers.TryGetValues(RetryAfter, out var values))
             {
-                using IEnumerator<string> v = values.GetEnumerator();
+                using var v = values.GetEnumerator();
                 string retryAfter = v.MoveNext() ? v.Current : throw new InvalidOperationException("Retry-After header is empty.");
                 // the delay could be in the form of a seconds or a http date. See https://httpwg.org/specs/rfc7231.html#header.retry-after
                 if(int.TryParse(retryAfter, out int delaySeconds))
@@ -200,7 +201,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 delayInSeconds = CalculateExponentialDelay(retryCount, delay);
             }
 
-            TimeSpan delayTimeSpan = TimeSpan.FromSeconds(Math.Min(delayInSeconds, RetryHandlerOption.MaxDelay));
+            var delayTimeSpan = TimeSpan.FromSeconds(Math.Min(delayInSeconds, RetryHandlerOption.MaxDelay));
             delayInSeconds = delayTimeSpan.TotalSeconds;
             return Task.Delay(delayTimeSpan, cancellationToken);
         }
