@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.16.1] - 2024-12-18
+
+### Changed
+
+- Aligned retry open telemetry attributes names with latest specification. [#324](https://github.com/microsoft/kiota-dotnet/issues/324)
+
 ## [1.16.0] - 2024-12-13
 
 ### Added
