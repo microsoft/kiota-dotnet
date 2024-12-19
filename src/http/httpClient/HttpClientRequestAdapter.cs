@@ -541,6 +541,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// </summary>
         public const string AuthenticateChallengedEventKey = "com.microsoft.kiota.authenticate_challenge_received";
 
+        internal const string RetryCountAttributeName = "http.request.resend_count";
+
         private async Task<HttpResponseMessage> RetryCAEResponseIfRequiredAsync(HttpResponseMessage response, RequestInformation requestInfo, CancellationToken cancellationToken, string? claims, Activity? activityForAttributes)
         {
             using var span = activitySource?.StartActivity(nameof(RetryCAEResponseIfRequiredAsync));
@@ -554,7 +556,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                     return response;
                 }
                 span?.AddEvent(new ActivityEvent(AuthenticateChallengedEventKey));
-                activityForAttributes?.SetTag("http.retry_count", 1);
+                activityForAttributes?.SetTag(RetryCountAttributeName, 1);
                 requestInfo.Content?.Seek(0, SeekOrigin.Begin);
                 await DrainAsync(response, cancellationToken).ConfigureAwait(false);
                 return await GetHttpResponseMessageAsync(requestInfo, cancellationToken, activityForAttributes, responseClaims).ConfigureAwait(false);
