@@ -21,12 +21,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
     public class HttpClientRequestAdapterTests
     {
         private readonly IAuthenticationProvider _authenticationProvider;
-        private readonly HttpClientRequestAdapter requestAdapter;
+        private readonly HttpClientRequestAdapter _requestAdapter;
 
         public HttpClientRequestAdapterTests()
         {
             _authenticationProvider = new Mock<IAuthenticationProvider>().Object;
-            requestAdapter = new HttpClientRequestAdapter(new AnonymousAuthenticationProvider());
+            _requestAdapter = new HttpClientRequestAdapter(new AnonymousAuthenticationProvider());
         }
 
         [Fact]
@@ -82,7 +82,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         public async Task GetRequestMessageFromRequestInformationWithBaseUrlTemplate()
         {
             // Arrange
-            requestAdapter.BaseUrl = "http://localhost";
+            _requestAdapter.BaseUrl = "http://localhost";
             var requestInfo = new RequestInformation
             {
                 HttpMethod = Method.GET,
@@ -90,7 +90,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             };
 
             // Act
-            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -113,10 +113,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
 
             };
             // Change the baseUrl of the adapter
-            requestAdapter.BaseUrl = "http://localhost";
+            _requestAdapter.BaseUrl = "http://localhost";
 
             // Act
-            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -140,7 +140,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             requestInfo.QueryParameters.Add(queryParam, queryParamObject!);
 
             // Act
-            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -162,7 +162,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             requestInfo.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes("contents")), "application/octet-stream");
 
             // Act
-            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -205,6 +205,31 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             Assert.NotNull(response);
             Assert.True(response.CanRead);
             Assert.Equal(4, response.Length);
+        }
+
+        [InlineData(HttpStatusCode.Redirect)]
+        [InlineData(HttpStatusCode.MovedPermanently)]
+        [Theory]
+        public async Task SendMethodDoesNotThrowOn3XXWithNoLocationAsync(HttpStatusCode httpStatusCode)
+        {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = httpStatusCode
+                });
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                URI = new Uri("https://example.com")
+            };
+
+            var response = await adapter.SendAsync(requestInfo, MockEntity.Factory);
+
+            Assert.Null(response);
         }
 
         [InlineData(HttpStatusCode.OK)]
