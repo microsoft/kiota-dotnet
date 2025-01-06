@@ -276,7 +276,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Gets the untyped value of the node
         /// </summary>
         /// <returns>The untyped value of the node.</returns>
-        private UntypedNode? GetUntypedValue() => GetUntypedValue(_jsonNode);
+        private UntypedNode GetUntypedValue() => GetUntypedValue(_jsonNode);
 
 
         /// <summary>
@@ -350,7 +350,7 @@ namespace Microsoft.Kiota.Serialization.Json
                         OnBeforeAssignFieldValues = OnBeforeAssignFieldValues,
                         OnAfterAssignFieldValues = OnAfterAssignFieldValues
                     };
-                    yield return currentParseNode.GetUntypedValue()!;
+                    yield return currentParseNode.GetUntypedValue();
                 }
             }
         }
@@ -379,66 +379,27 @@ namespace Microsoft.Kiota.Serialization.Json
                     }
                     else
                     {
-                        properties[objectValue.Name] = GetUntypedValue(property)!;
+                        properties[objectValue.Name] = GetUntypedValue(property);
                     }
                 }
             }
             return properties;
         }
 
-        private UntypedNode? GetUntypedValue(JsonElement jsonNode)
+        private UntypedNode GetUntypedValue(JsonElement jsonNode) => jsonNode.ValueKind switch
         {
-            UntypedNode? untypedNode = null;
-            switch(jsonNode.ValueKind)
-            {
-                case JsonValueKind.Number:
-                    if(jsonNode.TryGetInt32(out var intValue))
-                    {
-                        untypedNode = new UntypedInteger(intValue);
-                    }
-                    else if(jsonNode.TryGetInt64(out var longValue))
-                    {
-                        untypedNode = new UntypedLong(longValue);
-                    }
-                    else if(jsonNode.TryGetDecimal(out var decimalValue))
-                    {
-                        untypedNode = new UntypedDecimal(decimalValue);
-                    }
-                    else if(jsonNode.TryGetSingle(out var floatValue))
-                    {
-                        untypedNode = new UntypedFloat(floatValue);
-                    }
-                    else if(jsonNode.TryGetDouble(out var doubleValue))
-                    {
-                        untypedNode = new UntypedDouble(doubleValue);
-                    }
-                    else throw new InvalidOperationException("unexpected additional value type during number deserialization");
-                    break;
-                case JsonValueKind.String:
-                    var stringValue = jsonNode.GetString();
-                    untypedNode = new UntypedString(stringValue);
-                    break;
-                case JsonValueKind.True:
-                case JsonValueKind.False:
-                    var boolValue = jsonNode.GetBoolean();
-                    untypedNode = new UntypedBoolean(boolValue);
-                    break;
-                case JsonValueKind.Array:
-                    var arrayValue = GetCollectionOfUntypedValues(jsonNode);
-                    untypedNode = new UntypedArray(arrayValue);
-                    break;
-                case JsonValueKind.Object:
-                    var objectValue = GetPropertiesOfUntypedObject(jsonNode);
-                    untypedNode = new UntypedObject(objectValue);
-                    break;
-                case JsonValueKind.Null:
-                case JsonValueKind.Undefined:
-                    untypedNode = new UntypedNull();
-                    break;
-            }
-
-            return untypedNode;
-        }
+            JsonValueKind.Number when jsonNode.TryGetInt32(out var intValue) => new UntypedInteger(intValue),
+            JsonValueKind.Number when jsonNode.TryGetInt64(out var longValue) => new UntypedLong(longValue),
+            JsonValueKind.Number when jsonNode.TryGetDecimal(out var decimalValue) => new UntypedDecimal(decimalValue),
+            JsonValueKind.Number when jsonNode.TryGetSingle(out var floatValue) => new UntypedFloat(floatValue),
+            JsonValueKind.Number when jsonNode.TryGetDouble(out var doubleValue) => new UntypedDouble(doubleValue),
+            JsonValueKind.String => new UntypedString(jsonNode.GetString()),
+            JsonValueKind.True or JsonValueKind.False => new UntypedBoolean(jsonNode.GetBoolean()),
+            JsonValueKind.Array => new UntypedArray(GetCollectionOfUntypedValues(jsonNode)),
+            JsonValueKind.Object => new UntypedObject(GetPropertiesOfUntypedObject(jsonNode)),
+            JsonValueKind.Null or JsonValueKind.Undefined => new UntypedNull(),
+            _ => throw new InvalidOperationException($"unexpected additional value type during deserialization json kind : {jsonNode.ValueKind}")
+        };
 
         /// <summary>
         /// The action to perform before assigning field values.
@@ -461,7 +422,7 @@ namespace Microsoft.Kiota.Serialization.Json
             var genericType = typeof(T);
             if(genericType == typeof(UntypedNode))
             {
-                return (T)(object)GetUntypedValue()!;
+                return (T)(object)GetUntypedValue();
             }
             var item = factory(this);
             OnBeforeAssignFieldValues?.Invoke(item);
