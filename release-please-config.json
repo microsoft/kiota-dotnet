@@ -1,4 +1,4 @@
-﻿{
+{
   "bootstrap-sha": "e88a174d88534242c73861151f301282d4472edf",
   "exclude-paths": [
     ".azure-pipelines",
