@@ -85,13 +85,14 @@ public class BodyInspectionHandler : DelegatingHandler
             CancellationToken cancellationToken
         )
         {
-            if(httpContent is null or { Headers.ContentLength: 0 })
+            if(httpContent is null)
             {
                 return Stream.Null;
             }
 
             var stream = new MemoryStream();
-
+            await httpContent.LoadIntoBufferAsync().ConfigureAwait(false);
+            
 #if NET5_0_OR_GREATER
             await httpContent.CopyToAsync(stream, cancellationToken).ConfigureAwait(false);
 #else
