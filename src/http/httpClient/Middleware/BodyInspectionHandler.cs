@@ -92,7 +92,7 @@ public class BodyInspectionHandler : DelegatingHandler
 
             var stream = new MemoryStream();
             await httpContent.LoadIntoBufferAsync().ConfigureAwait(false);
-            
+
 #if NET5_0_OR_GREATER
             await httpContent.CopyToAsync(stream, cancellationToken).ConfigureAwait(false);
 #else
