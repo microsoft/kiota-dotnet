@@ -278,13 +278,11 @@ extends:
                   inputs:
                     gitHubConnection: 'Kiota_Release'
                     target: $(Build.SourceVersion)
-                    tagSource: userSpecifiedTag
+                    repositoryName: '$(Build.Repository.Name)'
+                    action: edit
                     tag: 'v$(VERSION_STRING)'
-                    title: '$(VERSION_STRING)'
-                    releaseNotesSource: inline
+                    addChangeLog: false
+                    assetUploadMode: replace
                     assets: |
                       !**/**
                       $(Pipeline.Workspace)/Microsoft.Kiota.*.*nupkg
-                    changeLogType: issueBased
-                    isPreRelease : '$(IS_PRE_RELEASE)'
-                    addChangeLog : true 
