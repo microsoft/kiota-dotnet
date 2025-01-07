@@ -93,7 +93,7 @@ public class BodyInspectionHandlerTests : IDisposable
         Assert.Equal("response test", await response.Content.ReadAsStringAsync()); // response from option is separate from "normal" response stream
     }
 
-    [Fact(Skip = "Test can potentially be flaky due to usage limitations on Github. Enable to verify locally.")]
+    [Fact(Skip = "Test can potentially be flaky due to usage limitations on Github. Enable to verify.")]
     public async Task BodyInspectionHandlerGetsResponseBodyStreamFromGithub()
     {
         var option = new BodyInspectionHandlerOption { InspectResponseBody = true, InspectRequestBody = true };

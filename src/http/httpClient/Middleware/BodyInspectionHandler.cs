@@ -85,7 +85,7 @@ public class BodyInspectionHandler : DelegatingHandler
             CancellationToken cancellationToken
         )
         {
-            if(httpContent is null)
+            if(httpContent is null or { Headers.ContentLength: 0 })
             {
                 return Stream.Null;
             }
