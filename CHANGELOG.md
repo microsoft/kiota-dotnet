@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.16.2] - 2024-01-07
+
+- Fixed inspecting of response body when response http content is not buffered. [#501](https://github.com/microsoft/kiota-dotnet/issues/501)
 - Fixed a misalignment in return nullability for IParseNode GetObjectValue. [#429](https://github.com/microsoft/kiota-dotnet/issues/429)
 
 ## [1.16.1] - 2024-12-18

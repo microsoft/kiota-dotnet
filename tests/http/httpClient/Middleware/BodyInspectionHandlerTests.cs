@@ -1,4 +1,5 @@
 using System.Net.Http;
+using System.Text.Json;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
 using Microsoft.Kiota.Http.HttpClientLibrary.Tests.Mocks;
@@ -90,6 +91,37 @@ public class BodyInspectionHandlerTests : IDisposable
         // Then
         Assert.Equal("response test", GetStringFromStream(option.ResponseBody!));
         Assert.Equal("response test", await response.Content.ReadAsStringAsync()); // response from option is separate from "normal" response stream
+    }
+
+    [Fact(Skip = "Test can potentially be flaky due to usage limitations on Github. Enable to verify.")]
+    public async Task BodyInspectionHandlerGetsResponseBodyStreamFromGithub()
+    {
+        var option = new BodyInspectionHandlerOption { InspectResponseBody = true, InspectRequestBody = true };
+        var httpClient = KiotaClientFactory.Create(optionsForHandlers: [option]);
+
+        // When
+        var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/microsoft/kiota-dotnet");
+        var response = await httpClient.SendAsync(request);
+
+        // Then
+        if(response.IsSuccessStatusCode)
+        {
+            Assert.NotEqual(Stream.Null, option.ResponseBody);
+            var jsonFromInspection = await JsonDocument.ParseAsync(option.ResponseBody);
+            var jsonFromContent = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+            Assert.True(jsonFromInspection.RootElement.TryGetProperty("owner", out _));
+            Assert.True(jsonFromContent.RootElement.TryGetProperty("owner", out _));
+        }
+        else if((int)response.StatusCode is 429 or 403)
+        {
+            // We've been throttled according to the docs below. No need to fail for now.
+            // https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28#primary-rate-limit-for-unauthenticated-users
+            Assert.Fail("Request was throttled");
+        }
+        else
+        {
+            Assert.Fail("Unexpected response status code in BodyInspectionHandler test");
+        }
     }
 
     [Fact]
