@@ -13,15 +13,15 @@ pr:
       - main
 
 variables:
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+  buildPlatform: "Any CPU"
+  buildConfiguration: "Release"
 
 resources:
   repositories:
-  - repository: 1ESPipelineTemplates
-    type: git
-    name: 1ESPipelineTemplates/1ESPipelineTemplates
-    ref: refs/tags/release
+    - repository: 1ESPipelineTemplates
+      type: git
+      name: 1ESPipelineTemplates/1ESPipelineTemplates
+      ref: refs/tags/release
 
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
@@ -30,259 +30,260 @@ extends:
       name: Azure-Pipelines-1ESPT-ExDShared
       vmImage: windows-latest
     stages:
+      - stage: build
+        jobs:
+          - job: build
+            templateContext:
+              outputs:
+                - output: pipelineArtifact
+                  displayName: "Publish Microsoft.Kiota.*.nupkg and release pipeline scripts"
+                  artifactName: ArtifactsForRelease
+                  targetPath: $(Build.ArtifactStagingDirectory)
+            steps:
+              - task: UseDotNet@2 # needed for ESRP sign
+                displayName: "Use .NET 6"
+                inputs:
+                  version: 6.x
 
-    - stage: build
-      jobs:
-        - job: build
-          templateContext:
-            outputs:
-              - output: pipelineArtifact
-                displayName: 'Publish Microsoft.Kiota.*.nupkg and release pipeline scripts'
-                artifactName: ArtifactsForRelease
-                targetPath: $(Build.ArtifactStagingDirectory)
-          steps:
+              - task: UseDotNet@2
+                displayName: "Use .NET 9"
+                inputs:
+                  version: 9.x
 
-          - task: UseDotNet@2 # needed for ESRP sign
-            displayName: 'Use .NET 6'
-            inputs:
-              version: 6.x
+              - pwsh: dotnet workload install wasm-tools
+                displayName: "Install browser workload wasm-tools"
 
-          - task: UseDotNet@2
-            displayName: 'Use .NET 9'
-            inputs:
-              version: 9.x
-          
-          - task: PowerShell@2
-            displayName: 'Enable signing'
-            inputs:
-              targetType: filePath
-              filePath: 'scripts\EnableSigning.ps1'
-              arguments: '-projectPath "$(Build.SourcesDirectory)/Directory.Build.props"'
-              pwsh: true
-            enabled: true
+              - task: PowerShell@2
+                displayName: "Enable signing"
+                inputs:
+                  targetType: filePath
+                  filePath: 'scripts\EnableSigning.ps1'
+                  arguments: '-projectPath "$(Build.SourcesDirectory)/Directory.Build.props"'
+                  pwsh: true
+                enabled: true
 
-          - task: PowerShell@2
-            displayName: 'Validate project version has been incremented'
-            condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
-            inputs:
-              targetType: 'filePath'
-              filePath: $(System.DefaultWorkingDirectory)\scripts\ValidateProjectVersionUpdated.ps1
-              arguments: '-projectPath "$(Build.SourcesDirectory)/Directory.Build.props" -packageName "Microsoft.Kiota.Abstractions"'
-              pwsh: true
+              - task: PowerShell@2
+                displayName: "Validate project version has been incremented"
+                condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
+                inputs:
+                  targetType: "filePath"
+                  filePath: $(System.DefaultWorkingDirectory)\scripts\ValidateProjectVersionUpdated.ps1
+                  arguments: '-projectPath "$(Build.SourcesDirectory)/Directory.Build.props" -packageName "Microsoft.Kiota.Abstractions"'
+                  pwsh: true
 
-          # Install the nuget tool.
-          - task: NuGetToolInstaller@1
-            displayName: 'Install Nuget dependency manager'
-            inputs:
-              versionSpec: '>=6.11.0'
-              checkLatest: true
+              # Install the nuget tool.
+              - task: NuGetToolInstaller@1
+                displayName: "Install Nuget dependency manager"
+                inputs:
+                  versionSpec: ">=6.11.0"
+                  checkLatest: true
 
-          # Build the Product project
-          - task: DotNetCoreCLI@2
-            displayName: 'Build projects in Microsoft.Kiota'
-            inputs:
-              projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.sln'
-              arguments: '--configuration $(BuildConfiguration) --no-incremental'
+              # Build the Product project
+              - task: DotNetCoreCLI@2
+                displayName: "Build projects in Microsoft.Kiota"
+                inputs:
+                  projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.sln'
+                  arguments: "--configuration $(BuildConfiguration) --no-incremental"
 
-          # Run the Unit test
-          - task: DotNetCoreCLI@2
-            displayName: 'Test projects in Microsoft.Kiota'
-            inputs:
-              command: test
-              projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.sln'
-              arguments: '--configuration $(BuildConfiguration) --no-build --framework net9.0'
+              # Run the Unit test
+              - task: DotNetCoreCLI@2
+                displayName: "Test projects in Microsoft.Kiota"
+                inputs:
+                  command: test
+                  projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.sln'
+                  arguments: "--configuration $(BuildConfiguration) --no-build --framework net9.0"
 
-          - task: EsrpCodeSigning@5
-            displayName: 'ESRP DLL Strong Name'
-            inputs:
-              ConnectedServiceName: 'Federated DevX ESRP Managed Identity Connection'
-              AppRegistrationClientId: '65035b7f-7357-4f29-bf25-c5ee5c3949f8'
-              AppRegistrationTenantId: 'cdc5aeea-15c5-4db6-b079-fcadd2505dc2'
-              AuthAKVName: 'akv-prod-eastus'
-              AuthCertName: 'ReferenceLibraryPrivateCert'
-              AuthSignCertName: 'ReferencePackagePublisherCertificate'
-              FolderPath: src  # This path should already omit test dlls as they exist in the `tests` folder
-              Pattern: '**\*Microsoft.Kiota.*.dll'
-              signConfigType: inlineSignParams
-              UseMinimatch: true
-              inlineOperation: |
-                [
-                    {
-                        "keyCode": "CP-233863-SN",
-                        "operationSetCode": "StrongNameSign",
-                        "parameters": [],
-                        "toolName": "sign",
-                        "toolVersion": "1.0"
-                    },
-                    {
-                        "keyCode": "CP-233863-SN",
-                        "operationSetCode": "StrongNameVerify",
-                        "parameters": [],
-                        "toolName": "sign",
-                        "toolVersion": "1.0"
-                    }
-                ]
-              SessionTimeout: 20
-              MaxConcurrency: 50
-              MaxRetryAttempts: 5
-              PendingAnalysisWaitTimeoutMinutes: 5
-          
-          - task: EsrpCodeSigning@5
-            displayName: 'ESRP DLL CodeSigning'
-            inputs:
-              ConnectedServiceName: 'Federated DevX ESRP Managed Identity Connection'
-              AppRegistrationClientId: '65035b7f-7357-4f29-bf25-c5ee5c3949f8'
-              AppRegistrationTenantId: 'cdc5aeea-15c5-4db6-b079-fcadd2505dc2'
-              AuthAKVName: 'akv-prod-eastus'
-              AuthCertName: 'ReferenceLibraryPrivateCert'
-              AuthSignCertName: 'ReferencePackagePublisherCertificate'
-              FolderPath: src  # This path should already omit test dlls as they exist in the `tests` folder
-              signConfigType: inlineSignParams
-              UseMinimatch: true
-              Pattern: '**\*Microsoft.Kiota.*.dll'
-              inlineOperation: |
-                [
-                    {
-                        "keyCode": "CP-230012",
-                        "operationSetCode": "SigntoolSign",
-                        "parameters": [
+              - task: EsrpCodeSigning@5
+                displayName: "ESRP DLL Strong Name"
+                inputs:
+                  ConnectedServiceName: "Federated DevX ESRP Managed Identity Connection"
+                  AppRegistrationClientId: "65035b7f-7357-4f29-bf25-c5ee5c3949f8"
+                  AppRegistrationTenantId: "cdc5aeea-15c5-4db6-b079-fcadd2505dc2"
+                  AuthAKVName: "akv-prod-eastus"
+                  AuthCertName: "ReferenceLibraryPrivateCert"
+                  AuthSignCertName: "ReferencePackagePublisherCertificate"
+                  FolderPath: src # This path should already omit test dlls as they exist in the `tests` folder
+                  Pattern: '**\*Microsoft.Kiota.*.dll'
+                  signConfigType: inlineSignParams
+                  UseMinimatch: true
+                  inlineOperation: |
+                    [
                         {
-                            "parameterName": "OpusName",
-                            "parameterValue": "Microsoft"
+                            "keyCode": "CP-233863-SN",
+                            "operationSetCode": "StrongNameSign",
+                            "parameters": [],
+                            "toolName": "sign",
+                            "toolVersion": "1.0"
                         },
                         {
-                            "parameterName": "OpusInfo",
-                            "parameterValue": "http://www.microsoft.com"
-                        },
-                        {
-                            "parameterName": "FileDigest",
-                            "parameterValue": "/fd \"SHA256\""
-                        },
-                        {
-                            "parameterName": "PageHash",
-                            "parameterValue": "/NPH"
-                        },
-                        {
-                            "parameterName": "TimeStamp",
-                            "parameterValue": "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
+                            "keyCode": "CP-233863-SN",
+                            "operationSetCode": "StrongNameVerify",
+                            "parameters": [],
+                            "toolName": "sign",
+                            "toolVersion": "1.0"
                         }
-                        ],
-                        "toolName": "sign",
-                        "toolVersion": "1.0"
-                    },
-                    {
-                        "keyCode": "CP-230012",
-                        "operationSetCode": "SigntoolVerify",
-                        "parameters": [ ],
-                        "toolName": "sign",
-                        "toolVersion": "1.0"
-                    }
-                ]
-              SessionTimeout: 20
-              MaxConcurrency: 50
-              MaxRetryAttempts: 5
-              PendingAnalysisWaitTimeoutMinutes: 5
+                    ]
+                  SessionTimeout: 20
+                  MaxConcurrency: 50
+                  MaxRetryAttempts: 5
+                  PendingAnalysisWaitTimeoutMinutes: 5
 
-          # arguments are not parsed in DotNetCoreCLI@2 task for `pack` command, that's why we have a custom pack command here
-          - pwsh: dotnet pack /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg --no-build --output $env:BUILD_ARTIFACTSTAGINGDIRECTORY --configuration $env:BUILD_CONFIGURATION
-            env:
-              BUILD_CONFIGURATION: $(BuildConfiguration)
-            displayName: Dotnet pack
+              - task: EsrpCodeSigning@5
+                displayName: "ESRP DLL CodeSigning"
+                inputs:
+                  ConnectedServiceName: "Federated DevX ESRP Managed Identity Connection"
+                  AppRegistrationClientId: "65035b7f-7357-4f29-bf25-c5ee5c3949f8"
+                  AppRegistrationTenantId: "cdc5aeea-15c5-4db6-b079-fcadd2505dc2"
+                  AuthAKVName: "akv-prod-eastus"
+                  AuthCertName: "ReferenceLibraryPrivateCert"
+                  AuthSignCertName: "ReferencePackagePublisherCertificate"
+                  FolderPath: src # This path should already omit test dlls as they exist in the `tests` folder
+                  signConfigType: inlineSignParams
+                  UseMinimatch: true
+                  Pattern: '**\*Microsoft.Kiota.*.dll'
+                  inlineOperation: |
+                    [
+                        {
+                            "keyCode": "CP-230012",
+                            "operationSetCode": "SigntoolSign",
+                            "parameters": [
+                            {
+                                "parameterName": "OpusName",
+                                "parameterValue": "Microsoft"
+                            },
+                            {
+                                "parameterName": "OpusInfo",
+                                "parameterValue": "http://www.microsoft.com"
+                            },
+                            {
+                                "parameterName": "FileDigest",
+                                "parameterValue": "/fd \"SHA256\""
+                            },
+                            {
+                                "parameterName": "PageHash",
+                                "parameterValue": "/NPH"
+                            },
+                            {
+                                "parameterName": "TimeStamp",
+                                "parameterValue": "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
+                            }
+                            ],
+                            "toolName": "sign",
+                            "toolVersion": "1.0"
+                        },
+                        {
+                            "keyCode": "CP-230012",
+                            "operationSetCode": "SigntoolVerify",
+                            "parameters": [ ],
+                            "toolName": "sign",
+                            "toolVersion": "1.0"
+                        }
+                    ]
+                  SessionTimeout: 20
+                  MaxConcurrency: 50
+                  MaxRetryAttempts: 5
+                  PendingAnalysisWaitTimeoutMinutes: 5
 
-          - task: EsrpCodeSigning@5
-            displayName: 'ESRP CodeSigning Nuget Packages'
-            inputs:
-              ConnectedServiceName: 'Federated DevX ESRP Managed Identity Connection'
-              AppRegistrationClientId: '65035b7f-7357-4f29-bf25-c5ee5c3949f8'
-              AppRegistrationTenantId: 'cdc5aeea-15c5-4db6-b079-fcadd2505dc2'
-              AuthAKVName: 'akv-prod-eastus'
-              AuthCertName: 'ReferenceLibraryPrivateCert'
-              AuthSignCertName: 'ReferencePackagePublisherCertificate'
-              FolderPath: '$(Build.ArtifactStagingDirectory)'
-              Pattern: '*.nupkg'
-              signConfigType: inlineSignParams
-              UseMinimatch: true
-              inlineOperation: |
-                [
-                    {
-                        "keyCode": "CP-401405",
-                        "operationSetCode": "NuGetSign",
-                        "parameters": [ ],
-                        "toolName": "sign",
-                        "toolVersion": "1.0"
-                    },
-                    {
-                        "keyCode": "CP-401405",
-                        "operationSetCode": "NuGetVerify",
-                        "parameters": [ ],
-                        "toolName": "sign",
-                        "toolVersion": "1.0"
-                    }
-                ]
-              SessionTimeout: 20
-              MaxConcurrency: 50
-              MaxRetryAttempts: 5
-              PendingAnalysisWaitTimeoutMinutes: 5
-              
-          - task: CopyFiles@2
-            displayName: 'Copy release scripts to artifact staging directory'
-            condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
-            inputs:
-              SourceFolder: '$(Build.SourcesDirectory)'
-              Contents: 'scripts\**'
-              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+              # arguments are not parsed in DotNetCoreCLI@2 task for `pack` command, that's why we have a custom pack command here
+              - pwsh: dotnet pack /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg --no-build --output $env:BUILD_ARTIFACTSTAGINGDIRECTORY --configuration $env:BUILD_CONFIGURATION
+                env:
+                  BUILD_CONFIGURATION: $(BuildConfiguration)
+                displayName: Dotnet pack
 
-    - stage: deploy
-      condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
-      dependsOn: build
-      jobs:
-        - deployment: deploy_dotnet_kiota_libs
-          dependsOn: []
-          environment: nuget-org
-          templateContext:
-            type: releaseJob
-            isProduction: true
-            inputs:
-              - input: pipelineArtifact
-                artifactName: ArtifactsForRelease
-                targetPath: $(Pipeline.Workspace)
-          strategy:
-            runOnce:
-              deploy:
-                pool:
-                  vmImage: ubuntu-latest
-                steps:
-                # Install the nuget tool.
-                - task: NuGetToolInstaller@1
-                  displayName: 'Use NuGet >=6.11.0'
-                  inputs:
-                    versionSpec: '>=6.11.0'
-                    checkLatest: true
-                - task: PowerShell@2
-                  displayName: 'Extract release information to pipeline'
-                  inputs:
-                    targetType: 'filePath'
-                    filePath: $(Pipeline.Workspace)\scripts\GetNugetPackageVersion.ps1
-                    pwsh: true
-                    arguments: '-packageDirPath "$(Pipeline.Workspace)/"'
-                - task: 1ES.PublishNuget@1
-                  displayName: 'Push Nuget for Kiota libraries'
-                  inputs:
-                    command: push
-                    packagesToPush: '$(Pipeline.Workspace)/Microsoft.Kiota.*.nupkg'
-                    packageParentPath: '$(Pipeline.Workspace)'
-                    nuGetFeedType: external
-                    publishFeedCredentials: 'Kiota Nuget Connection'
-                - task: GitHubRelease@1
-                  displayName: 'GitHub release (create)'
-                  inputs:
-                    gitHubConnection: 'Kiota_Release'
-                    target: $(Build.SourceVersion)
-                    repositoryName: '$(Build.Repository.Name)'
-                    action: edit
-                    tag: 'v$(VERSION_STRING)'
-                    addChangeLog: false
-                    assetUploadMode: replace
-                    assets: |
-                      !**/**
-                      $(Pipeline.Workspace)/Microsoft.Kiota.*.*nupkg
+              - task: EsrpCodeSigning@5
+                displayName: "ESRP CodeSigning Nuget Packages"
+                inputs:
+                  ConnectedServiceName: "Federated DevX ESRP Managed Identity Connection"
+                  AppRegistrationClientId: "65035b7f-7357-4f29-bf25-c5ee5c3949f8"
+                  AppRegistrationTenantId: "cdc5aeea-15c5-4db6-b079-fcadd2505dc2"
+                  AuthAKVName: "akv-prod-eastus"
+                  AuthCertName: "ReferenceLibraryPrivateCert"
+                  AuthSignCertName: "ReferencePackagePublisherCertificate"
+                  FolderPath: "$(Build.ArtifactStagingDirectory)"
+                  Pattern: "*.nupkg"
+                  signConfigType: inlineSignParams
+                  UseMinimatch: true
+                  inlineOperation: |
+                    [
+                        {
+                            "keyCode": "CP-401405",
+                            "operationSetCode": "NuGetSign",
+                            "parameters": [ ],
+                            "toolName": "sign",
+                            "toolVersion": "1.0"
+                        },
+                        {
+                            "keyCode": "CP-401405",
+                            "operationSetCode": "NuGetVerify",
+                            "parameters": [ ],
+                            "toolName": "sign",
+                            "toolVersion": "1.0"
+                        }
+                    ]
+                  SessionTimeout: 20
+                  MaxConcurrency: 50
+                  MaxRetryAttempts: 5
+                  PendingAnalysisWaitTimeoutMinutes: 5
+
+              - task: CopyFiles@2
+                displayName: "Copy release scripts to artifact staging directory"
+                condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
+                inputs:
+                  SourceFolder: "$(Build.SourcesDirectory)"
+                  Contents: 'scripts\**'
+                  TargetFolder: "$(Build.ArtifactStagingDirectory)"
+
+      - stage: deploy
+        condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
+        dependsOn: build
+        jobs:
+          - deployment: deploy_dotnet_kiota_libs
+            dependsOn: []
+            environment: nuget-org
+            templateContext:
+              type: releaseJob
+              isProduction: true
+              inputs:
+                - input: pipelineArtifact
+                  artifactName: ArtifactsForRelease
+                  targetPath: $(Pipeline.Workspace)
+            strategy:
+              runOnce:
+                deploy:
+                  pool:
+                    vmImage: ubuntu-latest
+                  steps:
+                    # Install the nuget tool.
+                    - task: NuGetToolInstaller@1
+                      displayName: "Use NuGet >=6.11.0"
+                      inputs:
+                        versionSpec: ">=6.11.0"
+                        checkLatest: true
+                    - task: PowerShell@2
+                      displayName: "Extract release information to pipeline"
+                      inputs:
+                        targetType: "filePath"
+                        filePath: $(Pipeline.Workspace)\scripts\GetNugetPackageVersion.ps1
+                        pwsh: true
+                        arguments: '-packageDirPath "$(Pipeline.Workspace)/"'
+                    - task: 1ES.PublishNuget@1
+                      displayName: "Push Nuget for Kiota libraries"
+                      inputs:
+                        command: push
+                        packagesToPush: "$(Pipeline.Workspace)/Microsoft.Kiota.*.nupkg"
+                        packageParentPath: "$(Pipeline.Workspace)"
+                        nuGetFeedType: external
+                        publishFeedCredentials: "Kiota Nuget Connection"
+                    - task: GitHubRelease@1
+                      displayName: "GitHub release (create)"
+                      inputs:
+                        gitHubConnection: "Kiota_Release"
+                        target: $(Build.SourceVersion)
+                        repositoryName: "$(Build.Repository.Name)"
+                        action: edit
+                        tag: "v$(VERSION_STRING)"
+                        addChangeLog: false
+                        assetUploadMode: replace
+                        assets: |
+                          !**/**
+                          $(Pipeline.Workspace)/Microsoft.Kiota.*.*nupkg
