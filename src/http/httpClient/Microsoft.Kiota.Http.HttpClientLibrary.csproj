@@ -5,7 +5,7 @@
     <Description>Kiota Http provider implementation for dotnet with HttpClient.</Description>
     <AssemblyTitle>Kiota Http Library for dotnet</AssemblyTitle>
     <!-- NET 5 target to be removed on next major version-->
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0;net6.0;net8.0;net462;net5.0-browser;net6.0-browser;net8.0-browser;</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0;net6.0;net8.0;net462;net8.0-browser;</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
