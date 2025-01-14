@@ -23,8 +23,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.x
-      - name: Install browser workload wasm-tools
-        run: dotnet workload install wasm-tools
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:

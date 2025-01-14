@@ -44,8 +44,6 @@ jobs:
           dotnet-version: |
             5.x 
             9.x
-      - name: Install browser workload wasm-tools
-        run: dotnet workload install wasm-tools
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
