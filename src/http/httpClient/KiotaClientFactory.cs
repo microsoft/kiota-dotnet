@@ -28,11 +28,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         {
             var defaultHandlersEnumerable = CreateDefaultHandlers(optionsForHandlers);
             int count = 0;
-            foreach (var _ in defaultHandlersEnumerable) count++;
+            foreach(var _ in defaultHandlersEnumerable) count++;
 
             var defaultHandlersArray = new DelegatingHandler[count];
             int index = 0;
-            foreach (var handler2 in defaultHandlersEnumerable)
+            foreach(var handler2 in defaultHandlersEnumerable)
             {
                 defaultHandlersArray[index++] = handler2;
             }
@@ -48,11 +48,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <returns>The <see cref="HttpClient"/> with the custom handlers.</returns>
         public static HttpClient Create(IList<DelegatingHandler> handlers, HttpMessageHandler? finalHandler = null)
         {
-            if (handlers == null || handlers.Count == 0)
+            if(handlers == null || handlers.Count == 0)
                 return Create(finalHandler);
 
             DelegatingHandler[] handlersArray = new DelegatingHandler[handlers.Count];
-            for (int i = 0; i < handlers.Count; i++)
+            for(int i = 0; i < handlers.Count; i++)
             {
                 handlersArray[i] = handlers[i];
             }
@@ -91,21 +91,21 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             HeadersInspectionHandlerOption? headersInspectionHandlerOption = null;
             BodyInspectionHandlerOption? bodyInspectionHandlerOption = null;
 
-            foreach (var option in optionsForHandlers)
+            foreach(var option in optionsForHandlers)
             {
-                if (uriReplacementOption == null && option is UriReplacementHandlerOption uriOption)
+                if(uriReplacementOption == null && option is UriReplacementHandlerOption uriOption)
                     uriReplacementOption = uriOption;
-                else if (retryHandlerOption == null && option is RetryHandlerOption retryOption)
+                else if(retryHandlerOption == null && option is RetryHandlerOption retryOption)
                     retryHandlerOption = retryOption;
-                else if (redirectHandlerOption == null && option is RedirectHandlerOption redirectOption)
+                else if(redirectHandlerOption == null && option is RedirectHandlerOption redirectOption)
                     redirectHandlerOption = redirectOption;
-                else if (parametersNameDecodingOption == null && option is ParametersNameDecodingOption parametersOption)
+                else if(parametersNameDecodingOption == null && option is ParametersNameDecodingOption parametersOption)
                     parametersNameDecodingOption = parametersOption;
-                else if (userAgentHandlerOption == null && option is UserAgentHandlerOption userAgentOption)
+                else if(userAgentHandlerOption == null && option is UserAgentHandlerOption userAgentOption)
                     userAgentHandlerOption = userAgentOption;
-                else if (headersInspectionHandlerOption == null && option is HeadersInspectionHandlerOption headersInspectionOption)
+                else if(headersInspectionHandlerOption == null && option is HeadersInspectionHandlerOption headersInspectionOption)
                     headersInspectionHandlerOption = headersInspectionOption;
-                else if (bodyInspectionHandlerOption == null && option is BodyInspectionHandlerOption bodyInspectionOption)
+                else if(bodyInspectionHandlerOption == null && option is BodyInspectionHandlerOption bodyInspectionOption)
                     bodyInspectionHandlerOption = bodyInspectionOption;
             }
 
@@ -148,19 +148,19 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <returns>The created <see cref="DelegatingHandler"/>.</returns>
         public static DelegatingHandler? ChainHandlersCollectionAndGetFirstLink(HttpMessageHandler? finalHandler, params DelegatingHandler[] handlers)
         {
-            if (handlers == null || handlers.Length == 0) return default;
+            if(handlers == null || handlers.Length == 0) return default;
             var handlersCount = handlers.Length;
-            for (var i = 0; i < handlersCount; i++)
+            for(var i = 0; i < handlersCount; i++)
             {
                 var handler = handlers[i];
                 var previousItemIndex = i - 1;
-                if (previousItemIndex >= 0)
+                if(previousItemIndex >= 0)
                 {
                     var previousHandler = handlers[previousItemIndex];
                     previousHandler.InnerHandler = handler;
                 }
             }
-            if (finalHandler != null)
+            if(finalHandler != null)
                 handlers[handlers.Length - 1].InnerHandler = finalHandler;
             return handlers[0];//first
         }
@@ -187,6 +187,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             return new WinHttpHandler { Proxy = proxy, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate, WindowsProxyUsePolicy = proxyPolicy, SendTimeout = System.Threading.Timeout.InfiniteTimeSpan, ReceiveDataTimeout = System.Threading.Timeout.InfiniteTimeSpan, ReceiveHeadersTimeout = System.Threading.Timeout.InfiniteTimeSpan, EnableMultipleHttp2Connections = true };
 #elif NET5_0_OR_GREATER && !BROWSER
             return new SocketsHttpHandler { Proxy = proxy, AllowAutoRedirect = false, EnableMultipleHttp2Connections = true, AutomaticDecompression = DecompressionMethods.All };
+#elif BROWSER
+            return new HttpClientHandler { AllowAutoRedirect = false };
 #else
             return new HttpClientHandler { Proxy = proxy, AllowAutoRedirect = false, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
 #endif
