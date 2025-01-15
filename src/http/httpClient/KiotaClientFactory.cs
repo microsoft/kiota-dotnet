@@ -185,8 +185,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             // https://github.com/dotnet/runtime/blob/main/src/libraries/System.Net.Http.WinHttpHandler/src/System/Net/Http/WinHttpHandler.cs#L575
             var proxyPolicy = proxy != null ? WindowsProxyUsePolicy.UseCustomProxy : WindowsProxyUsePolicy.UseWinHttpProxy;
             return new WinHttpHandler { Proxy = proxy, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate, WindowsProxyUsePolicy = proxyPolicy, SendTimeout = System.Threading.Timeout.InfiniteTimeSpan, ReceiveDataTimeout = System.Threading.Timeout.InfiniteTimeSpan, ReceiveHeadersTimeout = System.Threading.Timeout.InfiniteTimeSpan, EnableMultipleHttp2Connections = true };
-#elif NET5_0_OR_GREATER
+#elif NET5_0_OR_GREATER && !BROWSER
             return new SocketsHttpHandler { Proxy = proxy, AllowAutoRedirect = false, EnableMultipleHttp2Connections = true, AutomaticDecompression = DecompressionMethods.All };
+#elif BROWSER
+            return new HttpClientHandler { AllowAutoRedirect = false };
 #else
             return new HttpClientHandler { Proxy = proxy, AllowAutoRedirect = false, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
 #endif
