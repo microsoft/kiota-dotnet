@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.16.4](https://github.com/microsoft/kiota-dotnet/compare/v1.16.3...v1.16.4) (2025-01-15)
+
+
+### Bug Fixes
+
+* browser/wasm message handler being returned was incompatible ([fa0c59e](https://github.com/microsoft/kiota-dotnet/commit/fa0c59e3bffdd868e00381148e6f674eaf035524))
+* browser/wasm message handler being returned was incompatible ([aaf4ced](https://github.com/microsoft/kiota-dotnet/commit/aaf4ced980c7368cc4854a91a4b9bef2c78093ef))
+* removes message handler properties that don't exist for browser ([45a41a9](https://github.com/microsoft/kiota-dotnet/commit/45a41a9679b3f8cd0badeffbbe7ad4450f825dc6))
+
 ## [1.16.3](https://github.com/microsoft/kiota-dotnet/compare/v1.16.2...v1.16.3) (2025-01-07)
 
 
