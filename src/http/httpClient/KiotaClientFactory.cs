@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
 using Microsoft.Kiota.Abstractions;
@@ -126,6 +127,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// </summary>
         /// <returns>A list of all the default handlers</returns>
         /// <remarks>Order matters</remarks>
+        [Obsolete("Use GetDefaultHandlerActivatableTypes instead")]
         public static IList<System.Type> GetDefaultHandlerTypes()
         {
             return new List<System.Type>
@@ -139,6 +141,72 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 typeof(BodyInspectionHandler),
             };
         }
+
+        /// <summary>
+        /// Gets the default handler types.
+        /// </summary>
+        /// <returns>A list of all the default handlers</returns>
+        /// <remarks>Order matters</remarks>
+        public static IList<ActivatableType> GetDefaultHandlerActivatableTypes()
+        {
+            return new List<ActivatableType>()
+            {
+                new(typeof(UriReplacementHandler<UriReplacementHandlerOption>)),
+                new(typeof(RetryHandler)),
+                new(typeof(RedirectHandler)),
+                new(typeof(ParametersNameDecodingHandler)),
+                new(typeof(UserAgentHandler)),
+                new(typeof(HeadersInspectionHandler)),
+                new(typeof(BodyInspectionHandler)),
+            };
+        }
+        
+        /// <summary>
+        /// Provides DI-safe trim annotations for an underlying type.
+        /// Required due to https://github.com/dotnet/runtime/issues/110239
+        /// </summary>
+        public readonly struct ActivatableType
+        {
+#if NET5_0_OR_GREATER
+             /// <summary>
+            /// Provides DI-safe trim annotations for an underlying type.
+            /// </summary>
+            /// <param name="type">The type to be wrapped.</param>
+            public ActivatableType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
+            {
+                Type = type;
+            }
+
+            /// <summary>
+            /// The underlying type.
+            /// </summary>
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+            public readonly Type Type;
+            
+#else
+            /// <summary>
+            /// Provides DI-safe trim annotations for an underlying type.
+            /// </summary>
+            /// <param name="type">The type to be wrapped.</param>
+            public ActivatableType(Type type)
+            {
+                Type = type;
+            }
+
+            /// <summary>
+            /// The underlying type.
+            /// </summary>
+            public readonly Type Type;
+#endif
+           
+            /// <summary>
+            /// Implicitly converts from the wrapper to the underlying type.
+            /// </summary>
+            /// <param name="type">An instance of <see cref="ActivatableType"/></param>
+            /// <returns>The <see cref="Type"/></returns>
+            public static implicit operator Type(ActivatableType type) => type.Type;
+        }
+        
 
         /// <summary>
         /// Creates a <see cref="DelegatingHandler"/> to use for the <see cref="HttpClient" /> from the provided <see cref="DelegatingHandler"/> instances. Order matters.
