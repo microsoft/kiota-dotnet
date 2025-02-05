@@ -160,7 +160,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 new(typeof(BodyInspectionHandler)),
             };
         }
-        
+
         /// <summary>
         /// Provides DI-safe trim annotations for an underlying type.
         /// Required due to https://github.com/dotnet/runtime/issues/110239
@@ -198,7 +198,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             /// </summary>
             public readonly Type Type;
 #endif
-           
+
             /// <summary>
             /// Implicitly converts from the wrapper to the underlying type.
             /// </summary>
@@ -206,7 +206,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             /// <returns>The <see cref="Type"/></returns>
             public static implicit operator Type(ActivatableType type) => type.Type;
         }
-        
+
 
         /// <summary>
         /// Creates a <see cref="DelegatingHandler"/> to use for the <see cref="HttpClient" /> from the provided <see cref="DelegatingHandler"/> instances. Order matters.
