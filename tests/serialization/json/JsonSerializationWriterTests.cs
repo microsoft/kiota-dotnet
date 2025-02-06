@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -40,6 +40,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                     {"createdDateTime", DateTimeOffset.MinValue}, // write date value
                     {"weightInKgs", 51.80m}, // write weigth
                     {"businessPhones", new List<string>() {"+1 412 555 0109"}}, // write collection of primitives value
+                    {"dates",new List<DateTimeOffset> { DateTimeOffset.MaxValue , DateTimeOffset.MinValue }},
                     {"endDateTime", new DateTime(2023,03,14,0,0,0,DateTimeKind.Utc) }, // ensure the DateTime doesn't crash
                     {"manager", new TestEntity{Id = "48d31887-5fad-4d73-a9f5-3c356e68a038"}}, // write nested object value
                     {"anonymousObject", new {Value1 = true, Value2 = "", Value3 = new List<string>{ "Value3.1", "Value3.2"}}}, // write nested object value
@@ -69,6 +70,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                                  "\"createdDateTime\":\"0001-01-01T00:00:00+00:00\"," +
                                  "\"weightInKgs\":51.80," +
                                  "\"businessPhones\":[\"\\u002B1 412 555 0109\"]," +
+                                 "\"dates\":[\"9999-12-31T23:59:59.9999999+00:00\",\"0001-01-01T00:00:00+00:00\"]," +
                                  "\"endDateTime\":\"2023-03-14T00:00:00+00:00\"," +
                                  "\"manager\":{\"id\":\"48d31887-5fad-4d73-a9f5-3c356e68a038\"}," +
                                  "\"anonymousObject\":{\"Value1\":true,\"Value2\":\"\",\"Value3\":[\"Value3.1\",\"Value3.2\"]}," +
@@ -290,6 +292,36 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             Assert.Contains("\n", serializedJsonString); // string is indented and not escaped
             Assert.Contains("你好", serializedJsonString); // string is indented and not escaped
             Assert.Equal(expectedString, serializedJsonString.Replace("\r", string.Empty)); // string is indented and not escaped
+        }
+
+        [Fact]
+        public void WritesPrimitiveCollectionsInAdditionalData()
+        {
+            // Arrange
+            var dates = new List<DateTimeOffset>
+            {
+                DateTimeOffset.MaxValue, DateTimeOffset.MinValue
+            };
+            var testEntity = new TestEntity
+            {
+                Id = "testId",
+                AdditionalData = new Dictionary<string, object>()
+                {
+                    {"dates", dates}
+                }
+            };
+            using var jsonSerializerWriter = new JsonSerializationWriter();
+            // Act
+            jsonSerializerWriter.WriteObjectValue(string.Empty, testEntity);
+            var serializedStream = jsonSerializerWriter.GetSerializedContent();
+            using var reader = new StreamReader(serializedStream, Encoding.UTF8);
+            var serializedJsonString = reader.ReadToEnd();
+
+            // Assert
+            Assert.Contains("\"id\":\"testId\"", serializedJsonString);
+            Assert.Contains("\"dates\":[\"", serializedJsonString);
+            Assert.Contains(JsonSerializer.Serialize(DateTimeOffset.MinValue), serializedJsonString);
+            Assert.Contains(JsonSerializer.Serialize(DateTimeOffset.MaxValue), serializedJsonString);
         }
 
         [Fact]

@@ -2,9 +2,11 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
 using Microsoft.Kiota.Http.HttpClientLibrary.Tests.Mocks;
+using Moq;
 using Xunit;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
@@ -136,6 +138,13 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             handlers.Add(new CompressionHandler());
 #pragma warning restore CS0618 // Type or member is obsolete
             var client = KiotaClientFactory.Create(handlers);
+            Assert.IsType<HttpClient>(client);
+        }
+
+        [Fact]
+        public void CreateWithAuthenticationProvider()
+        {
+            var client = KiotaClientFactory.Create(new BaseBearerTokenAuthenticationProvider(new Mock<IAccessTokenProvider>().Object));
             Assert.IsType<HttpClient>(client);
         }
     }

@@ -78,7 +78,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             var decodedUriTemplate = ParametersNameDecodingHandler.DecodeUriEncodedString(requestInfo.UrlTemplate, charactersToDecodeForUriTemplate);
             var telemetryPathValue = string.IsNullOrEmpty(decodedUriTemplate) ? string.Empty : queryParametersCleanupRegex.Replace(decodedUriTemplate, string.Empty);
             var span = activitySource?.StartActivity($"{methodName} - {telemetryPathValue}");
-            span?.SetTag("http.uri_template", decodedUriTemplate);
+            span?.SetTag("url.uri_template", decodedUriTemplate);
             return span;
         }
         /// <summary>
@@ -424,7 +424,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         private async Task ThrowIfFailedResponseAsync(HttpResponseMessage response, Dictionary<string, ParsableFactory<IParsable>>? errorMapping, Activity? activityForAttributes, CancellationToken cancellationToken)
         {
             using var span = activitySource?.StartActivity(nameof(ThrowIfFailedResponseAsync));
-            if(response.IsSuccessStatusCode) return;
+            if(response.IsSuccessStatusCode || response.StatusCode is HttpStatusCode.Moved or HttpStatusCode.MovedPermanently or HttpStatusCode.Found or HttpStatusCode.Redirect) return;
 
             activityForAttributes?.SetStatus(ActivityStatusCode.Error, "received_error_response");
 
@@ -494,7 +494,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         }
         private const string ClaimsKey = "claims";
         private const string BearerAuthenticationScheme = "Bearer";
-        private static Func<AuthenticationHeaderValue, bool> filterAuthHeader = static x => x.Scheme.Equals(BearerAuthenticationScheme, StringComparison.OrdinalIgnoreCase);
         private async Task<HttpResponseMessage> GetHttpResponseMessageAsync(RequestInformation requestInfo, CancellationToken cancellationToken, Activity? activityForAttributes, string? claims = default, bool isStreamResponse = false)
         {
             using var span = activitySource?.StartActivity(nameof(GetHttpResponseMessageAsync));
@@ -519,7 +518,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 using var contentLengthEnumerator = contentLengthValues.GetEnumerator();
                 if(contentLengthEnumerator.MoveNext() && int.TryParse(contentLengthEnumerator.Current, out var contentLength))
                 {
-                    activityForAttributes?.SetTag("http.response_content_length", contentLength);
+                    activityForAttributes?.SetTag("http.response.body.size", contentLength);
                 }
             }
             if(response.Headers.TryGetValues("Content-Type", out var contentTypeValues))
@@ -527,22 +526,22 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 using var contentTypeEnumerator = contentTypeValues.GetEnumerator();
                 if(contentTypeEnumerator.MoveNext())
                 {
-                    activityForAttributes?.SetTag("http.response_content_type", contentTypeEnumerator.Current);
+                    activityForAttributes?.SetTag("http.response.header.content-type", contentTypeEnumerator.Current);
                 }
             }
-            activityForAttributes?.SetTag("http.status_code", (int)response.StatusCode);
-            activityForAttributes?.SetTag("http.flavor", $"{response.Version.Major}.{response.Version.Minor}");
+            activityForAttributes?.SetTag("http.response.status_code", (int)response.StatusCode);
+            activityForAttributes?.SetTag("network.protocol.name", $"{response.Version.Major}.{response.Version.Minor}");
 
             return await RetryCAEResponseIfRequiredAsync(response, requestInfo, cancellationToken, claims, activityForAttributes).ConfigureAwait(false);
         }
 
-        private static readonly Regex caeValueRegex = new("\"([^\"]*)\"", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 
         /// <summary>
         /// The key for the event raised by tracing when an authentication challenge is received
         /// </summary>
         public const string AuthenticateChallengedEventKey = "com.microsoft.kiota.authenticate_challenge_received";
-        private static readonly char[] ComaSplitSeparator = [','];
+
+        internal const string RetryCountAttributeName = "http.request.resend_count";
 
         private async Task<HttpResponseMessage> RetryCAEResponseIfRequiredAsync(HttpResponseMessage response, RequestInformation requestInfo, CancellationToken cancellationToken, string? claims, Activity? activityForAttributes)
         {
@@ -551,46 +550,16 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 string.IsNullOrEmpty(claims) && // avoid infinite loop, we only retry once
                 (requestInfo.Content?.CanSeek ?? true))
             {
-                AuthenticationHeaderValue? authHeader = null;
-                foreach(var header in response.Headers.WwwAuthenticate)
+                var responseClaims = ContinuousAccessEvaluation.GetClaims(response);
+                if(string.IsNullOrEmpty(responseClaims))
                 {
-                    if(filterAuthHeader(header))
-                    {
-                        authHeader = header;
-                        break;
-                    }
+                    return response;
                 }
-
-                if(authHeader is not null)
-                {
-                    var authHeaderParameters = authHeader.Parameter?.Split(ComaSplitSeparator, StringSplitOptions.RemoveEmptyEntries);
-
-                    string? rawResponseClaims = null;
-                    if(authHeaderParameters != null)
-                    {
-                        foreach(var parameter in authHeaderParameters)
-                        {
-                            var trimmedParameter = parameter.Trim();
-                            if(trimmedParameter.StartsWith(ClaimsKey, StringComparison.OrdinalIgnoreCase))
-                            {
-                                rawResponseClaims = trimmedParameter;
-                                break;
-                            }
-                        }
-                    }
-
-                    if(rawResponseClaims != null &&
-                        caeValueRegex.Match(rawResponseClaims) is Match claimsMatch &&
-                        claimsMatch.Groups.Count > 1 &&
-                        claimsMatch.Groups[1].Value is string responseClaims)
-                    {
-                        span?.AddEvent(new ActivityEvent(AuthenticateChallengedEventKey));
-                        activityForAttributes?.SetTag("http.retry_count", 1);
-                        requestInfo.Content?.Seek(0, SeekOrigin.Begin);
-                        await DrainAsync(response, cancellationToken).ConfigureAwait(false);
-                        return await GetHttpResponseMessageAsync(requestInfo, cancellationToken, activityForAttributes, responseClaims).ConfigureAwait(false);
-                    }
-                }
+                span?.AddEvent(new ActivityEvent(AuthenticateChallengedEventKey));
+                activityForAttributes?.SetTag(RetryCountAttributeName, 1);
+                requestInfo.Content?.Seek(0, SeekOrigin.Begin);
+                await DrainAsync(response, cancellationToken).ConfigureAwait(false);
+                return await GetHttpResponseMessageAsync(requestInfo, cancellationToken, activityForAttributes, responseClaims).ConfigureAwait(false);
             }
             return response;
         }
@@ -612,12 +581,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         {
             using var span = activitySource?.StartActivity(nameof(GetRequestMessageFromRequestInformation));
             SetBaseUrlForRequestInformation(requestInfo);// this method can also be called from a different context so ensure the baseUrl is added.
-            activityForAttributes?.SetTag("http.method", requestInfo.HttpMethod.ToString());
+            activityForAttributes?.SetTag("http.request.method", requestInfo.HttpMethod.ToString());
             var requestUri = requestInfo.URI;
-            activityForAttributes?.SetTag("http.host", requestUri.Host);
-            activityForAttributes?.SetTag("http.scheme", requestUri.Scheme);
+            activityForAttributes?.SetTag("url.scheme", requestUri.Host);
+            activityForAttributes?.SetTag("server.address", requestUri.Scheme);
             if(obsOptions.IncludeEUIIAttributes)
-                activityForAttributes?.SetTag("http.uri", requestUri.ToString());
+                activityForAttributes?.SetTag("url.full", requestUri.ToString());
             var message = new HttpRequestMessage
             {
                 Method = new HttpMethod(requestInfo.HttpMethod.ToString().ToUpperInvariant()),
@@ -653,13 +622,13 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 {
                     var contentLenEnumerator = contentLenValues.GetEnumerator();
                     if(contentLenEnumerator.MoveNext() && int.TryParse(contentLenEnumerator.Current, out var contentLenValueInt))
-                        activityForAttributes?.SetTag("http.request_content_length", contentLenValueInt);
+                        activityForAttributes?.SetTag("http.request.body.size", contentLenValueInt);
                 }
                 if(message.Content.Headers.TryGetValues("Content-Type", out var contentTypeValues))
                 {
                     var contentTypeEnumerator = contentTypeValues.GetEnumerator();
                     if(contentTypeEnumerator.MoveNext())
-                        activityForAttributes?.SetTag("http.request_content_type", contentTypeEnumerator.Current);
+                        activityForAttributes?.SetTag("http.request.header.content-type", contentTypeEnumerator.Current);
                 }
             }
             return message;

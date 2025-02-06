@@ -10,6 +10,7 @@ namespace Microsoft.Kiota.Abstractions.Serialization
     /// <summary>
     ///     Defines a serializable model object.
     /// </summary>
+    /// <remarks>In the Microsoft.Kiota.Serialization namespace, you can find extension methods for serializing this object.</remarks>
     public interface IParsable
     {
         /// <summary>

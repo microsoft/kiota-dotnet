@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
 using Microsoft.Kiota.Abstractions;
@@ -62,6 +63,20 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         }
 
         /// <summary>
+        /// Initializes the <see cref="HttpClient"/> with the default configuration and authentication middleware using the <see cref="IAuthenticationProvider"/> if provided.
+        /// </summary>
+        /// <param name="authenticationProvider"></param>
+        /// <param name="optionsForHandlers"></param>
+        /// <param name="finalHandler"></param>
+        /// <returns></returns>
+        public static HttpClient Create(BaseBearerTokenAuthenticationProvider authenticationProvider, IRequestOption[]? optionsForHandlers = null, HttpMessageHandler? finalHandler = null)
+        {
+            var defaultHandlersEnumerable = CreateDefaultHandlers(optionsForHandlers);
+            defaultHandlersEnumerable.Add(new AuthorizationHandler(authenticationProvider));
+            return Create(defaultHandlersEnumerable, finalHandler);
+        }
+
+        /// <summary>
         /// Creates a default set of middleware to be used by the <see cref="HttpClient"/>.
         /// </summary>
         /// <returns>A list of the default handlers used by the client.</returns>
@@ -75,6 +90,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             ParametersNameDecodingOption? parametersNameDecodingOption = null;
             UserAgentHandlerOption? userAgentHandlerOption = null;
             HeadersInspectionHandlerOption? headersInspectionHandlerOption = null;
+            BodyInspectionHandlerOption? bodyInspectionHandlerOption = null;
 
             foreach(var option in optionsForHandlers)
             {
@@ -88,8 +104,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                     parametersNameDecodingOption = parametersOption;
                 else if(userAgentHandlerOption == null && option is UserAgentHandlerOption userAgentOption)
                     userAgentHandlerOption = userAgentOption;
-                else if(headersInspectionHandlerOption == null && option is HeadersInspectionHandlerOption headersOption)
-                    headersInspectionHandlerOption = headersOption;
+                else if(headersInspectionHandlerOption == null && option is HeadersInspectionHandlerOption headersInspectionOption)
+                    headersInspectionHandlerOption = headersInspectionOption;
+                else if(bodyInspectionHandlerOption == null && option is BodyInspectionHandlerOption bodyInspectionOption)
+                    bodyInspectionHandlerOption = bodyInspectionOption;
             }
 
             return new List<DelegatingHandler>
@@ -100,6 +118,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 parametersNameDecodingOption != null ? new ParametersNameDecodingHandler(parametersNameDecodingOption) : new ParametersNameDecodingHandler(),
                 userAgentHandlerOption != null ? new UserAgentHandler(userAgentHandlerOption) : new UserAgentHandler(),
                 headersInspectionHandlerOption != null ? new HeadersInspectionHandler(headersInspectionHandlerOption) : new HeadersInspectionHandler(),
+                bodyInspectionHandlerOption != null ? new BodyInspectionHandler(bodyInspectionHandlerOption) : new BodyInspectionHandler(),
             };
         }
 
@@ -108,6 +127,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// </summary>
         /// <returns>A list of all the default handlers</returns>
         /// <remarks>Order matters</remarks>
+        [Obsolete("Use GetDefaultHandlerActivatableTypes instead")]
         public static IList<System.Type> GetDefaultHandlerTypes()
         {
             return new List<System.Type>
@@ -118,8 +138,75 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 typeof(ParametersNameDecodingHandler),
                 typeof(UserAgentHandler),
                 typeof(HeadersInspectionHandler),
+                typeof(BodyInspectionHandler),
             };
         }
+
+        /// <summary>
+        /// Gets the default handler types.
+        /// </summary>
+        /// <returns>A list of all the default handlers</returns>
+        /// <remarks>Order matters</remarks>
+        public static IList<ActivatableType> GetDefaultHandlerActivatableTypes()
+        {
+            return new List<ActivatableType>()
+            {
+                new(typeof(UriReplacementHandler<UriReplacementHandlerOption>)),
+                new(typeof(RetryHandler)),
+                new(typeof(RedirectHandler)),
+                new(typeof(ParametersNameDecodingHandler)),
+                new(typeof(UserAgentHandler)),
+                new(typeof(HeadersInspectionHandler)),
+                new(typeof(BodyInspectionHandler)),
+            };
+        }
+
+        /// <summary>
+        /// Provides DI-safe trim annotations for an underlying type.
+        /// Required due to https://github.com/dotnet/runtime/issues/110239
+        /// </summary>
+        public readonly struct ActivatableType
+        {
+#if NET5_0_OR_GREATER
+             /// <summary>
+            /// Provides DI-safe trim annotations for an underlying type.
+            /// </summary>
+            /// <param name="type">The type to be wrapped.</param>
+            public ActivatableType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
+            {
+                Type = type;
+            }
+
+            /// <summary>
+            /// The underlying type.
+            /// </summary>
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+            public readonly Type Type;
+            
+#else
+            /// <summary>
+            /// Provides DI-safe trim annotations for an underlying type.
+            /// </summary>
+            /// <param name="type">The type to be wrapped.</param>
+            public ActivatableType(Type type)
+            {
+                Type = type;
+            }
+
+            /// <summary>
+            /// The underlying type.
+            /// </summary>
+            public readonly Type Type;
+#endif
+
+            /// <summary>
+            /// Implicitly converts from the wrapper to the underlying type.
+            /// </summary>
+            /// <param name="type">An instance of <see cref="ActivatableType"/></param>
+            /// <returns>The <see cref="Type"/></returns>
+            public static implicit operator Type(ActivatableType type) => type.Type;
+        }
+
 
         /// <summary>
         /// Creates a <see cref="DelegatingHandler"/> to use for the <see cref="HttpClient" /> from the provided <see cref="DelegatingHandler"/> instances. Order matters.
@@ -166,8 +253,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             // https://github.com/dotnet/runtime/blob/main/src/libraries/System.Net.Http.WinHttpHandler/src/System/Net/Http/WinHttpHandler.cs#L575
             var proxyPolicy = proxy != null ? WindowsProxyUsePolicy.UseCustomProxy : WindowsProxyUsePolicy.UseWinHttpProxy;
             return new WinHttpHandler { Proxy = proxy, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate, WindowsProxyUsePolicy = proxyPolicy, SendTimeout = System.Threading.Timeout.InfiniteTimeSpan, ReceiveDataTimeout = System.Threading.Timeout.InfiniteTimeSpan, ReceiveHeadersTimeout = System.Threading.Timeout.InfiniteTimeSpan, EnableMultipleHttp2Connections = true };
-#elif NET5_0_OR_GREATER
+#elif NET5_0_OR_GREATER && !BROWSER
             return new SocketsHttpHandler { Proxy = proxy, AllowAutoRedirect = false, EnableMultipleHttp2Connections = true, AutomaticDecompression = DecompressionMethods.All };
+#elif BROWSER
+            return new HttpClientHandler { AllowAutoRedirect = false };
 #else
             return new HttpClientHandler { Proxy = proxy, AllowAutoRedirect = false, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
 #endif

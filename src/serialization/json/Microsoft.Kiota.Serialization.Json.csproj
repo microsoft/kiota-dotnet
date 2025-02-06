@@ -12,11 +12,9 @@
   </PropertyGroup>
 
   <!-- NET 5 target to be removed on next major version-->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0' or '$(TargetFramework)'== 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1'">
-    <!-- suppressed because of this CVE https://github.com/advisories/GHSA-hh2w-p6rv-4g7w
-     The target application is the one which will resolve the correct version
-     when the version range is updated to > 8.0.4 in the future, remove the nowarn suppression -->
-    <PackageReference Include="System.Text.Json" Version="[6.0,9.0)" NoWarn="NU1903" />
+  <ItemGroup
+    Condition="'$(TargetFramework)' == 'net5.0' or '$(TargetFramework)'== 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1'">
+    <PackageReference Include="System.Text.Json" Version="[6.0.10,)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.12.19">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
