@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.17.0](https://github.com/microsoft/kiota-dotnet/compare/v1.16.4...v1.17.0) (2025-02-06)
+
+
+### Features
+
+* Add trim-safe handler lookup ([cd2520f](https://github.com/microsoft/kiota-dotnet/commit/cd2520f931a8d4ea82f5c7e279abcc9f2d96ccf7))
+* Add trim-safe handler lookup ([a2800ab](https://github.com/microsoft/kiota-dotnet/commit/a2800ab7c9bfa0292b8490b91962636917fa8c4c))
+
 ## [1.16.4](https://github.com/microsoft/kiota-dotnet/compare/v1.16.3...v1.16.4) (2025-01-15)
 
 
