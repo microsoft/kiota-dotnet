@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.17.1](https://github.com/microsoft/kiota-dotnet/compare/v1.17.0...v1.17.1) (2025-02-12)
+
+
+### Bug Fixes
+
+* inverted server.name and url.scheme open telemetry attribute values ([c41fba8](https://github.com/microsoft/kiota-dotnet/commit/c41fba86a531f540ac03ee41a8e5c5738eacd490))
+
 ## [1.17.0](https://github.com/microsoft/kiota-dotnet/compare/v1.16.4...v1.17.0) (2025-02-06)
 
 
