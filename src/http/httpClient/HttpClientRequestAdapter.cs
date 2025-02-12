@@ -583,8 +583,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             SetBaseUrlForRequestInformation(requestInfo);// this method can also be called from a different context so ensure the baseUrl is added.
             activityForAttributes?.SetTag("http.request.method", requestInfo.HttpMethod.ToString());
             var requestUri = requestInfo.URI;
-            activityForAttributes?.SetTag("url.scheme", requestUri.Host);
-            activityForAttributes?.SetTag("server.address", requestUri.Scheme);
+            activityForAttributes?.SetTag("url.scheme", requestUri.Scheme);
+            activityForAttributes?.SetTag("server.address", requestUri.Host);
             if(obsOptions.IncludeEUIIAttributes)
                 activityForAttributes?.SetTag("url.full", requestUri.ToString());
             var message = new HttpRequestMessage
