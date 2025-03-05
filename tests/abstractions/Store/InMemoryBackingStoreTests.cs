@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
+using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
 using Microsoft.Kiota.Abstractions.Store;
 using Microsoft.Kiota.Abstractions.Tests.Mocks;
@@ -470,7 +471,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Store
 
             // Make the top-level entity sendable and verify that the resulting setting of "changed" on
             // every recursive IBackedModel and collection results in returning all objects in the result.
-            testUser.BackingStore.MakeSendable();
+            testUser.MakeSendable();
             changedValues = testUser.BackingStore.Enumerate().ToDictionary(x => x.Key, y => y.Value!);
             Assert.NotEmpty(changedValues);
             Assert.True(changedValues.TryGetValue("id", out var idObj));
