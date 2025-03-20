@@ -54,6 +54,7 @@ public class MultipartBody : IParsable
             _parts[key] = value;
         }
     }
+    // TODO: Remove with next major release
     /// <summary>
     /// Gets the value of a part from the multipart body.
     /// </summary>
@@ -86,6 +87,7 @@ public class MultipartBody : IParsable
         }
         return default;
     }
+    // TODO: Remove with next major release
     /// <summary>
     /// Removes a part from the multipart body.
     /// </summary>
