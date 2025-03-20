@@ -90,4 +90,37 @@ public class MultipartBodyTests
         requestAdapterMock.VerifyAll();
         serializationFactoryMock.VerifyAll();
     }
+
+
+    [Fact]
+    public void AllowsDuplicateEntries()
+    {
+        var body = new MultipartBody();
+
+        body.AddOrReplacePart("file", "application/json", "fileContent", "file.json");
+        body.AddOrReplacePart("file", "application/json", "fileContent2", "file2.json");
+
+        //Assert both files are stored in the body
+        Assert.Equal("fileContent", body.GetPartValue<string>("file", "file.json"));
+        Assert.Equal("fileContent2", body.GetPartValue<string>("file", "file2.json"));
+
+        //Assert part can only be removed if fileName is specified
+        Assert.False(body.RemovePart("file"));
+        Assert.True(body.RemovePart("file", "file.json"));
+
+        //Assert file.json is removed and file2.json is still accessible
+        Assert.Null(body.GetPartValue<string>("file", "file.json"));
+        Assert.Equal("fileContent2", body.GetPartValue<string>("file", "file2.json"));
+    }
+
+    [Fact]
+    public void ImplementationBreaksExisting()
+    {
+        var body = new MultipartBody();
+
+        body.AddOrReplacePart("file", "application/json", "fileContent", "file.json");
+
+        // existing usecase, file should still be able to be retreived
+        Assert.Equal("fileContent", body.GetPartValue<string>("file"));
+    }
 }

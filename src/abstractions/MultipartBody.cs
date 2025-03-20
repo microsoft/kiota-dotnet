@@ -47,10 +47,11 @@ public class MultipartBody : IParsable
         {
             throw new ArgumentNullException(nameof(partValue));
         }
+        var key = Tuple.Create(partName, fileName);
         var value = new Part(partName, partValue, contentType, fileName);
-        if(!_parts.TryAdd(partName, value))
+        if(!_parts.TryAdd(key, value))
         {
-            _parts[partName] = value;
+            _parts[key] = value;
         }
     }
     /// <summary>
@@ -61,11 +62,22 @@ public class MultipartBody : IParsable
     /// <returns>The value of the part.</returns>
     public T? GetPartValue<T>(string partName)
     {
+        return GetPartValue<T>(partName, null);
+    }
+    /// <summary>
+    /// Gets the value of a part from the multipart body.
+    /// </summary>
+    /// <typeparam name="T">The type of the part value.</typeparam>
+    /// <param name="partName">The name of the part.</param>
+    /// <param name="fileName">An optional file name for the part.</param>
+    /// <returns>The value of the part.</returns>
+    public T? GetPartValue<T>(string partName, string? fileName)
+    {
         if(string.IsNullOrEmpty(partName))
         {
             throw new ArgumentNullException(nameof(partName));
         }
-        if(_parts.TryGetValue(partName, out var value))
+        if(_parts.TryGetValue(Tuple.Create(partName, fileName), out var value))
         {
             if(value == null)
                 return default;
@@ -81,14 +93,25 @@ public class MultipartBody : IParsable
     /// <returns>True if the part was removed, false otherwise.</returns>   
     public bool RemovePart(string partName)
     {
+        return RemovePart(partName, null);
+    }
+
+    /// <summary>
+    /// Removes a part from the multipart body.
+    /// </summary>
+    /// <param name="partName">The name of the part.</param>
+    /// <param name="fileName">An optional file name for the part.</param>
+    /// <returns>True if the part was removed, false otherwise.</returns>   
+    public bool RemovePart(string partName, string? fileName)
+    {
         if(string.IsNullOrEmpty(partName))
         {
             throw new ArgumentNullException(nameof(partName));
         }
-        return _parts.Remove(partName);
+        return _parts.Remove(Tuple.Create(partName, fileName));
     }
 
-    private readonly Dictionary<string, Part> _parts = new Dictionary<string, Part>(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<Tuple<string, string?>, Part> _parts = new Dictionary<Tuple<string, string?>, Part>(new TupleComparer());
     /// <inheritdoc />
     public IDictionary<string, Action<IParseNode>> GetFieldDeserializers() => throw new NotImplementedException();
     private const char DoubleQuote = '"';
@@ -195,5 +218,24 @@ public class MultipartBody : IParsable
         public object Content { get; } = content;
         public string ContentType { get; } = contentType;
         public string? FileName { get; } = fileName;
+    }
+
+    private sealed class TupleComparer : IEqualityComparer<Tuple<string, string?>>
+    {
+        public bool Equals(Tuple<string, string?>? x, Tuple<string, string?>? y)
+        {
+            if(x == null && y == null) return true;
+            if(x == null || y == null) return false;
+            return StringComparer.OrdinalIgnoreCase.Equals(x.Item1, y.Item1) &&
+                   StringComparer.OrdinalIgnoreCase.Equals(x.Item2, y.Item2);
+        }
+
+        public int GetHashCode(Tuple<string, string?> obj)
+        {
+            if(obj == null) throw new ArgumentNullException(nameof(obj));
+            int hash1 = StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Item1);
+            int hash2 = obj.Item2 != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Item2) : 0;
+            return hash1 ^ hash2;
+        }
     }
 }
