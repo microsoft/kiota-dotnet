@@ -47,7 +47,7 @@ public class MultipartBody : IParsable
         {
             throw new ArgumentNullException(nameof(partValue));
         }
-        var key = Tuple.Create(partName, fileName);
+        var key = (partName, fileName ?? "");
         var value = new Part(partName, partValue, contentType, fileName);
         if(!_parts.TryAdd(key, value))
         {
@@ -77,7 +77,7 @@ public class MultipartBody : IParsable
         {
             throw new ArgumentNullException(nameof(partName));
         }
-        if(_parts.TryGetValue(Tuple.Create(partName, fileName), out var value))
+        if(_parts.TryGetValue((partName, fileName ?? ""), out var value))
         {
             if(value == null)
                 return default;
@@ -108,10 +108,10 @@ public class MultipartBody : IParsable
         {
             throw new ArgumentNullException(nameof(partName));
         }
-        return _parts.Remove(Tuple.Create(partName, fileName));
+        return _parts.Remove((partName, fileName ?? ""));
     }
 
-    private readonly Dictionary<Tuple<string, string?>, Part> _parts = new Dictionary<Tuple<string, string?>, Part>(new TupleComparer());
+    private readonly Dictionary<ValueTuple<string, string>, Part> _parts = new Dictionary<ValueTuple<string, string>, Part>(new ValueTupleComparer());
     /// <inheritdoc />
     public IDictionary<string, Action<IParseNode>> GetFieldDeserializers() => throw new NotImplementedException();
     private const char DoubleQuote = '"';
@@ -220,19 +220,16 @@ public class MultipartBody : IParsable
         public string? FileName { get; } = fileName;
     }
 
-    private sealed class TupleComparer : IEqualityComparer<Tuple<string, string?>>
+    private sealed class ValueTupleComparer : IEqualityComparer<ValueTuple<string, string>>
     {
-        public bool Equals(Tuple<string, string?>? x, Tuple<string, string?>? y)
+        public bool Equals((string, string) x, (string, string) y)
         {
-            if(x == null && y == null) return true;
-            if(x == null || y == null) return false;
             return StringComparer.OrdinalIgnoreCase.Equals(x.Item1, y.Item1) &&
                    StringComparer.OrdinalIgnoreCase.Equals(x.Item2, y.Item2);
         }
 
-        public int GetHashCode(Tuple<string, string?> obj)
+        public int GetHashCode(ValueTuple<string, string?> obj)
         {
-            if(obj == null) throw new ArgumentNullException(nameof(obj));
             int hash1 = StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Item1);
             int hash2 = obj.Item2 != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Item2) : 0;
             return hash1 ^ hash2;
