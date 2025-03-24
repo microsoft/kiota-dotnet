@@ -226,14 +226,14 @@ public class MultipartBody : IParsable
     {
         public bool Equals((string, string) x, (string, string) y)
         {
-            return StringComparer.OrdinalIgnoreCase.Equals(x.Item1, y.Item1) &&
-                   StringComparer.OrdinalIgnoreCase.Equals(x.Item2, y.Item2);
+            return StringComparer.Ordinal.Equals(x.Item1, y.Item1) &&
+                   StringComparer.Ordinal.Equals(x.Item2, y.Item2);
         }
 
         public int GetHashCode(ValueTuple<string, string?> obj)
         {
-            int hash1 = StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Item1);
-            int hash2 = obj.Item2 != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Item2) : 0;
+            int hash1 = StringComparer.Ordinal.GetHashCode(obj.Item1);
+            int hash2 = obj.Item2 != null ? StringComparer.Ordinal.GetHashCode(obj.Item2) : 0;
             return hash1 ^ hash2;
         }
     }
