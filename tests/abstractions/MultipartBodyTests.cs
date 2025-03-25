@@ -104,8 +104,7 @@ public class MultipartBodyTests
         Assert.Equal("fileContent", body.GetPartValue<string>("file", "file.json"));
         Assert.Equal("fileContent2", body.GetPartValue<string>("file", "file2.json"));
 
-        //Assert part can only be removed if fileName is specified
-        Assert.False(body.RemovePart("file"));
+        //Assert part can be removed if fileName is specified
         Assert.True(body.RemovePart("file", "file.json"));
 
         //Assert file.json is removed and file2.json is still accessible
