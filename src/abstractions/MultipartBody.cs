@@ -63,7 +63,21 @@ public class MultipartBody : IParsable
     /// <returns>The value of the part.</returns>
     public T? GetPartValue<T>(string partName)
     {
-        return GetPartValue<T>(partName, null);
+        var value = GetPartValue<T>(partName, null);
+
+        if(EqualityComparer<T?>.Default.Equals(value, default))
+        {
+            foreach(var key in _parts.Keys)
+            {
+                if(key.Item1 == partName)
+                {
+                    value = GetPartValue<T>(partName, key.Item2);
+                    break;
+                }
+            }
+        }
+
+        return value;
     }
     /// <summary>
     /// Gets the value of a part from the multipart body.
@@ -95,7 +109,21 @@ public class MultipartBody : IParsable
     /// <returns>True if the part was removed, false otherwise.</returns>   
     public bool RemovePart(string partName)
     {
-        return RemovePart(partName, null);
+        bool success = RemovePart(partName, null);
+
+        if(!success)
+        {
+            foreach(var key in _parts.Keys)
+            {
+                if(key.Item1 == partName)
+                {
+                    success = RemovePart(partName, key.Item2);
+                    break;
+                }
+            }
+        }
+
+        return success;
     }
 
     /// <summary>

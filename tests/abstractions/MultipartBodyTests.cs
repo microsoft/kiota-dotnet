@@ -114,7 +114,7 @@ public class MultipartBodyTests
     }
 
     [Fact]
-    public void ImplementationBreaksExisting()
+    public void MultiPartBodyExistingGetAndRemoveStillWork()
     {
         var body = new MultipartBody();
 
@@ -122,5 +122,8 @@ public class MultipartBodyTests
 
         // existing usecase, file should still be able to be retreived
         Assert.Equal("fileContent", body.GetPartValue<string>("file"));
+
+        // existing usecase, file should be sucesfully removed
+        Assert.True(body.RemovePart("file"));
     }
 }
