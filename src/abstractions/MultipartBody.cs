@@ -47,12 +47,14 @@ public class MultipartBody : IParsable
         {
             throw new ArgumentNullException(nameof(partValue));
         }
+        var key = (partName, fileName ?? "");
         var value = new Part(partName, partValue, contentType, fileName);
-        if(!_parts.TryAdd(partName, value))
+        if(!_parts.TryAdd(key, value))
         {
-            _parts[partName] = value;
+            _parts[key] = value;
         }
     }
+    // TODO: Remove with next major release
     /// <summary>
     /// Gets the value of a part from the multipart body.
     /// </summary>
@@ -61,11 +63,36 @@ public class MultipartBody : IParsable
     /// <returns>The value of the part.</returns>
     public T? GetPartValue<T>(string partName)
     {
+        var value = GetPartValue<T>(partName, null);
+
+        if(EqualityComparer<T?>.Default.Equals(value, default))
+        {
+            foreach(var key in _parts.Keys)
+            {
+                if(key.Item1 == partName)
+                {
+                    value = GetPartValue<T>(partName, key.Item2);
+                    break;
+                }
+            }
+        }
+
+        return value;
+    }
+    /// <summary>
+    /// Gets the value of a part from the multipart body.
+    /// </summary>
+    /// <typeparam name="T">The type of the part value.</typeparam>
+    /// <param name="partName">The name of the part.</param>
+    /// <param name="fileName">An optional file name for the part.</param>
+    /// <returns>The value of the part.</returns>
+    public T? GetPartValue<T>(string partName, string? fileName)
+    {
         if(string.IsNullOrEmpty(partName))
         {
             throw new ArgumentNullException(nameof(partName));
         }
-        if(_parts.TryGetValue(partName, out var value))
+        if(_parts.TryGetValue((partName, fileName ?? ""), out var value))
         {
             if(value == null)
                 return default;
@@ -74,6 +101,7 @@ public class MultipartBody : IParsable
         }
         return default;
     }
+    // TODO: Remove with next major release
     /// <summary>
     /// Removes a part from the multipart body.
     /// </summary>
@@ -81,14 +109,39 @@ public class MultipartBody : IParsable
     /// <returns>True if the part was removed, false otherwise.</returns>   
     public bool RemovePart(string partName)
     {
+        bool success = RemovePart(partName, null);
+
+        if(!success)
+        {
+            foreach(var key in _parts.Keys)
+            {
+                if(key.Item1 == partName)
+                {
+                    success = RemovePart(partName, key.Item2);
+                    break;
+                }
+            }
+        }
+
+        return success;
+    }
+
+    /// <summary>
+    /// Removes a part from the multipart body.
+    /// </summary>
+    /// <param name="partName">The name of the part.</param>
+    /// <param name="fileName">An optional file name for the part.</param>
+    /// <returns>True if the part was removed, false otherwise.</returns>   
+    public bool RemovePart(string partName, string? fileName)
+    {
         if(string.IsNullOrEmpty(partName))
         {
             throw new ArgumentNullException(nameof(partName));
         }
-        return _parts.Remove(partName);
+        return _parts.Remove((partName, fileName ?? ""));
     }
 
-    private readonly Dictionary<string, Part> _parts = new Dictionary<string, Part>(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<ValueTuple<string, string>, Part> _parts = new Dictionary<ValueTuple<string, string>, Part>(new ValueTupleComparer());
     /// <inheritdoc />
     public IDictionary<string, Action<IParseNode>> GetFieldDeserializers() => throw new NotImplementedException();
     private const char DoubleQuote = '"';
@@ -195,5 +248,21 @@ public class MultipartBody : IParsable
         public object Content { get; } = content;
         public string ContentType { get; } = contentType;
         public string? FileName { get; } = fileName;
+    }
+
+    private sealed class ValueTupleComparer : IEqualityComparer<ValueTuple<string, string>>
+    {
+        public bool Equals((string, string) x, (string, string) y)
+        {
+            return StringComparer.Ordinal.Equals(x.Item1, y.Item1) &&
+                   StringComparer.Ordinal.Equals(x.Item2, y.Item2);
+        }
+
+        public int GetHashCode(ValueTuple<string, string?> obj)
+        {
+            int hash1 = StringComparer.Ordinal.GetHashCode(obj.Item1);
+            int hash2 = obj.Item2 != null ? StringComparer.Ordinal.GetHashCode(obj.Item2) : 0;
+            return hash1 ^ hash2;
+        }
     }
 }
