@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.17.2](https://github.com/microsoft/kiota-dotnet/compare/v1.17.1...v1.17.2) (2025-04-03)
+
+
+### Bug Fixes
+
+* MultiPartBody: Add Support for multiple Body Parts with the same name ([#530](https://github.com/microsoft/kiota-dotnet/issues/530)) ([21bfc3f](https://github.com/microsoft/kiota-dotnet/commit/21bfc3fcea2aef5bdb700e710fcdeb59379d0353))
+
 ## [1.17.1](https://github.com/microsoft/kiota-dotnet/compare/v1.17.0...v1.17.1) (2025-02-12)
 
 
