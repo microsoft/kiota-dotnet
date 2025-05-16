@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -762,6 +763,32 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
 
             // Assert
             Assert.Equal("\"P756DT4H6M8.01S\"", serializedString);
+        }
+        [Fact]
+        public async Task SerializesNullPropertiesForBackingStoreOnce()
+        {
+            var value = new BackedTestEntity
+            {
+                Name = null,
+            };
+            var serializationJsonWriterFactory = new JsonSerializationWriterFactory();
+            var backedWriterFactory = ApiClientBuilder.EnableBackingStoreForSerializationWriterFactory(serializationJsonWriterFactory);
+            var writer = backedWriterFactory.GetSerializationWriter("application/json");
+            writer.WriteObjectValue(null, value);
+            var contentStream = writer.GetSerializedContent();
+            using var reader = new StreamReader(contentStream, Encoding.UTF8);
+            var serializedString = await reader.ReadToEndAsync();
+            var expected =
+            """
+            {
+                "name": null
+            }
+            """;
+            var expectedJsonNode = JsonNode.Parse(expected);
+            var actualJsonNode = JsonNode.Parse(serializedString);
+#if NET8_0_OR_GREATER
+            Assert.True(JsonNode.DeepEquals(expectedJsonNode, actualJsonNode));
+#endif
         }
     }
 }
