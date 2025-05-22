@@ -83,11 +83,11 @@ namespace Microsoft.Kiota.Abstractions.Tests
             var thirdResult = ApiClientBuilder.EnableBackingStoreForParseNodeFactory(secondResult);
 
 
-            //make sure the original was not modifed
+            //make sure the original was not modified
             Assert.IsNotType<BackingStoreParseNodeFactory>(parseNodeRegistry);
 
-            // Assert the type has changed due to backing store enabling
-            Assert.IsType<BackingStoreParseNodeFactory>(firstResult);
+            // Assert the type has NOT changed for registries to avoid double wrapping
+            Assert.IsType<ParseNodeFactoryRegistry>(firstResult);
 
             //make sure the second call returned the original wrapper
             Assert.Equal(firstResult, secondResult);
@@ -137,11 +137,11 @@ namespace Microsoft.Kiota.Abstractions.Tests
             var thirdResult = ApiClientBuilder.EnableBackingStoreForParseNodeFactory(secondResult);
 
 
-            //make sure the original was not modifed
+            //make sure the original was not modified
             Assert.IsNotType<BackingStoreParseNodeFactory>(parseNodeRegistry);
 
-            // Assert the type has changed due to backing store enabling
-            Assert.IsType<BackingStoreParseNodeFactory>(firstResult);
+            // Assert the type has NOT changed for registries to avoid double wrapping
+            Assert.IsType<ParseNodeFactoryRegistry>(firstResult);
 
             //make sure the second call returned the original wrapper
             Assert.Equal(firstResult, secondResult);
