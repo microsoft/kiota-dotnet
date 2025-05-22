@@ -770,10 +770,13 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             var value = new BackedTestEntity
             {
                 Name = null,
+                Id = "testId",
             };
+            var registry = new SerializationWriterFactoryRegistry();
             var serializationJsonWriterFactory = new JsonSerializationWriterFactory();
-            var backedWriterFactory = ApiClientBuilder.EnableBackingStoreForSerializationWriterFactory(serializationJsonWriterFactory);
-            var writer = backedWriterFactory.GetSerializationWriter("application/json");
+            registry.ContentTypeAssociatedFactories.TryAdd(serializationJsonWriterFactory.ValidContentType, serializationJsonWriterFactory);
+            var backedWriterFactory = ApiClientBuilder.EnableBackingStoreForSerializationWriterFactory(registry);
+            var writer = backedWriterFactory.GetSerializationWriter(serializationJsonWriterFactory.ValidContentType);
             writer.WriteObjectValue(null, value);
             var contentStream = writer.GetSerializedContent();
             using var reader = new StreamReader(contentStream, Encoding.UTF8);
@@ -781,7 +784,8 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             var expected =
             """
             {
-                "name": null
+                "name": null,
+                "id": "testId"
             }
             """;
             var expectedJsonNode = JsonNode.Parse(expected);

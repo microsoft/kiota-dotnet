@@ -43,14 +43,14 @@ namespace Microsoft.Kiota.Abstractions
         /// <returns>A new serialization writer with the backing store enabled.</returns>
         public static ISerializationWriterFactory EnableBackingStoreForSerializationWriterFactory(ISerializationWriterFactory original)
         {
-            ISerializationWriterFactory result = original ?? throw new ArgumentNullException(nameof(original));
+            var result = original ?? throw new ArgumentNullException(nameof(original));
             if(original is SerializationWriterFactoryRegistry registry)
             {
                 EnableBackingStoreForSerializationRegistry(registry);
                 if(registry != SerializationWriterFactoryRegistry.DefaultInstance)// if the registry is the default instance, we already enabled it above. No need to do it twice
                     EnableBackingStoreForSerializationRegistry(SerializationWriterFactoryRegistry.DefaultInstance);
             }
-            if(result is BackingStoreSerializationWriterProxyFactory)
+            else if(result is BackingStoreSerializationWriterProxyFactory)
                 //We are already enabled so use it.
                 return result;
             else
@@ -72,7 +72,7 @@ namespace Microsoft.Kiota.Abstractions
                 if(registry != ParseNodeFactoryRegistry.DefaultInstance)// if the registry is the default instance, we already enabled it above. No need to do it twice
                     EnableBackingStoreForParseNodeRegistry(ParseNodeFactoryRegistry.DefaultInstance);
             }
-            if(result is BackingStoreParseNodeFactory)
+            else if(result is BackingStoreParseNodeFactory)
                 //We are already enabled so use it.
                 return result;
             else
