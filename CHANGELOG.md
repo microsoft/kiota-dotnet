@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.17.4](https://github.com/microsoft/kiota-dotnet/compare/v1.17.3...v1.17.4) (2025-06-02)
+
+
+### Bug Fixes
+
+* decimal type conversion in URL templates (query or path parameters) ([c27fbeb](https://github.com/microsoft/kiota-dotnet/commit/c27fbeba5e0a86683e042ea8e726badd7773e916))
+
 ## [1.17.3](https://github.com/microsoft/kiota-dotnet/compare/v1.17.2...v1.17.3) (2025-05-22)
 
 
