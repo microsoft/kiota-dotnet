@@ -492,5 +492,26 @@ namespace Microsoft.Kiota.Abstractions
             Headers.TryAdd(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
         }
+
+        /// <summary>
+        /// Sets the request body from an enum value with the specified content type.
+        /// </summary>
+        /// <param name="requestAdapter">The core service to get the serialization writer from.</param>
+        /// <param name="item">The enum value to serialize.</param>
+        /// <param name="contentType">The content type to set.</param>
+        /// <typeparam name="T">The enum type to serialize.</typeparam>
+#if NET5_0_OR_GREATER
+        public void SetContentFromEnum<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(IRequestAdapter requestAdapter, string contentType, T? item) where T : struct, Enum
+#else
+        public void SetContentFromEnum<T>(IRequestAdapter requestAdapter, string contentType, T? item) where T : struct, Enum
+#endif
+        {
+            using var activity = _activitySource?.StartActivity(nameof(SetContentFromEnum));
+            using var writer = GetSerializationWriter(requestAdapter, contentType, item);
+            SetRequestType(item, activity);
+            writer.WriteEnumValue<T>(null, item);
+            Headers.TryAdd(ContentTypeHeader, contentType);
+            Content = writer.GetSerializedContent();
+        }
     }
 }
