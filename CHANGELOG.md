@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.18.0](https://github.com/microsoft/kiota-dotnet/compare/v1.17.4...v1.18.0) (2025-06-13)
+
+
+### Features
+
+* Add set content from enum ([#544](https://github.com/microsoft/kiota-dotnet/issues/544)) ([3c1356d](https://github.com/microsoft/kiota-dotnet/commit/3c1356df35a5a9ba1aedc3d4ad55f2687041e3c3))
+
 ## [1.17.4](https://github.com/microsoft/kiota-dotnet/compare/v1.17.3...v1.17.4) (2025-06-02)
 
 
