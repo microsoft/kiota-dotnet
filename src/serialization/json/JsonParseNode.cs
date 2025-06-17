@@ -97,7 +97,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the float value from the json node
         /// </summary>
         /// <returns>A float value</returns>
-        public float? GetFloatValue() => _jsonNode.ValueKind == JsonValueKind.Number
+        public float? GetFloatValue() => (_jsonNode.ValueKind == JsonValueKind.Number || (_jsonNode.ValueKind == JsonValueKind.String && _jsonSerializerContext.Options.NumberHandling.HasFlag(JsonNumberHandling.AllowReadingFromString)))
             ? _jsonNode.Deserialize(_jsonSerializerContext.Single)
             : null;
 
