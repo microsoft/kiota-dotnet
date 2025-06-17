@@ -119,6 +119,13 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
 
         private static readonly string TestUserCollectionString = $"[{TestUserJson}]";
 
+        private static readonly KiotaJsonSerializationContext ReadNumbersAsStringsContext = new KiotaJsonSerializationContext(
+            new JsonSerializerOptions()
+            {
+                NumberHandling = JsonNumberHandling.AllowReadingFromString
+            }
+        );
+
         [Fact]
         public void GetsEntityValueFromJson()
         {
@@ -546,44 +553,23 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             using var jsonDocument = JsonDocument.Parse(input);
             var parseNode = new JsonParseNode(jsonDocument.RootElement);
 
-            // Act
-            var actual = parseNode.GetIntValue();
-
-            // Assert
-            Assert.Equal(expected.HasValue, actual.HasValue);
-            if(expected.HasValue && actual.HasValue)
-            {
-                Assert.Equal(expected.Value, actual.Value);
-            }
+            // Act, Assert
+            Assert_CanReadNumber(parseNode.GetIntValue, expected);
         }
 
-        static KiotaJsonSerializationContext readNumbersAsStringsContext = new KiotaJsonSerializationContext(
-            new JsonSerializerOptions()
-            {
-                NumberHandling = JsonNumberHandling.AllowReadingFromString
-            }
-        );
-
         [Theory]
-        [InlineData("42", 42)]
-        [InlineData("\"42\"", 42)]
-        [InlineData("\"not-a-number\"", null)]
-        [InlineData("null", null)]
-        public void GetIntValue_CanReadNumber_AsString(string input, int? expected)
+        [InlineData("42", 42, "")]
+        [InlineData("\"42\"", 42, "")]
+        [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Int32.")]
+        [InlineData("null", null, "")]
+        public void GetIntValue_CanReadNumber_AsString(string input, int? expectedValue, string? expectexpectedExceptionMessage)
         {
             // Arrange
             using var jsonDocument = JsonDocument.Parse(input);
-            var parseNode = new JsonParseNode(jsonDocument.RootElement, readNumbersAsStringsContext);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, ReadNumbersAsStringsContext);
 
-            // Act
-            var actual = parseNode.GetIntValue();
-
-            // Assert
-            Assert.Equal(expected.HasValue, actual.HasValue);
-            if(expected.HasValue && actual.HasValue)
-            {
-                Assert.Equal(expected.Value, actual.Value);
-            }
+            // Act, Assert
+            Assert_CanReadNumber(parseNode.GetIntValue, expectedValue, expectexpectedExceptionMessage);
         }
 
         [Theory]
@@ -597,37 +583,23 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             using var jsonDocument = JsonDocument.Parse(input);
             var parseNode = new JsonParseNode(jsonDocument.RootElement);
 
-            // Act
-            var actual = parseNode.GetLongValue();
-
-            // Assert
-            Assert.Equal(expected.HasValue, actual.HasValue);
-            if(expected.HasValue && actual.HasValue)
-            {
-                Assert.Equal(expected.Value, actual.Value);
-            }
+            // Act, Assert
+            Assert_CanReadNumber(parseNode.GetLongValue, expected);
         }
 
         [Theory]
-        [InlineData("42", 42L)]
-        [InlineData("\"42\"", 42L)]
-        [InlineData("\"not-a-number\"", null)]
-        [InlineData("null", null)]
-        public void GetLongValue_CanReadNumber_AsString(string input, long? expected)
+        [InlineData("42", 42L, null)]
+        [InlineData("\"42\"", 42L, null)]
+        [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Int64.")]
+        [InlineData("null", null, null)]
+        public void GetLongValue_CanReadNumber_AsString(string input, long? expectedValue, string? expectedExceptionMessage)
         {
             // Arrange
             using var jsonDocument = JsonDocument.Parse(input);
-            var parseNode = new JsonParseNode(jsonDocument.RootElement, readNumbersAsStringsContext);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, ReadNumbersAsStringsContext);
 
-            // Act
-            var actual = parseNode.GetLongValue();
-
-            // Assert
-            Assert.Equal(expected.HasValue, actual.HasValue);
-            if(expected.HasValue && actual.HasValue)
-            {
-                Assert.Equal(expected.Value, actual.Value);
-            }
+            // Act, Assert
+            Assert_CanReadNumber(parseNode.GetLongValue, expectedValue, expectedExceptionMessage);
         }
 
         [Theory]
@@ -641,37 +613,23 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             using var jsonDocument = JsonDocument.Parse(input);
             var parseNode = new JsonParseNode(jsonDocument.RootElement);
 
-            // Act
-            var actual = parseNode.GetFloatValue();
-
-            // Assert
-            Assert.Equal(expected.HasValue, actual.HasValue);
-            if(expected.HasValue && actual.HasValue)
-            {
-                Assert.Equal(expected.Value, actual.Value);
-            }
+            // Act, Assert
+            Assert_CanReadNumber(parseNode.GetFloatValue, expected);
         }
 
         [Theory]
-        [InlineData("13.37", 13.37F)]
-        [InlineData("\"13.37\"", 13.37F)]
-        [InlineData("\"not-a-number\"", null)]
-        [InlineData("null", null)]
-        public void GetFloatValue_CanReadNumber_AsString(string input, float? expected)
+        [InlineData("13.37", 13.37F, "")]
+        [InlineData("\"13.37\"", 13.37F, "")]
+        [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Single.")]
+        [InlineData("null", null, "")]
+        public void GetFloatValue_CanReadNumber_AsString(string input, float? expectedValue, string? expectedExceptionMessage)
         {
             // Arrange
             using var jsonDocument = JsonDocument.Parse(input);
-            var parseNode = new JsonParseNode(jsonDocument.RootElement, readNumbersAsStringsContext);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, ReadNumbersAsStringsContext);
 
-            // Act
-            var actual = parseNode.GetFloatValue();
-
-            // Assert
-            Assert.Equal(expected.HasValue, actual.HasValue);
-            if(expected.HasValue && actual.HasValue)
-            {
-                Assert.Equal(expected.Value, actual.Value);
-            }
+            // Act, Assert
+            Assert_CanReadNumber(parseNode.GetFloatValue, expectedValue, expectedExceptionMessage);
         }
 
         [Theory]
@@ -685,37 +643,23 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             using var jsonDocument = JsonDocument.Parse(input);
             var parseNode = new JsonParseNode(jsonDocument.RootElement);
 
-            // Act
-            var actual = parseNode.GetDoubleValue();
-
-            // Assert
-            Assert.Equal(expected.HasValue, actual.HasValue);
-            if(expected.HasValue && actual.HasValue)
-            {
-                Assert.Equal(expected.Value, actual.Value);
-            }
+            // Act, Assert
+            Assert_CanReadNumber(parseNode.GetDoubleValue, expected);
         }
 
         [Theory]
         [InlineData("13.37", 13.37D)]
         [InlineData("\"13.37\"", 13.37D)]
-        [InlineData("\"not-a-number\"", null)]
+        [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Double.")]
         [InlineData("null", null)]
-        public void GetDoubleValue_CanReadNumber_AsString(string input, double? expected)
+        public void GetDoubleValue_CanReadNumber_AsString(string input, double? expectedValue, string? expectedExceptionMessage = null)
         {
             // Arrange
             using var jsonDocument = JsonDocument.Parse(input);
-            var parseNode = new JsonParseNode(jsonDocument.RootElement, readNumbersAsStringsContext);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, ReadNumbersAsStringsContext);
 
-            // Act
-            var actual = parseNode.GetDoubleValue();
-
-            // Assert
-            Assert.Equal(expected.HasValue, actual.HasValue);
-            if(expected.HasValue && actual.HasValue)
-            {
-                Assert.Equal(expected.Value, actual.Value);
-            }
+            // Act, Assert
+            Assert_CanReadNumber(parseNode.GetDoubleValue, expectedValue, expectedExceptionMessage);
         }
 
         [Theory]
@@ -726,7 +670,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         public void GetDecimalValue_CanReadNumber(string input, double? expectedDouble)
         {
             // Arrange
-            var expected = expectedDouble.HasValue
+            var expectedValue = expectedDouble.HasValue
                 ? Convert.ToDecimal(expectedDouble)
                 : default(decimal?)
             ; //13.37M is not supported as a constant expression in attributes
@@ -734,23 +678,15 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             using var jsonDocument = JsonDocument.Parse(input);
             var parseNode = new JsonParseNode(jsonDocument.RootElement);
 
-            // Act
-            var actual = parseNode.GetDecimalValue();
-
-            // Assert
-            Assert.Equal(expected.HasValue, actual.HasValue);
-            if(expected.HasValue && actual.HasValue)
-            {
-                Assert.Equal(expected.Value, actual.Value);
-            }
+            Assert_CanReadNumber(parseNode.GetDecimalValue, expectedValue);
         }
 
         [Theory]
         [InlineData("13.37", 13.37)]
         [InlineData("\"13.37\"", 13.37)]
-        [InlineData("\"not-a-number\"", null)]
+        [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Decimal.")]
         [InlineData("null", null)]
-        public void GetDecimalValue_CanReadNumber_AsString(string input, double? expectedDouble)
+        public void GetDecimalValue_CanReadNumber_AsString(string input, double? expectedDouble, string? expectedExceptionMessage = null)
         {
             // Arrange
             var expected = expectedDouble.HasValue
@@ -759,16 +695,31 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             ; //13.37M is not supported as a constant expression in attributes
 
             using var jsonDocument = JsonDocument.Parse(input);
-            var parseNode = new JsonParseNode(jsonDocument.RootElement, readNumbersAsStringsContext);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, ReadNumbersAsStringsContext);
 
-            // Act
-            var actual = parseNode.GetDecimalValue();
+            // Act, Assert
+            Assert_CanReadNumber(parseNode.GetDecimalValue, expected, expectedExceptionMessage);
+        }
 
-            // Assert
-            Assert.Equal(expected.HasValue, actual.HasValue);
-            if(expected.HasValue && actual.HasValue)
+        private static void Assert_CanReadNumber<TNumeric>(Func<TNumeric?> act, TNumeric? expectedValue, string? expectedExceptionMessage = null) where TNumeric : struct
+        {
+            if(string.IsNullOrEmpty(expectedExceptionMessage))
             {
-                Assert.Equal(expected.Value, actual.Value);
+                // Act
+                var actual = act();
+
+                // Assert
+                Assert.Equal(expectedValue.HasValue, actual.HasValue);
+                if(expectedValue.HasValue && actual.HasValue)
+                {
+                    Assert.Equal(expectedValue.Value, actual.Value);
+                }
+            }
+            else
+            {
+                // Act, Assert
+                var exception = Assert.Throws<JsonException>(() => act());
+                Assert.StartsWith(expectedExceptionMessage, exception.Message);
             }
         }
     }
