@@ -606,6 +606,27 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         }
 
         [Theory]
+        [InlineData("42", 42L)]
+        [InlineData("\"42\"", 42L)]
+        [InlineData("null", null)]
+        public void GetLongValue_CanReadNumber_AsString(string input, long? expected)
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse(input);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, readNumbersAsStringsContext);
+
+            // Act
+            var actual = parseNode.GetLongValue();
+
+            // Assert
+            Assert.Equal(expected.HasValue, actual.HasValue);
+            if(expected.HasValue && actual.HasValue)
+            {
+                Assert.Equal(expected.Value, actual.Value);
+            }
+        }
+
+        [Theory]
         [InlineData("13.37", 13.37F)]
         [InlineData("\"13.37\"", null)]
         [InlineData("null", null)]
