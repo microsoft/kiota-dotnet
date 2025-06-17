@@ -697,7 +697,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         {
             // Arrange
             using var jsonDocument = JsonDocument.Parse(input);
-            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, readNumbersAsStringsContext);
 
             // Act
             var actual = parseNode.GetDoubleValue();
