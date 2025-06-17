@@ -121,7 +121,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the decimal value from the json node
         /// </summary>
         /// <returns>A decimal value</returns>
-        public decimal? GetDecimalValue() => _jsonNode.ValueKind == JsonValueKind.Number
+        public decimal? GetDecimalValue() => (_jsonNode.ValueKind == JsonValueKind.Number || (_jsonNode.ValueKind == JsonValueKind.String && _jsonSerializerContext.Options.NumberHandling.HasFlag(JsonNumberHandling.AllowReadingFromString)))
             ? _jsonNode.Deserialize(_jsonSerializerContext.Decimal)
             : null;
 
