@@ -15,6 +15,8 @@ using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Helpers;
 using Microsoft.Kiota.Abstractions.Serialization;
+using System.Text.Json.Serialization;
+
 
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -87,7 +89,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the int value from the json node
         /// </summary>
         /// <returns>A int value</returns>
-        public int? GetIntValue() => _jsonNode.ValueKind == JsonValueKind.Number
+        public int? GetIntValue() => (_jsonNode.ValueKind == JsonValueKind.Number || (_jsonNode.ValueKind == JsonValueKind.String && _jsonSerializerContext.Options.NumberHandling.HasFlag(JsonNumberHandling.AllowReadingFromString)))
             ? _jsonNode.Deserialize(_jsonSerializerContext.Int32)
             : null;
 
