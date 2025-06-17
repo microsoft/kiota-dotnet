@@ -735,5 +735,31 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                 Assert.Equal(expected.Value, actual.Value);
             }
         }
+
+        [Theory]
+        [InlineData("13.37", 13.37)]
+        [InlineData("\"13.37\"", 13.37)]
+        [InlineData("null", null)]
+        public void GetDecimalValue_CanReadNumber_AsString(string input, double? expectedDouble)
+        {
+            // Arrange
+            var expected = expectedDouble.HasValue
+                ? Convert.ToDecimal(expectedDouble)
+                : default(decimal?)
+            ; //13.37M is not supported as a constant expression in attributes
+
+            using var jsonDocument = JsonDocument.Parse(input);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, readNumbersAsStringsContext);
+
+            // Act
+            var actual = parseNode.GetDecimalValue();
+
+            // Assert
+            Assert.Equal(expected.HasValue, actual.HasValue);
+            if(expected.HasValue && actual.HasValue)
+            {
+                Assert.Equal(expected.Value, actual.Value);
+            }
+        }
     }
 }
