@@ -556,6 +556,34 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             }
         }
 
+        static KiotaJsonSerializationContext readNumbersAsStringsContext = new KiotaJsonSerializationContext(
+            new JsonSerializerOptions()
+            {
+                NumberHandling = JsonNumberHandling.AllowReadingFromString
+            }
+        );
+
+        [Theory]
+        [InlineData("42", 42)]
+        [InlineData("\"42\"", 42)]
+        [InlineData("null", null)]
+        public void GetIntValue_CanReadNumber_AsString(string input, int? expected)
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse(input);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, readNumbersAsStringsContext);
+
+            // Act
+            var actual = parseNode.GetIntValue();
+
+            // Assert
+            Assert.Equal(expected.HasValue, actual.HasValue);
+            if(expected.HasValue && actual.HasValue)
+            {
+                Assert.Equal(expected.Value, actual.Value);
+            }
+        }
+
         [Theory]
         [InlineData("42", 42L)]
         [InlineData("\"42\"", null)]
