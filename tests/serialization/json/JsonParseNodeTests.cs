@@ -690,6 +690,27 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         }
 
         [Theory]
+        [InlineData("13.37", 13.37D)]
+        [InlineData("\"13.37\"", 13.37D)]
+        [InlineData("null", null)]
+        public void GetDoubleValue_CanReadNumber_AsString(string input, double? expected)
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse(input);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var actual = parseNode.GetDoubleValue();
+
+            // Assert
+            Assert.Equal(expected.HasValue, actual.HasValue);
+            if(expected.HasValue && actual.HasValue)
+            {
+                Assert.Equal(expected.Value, actual.Value);
+            }
+        }
+
+        [Theory]
         [InlineData("13.37", 13.37)]
         [InlineData("\"13.37\"", null)]
         [InlineData("null", null)]
