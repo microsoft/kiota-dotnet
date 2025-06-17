@@ -105,7 +105,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the Long value from the json node
         /// </summary>
         /// <returns>A Long value</returns>
-        public long? GetLongValue() => _jsonNode.ValueKind == JsonValueKind.Number
+        public long? GetLongValue() => (_jsonNode.ValueKind == JsonValueKind.Number || (_jsonNode.ValueKind == JsonValueKind.String && _jsonSerializerContext.Options.NumberHandling.HasFlag(JsonNumberHandling.AllowReadingFromString)))
             ? _jsonNode.Deserialize(_jsonSerializerContext.Int64)
             : null;
 
