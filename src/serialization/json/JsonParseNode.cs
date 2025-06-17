@@ -113,7 +113,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the double value from the json node
         /// </summary>
         /// <returns>A double value</returns>
-        public double? GetDoubleValue() => _jsonNode.ValueKind == JsonValueKind.Number
+        public double? GetDoubleValue() => (_jsonNode.ValueKind == JsonValueKind.Number || (_jsonNode.ValueKind == JsonValueKind.String && _jsonSerializerContext.Options.NumberHandling.HasFlag(JsonNumberHandling.AllowReadingFromString)))
             ? _jsonNode.Deserialize(_jsonSerializerContext.Double)
             : null;
 
