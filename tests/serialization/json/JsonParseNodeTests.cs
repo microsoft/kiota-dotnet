@@ -648,6 +648,27 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         }
 
         [Theory]
+        [InlineData("13.37", 13.37F)]
+        [InlineData("\"13.37\"", 13.37F)]
+        [InlineData("null", null)]
+        public void GetFloatValue_CanReadNumber_AsString(string input, float? expected)
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse(input);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, readNumbersAsStringsContext);
+
+            // Act
+            var actual = parseNode.GetFloatValue();
+
+            // Assert
+            Assert.Equal(expected.HasValue, actual.HasValue);
+            if(expected.HasValue && actual.HasValue)
+            {
+                Assert.Equal(expected.Value, actual.Value);
+            }
+        }
+
+        [Theory]
         [InlineData("13.37", 13.37D)]
         [InlineData("\"13.37\"", null)]
         [InlineData("null", null)]
