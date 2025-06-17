@@ -538,7 +538,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [Theory]
         [InlineData("42", 42)]
         [InlineData("\"42\"", null)]
-        [InlineData("\"NotAnNumber\"", null)]
+        [InlineData("\"not-a-number\"", null)]
         [InlineData("null", null)]
         public void GetIntValue_CanReadNumber(string input, int? expected)
         {
@@ -567,7 +567,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [Theory]
         [InlineData("42", 42)]
         [InlineData("\"42\"", 42)]
-        [InlineData("\"NotAnNumber\"", null)]
+        [InlineData("\"not-a-number\"", null)]
         [InlineData("null", null)]
         public void GetIntValue_CanReadNumber_AsString(string input, int? expected)
         {
@@ -589,7 +589,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [Theory]
         [InlineData("42", 42L)]
         [InlineData("\"42\"", null)]
-        [InlineData("\"NotAnNumber\"", null)]
+        [InlineData("\"not-a-number\"", null)]
         [InlineData("null", null)]
         public void GetLongValue_CanReadNumber(string input, long? expected)
         {
@@ -611,7 +611,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [Theory]
         [InlineData("42", 42L)]
         [InlineData("\"42\"", 42L)]
-        [InlineData("\"NotAnNumber\"", null)]
+        [InlineData("\"not-a-number\"", null)]
         [InlineData("null", null)]
         public void GetLongValue_CanReadNumber_AsString(string input, long? expected)
         {
@@ -633,7 +633,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [Theory]
         [InlineData("13.37", 13.37F)]
         [InlineData("\"13.37\"", null)]
-        [InlineData("\"NotAnNumber\"", null)]
+        [InlineData("\"not-a-number\"", null)]
         [InlineData("null", null)]
         public void GetFloatValue_CanReadNumber(string input, float? expected)
         {
@@ -655,7 +655,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [Theory]
         [InlineData("13.37", 13.37F)]
         [InlineData("\"13.37\"", 13.37F)]
-        [InlineData("\"NotAnNumber\"", null)]
+        [InlineData("\"not-a-number\"", null)]
         [InlineData("null", null)]
         public void GetFloatValue_CanReadNumber_AsString(string input, float? expected)
         {
@@ -677,7 +677,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [Theory]
         [InlineData("13.37", 13.37D)]
         [InlineData("\"13.37\"", null)]
-        [InlineData("\"NotAnNumber\"", null)]
+        [InlineData("\"not-a-number\"", null)]
         [InlineData("null", null)]
         public void GetDoubleValue_CanReadNumber(string input, double? expected)
         {
@@ -699,7 +699,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [Theory]
         [InlineData("13.37", 13.37D)]
         [InlineData("\"13.37\"", 13.37D)]
-        [InlineData("\"NotAnNumber\"", null)]
+        [InlineData("\"not-a-number\"", null)]
         [InlineData("null", null)]
         public void GetDoubleValue_CanReadNumber_AsString(string input, double? expected)
         {
@@ -721,7 +721,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [Theory]
         [InlineData("13.37", 13.37)]
         [InlineData("\"13.37\"", null)]
-        [InlineData("\"NotAnNumber\"", null)]
+        [InlineData("\"not-a-number\"", null)]
         [InlineData("null", null)]
         public void GetDecimalValue_CanReadNumber(string input, double? expectedDouble)
         {
@@ -748,7 +748,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [Theory]
         [InlineData("13.37", 13.37)]
         [InlineData("\"13.37\"", 13.37)]
-        [InlineData("\"NotAnNumber\"", null)]
+        [InlineData("\"not-a-number\"", null)]
         [InlineData("null", null)]
         public void GetDecimalValue_CanReadNumber_AsString(string input, double? expectedDouble)
         {
