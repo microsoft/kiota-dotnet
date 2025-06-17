@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -532,6 +533,116 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             Assert.Equal(12, result.Value.Hour);
             Assert.Equal(34, result.Value.Minute);
             Assert.Equal(56, result.Value.Second);
+        }
+
+        [Theory]
+        [InlineData("42", 42)]
+        [InlineData("\"42\"", null)]
+        [InlineData("null", null)]
+        public void GetIntValue_CanReadNumber(string input, int? expected)
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse(input);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var actual = parseNode.GetIntValue();
+
+            // Assert
+            Assert.Equal(expected.HasValue, actual.HasValue);
+            if(expected.HasValue && actual.HasValue)
+            {
+                Assert.Equal(expected.Value, actual.Value);
+            }
+        }
+
+        [Theory]
+        [InlineData("42", 42L)]
+        [InlineData("\"42\"", null)]
+        [InlineData("null", null)]
+        public void GetLongValue_CanReadNumber(string input, long? expected)
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse(input);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var actual = parseNode.GetLongValue();
+
+            // Assert
+            Assert.Equal(expected.HasValue, actual.HasValue);
+            if(expected.HasValue && actual.HasValue)
+            {
+                Assert.Equal(expected.Value, actual.Value);
+            }
+        }
+
+        [Theory]
+        [InlineData("13.37", 13.37F)]
+        [InlineData("\"13.37\"", null)]
+        [InlineData("null", null)]
+        public void GetFloatValue_CanReadNumber(string input, float? expected)
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse(input);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var actual = parseNode.GetFloatValue();
+
+            // Assert
+            Assert.Equal(expected.HasValue, actual.HasValue);
+            if(expected.HasValue && actual.HasValue)
+            {
+                Assert.Equal(expected.Value, actual.Value);
+            }
+        }
+
+        [Theory]
+        [InlineData("13.37", 13.37D)]
+        [InlineData("\"13.37\"", null)]
+        [InlineData("null", null)]
+        public void GetDoubleValue_CanReadNumber(string input, double? expected)
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse(input);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var actual = parseNode.GetDoubleValue();
+
+            // Assert
+            Assert.Equal(expected.HasValue, actual.HasValue);
+            if(expected.HasValue && actual.HasValue)
+            {
+                Assert.Equal(expected.Value, actual.Value);
+            }
+        }
+
+        [Theory]
+        [InlineData("13.37", 13.37)]
+        [InlineData("\"13.37\"", null)]
+        [InlineData("null", null)]
+        public void GetDecimalValue_CanReadNumber(string input, double? expectedDouble)
+        {
+            // Arrange
+            var expected = expectedDouble.HasValue
+                ? Convert.ToDecimal(expectedDouble)
+                : default(decimal?)
+            ; //13.37M is not supported as a constant expression in attributes
+
+            using var jsonDocument = JsonDocument.Parse(input);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var actual = parseNode.GetDecimalValue();
+
+            // Assert
+            Assert.Equal(expected.HasValue, actual.HasValue);
+            if(expected.HasValue && actual.HasValue)
+            {
+                Assert.Equal(expected.Value, actual.Value);
+            }
         }
     }
 }
