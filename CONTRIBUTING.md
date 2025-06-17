@@ -53,6 +53,6 @@ The recommended commit types used are:
 - __docs__ for documentation updates e.g. ReadMe update or code documentation updates
 - __build__ for build system changes (gradle updates, external dependency updates)
 - __ci__ for CI configuration file changes e.g. updating a pipeline
-- __chore__ for miscallaneous non-sdk changesin the repo e.g. removing an unused file
+- __chore__ for miscallaneous non-sdk changes in the repo e.g. removing an unused file
 
 Adding an exclamation mark after the commit type (`feat!`) or footer with the prefix __BREAKING CHANGE:__ will cause an increment of the _major_ version.
