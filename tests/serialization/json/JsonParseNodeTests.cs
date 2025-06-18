@@ -669,7 +669,6 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [InlineData("13.37", 13.37D)]
         [InlineData("null", null)]
         [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Double.")]
-        [InlineData("\"13.37\"", 13.37D)]
 #if NET5_0_OR_GREATER
         [InlineData("\"13.37\"", 13.37D, "")]
 #else
@@ -710,7 +709,6 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [InlineData("13.37", 13.37)]
         [InlineData("null", null)]
         [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Decimal.")]
-        [InlineData("\"13.37\"", 13.37)]
 #if NET5_0_OR_GREATER
         [InlineData("\"13.37\"", 13.37, "")]
 #else
