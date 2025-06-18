@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.19.0](https://github.com/microsoft/kiota-dotnet/compare/v1.18.0...v1.19.0) (2025-06-18)
+
+
+### Features
+
+* optionally parse Decimal as string ([ea198e0](https://github.com/microsoft/kiota-dotnet/commit/ea198e011a89474698c3880fbcd38477dd41a694))
+* optionally parse Double as string ([e205169](https://github.com/microsoft/kiota-dotnet/commit/e205169d6bae1847884c4b900784b34867e12a2d))
+* optionally parse Float as string ([cbee369](https://github.com/microsoft/kiota-dotnet/commit/cbee369dfe3cf26b001980318d3120d9229db6dd))
+* optionally parse Int as string ([51fc88a](https://github.com/microsoft/kiota-dotnet/commit/51fc88a2482365383302ad733c36a613050344e6))
+* optionally parse Long as string ([54c132d](https://github.com/microsoft/kiota-dotnet/commit/54c132d037b3a07d3c9167005cd085163cee5ea1))
+
 ## [1.18.0](https://github.com/microsoft/kiota-dotnet/compare/v1.17.4...v1.18.0) (2025-06-13)
 
 
