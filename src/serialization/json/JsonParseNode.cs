@@ -9,12 +9,14 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using System.Xml;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Helpers;
 using Microsoft.Kiota.Abstractions.Serialization;
+
 
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -87,15 +89,16 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the int value from the json node
         /// </summary>
         /// <returns>A int value</returns>
-        public int? GetIntValue() => _jsonNode.ValueKind == JsonValueKind.Number
+        public int? GetIntValue() => ShouldBeDeserializableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
             ? _jsonNode.Deserialize(_jsonSerializerContext.Int32)
             : null;
+
 
         /// <summary>
         /// Get the float value from the json node
         /// </summary>
         /// <returns>A float value</returns>
-        public float? GetFloatValue() => _jsonNode.ValueKind == JsonValueKind.Number
+        public float? GetFloatValue() => ShouldBeDeserializableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
             ? _jsonNode.Deserialize(_jsonSerializerContext.Single)
             : null;
 
@@ -103,7 +106,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the Long value from the json node
         /// </summary>
         /// <returns>A Long value</returns>
-        public long? GetLongValue() => _jsonNode.ValueKind == JsonValueKind.Number
+        public long? GetLongValue() => ShouldBeDeserializableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
             ? _jsonNode.Deserialize(_jsonSerializerContext.Int64)
             : null;
 
@@ -111,7 +114,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the double value from the json node
         /// </summary>
         /// <returns>A double value</returns>
-        public double? GetDoubleValue() => _jsonNode.ValueKind == JsonValueKind.Number
+        public double? GetDoubleValue() => ShouldBeDeserializableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
             ? _jsonNode.Deserialize(_jsonSerializerContext.Double)
             : null;
 
@@ -119,9 +122,16 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the decimal value from the json node
         /// </summary>
         /// <returns>A decimal value</returns>
-        public decimal? GetDecimalValue() => _jsonNode.ValueKind == JsonValueKind.Number
+        public decimal? GetDecimalValue() => ShouldBeDeserializableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
             ? _jsonNode.Deserialize(_jsonSerializerContext.Decimal)
             : null;
+
+        private static bool ShouldBeDeserializableNumber(JsonValueKind valueKind, JsonNumberHandling numberHandling) => valueKind switch
+        {
+            JsonValueKind.Number => true,
+            JsonValueKind.String when numberHandling.HasFlag(JsonNumberHandling.AllowReadingFromString) => true,
+            _ => false
+        };
 
         /// <summary>
         /// Get the guid value from the json node
