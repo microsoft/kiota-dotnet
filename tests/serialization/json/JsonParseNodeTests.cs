@@ -559,9 +559,15 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
 
         [Theory]
         [InlineData("42", 42, "")]
-        [InlineData("\"42\"", 42, "")]
-        [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Int32.")]
         [InlineData("null", null, "")]
+        [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Int32.")]
+#if NET5_0_OR_GREATER
+        [InlineData("\"42\"", 42, "")]
+#else
+        // below net5, JsonNumberHandling.AllowReadingFromString is not fully supported, so we are expecting an exception in this case
+        // see https://github.com/microsoft/kiota-dotnet/pull/551#issuecomment-2981322976
+        [InlineData("\"42\"", null, "The JSON value could not be converted to System.Int32.")]
+#endif
         public void GetIntValue_CanReadNumber_AsString(string input, int? expectedValue, string? expectexpectedExceptionMessage)
         {
             // Arrange
@@ -589,9 +595,15 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
 
         [Theory]
         [InlineData("42", 42L, null)]
-        [InlineData("\"42\"", 42L, null)]
-        [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Int64.")]
         [InlineData("null", null, null)]
+        [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Int64.")]
+#if NET5_0_OR_GREATER
+        [InlineData("\"42\"", 42L, null)]
+#else
+        // below net5, JsonNumberHandling.AllowReadingFromString is not fully supported, so we are expecting an exception in this case
+        // see https://github.com/microsoft/kiota-dotnet/pull/551#issuecomment-2981322976
+        [InlineData("\"42\"", null, "The JSON value could not be converted to System.Int64.")]
+#endif
         public void GetLongValue_CanReadNumber_AsString(string input, long? expectedValue, string? expectedExceptionMessage)
         {
             // Arrange
@@ -619,9 +631,15 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
 
         [Theory]
         [InlineData("13.37", 13.37F, "")]
-        [InlineData("\"13.37\"", 13.37F, "")]
-        [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Single.")]
         [InlineData("null", null, "")]
+        [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Single.")]
+#if NET5_0_OR_GREATER
+        [InlineData("\"13.37\"", 13.37F, "")]
+#else
+        // below net5, JsonNumberHandling.AllowReadingFromString is not fully supported, so we are expecting an exception in this case
+        // see https://github.com/microsoft/kiota-dotnet/pull/551#issuecomment-2981322976
+        [InlineData("\"13.37\"", null, "The JSON value could not be converted to System.Single.")]
+#endif
         public void GetFloatValue_CanReadNumber_AsString(string input, float? expectedValue, string? expectedExceptionMessage)
         {
             // Arrange
@@ -649,9 +667,16 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
 
         [Theory]
         [InlineData("13.37", 13.37D)]
-        [InlineData("\"13.37\"", 13.37D)]
-        [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Double.")]
         [InlineData("null", null)]
+        [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Double.")]
+        [InlineData("\"13.37\"", 13.37D)]
+#if NET5_0_OR_GREATER
+        [InlineData("\"13.37\"", 13.37D, "")]
+#else
+        // below net5, JsonNumberHandling.AllowReadingFromString is not fully supported, so we are expecting an exception in this case
+        // see https://github.com/microsoft/kiota-dotnet/pull/551#issuecomment-2981322976
+        [InlineData("\"13.37\"", null, "The JSON value could not be converted to System.Double.")]
+#endif
         public void GetDoubleValue_CanReadNumber_AsString(string input, double? expectedValue, string? expectedExceptionMessage = null)
         {
             // Arrange
@@ -683,9 +708,14 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
 
         [Theory]
         [InlineData("13.37", 13.37)]
-        [InlineData("\"13.37\"", 13.37)]
-        [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Decimal.")]
         [InlineData("null", null)]
+        [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Decimal.")]
+        [InlineData("\"13.37\"", 13.37)]
+#if NET5_0_OR_GREATER
+        [InlineData("\"13.37\"", 13.37, "")]
+#else
+        [InlineData("\"13.37\"", null, "The JSON value could not be converted to System.Decimal.")]
+#endif
         public void GetDecimalValue_CanReadNumber_AsString(string input, double? expectedDouble, string? expectedExceptionMessage = null)
         {
             // Arrange
