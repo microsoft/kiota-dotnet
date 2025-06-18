@@ -89,7 +89,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the int value from the json node
         /// </summary>
         /// <returns>A int value</returns>
-        public int? GetIntValue() => IsParsableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
+        public int? GetIntValue() => ShouldBeDeserializableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
             ? _jsonNode.Deserialize(_jsonSerializerContext.Int32)
             : null;
 
@@ -98,7 +98,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the float value from the json node
         /// </summary>
         /// <returns>A float value</returns>
-        public float? GetFloatValue() => IsParsableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
+        public float? GetFloatValue() => ShouldBeDeserializableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
             ? _jsonNode.Deserialize(_jsonSerializerContext.Single)
             : null;
 
@@ -106,7 +106,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the Long value from the json node
         /// </summary>
         /// <returns>A Long value</returns>
-        public long? GetLongValue() => IsParsableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
+        public long? GetLongValue() => ShouldBeDeserializableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
             ? _jsonNode.Deserialize(_jsonSerializerContext.Int64)
             : null;
 
@@ -114,7 +114,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the double value from the json node
         /// </summary>
         /// <returns>A double value</returns>
-        public double? GetDoubleValue() => IsParsableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
+        public double? GetDoubleValue() => ShouldBeDeserializableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
             ? _jsonNode.Deserialize(_jsonSerializerContext.Double)
             : null;
 
@@ -122,11 +122,11 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the decimal value from the json node
         /// </summary>
         /// <returns>A decimal value</returns>
-        public decimal? GetDecimalValue() => IsParsableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
+        public decimal? GetDecimalValue() => ShouldBeDeserializableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
             ? _jsonNode.Deserialize(_jsonSerializerContext.Decimal)
             : null;
 
-        private static bool IsParsableNumber(JsonValueKind valueKind, JsonNumberHandling numberHandling) => valueKind switch
+        private static bool ShouldBeDeserializableNumber(JsonValueKind valueKind, JsonNumberHandling numberHandling) => valueKind switch
         {
             JsonValueKind.Number => true,
             JsonValueKind.String when numberHandling.HasFlag(JsonNumberHandling.AllowReadingFromString) => true,
