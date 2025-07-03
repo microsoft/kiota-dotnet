@@ -39,7 +39,7 @@ public class BaseBearerTokenAuthenticationProvider : IAuthenticationProvider
 
         if(!request.Headers.ContainsKey(AuthorizationHeaderKey))
         {
-            var token = await AccessTokenProvider.GetAuthorizationTokenAsync(request.URI, additionalAuthenticationContext, cancellationToken);
+            var token = await AccessTokenProvider.GetAuthorizationTokenAsync(request.URI, additionalAuthenticationContext, cancellationToken).ConfigureAwait(false);
             if(!string.IsNullOrEmpty(token))
                 request.Headers.Add(AuthorizationHeaderKey, $"Bearer {token}");
         }
