@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.19.1](https://github.com/microsoft/kiota-dotnet/compare/v1.19.0...v1.19.1) (2025-07-04)
+
+
+### Bug Fixes
+
+* ConfigureAwait(false) deadlock issue in BaseBearerTokenAuthenticationProvider ([473b886](https://github.com/microsoft/kiota-dotnet/commit/473b88693ce1a821a2b8218c5a85cfda241351c6))
+
 ## [1.19.0](https://github.com/microsoft/kiota-dotnet/compare/v1.18.0...v1.19.0) (2025-06-18)
 
 
