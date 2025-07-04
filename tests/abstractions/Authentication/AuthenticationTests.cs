@@ -133,4 +133,47 @@ public class AuthenticationTests
         Assert.Throws<ArgumentException>(() => validator.AllowedHosts = urlStrings);
         Assert.Equal("host should not contain http or https prefix", exception.Message);
     }
+
+    [Fact]
+    public async Task BaseBearerTokenAuthenticationProviderUsesConfigureAwaitFalse()
+    {
+        // Arrange
+        var expectedToken = "test-token";
+        var mockAccessTokenProvider = new Mock<IAccessTokenProvider>();
+        var tokenTask = new TaskCompletionSource<string>();
+
+        // Setup mock to return a task that we can control
+        mockAccessTokenProvider.Setup(provider => provider.GetAuthorizationTokenAsync(
+            It.IsAny<Uri>(),
+            It.IsAny<Dictionary<string, object>>(),
+            It.IsAny<CancellationToken>()))
+            .Returns(tokenTask.Task);
+
+        var authProvider = new BaseBearerTokenAuthenticationProvider(mockAccessTokenProvider.Object);
+        var request = new RequestInformation()
+        {
+            HttpMethod = Method.GET,
+            URI = new Uri("https://example.com")
+        };
+
+        // Act - start the authentication task
+        var authTask = authProvider.AuthenticateRequestAsync(request);
+
+        // Complete the token task to allow authentication to complete
+        tokenTask.SetResult(expectedToken);
+
+        // Wait for authentication to complete
+        await authTask;
+
+        // Assert
+        Assert.True(request.Headers.ContainsKey("Authorization"));
+        Assert.Equal($"Bearer {expectedToken}", request.Headers["Authorization"].First());
+
+        // Verify the mock was called correctly
+        mockAccessTokenProvider.Verify(provider => provider.GetAuthorizationTokenAsync(
+            It.IsAny<Uri>(),
+            It.IsAny<Dictionary<string, object>>(),
+            It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
 }
