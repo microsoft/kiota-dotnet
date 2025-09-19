@@ -5,11 +5,15 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+#if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
+#endif
 using System.IO;
 using System.Net;
 using System.Net.Http;
+#if NET5_0_OR_GREATER
 using System.Net.Http.Headers;
+#endif
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,6 +40,16 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         private readonly bool createdClient;
         private readonly ObservabilityOptions obsOptions;
         private readonly ActivitySource activitySource;
+        private readonly Version httpVersion;
+#if NETSTANDARD2_1_OR_GREATER
+        private static readonly Version defaultHttpVersion = HttpVersion.Version20;
+#elif NETSTANDARD2_0_OR_GREATER || NETFRAMEWORK
+        private static readonly Version defaultHttpVersion = HttpVersion.Version11;
+#endif
+#if NET5_0_OR_GREATER
+        private readonly HttpVersionPolicy httpVersionPolicy;
+#endif
+#if NET5_0_OR_GREATER
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpClientRequestAdapter"/> class.
         /// <param name="authenticationProvider">The authentication provider.</param>
@@ -43,8 +57,22 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <param name="serializationWriterFactory">The serialization writer factory.</param>
         /// <param name="httpClient">The native HTTP client.</param>
         /// <param name="observabilityOptions">The observability options.</param>
+        /// <param name="httpVersion">The HTTP version.</param>
+        /// <param name="httpVersionPolicy">The HTTP version policy.</param>
         /// </summary>
-        public HttpClientRequestAdapter(IAuthenticationProvider authenticationProvider, IParseNodeFactory? parseNodeFactory = null, ISerializationWriterFactory? serializationWriterFactory = null, HttpClient? httpClient = null, ObservabilityOptions? observabilityOptions = null)
+        public HttpClientRequestAdapter(IAuthenticationProvider authenticationProvider, IParseNodeFactory? parseNodeFactory = null, ISerializationWriterFactory? serializationWriterFactory = null, HttpClient? httpClient = null, ObservabilityOptions? observabilityOptions = null, Version? httpVersion = null, HttpVersionPolicy? httpVersionPolicy = null)
+#else
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HttpClientRequestAdapter"/> class.
+        /// <param name="authenticationProvider">The authentication provider.</param>
+        /// <param name="parseNodeFactory">The parse node factory.</param>
+        /// <param name="serializationWriterFactory">The serialization writer factory.</param>
+        /// <param name="httpClient">The native HTTP client.</param>
+        /// <param name="observabilityOptions">The observability options.</param>
+        /// <param name="httpVersion">The HTTP version.</param>
+        /// </summary>
+        public HttpClientRequestAdapter(IAuthenticationProvider authenticationProvider, IParseNodeFactory? parseNodeFactory = null, ISerializationWriterFactory? serializationWriterFactory = null, HttpClient? httpClient = null, ObservabilityOptions? observabilityOptions = null, Version? httpVersion = null)
+#endif
         {
             authProvider = authenticationProvider ?? throw new ArgumentNullException(nameof(authenticationProvider));
             createdClient = httpClient == null;
@@ -54,6 +82,13 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             sWriterFactory = serializationWriterFactory ?? SerializationWriterFactoryRegistry.DefaultInstance;
             obsOptions = observabilityOptions ?? new ObservabilityOptions();
             activitySource = ActivitySourceRegistry.DefaultInstance.GetOrCreateActivitySource(obsOptions.TracerInstrumentationName);
+
+#if NET5_0_OR_GREATER
+            this.httpVersion = httpVersion ?? client.DefaultRequestVersion;
+            this.httpVersionPolicy = httpVersionPolicy ?? client.DefaultVersionPolicy;
+#else
+            this.httpVersion = httpVersion ?? defaultHttpVersion;
+#endif
         }
         /// <summary>Factory to use to get a serializer for payload serialization</summary>
         public ISerializationWriterFactory SerializationWriterFactory
@@ -93,7 +128,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             using var span = startTracingSpan(requestInfo, nameof(SendCollectionAsync));
             var response = await GetHttpResponseMessageAsync(requestInfo, cancellationToken, span).ConfigureAwait(false);
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER
-            if (requestInfo.Content is not null)
+            if(requestInfo.Content is not null)
                 await requestInfo.Content.DisposeAsync().ConfigureAwait(false);
 #else
             requestInfo.Content?.Dispose();
@@ -138,7 +173,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             using var span = startTracingSpan(requestInfo, nameof(SendPrimitiveCollectionAsync));
             var response = await GetHttpResponseMessageAsync(requestInfo, cancellationToken, span).ConfigureAwait(false);
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER
-            if (requestInfo.Content is not null)
+            if(requestInfo.Content is not null)
                 await requestInfo.Content.DisposeAsync().ConfigureAwait(false);
 #else
             requestInfo.Content?.Dispose();
@@ -184,7 +219,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             using var span = startTracingSpan(requestInfo, nameof(SendAsync));
             var response = await GetHttpResponseMessageAsync(requestInfo, cancellationToken, span).ConfigureAwait(false);
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER
-            if (requestInfo.Content is not null)
+            if(requestInfo.Content is not null)
                 await requestInfo.Content.DisposeAsync().ConfigureAwait(false);
 #else
             requestInfo.Content?.Dispose();
@@ -235,7 +270,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             var isStreamResponse = modelType == typeof(Stream);
             var response = await GetHttpResponseMessageAsync(requestInfo, cancellationToken, span, isStreamResponse: isStreamResponse).ConfigureAwait(false);
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER
-            if (requestInfo.Content is not null)
+            if(requestInfo.Content is not null)
                 await requestInfo.Content.DisposeAsync().ConfigureAwait(false);
 #else
             requestInfo.Content?.Dispose();
@@ -362,7 +397,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             using var span = startTracingSpan(requestInfo, nameof(SendNoContentAsync));
             var response = await GetHttpResponseMessageAsync(requestInfo, cancellationToken, span).ConfigureAwait(false);
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER
-            if (requestInfo.Content is not null)
+            if(requestInfo.Content is not null)
                 await requestInfo.Content.DisposeAsync().ConfigureAwait(false);
 #else
             requestInfo.Content?.Dispose();
@@ -591,13 +626,16 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             {
                 Method = new HttpMethod(requestInfo.HttpMethod.ToString().ToUpperInvariant()),
                 RequestUri = requestUri,
-                Version = new Version(2, 0)
+                Version = httpVersion,
+#if NET5_0_OR_GREATER
+                VersionPolicy = httpVersionPolicy
+#endif
             };
 
             if(requestInfo.RequestOptions != null)
 #if NET5_0_OR_GREATER
             {
-                foreach (var option in requestInfo.RequestOptions)
+                foreach(var option in requestInfo.RequestOptions)
                     message.Options.Set(new HttpRequestOptionsKey<IRequestOption>(option.GetType().FullName!), option);
             }
             message.Options.Set(new HttpRequestOptionsKey<IRequestOption>(typeof(ObservabilityOptions).FullName!), obsOptions);
