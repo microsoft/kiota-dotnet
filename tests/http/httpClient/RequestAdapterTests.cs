@@ -1067,57 +1067,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             Assert.Equal(clientHttpVersionPolicy, requestMessage.VersionPolicy);
         }
 
-        [Fact]
-        public async Task HttpVersionIsSetFromAdapter()
-        {
-            // Arrange
-            var clientHttpVersion = new Version(111, 222);
-            var adapterHttpVersion = new Version(333, 444);
-            var mockHandler = new Mock<HttpMessageHandler>();
-            var client = new HttpClient(mockHandler.Object)
-            {
-                DefaultRequestVersion = clientHttpVersion
-            };
-            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client, httpVersion: adapterHttpVersion);
-            var requestInfo = new RequestInformation()
-            {
-                HttpMethod = Method.GET,
-                UrlTemplate = "https://example.com"
-            };
-
-            // Act
-            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
-
-            // Assert
-            Assert.NotNull(requestMessage);
-            Assert.Equal(adapterHttpVersion, requestMessage.Version);
-        }
-
-        [Fact]
-        public async Task VersionPolicyIsSetFromAdapter()
-        {
-            // Arrange
-            var clientHttpVersionPolicy = HttpVersionPolicy.RequestVersionExact;
-            var adapterHttpVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher;
-            var mockHandler = new Mock<HttpMessageHandler>();
-            var client = new HttpClient(mockHandler.Object)
-            {
-                DefaultVersionPolicy = clientHttpVersionPolicy
-            };
-            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client, httpVersionPolicy: adapterHttpVersionPolicy);
-            var requestInfo = new RequestInformation()
-            {
-                HttpMethod = Method.GET,
-                UrlTemplate = "https://example.com"
-            };
-
-            // Act
-            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
-
-            // Assert
-            Assert.NotNull(requestMessage);
-            Assert.Equal(adapterHttpVersionPolicy, requestMessage.VersionPolicy);
-        }
 #elif NETSTANDARD2_1_OR_GREATER
         [Fact]
         public async Task HttpVersionIsSetFromAdapter()
@@ -1161,7 +1110,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             Assert.NotNull(requestMessage);
             Assert.Equal(HttpVersion.Version20, requestMessage.Version);
         }
-#elif NETSTANDARD2_0_OR_GREATER || NETFRAMEWORK
+#elif NETSTANDARD2_0 || NETFRAMEWORK
         [Fact]
         public async Task HttpVersionIsSetFromAdapter()
         {

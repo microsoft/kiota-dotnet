@@ -40,14 +40,13 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         private readonly bool createdClient;
         private readonly ObservabilityOptions obsOptions;
         private readonly ActivitySource activitySource;
+#if !NET5_0_OR_GREATER
         private readonly Version httpVersion;
+#endif
 #if NETSTANDARD2_1_OR_GREATER
         private static readonly Version defaultHttpVersion = HttpVersion.Version20;
-#elif NETSTANDARD2_0_OR_GREATER || NETFRAMEWORK
+#elif NETSTANDARD2_0 || NETFRAMEWORK
         private static readonly Version defaultHttpVersion = HttpVersion.Version11;
-#endif
-#if NET5_0_OR_GREATER
-        private readonly HttpVersionPolicy httpVersionPolicy;
 #endif
 #if NET5_0_OR_GREATER
         /// <summary>
@@ -57,10 +56,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <param name="serializationWriterFactory">The serialization writer factory.</param>
         /// <param name="httpClient">The native HTTP client.</param>
         /// <param name="observabilityOptions">The observability options.</param>
-        /// <param name="httpVersion">The HTTP version.</param>
-        /// <param name="httpVersionPolicy">The HTTP version policy.</param>
         /// </summary>
-        public HttpClientRequestAdapter(IAuthenticationProvider authenticationProvider, IParseNodeFactory? parseNodeFactory = null, ISerializationWriterFactory? serializationWriterFactory = null, HttpClient? httpClient = null, ObservabilityOptions? observabilityOptions = null, Version? httpVersion = null, HttpVersionPolicy? httpVersionPolicy = null)
+        public HttpClientRequestAdapter(IAuthenticationProvider authenticationProvider, IParseNodeFactory? parseNodeFactory = null, ISerializationWriterFactory? serializationWriterFactory = null, HttpClient? httpClient = null, ObservabilityOptions? observabilityOptions = null)
 #else
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpClientRequestAdapter"/> class.
@@ -82,11 +79,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             sWriterFactory = serializationWriterFactory ?? SerializationWriterFactoryRegistry.DefaultInstance;
             obsOptions = observabilityOptions ?? new ObservabilityOptions();
             activitySource = ActivitySourceRegistry.DefaultInstance.GetOrCreateActivitySource(obsOptions.TracerInstrumentationName);
-
-#if NET5_0_OR_GREATER
-            this.httpVersion = httpVersion ?? client.DefaultRequestVersion;
-            this.httpVersionPolicy = httpVersionPolicy ?? client.DefaultVersionPolicy;
-#else
+#if !NET5_0_OR_GREATER
             this.httpVersion = httpVersion ?? defaultHttpVersion;
 #endif
         }
@@ -626,9 +619,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             {
                 Method = new HttpMethod(requestInfo.HttpMethod.ToString().ToUpperInvariant()),
                 RequestUri = requestUri,
-                Version = httpVersion,
 #if NET5_0_OR_GREATER
-                VersionPolicy = httpVersionPolicy
+                Version = client.DefaultRequestVersion,
+                VersionPolicy = client.DefaultVersionPolicy
+#else
+                Version = httpVersion
 #endif
             };
 
