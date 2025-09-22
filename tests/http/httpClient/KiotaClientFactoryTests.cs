@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
+#if !NET5_0_OR_GREATER
 using System.Net.Http;
+#endif
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
@@ -110,7 +110,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             // Arrange
             var retryHandlerOption = new RetryHandlerOption { MaxRetry = 5, ShouldRetry = (_, _, _) => true };
 
-
             // Act
             var handlers = KiotaClientFactory.CreateDefaultHandlers([retryHandlerOption]);
             var retryHandler = handlers.OfType<RetryHandler>().FirstOrDefault();
@@ -147,5 +146,14 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             var client = KiotaClientFactory.Create(new BaseBearerTokenAuthenticationProvider(new Mock<IAccessTokenProvider>().Object));
             Assert.IsType<HttpClient>(client);
         }
+#if NET5_0_OR_GREATER
+
+        [Fact]
+        public void CreateReturnsHttpClientWithHttp2()
+        {
+            var client = KiotaClientFactory.Create();
+            Assert.Equal(HttpVersion.Version20, client.DefaultRequestVersion);
+        }
+#endif
     }
 }

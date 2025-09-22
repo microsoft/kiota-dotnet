@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
+﻿using System.Net;
+#if !NET5_0_OR_GREATER
 using System.Net.Http;
+#endif
 using System.Runtime.Serialization;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -77,7 +74,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             Assert.IsAssignableFrom(backingStore.GetType(), BackingStoreFactorySingleton.Instance);
         }
 
-
         [Fact]
         public async Task GetRequestMessageFromRequestInformationWithBaseUrlTemplate()
         {
@@ -110,7 +106,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 {
                     { "baseurl", "https://graph.microsoft.com/beta"}//request information with different base url
                 }
-
             };
             // Change the baseUrl of the adapter
             _requestAdapter.BaseUrl = "http://localhost";
