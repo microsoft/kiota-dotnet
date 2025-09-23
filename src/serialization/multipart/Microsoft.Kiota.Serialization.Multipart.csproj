@@ -1,12 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <Sdk Name="Microsoft.DotNet.PackageValidation" Version="1.0.0-preview.7.21379.12" />
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Kiota Multipart serialization provider implementation.</Description>
     <AssemblyTitle>Kiota Multipart Serialization Library for dotnet</AssemblyTitle>
     <!-- NET 5 target to be removed on next major version-->
     <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0;net6.0;net8.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <GenerateCompatibilitySuppressionFile>false</GenerateCompatibilitySuppressionFile>
   </PropertyGroup>
 
   <ItemGroup>

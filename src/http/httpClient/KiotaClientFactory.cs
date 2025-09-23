@@ -4,7 +4,9 @@
 
 using System;
 using System.Collections.Generic;
+#if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
+#endif
 using System.Net;
 using System.Net.Http;
 using Microsoft.Kiota.Abstractions;
@@ -26,20 +28,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <param name="optionsForHandlers">A array of <see cref="IRequestOption"/> objects passed to the default handlers.</param>
         /// <returns>The <see cref="HttpClient"/> with the default middlewares.</returns>
         public static HttpClient Create(HttpMessageHandler? finalHandler = null, IRequestOption[]? optionsForHandlers = null)
-        {
-            var defaultHandlersEnumerable = CreateDefaultHandlers(optionsForHandlers);
-            int count = 0;
-            foreach(var _ in defaultHandlersEnumerable) count++;
-
-            var defaultHandlersArray = new DelegatingHandler[count];
-            int index = 0;
-            foreach(var handler2 in defaultHandlersEnumerable)
-            {
-                defaultHandlersArray[index++] = handler2;
-            }
-            var handler = ChainHandlersCollectionAndGetFirstLink(finalHandler ?? GetDefaultHttpMessageHandler(), defaultHandlersArray);
-            return handler != null ? new HttpClient(handler) : new HttpClient();
-        }
+            => Create(finalHandler, CreateDefaultHandlers(optionsForHandlers));
 
         /// <summary>
         /// Initializes the <see cref="HttpClient"/> with a custom middleware pipeline.
@@ -48,19 +37,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <param name="finalHandler">The final <see cref="HttpMessageHandler"/> in the http pipeline. Can be configured for proxies, auto-decompression and auto-redirects</param>
         /// <returns>The <see cref="HttpClient"/> with the custom handlers.</returns>
         public static HttpClient Create(IList<DelegatingHandler> handlers, HttpMessageHandler? finalHandler = null)
-        {
-            if(handlers == null || handlers.Count == 0)
-                return Create(finalHandler);
-
-            DelegatingHandler[] handlersArray = new DelegatingHandler[handlers.Count];
-            for(int i = 0; i < handlers.Count; i++)
-            {
-                handlersArray[i] = handlers[i];
-            }
-
-            var handler = ChainHandlersCollectionAndGetFirstLink(finalHandler ?? GetDefaultHttpMessageHandler(), handlersArray);
-            return handler != null ? new HttpClient(handler) : new HttpClient();
-        }
+            => handlers?.Count is not > 0
+                ? Create(finalHandler)
+                : Create(finalHandler, handlers);
 
         /// <summary>
         /// Initializes the <see cref="HttpClient"/> with the default configuration and authentication middleware using the <see cref="IAuthenticationProvider"/> if provided.
@@ -168,7 +147,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         public readonly struct ActivatableType
         {
 #if NET5_0_OR_GREATER
-             /// <summary>
+            /// <summary>
             /// Provides DI-safe trim annotations for an underlying type.
             /// </summary>
             /// <param name="type">The type to be wrapped.</param>
@@ -182,7 +161,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             /// </summary>
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
             public readonly Type Type;
-            
+
 #else
             /// <summary>
             /// Provides DI-safe trim annotations for an underlying type.
@@ -206,7 +185,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             /// <returns>The <see cref="Type"/></returns>
             public static implicit operator Type(ActivatableType type) => type.Type;
         }
-
 
         /// <summary>
         /// Creates a <see cref="DelegatingHandler"/> to use for the <see cref="HttpClient" /> from the provided <see cref="DelegatingHandler"/> instances. Order matters.
@@ -260,6 +238,16 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
 #else
             return new HttpClientHandler { Proxy = proxy, AllowAutoRedirect = false, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
 #endif
+        }
+
+        private static HttpClient Create(HttpMessageHandler? finalHandler, IList<DelegatingHandler> handlersArray)
+        {
+            var handler = ChainHandlersCollectionAndGetFirstLink(finalHandler ?? GetDefaultHttpMessageHandler(), [.. handlersArray]);
+            var client = handler != null ? new HttpClient(handler) : new HttpClient();
+#if NET5_0_OR_GREATER
+            client.DefaultRequestVersion = HttpVersion.Version20;
+#endif
+            return client;
         }
     }
 }

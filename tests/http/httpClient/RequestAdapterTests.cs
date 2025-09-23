@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
+﻿using System.Net;
+#if !NET5_0_OR_GREATER
 using System.Net.Http;
+#endif
 using System.Runtime.Serialization;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -77,7 +74,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             Assert.IsAssignableFrom(backingStore.GetType(), BackingStoreFactorySingleton.Instance);
         }
 
-
         [Fact]
         public async Task GetRequestMessageFromRequestInformationWithBaseUrlTemplate()
         {
@@ -110,7 +106,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 {
                     { "baseurl", "https://graph.microsoft.com/beta"}//request information with different base url
                 }
-
             };
             // Change the baseUrl of the adapter
             _requestAdapter.BaseUrl = "http://localhost";
@@ -1015,6 +1010,145 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
 
             Assert.Null(response);
         }
+
+#if NET5_0_OR_GREATER
+        [Fact]
+        public async Task HttpVersionIsSetFromHttpClient()
+        {
+            // Arrange
+            var clientHttpVersion = new Version(111, 222);
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object)
+            {
+                DefaultRequestVersion = clientHttpVersion
+            };
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client);
+            var requestInfo = new RequestInformation()
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "https://example.com"
+            };
+
+            // Act
+            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+
+            // Assert
+            Assert.NotNull(requestMessage);
+            Assert.Equal(clientHttpVersion, requestMessage.Version);
+        }
+
+        [Fact]
+        public async Task VersionPolicyIsSetFromHttpClient()
+        {
+            // Arrange
+            var clientHttpVersionPolicy = HttpVersionPolicy.RequestVersionExact;
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object)
+            {
+                DefaultVersionPolicy = clientHttpVersionPolicy
+            };
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client);
+            var requestInfo = new RequestInformation()
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "https://example.com"
+            };
+
+            // Act
+            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+
+            // Assert
+            Assert.NotNull(requestMessage);
+            Assert.Equal(clientHttpVersionPolicy, requestMessage.VersionPolicy);
+        }
+
+#elif NETSTANDARD2_1_OR_GREATER
+        [Fact]
+        public async Task HttpVersionIsSetFromAdapter()
+        {
+            // Arrange
+            var adapterHttpVersion = new Version(111, 222);
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client, httpVersion: adapterHttpVersion);
+            var requestInfo = new RequestInformation()
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "https://example.com"
+            };
+
+            // Act
+            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+
+            // Assert
+            Assert.NotNull(requestMessage);
+            Assert.Equal(adapterHttpVersion, requestMessage.Version);
+        }
+
+        [Fact]
+        public async Task HttpVersionDefaultShouldBeHttp2()
+        {
+            // Arrange
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client);
+            var requestInfo = new RequestInformation()
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "https://example.com"
+            };
+
+            // Act
+            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+
+            // Assert
+            Assert.NotNull(requestMessage);
+            Assert.Equal(HttpVersion.Version20, requestMessage.Version);
+        }
+#elif NETSTANDARD2_0 || NETFRAMEWORK
+        [Fact]
+        public async Task HttpVersionIsSetFromAdapter()
+        {
+            // Arrange
+            var adapterHttpVersion = new Version(111, 222);
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client, httpVersion: adapterHttpVersion);
+            var requestInfo = new RequestInformation()
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "https://example.com"
+            };
+
+            // Act
+            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+
+            // Assert
+            Assert.NotNull(requestMessage);
+            Assert.Equal(adapterHttpVersion, requestMessage.Version);
+        }
+
+        [Fact]
+        public async Task HttpVersionDefaultShouldBeHttp11()
+        {
+            // Arrange
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client);
+            var requestInfo = new RequestInformation()
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "https://example.com"
+            };
+
+            // Act
+            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+
+            // Assert
+            Assert.NotNull(requestMessage);
+            Assert.Equal(HttpVersion.Version11, requestMessage.Version);
+        }
+#endif
     }
 
     public enum TestEnum
