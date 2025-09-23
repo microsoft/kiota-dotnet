@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.20.0](https://github.com/microsoft/kiota-dotnet/compare/v1.19.1...v1.20.0) (2025-09-23)
+
+
+### Features
+
+* adds the ability to pass the http version for netstandard/netfx/netcore instead of using a hardcoded value (default http/2) ([4aa10e1](https://github.com/microsoft/kiota-dotnet/commit/4aa10e17e5385e2169f253bc5547f0e67c3ac556))
+
+
+### Bug Fixes
+
+* get the http version and version policy from the http client for net5+ instead of using a hardcoded value (default http/2) ([4aa10e1](https://github.com/microsoft/kiota-dotnet/commit/4aa10e17e5385e2169f253bc5547f0e67c3ac556))
+
 ## [1.19.1](https://github.com/microsoft/kiota-dotnet/compare/v1.19.0...v1.19.1) (2025-07-04)
 
 
