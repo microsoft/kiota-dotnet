@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.20.1](https://github.com/microsoft/kiota-dotnet/compare/v1.20.0...v1.20.1) (2025-09-26)
+
+
+### Bug Fixes
+
+* upgrades azure core dependency ([3d56749](https://github.com/microsoft/kiota-dotnet/commit/3d56749da4a3ec63c2e5d47fd43abfb8d4caeb8a))
+
 ## [1.20.0](https://github.com/microsoft/kiota-dotnet/compare/v1.19.1...v1.20.0) (2025-09-23)
 
 
