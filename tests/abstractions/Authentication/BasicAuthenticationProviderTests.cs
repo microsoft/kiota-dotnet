@@ -23,7 +23,8 @@ public class BasicAuthenticationProviderTests
 
 
         var value = new BasicAuthenticationProvider("username", "password");
-        var request = new RequestInformation {
+        var request = new RequestInformation
+        {
             UrlTemplate = "https://localhost{?param1}",
         };
         await value.AuthenticateRequestAsync(request);

@@ -25,9 +25,9 @@ public class BasicAuthenticationProvider : IAuthenticationProvider
     /// <param name="password">The password to use for authentication.</param>
     public BasicAuthenticationProvider(string username, string password)
     {
-        if( string.IsNullOrEmpty(username) )
+        if(string.IsNullOrEmpty(username))
             throw new ArgumentNullException(nameof(username));
-        if( string.IsNullOrEmpty(password) )
+        if(string.IsNullOrEmpty(password))
             throw new ArgumentNullException(nameof(password));
 
         BasicAuthHeaderValue = $"Basic {Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"))}";
@@ -37,10 +37,11 @@ public class BasicAuthenticationProvider : IAuthenticationProvider
     /// <inheritdoc />
     public Task AuthenticateRequestAsync(RequestInformation request, Dictionary<string, object>? additionalAuthenticationContext = default, CancellationToken cancellationToken = default)
     {
-        if( request == null )
+        if(request == null)
             throw new ArgumentNullException(nameof(request));
 
-        if( !request.Headers.ContainsKey(AuthorizationHeaderKey) ) {
+        if(!request.Headers.ContainsKey(AuthorizationHeaderKey))
+        {
             request.Headers.Add(AuthorizationHeaderKey, BasicAuthHeaderValue);
         }
 
