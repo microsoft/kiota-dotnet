@@ -24,7 +24,7 @@ jobs:
         with:
           dotnet-version: 9.x
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: csharp
       - name: Restore dependencies
@@ -38,4 +38,4 @@ jobs:
       - name: Test for net9.0 and collect coverage
         run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=opencover --framework net9.0
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
