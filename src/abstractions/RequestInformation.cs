@@ -513,5 +513,40 @@ namespace Microsoft.Kiota.Abstractions
             Headers.TryAdd(ContentTypeHeader, contentType);
             Content = writer.GetSerializedContent();
         }
+
+        /// <summary>
+        /// Sets the request body from a collection of enum values with the specified content type.
+        /// </summary>
+        /// <param name="requestAdapter">The core service to get the serialization writer from.</param>
+        /// <param name="items">The enum values to serialize.</param>
+        /// <param name="contentType">The content type to set.</param>
+        /// <typeparam name="T">The enum type to serialize.</typeparam>
+#if NET5_0_OR_GREATER
+        public void SetContentFromEnumCollection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(IRequestAdapter requestAdapter, string contentType, IEnumerable<T?> items) where T : struct, Enum
+#else
+        public void SetContentFromEnumCollection<T>(IRequestAdapter requestAdapter, string contentType, IEnumerable<T?> items) where T : struct, Enum
+#endif
+        {
+            using var activity = _activitySource?.StartActivity(nameof(SetContentFromEnumCollection));
+            using var writer = GetSerializationWriter(requestAdapter, contentType, items);
+
+            T? firstNonNullItem = null;
+            using(var enumerator = items.GetEnumerator())
+            {
+                while(enumerator.MoveNext())
+                {
+                    if(enumerator.Current != null)
+                    {
+                        firstNonNullItem = enumerator.Current;
+                        break;
+                    }
+                }
+            }
+
+            SetRequestType(firstNonNullItem, activity);
+            writer.WriteCollectionOfEnumValues(null, items);
+            Headers.TryAdd(ContentTypeHeader, contentType);
+            Content = writer.GetSerializedContent();
+        }
     }
 }

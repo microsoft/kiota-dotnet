@@ -497,6 +497,26 @@ namespace Microsoft.Kiota.Abstractions.Tests
             serializationWriterMock.Verify(x => x.WriteCollectionOfEnumValues(It.IsAny<string>(), It.IsAny<IEnumerable<TestEnum?>>()), Times.Never);
         }
         [Fact]
+        public void SetsEnumCollectionContent()
+        {
+            var requestAdapterMock = new Mock<IRequestAdapter>();
+            var serializationWriterMock = new Mock<ISerializationWriter>();
+            var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
+            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(serializationWriterMock.Object);
+            requestAdapterMock.SetupGet(x => x.SerializationWriterFactory).Returns(serializationWriterFactoryMock.Object);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.POST,
+                UrlTemplate = "{+baseurl}/users{?%24count}"
+            };
+
+            requestInfo.SetContentFromEnumCollection<TestEnum>(requestAdapterMock.Object, "application/json", new TestEnum?[] { TestEnum.First, TestEnum.Second });
+
+            // Assert we now have an option
+            serializationWriterMock.Verify(x => x.WriteEnumValue<TestEnum>(It.IsAny<string>(), It.IsAny<TestEnum>()), Times.Never);
+            serializationWriterMock.Verify(x => x.WriteCollectionOfEnumValues(It.IsAny<string>(), It.IsAny<IEnumerable<TestEnum?>>()), Times.Once);
+        }
+        [Fact]
         public void SetsScalarCollectionContent()
         {
             var requestAdapterMock = new Mock<IRequestAdapter>();
