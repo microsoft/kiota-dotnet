@@ -531,15 +531,12 @@ namespace Microsoft.Kiota.Abstractions
             using var writer = GetSerializationWriter(requestAdapter, contentType, items);
 
             T? firstNonNullItem = null;
-            using(var enumerator = items.GetEnumerator())
+            foreach(var item in items)
             {
-                while(enumerator.MoveNext())
+                if(item != null)
                 {
-                    if(enumerator.Current != null)
-                    {
-                        firstNonNullItem = enumerator.Current;
-                        break;
-                    }
+                    firstNonNullItem = item;
+                    break;
                 }
             }
 
