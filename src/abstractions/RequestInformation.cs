@@ -530,15 +530,7 @@ namespace Microsoft.Kiota.Abstractions
             using var activity = _activitySource?.StartActivity(nameof(SetContentFromEnumCollection));
             using var writer = GetSerializationWriter(requestAdapter, contentType, items);
 
-            T? firstNonNullItem = null;
-            foreach(var item in items)
-            {
-                if(item != null)
-                {
-                    firstNonNullItem = item;
-                    break;
-                }
-            }
+            var firstNonNullItem = items.FirstOrDefault(static x => x is not null);
 
             SetRequestType(firstNonNullItem, activity);
             writer.WriteCollectionOfEnumValues(null, items);
