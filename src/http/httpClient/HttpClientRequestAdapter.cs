@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -48,7 +49,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
 #elif NETSTANDARD2_0 || NETFRAMEWORK
         private static readonly Version defaultHttpVersion = HttpVersion.Version11;
 #endif
-#if NET5_0_OR_GREATER
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpClientRequestAdapter"/> class.
         /// <param name="authenticationProvider">The authentication provider.</param>
@@ -57,8 +57,18 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <param name="httpClient">The native HTTP client.</param>
         /// <param name="observabilityOptions">The observability options.</param>
         /// </summary>
+#if NET5_0_OR_GREATER
         public HttpClientRequestAdapter(IAuthenticationProvider authenticationProvider, IParseNodeFactory? parseNodeFactory = null, ISerializationWriterFactory? serializationWriterFactory = null, HttpClient? httpClient = null, ObservabilityOptions? observabilityOptions = null)
 #else
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public HttpClientRequestAdapter(IAuthenticationProvider authenticationProvider, IParseNodeFactory? parseNodeFactory, ISerializationWriterFactory? serializationWriterFactory, HttpClient? httpClient, ObservabilityOptions? observabilityOptions)
+            : this(authenticationProvider, parseNodeFactory, serializationWriterFactory, httpClient, observabilityOptions, httpVersion: null)
+        {
+            // Constructor without HttpVersion for runtime backwards compatibility. Adding a new
+            // optional parameter provides *compile-time* backwards compatibility but throws a
+            // MissingMethodException at runtime.
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpClientRequestAdapter"/> class.
         /// <param name="authenticationProvider">The authentication provider.</param>
