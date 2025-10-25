@@ -1,10 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- https://learn.microsoft.com/dotnet/fundamentals/package-validation/diagnostic-ids -->
 <Suppressions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter.#ctor(Microsoft.Kiota.Abstractions.Authentication.IAuthenticationProvider,Microsoft.Kiota.Abstractions.Serialization.IParseNodeFactory,Microsoft.Kiota.Abstractions.Serialization.ISerializationWriterFactory,System.Net.Http.HttpClient,Microsoft.Kiota.Http.HttpClientLibrary.ObservabilityOptions,System.Version)</Target>
-    <Left>lib/netstandard2.1/Microsoft.Kiota.Http.HttpClientLibrary.dll</Left>
-    <Right>lib/net5.0/Microsoft.Kiota.Http.HttpClientLibrary.dll</Right>
-  </Suppression>
 </Suppressions>
