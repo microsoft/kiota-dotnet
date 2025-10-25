@@ -1148,6 +1148,47 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             Assert.NotNull(requestMessage);
             Assert.Equal(HttpVersion.Version11, requestMessage.Version);
         }
+
+        [Fact]
+        public void ConstructorOverloadsWorkCorrectlyForCompatibility()
+        {
+            // This test verifies the fix for the MissingMethodException issue
+            // when code compiled against netstandard2.1 runs on newer frameworks
+
+            // Arrange - Test the constructor without Version parameter (matches NET5+ signature)
+            var authProvider = new AnonymousAuthenticationProvider();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
+            var mockSerializationWriterFactory = new Mock<ISerializationWriterFactory>();
+            var httpClient = new HttpClient();
+            var observabilityOptions = new ObservabilityOptions();
+
+            // Act & Assert - Both constructor overloads should work
+            var adapter1 = new HttpClientRequestAdapter(
+                authProvider, 
+                mockParseNodeFactory.Object, 
+                mockSerializationWriterFactory.Object, 
+                httpClient, 
+                observabilityOptions);
+            
+            var adapter2 = new HttpClientRequestAdapter(
+                authProvider, 
+                mockParseNodeFactory.Object, 
+                mockSerializationWriterFactory.Object, 
+                httpClient, 
+                observabilityOptions, 
+                new Version(1, 1));
+
+            // Verify both adapters are created successfully
+            Assert.NotNull(adapter1);
+            Assert.NotNull(adapter2);
+            Assert.NotNull(adapter1.SerializationWriterFactory);
+            Assert.NotNull(adapter2.SerializationWriterFactory);
+            
+            // Clean up
+            adapter1.Dispose();
+            adapter2.Dispose();
+            httpClient.Dispose();
+        }
 #endif
     }
 
