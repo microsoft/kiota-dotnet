@@ -66,6 +66,17 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <param name="serializationWriterFactory">The serialization writer factory.</param>
         /// <param name="httpClient">The native HTTP client.</param>
         /// <param name="observabilityOptions">The observability options.</param>
+        /// </summary>
+        public HttpClientRequestAdapter(IAuthenticationProvider authenticationProvider, IParseNodeFactory? parseNodeFactory = null, ISerializationWriterFactory? serializationWriterFactory = null, HttpClient? httpClient = null, ObservabilityOptions? observabilityOptions = null):
+            this(authenticationProvider, parseNodeFactory, serializationWriterFactory, httpClient, observabilityOptions, null);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HttpClientRequestAdapter"/> class.
+        /// <param name="authenticationProvider">The authentication provider.</param>
+        /// <param name="parseNodeFactory">The parse node factory.</param>
+        /// <param name="serializationWriterFactory">The serialization writer factory.</param>
+        /// <param name="httpClient">The native HTTP client.</param>
+        /// <param name="observabilityOptions">The observability options.</param>
         /// <param name="httpVersion">The HTTP version.</param>
         /// </summary>
         public HttpClientRequestAdapter(IAuthenticationProvider authenticationProvider, IParseNodeFactory? parseNodeFactory = null, ISerializationWriterFactory? serializationWriterFactory = null, HttpClient? httpClient = null, ObservabilityOptions? observabilityOptions = null, Version? httpVersion = null)
