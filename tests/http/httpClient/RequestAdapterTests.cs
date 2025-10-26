@@ -1160,11 +1160,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             var authProvider = new AnonymousAuthenticationProvider();
             var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             var mockSerializationWriterFactory = new Mock<ISerializationWriterFactory>();
-            var httpClient = new HttpClient();
+            using var httpClient = new HttpClient();
             var observabilityOptions = new ObservabilityOptions();
 
             // Act & Assert - Both constructor overloads should work
-            var adapter1 = (HttpClientRequestAdapter?)Activator.CreateInstance(
+            using var adapter1 = (HttpClientRequestAdapter?)Activator.CreateInstance(
                 typeof(HttpClientRequestAdapter),
                 authProvider,
                 mockParseNodeFactory.Object,
@@ -1172,7 +1172,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 httpClient,
                 observabilityOptions);
 
-            var adapter2 = (HttpClientRequestAdapter?)Activator.CreateInstance(
+            using var adapter2 = (HttpClientRequestAdapter?)Activator.CreateInstance(
                 typeof(HttpClientRequestAdapter),
                 authProvider,
                 mockParseNodeFactory.Object,
@@ -1186,11 +1186,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             Assert.NotNull(adapter2);
             Assert.NotNull(adapter1.SerializationWriterFactory);
             Assert.NotNull(adapter2.SerializationWriterFactory);
-
-            // Clean up
-            adapter1.Dispose();
-            adapter2.Dispose();
-            httpClient.Dispose();
         }
     }
 
