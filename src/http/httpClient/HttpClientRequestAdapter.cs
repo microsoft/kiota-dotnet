@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -40,15 +41,13 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         private readonly bool createdClient;
         private readonly ObservabilityOptions obsOptions;
         private readonly ActivitySource activitySource;
-#if !NET5_0_OR_GREATER
-        private readonly Version httpVersion;
-#endif
+        private readonly Version? httpVersion;
 #if NETSTANDARD2_1_OR_GREATER
         private static readonly Version defaultHttpVersion = HttpVersion.Version20;
 #elif NETSTANDARD2_0 || NETFRAMEWORK
         private static readonly Version defaultHttpVersion = HttpVersion.Version11;
 #endif
-#if NET5_0_OR_GREATER
+
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpClientRequestAdapter"/> class.
         /// <param name="authenticationProvider">The authentication provider.</param>
@@ -57,8 +56,15 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <param name="httpClient">The native HTTP client.</param>
         /// <param name="observabilityOptions">The observability options.</param>
         /// </summary>
-        public HttpClientRequestAdapter(IAuthenticationProvider authenticationProvider, IParseNodeFactory? parseNodeFactory = null, ISerializationWriterFactory? serializationWriterFactory = null, HttpClient? httpClient = null, ObservabilityOptions? observabilityOptions = null)
-#else
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public HttpClientRequestAdapter(IAuthenticationProvider authenticationProvider, IParseNodeFactory? parseNodeFactory, ISerializationWriterFactory? serializationWriterFactory, HttpClient? httpClient, ObservabilityOptions? observabilityOptions)
+            : this(authenticationProvider, parseNodeFactory, serializationWriterFactory, httpClient, observabilityOptions, httpVersion: null)
+        {
+            // Constructor without HttpVersion for runtime backwards compatibility. Adding a new
+            // optional parameter provides *compile-time* backwards compatibility but throws a
+            // MissingMethodException at runtime.
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpClientRequestAdapter"/> class.
         /// <param name="authenticationProvider">The authentication provider.</param>
@@ -69,7 +75,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <param name="httpVersion">The HTTP version.</param>
         /// </summary>
         public HttpClientRequestAdapter(IAuthenticationProvider authenticationProvider, IParseNodeFactory? parseNodeFactory = null, ISerializationWriterFactory? serializationWriterFactory = null, HttpClient? httpClient = null, ObservabilityOptions? observabilityOptions = null, Version? httpVersion = null)
-#endif
         {
             authProvider = authenticationProvider ?? throw new ArgumentNullException(nameof(authenticationProvider));
             createdClient = httpClient == null;
@@ -79,7 +84,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             sWriterFactory = serializationWriterFactory ?? SerializationWriterFactoryRegistry.DefaultInstance;
             obsOptions = observabilityOptions ?? new ObservabilityOptions();
             activitySource = ActivitySourceRegistry.DefaultInstance.GetOrCreateActivitySource(obsOptions.TracerInstrumentationName);
-#if !NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER
+            this.httpVersion = httpVersion;
+#else
             this.httpVersion = httpVersion ?? defaultHttpVersion;
 #endif
         }
@@ -620,7 +627,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 Method = new HttpMethod(requestInfo.HttpMethod.ToString().ToUpperInvariant()),
                 RequestUri = requestUri,
 #if NET5_0_OR_GREATER
-                Version = client.DefaultRequestVersion,
+                Version = httpVersion ?? client.DefaultRequestVersion,
                 VersionPolicy = client.DefaultVersionPolicy
 #else
                 Version = httpVersion
