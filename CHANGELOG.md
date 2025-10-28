@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.21.0](https://github.com/microsoft/kiota-dotnet/compare/v1.20.1...v1.21.0) (2025-10-28)
+
+
+### Features
+
+* Add SetContentFromEnumCollection method to RequestInformation class ([d970e8e](https://github.com/microsoft/kiota-dotnet/commit/d970e8edcf4c18b906d8754537eb6b8583c227e1))
+
+
+### Bug Fixes
+
+* Restore constructor backwards compatibility on old .NET versions. ([ce59749](https://github.com/microsoft/kiota-dotnet/commit/ce5974988f6636accc48388358c43825f2703339))
+* Restore constructor compatibility consuming a downlevel library on .NET 5+. ([36c543e](https://github.com/microsoft/kiota-dotnet/commit/36c543ed1c44daea781fd4c969d8c38a2301f173))
+* Restore HttpClientRequestAdapter constructor compatibility between .NET 5+ and .NET Standard/Framework ([08edbad](https://github.com/microsoft/kiota-dotnet/commit/08edbada7f1747f50df334654a71ef77cbdf02e4))
+
 ## [1.20.1](https://github.com/microsoft/kiota-dotnet/compare/v1.20.0...v1.20.1) (2025-09-26)
 
 
