@@ -9,6 +9,7 @@ using Moq;
 using Xunit;
 
 namespace Microsoft.Kiota.Serialization.Multipart.Tests;
+
 public class MultipartSerializationWriterTests
 {
     [Fact]

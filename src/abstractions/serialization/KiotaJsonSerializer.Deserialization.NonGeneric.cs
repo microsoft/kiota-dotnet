@@ -13,6 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 #endif
 
 namespace Microsoft.Kiota.Abstractions.Serialization;
+
 public static partial class KiotaJsonSerializer
 {
 

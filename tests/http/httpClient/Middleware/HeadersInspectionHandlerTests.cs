@@ -9,6 +9,7 @@ using Microsoft.Kiota.Http.HttpClientLibrary.Tests.Mocks;
 using Xunit;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware;
+
 public class HeadersInspectionHandlerTests : IDisposable
 {
     private readonly List<IDisposable> _disposables = new();

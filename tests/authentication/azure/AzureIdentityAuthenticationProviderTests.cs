@@ -8,6 +8,7 @@ using Moq;
 using Xunit;
 
 namespace Microsoft.Kiota.Authentication.Azure.Tests;
+
 public class AzureIdentityAuthenticationProviderTests
 {
     [Fact]
