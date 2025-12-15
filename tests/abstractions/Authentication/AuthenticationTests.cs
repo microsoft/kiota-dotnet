@@ -8,6 +8,7 @@ using Moq;
 using Xunit;
 
 namespace Microsoft.Kiota.Abstractions.Tests;
+
 public class AuthenticationTests
 {
     [Fact]

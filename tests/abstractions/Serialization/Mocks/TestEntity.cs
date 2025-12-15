@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Kiota.Abstractions.Serialization;
 
 namespace Microsoft.Kiota.Abstractions.Tests.Serialization.Mocks;
+
 public class TestEntity : IParsable, IAdditionalDataHolder
 {
     /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>

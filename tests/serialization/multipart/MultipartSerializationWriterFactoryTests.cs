@@ -2,6 +2,7 @@
 using Xunit;
 
 namespace Microsoft.Kiota.Serialization.Multipart.Tests;
+
 public class MultipartSerializationWriterFactoryTests
 {
     private readonly MultipartSerializationWriterFactory _multipartSerializationFactory;

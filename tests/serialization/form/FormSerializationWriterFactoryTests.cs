@@ -1,4 +1,5 @@
 ﻿namespace Microsoft.Kiota.Serialization.Form.Tests;
+
 public class FormSerializationWriterFactoryTests
 {
     private readonly FormSerializationWriterFactory _formSerializationFactory = new();

@@ -3,6 +3,7 @@ using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Serialization.Form.Tests.Mocks;
 
 namespace Microsoft.Kiota.Serialization.Form.Tests;
+
 public class FormParseNodeTests
 {
     public FormParseNodeTests()
