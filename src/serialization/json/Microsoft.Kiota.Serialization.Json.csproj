@@ -13,7 +13,7 @@
 
   <!-- NET 5 target to be removed on next major version-->
   <ItemGroup Condition="'$(TargetFramework)' == 'net5.0' or '$(TargetFramework)'== 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1'">
-    <PackageReference Include="System.Text.Json" Version="[6.0.10,)" />
+    <PackageReference Include="System.Text.Json" Version="9.0.11" />
   </ItemGroup>
 
   <ItemGroup>
