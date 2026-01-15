@@ -19,6 +19,10 @@ using Microsoft.Kiota.Abstractions.Serialization;
 using System.Diagnostics.CodeAnalysis;
 #endif
 
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER
+using System.Buffers;
+#endif
+
 namespace Microsoft.Kiota.Serialization.Json
 {
     /// <summary>
