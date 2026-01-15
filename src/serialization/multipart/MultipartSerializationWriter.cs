@@ -18,7 +18,8 @@ namespace Microsoft.Kiota.Serialization.Multipart;
 /// </summary>
 public class MultipartSerializationWriter : ISerializationWriter
 {
-    private readonly RecyclableMemoryStream _stream = new RecyclableMemoryStreamManager().GetStream();
+    private static readonly RecyclableMemoryStreamManager _memoryStreamManager = new RecyclableMemoryStreamManager();
+    private readonly RecyclableMemoryStream _stream = _memoryStreamManager.GetStream();
     /// <inheritdoc/>
     public Action<IParsable>? OnBeforeObjectSerialization { get; set; }
     /// <inheritdoc/>

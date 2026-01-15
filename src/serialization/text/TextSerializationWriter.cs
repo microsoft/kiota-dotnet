@@ -20,7 +20,8 @@ namespace Microsoft.Kiota.Serialization.Text;
 /// </summary>
 public class TextSerializationWriter : ISerializationWriter, IDisposable
 {
-    private readonly RecyclableMemoryStream _stream = new RecyclableMemoryStreamManager().GetStream();
+    private static readonly RecyclableMemoryStreamManager _memoryStreamManager = new RecyclableMemoryStreamManager();
+    private readonly RecyclableMemoryStream _stream = _memoryStreamManager.GetStream();
     private readonly StreamWriter _writer;
     /// <summary>
     /// Initializes a new instance of the <see cref="TextSerializationWriter"/> class.

@@ -26,7 +26,8 @@ namespace Microsoft.Kiota.Serialization.Json
     /// </summary>
     public class JsonSerializationWriter : ISerializationWriter, IDisposable
     {
-        private readonly RecyclableMemoryStream _stream = new RecyclableMemoryStreamManager().GetStream();
+        private static readonly RecyclableMemoryStreamManager _memoryStreamManager = new RecyclableMemoryStreamManager();
+        private readonly RecyclableMemoryStream _stream = _memoryStreamManager.GetStream();
         private readonly KiotaJsonSerializationContext _kiotaJsonSerializationContext;
 
         /// <summary>

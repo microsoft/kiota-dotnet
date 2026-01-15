@@ -20,6 +20,7 @@ public class FormSerializationWriter : ISerializationWriter
 {
     private int depth;
     private readonly StringBuilder _builder = new();
+    private static readonly RecyclableMemoryStreamManager _memoryStreamManager = new RecyclableMemoryStreamManager();
     /// <inheritdoc/>
     public Action<IParsable>? OnBeforeObjectSerialization { get; set; }
     /// <inheritdoc/>
@@ -32,7 +33,7 @@ public class FormSerializationWriter : ISerializationWriter
         GC.SuppressFinalize(this);
     }
     /// <inheritdoc/>
-    public Stream GetSerializedContent() => new RecyclableMemoryStreamManager().GetStream(Encoding.UTF8.GetBytes(_builder.ToString()));
+    public Stream GetSerializedContent() => _memoryStreamManager.GetStream(Encoding.UTF8.GetBytes(_builder.ToString()));
     /// <inheritdoc/>
     public void WriteAdditionalData(IDictionary<string, object> value)
     {
