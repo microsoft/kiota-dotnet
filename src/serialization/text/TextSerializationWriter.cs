@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Xml;
+using Microsoft.IO;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Helpers;
@@ -19,7 +20,7 @@ namespace Microsoft.Kiota.Serialization.Text;
 /// </summary>
 public class TextSerializationWriter : ISerializationWriter, IDisposable
 {
-    private readonly MemoryStream _stream = new MemoryStream();
+    private readonly RecyclableMemoryStream _stream = new RecyclableMemoryStreamManager().GetStream();
     private readonly StreamWriter _writer;
     /// <summary>
     /// Initializes a new instance of the <see cref="TextSerializationWriter"/> class.

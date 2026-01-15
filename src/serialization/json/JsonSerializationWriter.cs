@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Xml;
+using Microsoft.IO;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Helpers;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -25,7 +26,7 @@ namespace Microsoft.Kiota.Serialization.Json
     /// </summary>
     public class JsonSerializationWriter : ISerializationWriter, IDisposable
     {
-        private readonly MemoryStream _stream = new MemoryStream();
+        private readonly RecyclableMemoryStream _stream = new RecyclableMemoryStreamManager().GetStream();
         private readonly KiotaJsonSerializationContext _kiotaJsonSerializationContext;
 
         /// <summary>
@@ -48,7 +49,7 @@ namespace Microsoft.Kiota.Serialization.Json
         public JsonSerializationWriter(KiotaJsonSerializationContext kiotaJsonSerializationContext)
         {
             _kiotaJsonSerializationContext = kiotaJsonSerializationContext;
-            writer = new Utf8JsonWriter(_stream, new JsonWriterOptions
+            writer = new Utf8JsonWriter((Stream)_stream, new JsonWriterOptions
             {
                 Encoder = kiotaJsonSerializationContext.Options.Encoder,
                 Indented = kiotaJsonSerializationContext.Options.WriteIndented
