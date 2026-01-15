@@ -50,19 +50,15 @@ namespace Microsoft.Kiota.Serialization.Json
         public JsonSerializationWriter(KiotaJsonSerializationContext kiotaJsonSerializationContext)
         {
             _kiotaJsonSerializationContext = kiotaJsonSerializationContext;
-#if netstandard2_1 || NET_CORE_APP || NET_5_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
             writer = new Utf8JsonWriter((IBufferWriter<byte>)_stream, new JsonWriterOptions
-            {
-                Encoder = kiotaJsonSerializationContext.Options.Encoder,
-                Indented = kiotaJsonSerializationContext.Options.WriteIndented
-            });
 #else
             writer = new Utf8JsonWriter((Stream)_stream, new JsonWriterOptions
+#endif
             {
                 Encoder = kiotaJsonSerializationContext.Options.Encoder,
                 Indented = kiotaJsonSerializationContext.Options.WriteIndented
             });
-#endif
         }
 
         /// <summary>
