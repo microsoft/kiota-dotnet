@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.IO;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Serialization;
 #if NET5_0_OR_GREATER
@@ -17,7 +18,8 @@ namespace Microsoft.Kiota.Serialization.Multipart;
 /// </summary>
 public class MultipartSerializationWriter : ISerializationWriter
 {
-    private readonly MemoryStream _stream = new MemoryStream();
+    private static readonly RecyclableMemoryStreamManager _memoryStreamManager = new RecyclableMemoryStreamManager();
+    private readonly RecyclableMemoryStream _stream = _memoryStreamManager.GetStream();
     /// <inheritdoc/>
     public Action<IParsable>? OnBeforeObjectSerialization { get; set; }
     /// <inheritdoc/>

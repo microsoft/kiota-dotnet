@@ -12,6 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using Microsoft.Kiota.Abstractions.Helpers;
+using Microsoft.IO;
 
 namespace Microsoft.Kiota.Serialization.Form;
 /// <summary>Represents a serialization writer that can be used to write a form url encoded string.</summary>
@@ -19,6 +20,7 @@ public class FormSerializationWriter : ISerializationWriter
 {
     private int depth;
     private readonly StringBuilder _builder = new();
+    private static readonly RecyclableMemoryStreamManager _memoryStreamManager = new RecyclableMemoryStreamManager();
     /// <inheritdoc/>
     public Action<IParsable>? OnBeforeObjectSerialization { get; set; }
     /// <inheritdoc/>
@@ -31,7 +33,7 @@ public class FormSerializationWriter : ISerializationWriter
         GC.SuppressFinalize(this);
     }
     /// <inheritdoc/>
-    public Stream GetSerializedContent() => new MemoryStream(Encoding.UTF8.GetBytes(_builder.ToString()));
+    public Stream GetSerializedContent() => _memoryStreamManager.GetStream(Encoding.UTF8.GetBytes(_builder.ToString()));
     /// <inheritdoc/>
     public void WriteAdditionalData(IDictionary<string, object> value)
     {

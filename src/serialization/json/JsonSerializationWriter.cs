@@ -10,12 +10,17 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Xml;
+using Microsoft.IO;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Helpers;
 using Microsoft.Kiota.Abstractions.Serialization;
 
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
+#endif
+
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER
+using System.Buffers;
 #endif
 
 namespace Microsoft.Kiota.Serialization.Json
@@ -25,7 +30,8 @@ namespace Microsoft.Kiota.Serialization.Json
     /// </summary>
     public class JsonSerializationWriter : ISerializationWriter, IDisposable
     {
-        private readonly MemoryStream _stream = new MemoryStream();
+        private static readonly RecyclableMemoryStreamManager _memoryStreamManager = new RecyclableMemoryStreamManager();
+        private readonly RecyclableMemoryStream _stream = _memoryStreamManager.GetStream();
         private readonly KiotaJsonSerializationContext _kiotaJsonSerializationContext;
 
         /// <summary>
@@ -48,7 +54,11 @@ namespace Microsoft.Kiota.Serialization.Json
         public JsonSerializationWriter(KiotaJsonSerializationContext kiotaJsonSerializationContext)
         {
             _kiotaJsonSerializationContext = kiotaJsonSerializationContext;
-            writer = new Utf8JsonWriter(_stream, new JsonWriterOptions
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+            writer = new Utf8JsonWriter((IBufferWriter<byte>)_stream, new JsonWriterOptions
+#else
+            writer = new Utf8JsonWriter((Stream)_stream, new JsonWriterOptions
+#endif
             {
                 Encoder = kiotaJsonSerializationContext.Options.Encoder,
                 Indented = kiotaJsonSerializationContext.Options.WriteIndented
