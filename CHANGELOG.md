@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.21.2](https://github.com/microsoft/kiota-dotnet/compare/v1.21.1...v1.21.2) (2026-01-17)
+
+
+### Bug Fixes
+
+* use recyclable streams for serialization to reduce memory pressure and improve overall performance ([41e3cce](https://github.com/microsoft/kiota-dotnet/commit/41e3cced59ff3a9c8a55e576232d3fc2f99a1bb5))
+
 ## [1.21.1](https://github.com/microsoft/kiota-dotnet/compare/v1.21.0...v1.21.1) (2025-12-18)
 
 
