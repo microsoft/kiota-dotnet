@@ -11,7 +11,7 @@
 
   <!-- Package references -->
   <ItemGroup>
-    <PackageReference Include="Azure.Core" Version="1.50.0" />
+    <PackageReference Include="Azure.Core" Version="1.51.0" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.14.15">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -21,6 +21,6 @@
 
   <!-- NET 5 target to be removed on next major version-->
   <ItemGroup Condition="'$(TargetFramework)' == 'net5.0' or '$(TargetFramework)'== 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1'">
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="[8.0.1,)" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.2" />
   </ItemGroup>
 </Project>
