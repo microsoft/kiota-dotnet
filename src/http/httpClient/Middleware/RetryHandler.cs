@@ -38,7 +38,17 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
         /// <param name="retryOption">An OPTIONAL <see cref="RetryHandlerOption"/> to configure <see cref="RetryHandler"/></param>
         public RetryHandler(RetryHandlerOption? retryOption = null)
         {
-            RetryOption = retryOption ?? new RetryHandlerOption();
+            RetryOption = retryOption ?? new RetryHandlerOption()
+            {
+                ShouldRetry = (_, _, response) => response.StatusCode switch
+                {
+                    // By default, retry on 503, 504, and 429 status codes
+                    HttpStatusCode.ServiceUnavailable => true,
+                    HttpStatusCode.GatewayTimeout => true,
+                    (HttpStatusCode)429 => true,
+                    _ => false
+                }
+            };
         }
 
         /// <summary>
@@ -73,7 +83,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
                 // Check whether retries are permitted and that the MaxRetry value is a non - negative, non - zero value
-                if(request.IsBuffered() && retryOption.MaxRetry > 0 && (ShouldRetry(response.StatusCode) || retryOption.ShouldRetry(retryOption.Delay, 0, response)))
+                if(request.IsBuffered() && retryOption.MaxRetry > 0 && retryOption.ShouldRetry(retryOption.Delay, 0, response))
                 {
                     response = await SendRetryAsync(response, retryOption, cancellationToken, activitySource).ConfigureAwait(false);
                 }
@@ -143,7 +153,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 // Call base.SendAsync to send the request
                 response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
-                if(!(request.IsBuffered() && (ShouldRetry(response.StatusCode) || retryOption.ShouldRetry(retryOption.Delay, retryCount, response))))
+                if(!(request.IsBuffered() && retryOption.ShouldRetry(retryOption.Delay, retryCount, response)))
                 {
                     return response;
                 }
@@ -215,22 +225,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
         private static double CalculateExponentialDelay(int retryCount, int delay)
         {
             return Math.Pow(2, retryCount) * delay;
-        }
-
-        /// <summary>
-        /// Check the HTTP status to determine whether it should be retried or not.
-        /// </summary>
-        /// <param name="statusCode">The <see cref="HttpStatusCode"/>returned.</param>
-        /// <returns></returns>
-        private static bool ShouldRetry(HttpStatusCode statusCode)
-        {
-            return statusCode switch
-            {
-                HttpStatusCode.ServiceUnavailable => true,
-                HttpStatusCode.GatewayTimeout => true,
-                (HttpStatusCode)429 => true,
-                _ => false
-            };
         }
 
         private static async Task<Exception> GetInnerExceptionAsync(HttpResponseMessage response)
