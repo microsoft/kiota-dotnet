@@ -412,14 +412,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             _capturedActivities.Clear();
 
             // Act
-            try
-            {
-                await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
-            }
-            catch
-            {
-                // Ignore exceptions, we're only interested in the activity
-            }
+            await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
 
             // Assert
             var activity = _capturedActivities.FirstOrDefault(a => a.OperationName.Contains("SendAsync"));
@@ -462,14 +455,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             _capturedActivities.Clear();
 
             // Act
-            try
-            {
-                await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
-            }
-            catch
-            {
-                // Ignore exceptions, we're only interested in the activity
-            }
+            await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
 
             // Assert
             var activity = _capturedActivities.FirstOrDefault(a => a.OperationName.Contains("SendAsync"));
@@ -511,14 +497,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             _capturedActivities.Clear();
 
             // Act
-            try
-            {
-                await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
-            }
-            catch
-            {
-                // Ignore exceptions, we're only interested in the activity
-            }
+            await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
 
             // Assert
             var activity = _capturedActivities.FirstOrDefault(a => a.OperationName.Contains("SendAsync"));
