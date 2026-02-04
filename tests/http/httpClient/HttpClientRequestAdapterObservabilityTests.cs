@@ -63,7 +63,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
     /// or end-to-end testing frameworks rather than unit tests with mocks.
     /// </para>
     /// </summary>
-    public class HttpClientRequestAdapterObservabilityTests : IDisposable
+    public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
     {
         private readonly HttpClientRequestAdapter _requestAdapter;
         private readonly ActivityListener _activityListener;
