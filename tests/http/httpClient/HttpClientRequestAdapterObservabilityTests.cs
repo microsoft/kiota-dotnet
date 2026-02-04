@@ -404,9 +404,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             var requestInfo = new RequestInformation
             {
                 HttpMethod = Method.GET,
-                UrlTemplate = "{+baseurl}/users/{user-id}"
+                UrlTemplate = "{+baseurl}/users/{user%2Did}"
             };
-            requestInfo.PathParameters.Add("user-id", "john@contoso.com");
+            requestInfo.PathParameters.Add("user%2Did", "john@contoso.com");
 
             // Clear any previously captured activities
             _capturedActivities.Clear();
@@ -447,9 +447,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             var requestInfo = new RequestInformation
             {
                 HttpMethod = Method.GET,
-                UrlTemplate = "{+baseurl}/users/{user-id}/messages"
+                UrlTemplate = "{+baseurl}/users/{user%2Did}/messages"
             };
-            requestInfo.PathParameters.Add("user-id", "john@contoso.com");
+            requestInfo.PathParameters.Add("user%2Did", "john@contoso.com");
 
             // Clear any previously captured activities
             _capturedActivities.Clear();
@@ -662,10 +662,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
 
             // Assert - Verify various nested spans are created
-            Assert.Contains(_capturedActivities, a => a.OperationName.Contains("SendAsync"));
-            Assert.Contains(_capturedActivities, a => a.OperationName.Contains("GetHttpResponseMessageAsync"));
-            Assert.Contains(_capturedActivities, a => a.OperationName.Contains("GetRequestMessageFromRequestInformation"));
-            Assert.Contains(_capturedActivities, a => a.OperationName.Contains("GetRootParseNodeAsync"));
+            var resultingActivities = new HashSet<string>(_capturedActivities.Select(static a => a.OperationName), StringComparer.Ordinal);
+            Assert.Contains("SendAsync - {+baseurl}/users", resultingActivities);
+            Assert.Contains("GetHttpResponseMessageAsync", resultingActivities);
+            Assert.Contains("GetRequestMessageFromRequestInformation", resultingActivities);
+            Assert.Contains("GetRootParseNodeAsync", resultingActivities);
         }
 
         #endregion
