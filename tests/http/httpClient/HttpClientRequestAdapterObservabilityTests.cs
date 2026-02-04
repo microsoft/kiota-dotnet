@@ -562,7 +562,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             {
                 await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
             }
-            catch { }
+            catch
+            {
+                // Ignore exceptions, we're only interested in the activity
+            }
 
             // Assert
             Assert.NotEmpty(_capturedActivities);
@@ -648,7 +651,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             {
                 await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
             }
-            catch { }
+            catch
+            {
+                // Ignore exceptions, we're only interested in the activity
+            }
 
             // Assert
             Assert.NotEmpty(_capturedActivities);
