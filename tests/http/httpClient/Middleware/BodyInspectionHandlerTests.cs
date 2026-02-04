@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware;
 
-public class BodyInspectionHandlerTests : IDisposable
+public sealed class BodyInspectionHandlerTests : IDisposable
 {
     private readonly List<IDisposable> _disposables = [];
 

@@ -16,7 +16,7 @@ using Xunit;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 {
-    public class RetryHandlerTests : IDisposable
+    public sealed class RetryHandlerTests : IDisposable
     {
         private readonly MockRedirectHandler _testHttpMessageHandler;
         private readonly RetryHandler _retryHandler;

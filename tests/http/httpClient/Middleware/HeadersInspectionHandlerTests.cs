@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware;
 
-public class HeadersInspectionHandlerTests : IDisposable
+public sealed class HeadersInspectionHandlerTests : IDisposable
 {
     private readonly List<IDisposable> _disposables = new();
     [Fact]
