@@ -139,11 +139,18 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             var placeholderIndex = span.IndexOf(baseUrlPlaceholder.AsSpan(), StringComparison.OrdinalIgnoreCase);
             if(placeholderIndex >= 0)
             {
-                // Concatenate parts around the placeholder - reduces allocations by using spans
-                var withoutPlaceholder = string.Concat(
-                    new string(span[..placeholderIndex]),
-                    new string(span[(placeholderIndex + baseUrlPlaceholder.Length)..])
-                );
+                // Build the string without the placeholder in a single allocation
+                var withoutPlaceholder = string.Create(
+                    telemetryPathValue.Length - baseUrlPlaceholder.Length,
+                    (telemetryPathValue, placeholderIndex, baseUrlPlaceholder.Length),
+                    static (destination, state) =>
+                    {
+                        var (source, index, length) = state;
+                        // Copy the part before the placeholder
+                        source.AsSpan(0, index).CopyTo(destination);
+                        // Copy the part after the placeholder
+                        source.AsSpan(index + length).CopyTo(destination[index..]);
+                    });
                 span = withoutPlaceholder.AsSpan();
             }
 
