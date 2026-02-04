@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Http.HttpClientLibrary.Tests.Mocks;
@@ -537,10 +538,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 .Setup<Task<HttpResponseMessage>>("SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<System.Threading.CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage
+                .ReturnsAsync(() => new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent("{\"id\":\"123\"}")
+                    Content = new StringContent("{\"id\":\"123\"}", Encoding.UTF8, "application/json")
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
@@ -558,14 +559,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             _capturedActivities.Clear();
 
             // Act
-            try
-            {
-                await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
-            }
-            catch
-            {
-                // Ignore exceptions, we're only interested in the activity
-            }
+            await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
 
             // Assert
             Assert.NotEmpty(_capturedActivities);
@@ -584,10 +578,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 .Setup<Task<HttpResponseMessage>>("SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<System.Threading.CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage
+                .ReturnsAsync(() => new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent("{\"id\":\"123\"}")
+                    Content = new StringContent("{\"id\":\"123\"}", Encoding.UTF8, "application/json")
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
@@ -626,10 +620,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 .Setup<Task<HttpResponseMessage>>("SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<System.Threading.CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage
+                .ReturnsAsync(() => new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent("{\"id\":\"123\"}")
+                    Content = new StringContent("{\"id\":\"123\"}", Encoding.UTF8, "application/json")
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
@@ -647,14 +641,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             _capturedActivities.Clear();
 
             // Act
-            try
-            {
-                await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
-            }
-            catch
-            {
-                // Ignore exceptions, we're only interested in the activity
-            }
+            await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
 
             // Assert
             Assert.NotEmpty(_capturedActivities);
@@ -672,10 +659,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 .Setup<Task<HttpResponseMessage>>("SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<System.Threading.CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage
+                .ReturnsAsync(() => new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent("{\"id\":\"123\"}")
+                    Content = new StringContent("{\"id\":\"123\"}", Encoding.UTF8, "application/json")
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
