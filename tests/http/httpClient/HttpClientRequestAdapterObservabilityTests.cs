@@ -644,11 +644,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             _capturedActivities.Clear();
 
             // Act
-            try
-            {
-                await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
-            }
-            catch { }
+            await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
 
             // Assert
             Assert.NotEmpty(_capturedActivities);
