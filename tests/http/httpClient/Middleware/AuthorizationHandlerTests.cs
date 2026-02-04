@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 {
-    public class AuthorizationHandlerTests : IDisposable
+    public sealed class AuthorizationHandlerTests : IDisposable
     {
         private readonly MockRedirectHandler _testHttpMessageHandler;
         private const string _expectedAccessToken = "token";
