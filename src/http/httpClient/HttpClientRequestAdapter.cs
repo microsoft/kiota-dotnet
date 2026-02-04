@@ -130,9 +130,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <returns>The normalized HTTP route.</returns>
         internal string GetNormalizedHttpRoute(string telemetryPathValue)
         {
+            const string baseUrlPlaceholder = "{+baseurl}";
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER
             // Optimized path using spans to reduce string allocations
-            const string baseUrlPlaceholder = "{+baseurl}";
             var span = telemetryPathValue.AsSpan();
 
             // Remove the base URL placeholder if present
@@ -170,7 +170,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
 #else
             // Fallback for older frameworks
             var httpRoute = telemetryPathValue;
-            const string baseUrlPlaceholder = "{+baseurl}";
 
             // Remove the base URL placeholder if present
             var baseUrlPlaceholderIndex = httpRoute.IndexOf(baseUrlPlaceholder, StringComparison.OrdinalIgnoreCase);
