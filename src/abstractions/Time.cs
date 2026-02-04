@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.Kiota.Abstractions
 {
@@ -55,6 +56,7 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="hour">The hour.</param>
         /// <param name="minute">The minute.</param>
         /// <param name="second">The second.</param>
+        [JsonConstructor]
         public Time(int hour, int minute, int second)
             : this(new DateTime(1, 1, 1, hour, minute, second))
         {

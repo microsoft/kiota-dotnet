@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.Kiota.Abstractions
 {
@@ -42,6 +43,7 @@ namespace Microsoft.Kiota.Abstractions
         /// <param name="year">The year.</param>
         /// <param name="month">The month.</param>
         /// <param name="day">The day of the month.</param>
+        [JsonConstructor]
         public Date(int year, int month, int day)
             : this(new DateTime(year, month, day))
         {
