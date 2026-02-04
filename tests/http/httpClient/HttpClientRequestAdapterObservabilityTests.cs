@@ -388,7 +388,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 .Setup<Task<HttpResponseMessage>>("SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<System.Threading.CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage
+                .ReturnsAsync(() => new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
                     Content = new StringContent("{\"id\":\"123\"}")
