@@ -602,11 +602,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             _capturedActivities.Clear();
 
             // Act
-            try
-            {
-                await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
-            }
-            catch { }
+            await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
 
             // Assert
             Assert.NotEmpty(_capturedActivities);
@@ -691,11 +687,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             _capturedActivities.Clear();
 
             // Act
-            try
-            {
-                await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
-            }
-            catch { }
+            await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
 
             // Assert - Verify various nested spans are created
             Assert.Contains(_capturedActivities, a => a.OperationName.Contains("SendAsync"));
