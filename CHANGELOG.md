@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.21.3](https://github.com/microsoft/kiota-dotnet/compare/v1.21.2...v1.21.3) (2026-02-05)
+
+
+### Bug Fixes
+
+* Move the default should-retry logic into the default RetryOption ([#639](https://github.com/microsoft/kiota-dotnet/issues/639)) ([33d115c](https://github.com/microsoft/kiota-dotnet/commit/33d115cc257948f5bee6aa6500b9b1d08163a233))
+
 ## [1.21.2](https://github.com/microsoft/kiota-dotnet/compare/v1.21.1...v1.21.2) (2026-01-17)
 
 
