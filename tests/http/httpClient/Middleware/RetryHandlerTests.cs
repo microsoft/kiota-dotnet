@@ -426,6 +426,35 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             mockHttpMessageHandler.Protected().Verify<Task<HttpResponseMessage>>("SendAsync", Times.Exactly(1 + expectedMaxRetry), ItExpr.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>());
         }
 
+        [Theory]
+        [InlineData(HttpStatusCode.GatewayTimeout)]  // 504
+        [InlineData(HttpStatusCode.ServiceUnavailable)]  // 503
+        [InlineData((HttpStatusCode)429)] // 429
+        public async Task ShouldNotRetryWithCustomShouldRetryDelegate(HttpStatusCode statusCode)
+        {
+            // Arrange
+            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo")
+            {
+                Content = new StringContent("Test Content")
+            };
+            httpRequestMessage.Content.Headers.ContentLength = -1;
+
+            var retryResponse = new HttpResponseMessage(statusCode);
+            var response2 = new HttpResponseMessage(HttpStatusCode.OK);
+            this._testHttpMessageHandler.SetHttpResponse(retryResponse, response2);
+            _retryHandler.RetryOption.ShouldRetry = (_, _, _) => false;
+            // Act
+            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            // Assert
+            Assert.NotEqual(response, response2);
+            Assert.Same(response, retryResponse);
+            Assert.Same(response.RequestMessage, httpRequestMessage);
+            Assert.NotNull(response.RequestMessage);
+            Assert.NotNull(response.RequestMessage.Content);
+            Assert.NotNull(response.RequestMessage.Content.Headers.ContentLength);
+            Assert.Equal(response.RequestMessage.Content.Headers.ContentLength, -1);
+        }
+
         private async Task DelayTestWithMessage(HttpResponseMessage response, int count, string message, int delay = RetryHandlerOption.MaxDelay)
         {
             Message = message;
