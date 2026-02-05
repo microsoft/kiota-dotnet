@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.Net;
 using System.Net.Http;
 using Microsoft.Kiota.Abstractions;
 
@@ -66,8 +67,16 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
 
         /// <summary>
         /// A delegate that's called to determine whether a request should be retried or not.
-        /// The delegate method should accept a delay time in seconds of, number of retry attempts and <see cref="HttpResponseMessage"/> as it's parameters and return a <see cref="bool"/>. This defaults to false
+        /// The delegate method should accept a delay time in seconds of, number of retry attempts and <see cref="HttpResponseMessage"/> as its parameters and return a <see cref="bool"/>.
+        /// This defaults to a function that returns true for 503, 504, and 429 status codes and false otherwise.
         /// </summary>
-        public Func<int, int, HttpResponseMessage, bool> ShouldRetry { get; set; } = (_, _, _) => false;
+        public Func<int, int, HttpResponseMessage, bool> ShouldRetry { get; set; } = (_, _, response) => response.StatusCode switch
+        {
+            // By default, retry on 503, 504, and 429 status codes
+            HttpStatusCode.ServiceUnavailable => true,
+            HttpStatusCode.GatewayTimeout => true,
+            (HttpStatusCode)429 => true,
+            _ => false
+        };
     }
 }
