@@ -38,17 +38,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
         /// <param name="retryOption">An OPTIONAL <see cref="RetryHandlerOption"/> to configure <see cref="RetryHandler"/></param>
         public RetryHandler(RetryHandlerOption? retryOption = null)
         {
-            RetryOption = retryOption ?? new RetryHandlerOption()
-            {
-                ShouldRetry = (_, _, response) => response.StatusCode switch
-                {
-                    // By default, retry on 503, 504, and 429 status codes
-                    HttpStatusCode.ServiceUnavailable => true,
-                    HttpStatusCode.GatewayTimeout => true,
-                    (HttpStatusCode)429 => true,
-                    _ => false
-                }
-            };
+            RetryOption = retryOption ?? new RetryHandlerOption();
         }
 
         /// <summary>
