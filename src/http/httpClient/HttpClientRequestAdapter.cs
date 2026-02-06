@@ -112,9 +112,100 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         {
             var decodedUriTemplate = ParametersNameDecodingHandler.DecodeUriEncodedString(requestInfo.UrlTemplate, charactersToDecodeForUriTemplate);
             var telemetryPathValue = string.IsNullOrEmpty(decodedUriTemplate) ? string.Empty : queryParametersCleanupRegex.Replace(decodedUriTemplate, string.Empty);
+            // Also strip literal query strings (e.g., ?@id={@id})
+            var questionMarkIndex = telemetryPathValue.IndexOf('?');
+            if(questionMarkIndex >= 0)
+            {
+                telemetryPathValue = telemetryPathValue.Substring(0, questionMarkIndex);
+            }
             var span = activitySource?.StartActivity($"{methodName} - {telemetryPathValue}");
             span?.SetTag("url.uri_template", decodedUriTemplate);
+            if(!string.IsNullOrEmpty(telemetryPathValue))
+            {
+                var httpRoute = GetNormalizedHttpRoute(telemetryPathValue);
+                span?.SetTag("http.route", httpRoute);
+            }
             return span;
+        }
+
+        /// <summary>
+        /// Normalizes the URI template into an HTTP route for observability by removing
+        /// the base URL placeholder and prefix, ensuring the route starts with "/".
+        /// </summary>
+        /// <param name="telemetryPathValue">The URI template path to normalize.</param>
+        /// <returns>The normalized HTTP route.</returns>
+        internal string GetNormalizedHttpRoute(string telemetryPathValue)
+        {
+            const string baseUrlPlaceholder = "{+baseurl}";
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER
+            // Optimized path using spans to reduce string allocations
+            var span = telemetryPathValue.AsSpan();
+
+            // Remove the base URL placeholder if present
+            var placeholderIndex = span.IndexOf(baseUrlPlaceholder.AsSpan(), StringComparison.OrdinalIgnoreCase);
+            if(placeholderIndex >= 0)
+            {
+                // Build the string without the placeholder in a single allocation
+                var withoutPlaceholder = string.Create(
+                    telemetryPathValue.Length - baseUrlPlaceholder.Length,
+                    (telemetryPathValue, placeholderIndex, baseUrlPlaceholder.Length),
+                    static (destination, state) =>
+                    {
+                        var (source, index, length) = state;
+                        // Copy the part before the placeholder
+                        source.AsSpan(0, index).CopyTo(destination);
+                        // Copy the part after the placeholder
+                        source.AsSpan(index + length).CopyTo(destination[index..]);
+                    });
+                span = withoutPlaceholder.AsSpan();
+            }
+
+            // Remove the base URL prefix if present (zero-allocation slice)
+            if(!string.IsNullOrEmpty(BaseUrl) && span.StartsWith(BaseUrl.AsSpan(), StringComparison.OrdinalIgnoreCase))
+            {
+                span = span[BaseUrl.Length..];
+            }
+
+            // Trim whitespace (zero-allocation)
+            span = span.Trim();
+
+            // If empty, return "/"
+            if(span.IsEmpty)
+            {
+                return "/";
+            }
+
+            // Trim leading slashes (zero-allocation slice)
+            span = span.TrimStart('/');
+
+            // Final allocation - create string with "/" prefix
+            return "/" + new string(span);
+#else
+            // Fallback for older frameworks
+            var httpRoute = telemetryPathValue;
+
+            // Remove the base URL placeholder if present
+            var baseUrlPlaceholderIndex = httpRoute.IndexOf(baseUrlPlaceholder, StringComparison.OrdinalIgnoreCase);
+            if(baseUrlPlaceholderIndex >= 0)
+            {
+                httpRoute = httpRoute.Remove(baseUrlPlaceholderIndex, baseUrlPlaceholder.Length);
+            }
+
+            // Remove the base URL prefix if the route starts with it
+            if(!string.IsNullOrEmpty(BaseUrl) && httpRoute.StartsWith(BaseUrl, StringComparison.OrdinalIgnoreCase))
+            {
+                httpRoute = httpRoute.Substring(BaseUrl!.Length);
+            }
+
+            // Normalize whitespace and ensure the route starts with "/"
+            httpRoute = httpRoute.Trim();
+            if(string.IsNullOrEmpty(httpRoute))
+            {
+                return "/";
+            }
+
+            return "/" + httpRoute.TrimStart('/');
+#endif
         }
         /// <summary>
         /// Send a <see cref="RequestInformation"/> instance with a collection instance of <typeparam name="ModelType"></typeparam>

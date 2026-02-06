@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\http\httpClient\Microsoft.Kiota.Http.HttpClientLibrary.csproj" />
+    <ProjectReference Include="..\..\..\src\serialization\json\Microsoft.Kiota.Serialization.Json.csproj" />
   </ItemGroup>
 
 </Project>
