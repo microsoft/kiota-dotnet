@@ -112,6 +112,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         {
             var decodedUriTemplate = ParametersNameDecodingHandler.DecodeUriEncodedString(requestInfo.UrlTemplate, charactersToDecodeForUriTemplate);
             var telemetryPathValue = string.IsNullOrEmpty(decodedUriTemplate) ? string.Empty : queryParametersCleanupRegex.Replace(decodedUriTemplate, string.Empty);
+            // Also strip literal query strings (e.g., ?@id={@id})
+            var questionMarkIndex = telemetryPathValue.IndexOf('?');
+            if(questionMarkIndex >= 0)
+            {
+                telemetryPathValue = telemetryPathValue.Substring(0, questionMarkIndex);
+            }
             var span = activitySource?.StartActivity($"{methodName} - {telemetryPathValue}");
             span?.SetTag("url.uri_template", decodedUriTemplate);
             if(!string.IsNullOrEmpty(telemetryPathValue))

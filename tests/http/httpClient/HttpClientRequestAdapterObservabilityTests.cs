@@ -107,281 +107,50 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
 
     #region GetNormalizedHttpRoute Tests
 
-    [Fact]
-    public void GetNormalizedHttpRoute_WithBaseUrlPlaceholder_RemovesPlaceholder()
+    [Theory]
+    [InlineData("{+baseurl}/users/{id}", "/users/{id}")]
+    [InlineData("{+BASEURL}/users/{id}", "/users/{id}")]
+    [InlineData("prefix{+baseurl}/users/{id}", "/prefix/users/{id}")]
+    [InlineData("https://graph.microsoft.com/v1.0/users/{id}", "/users/{id}")]
+    [InlineData("HTTPS://GRAPH.MICROSOFT.COM/V1.0/users/{id}", "/users/{id}")]
+    [InlineData("/users/{id}", "/users/{id}")]
+    [InlineData("users/{id}", "/users/{id}")]
+    [InlineData("///users/{id}", "/users/{id}")]
+    [InlineData("  users/{id}", "/users/{id}")]
+    [InlineData("users/{id}  ", "/users/{id}")]
+    [InlineData("  users/{id}  ", "/users/{id}")]
+    [InlineData("", "/")]
+    [InlineData("   ", "/")]
+    [InlineData("{+baseurl}", "/")]
+    [InlineData("https://graph.microsoft.com/v1.0", "/")]
+    [InlineData("https://graph.microsoft.com/v1.0/", "/")]
+    [InlineData("{+baseurl}/users/{user-id}/messages/{message-id}/attachments", "/users/{user-id}/messages/{message-id}/attachments")]
+    public void GetNormalizedHttpRoute_NormalizesCorrectly(string input, string expected)
     {
-        // Arrange
-        var input = "{+baseurl}/users/{id}";
-
         // Act
         var result = _requestAdapter.GetNormalizedHttpRoute(input);
 
         // Assert
-        Assert.Equal("/users/{id}", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithBaseUrlPlaceholderCaseInsensitive_RemovesPlaceholder()
-    {
-        // Arrange
-        var input = "{+BASEURL}/users/{id}";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/users/{id}", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithBaseUrlPlaceholderInMiddle_RemovesPlaceholder()
-    {
-        // Arrange
-        var input = "prefix{+baseurl}/users/{id}";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/prefix/users/{id}", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithBaseUrlPrefix_RemovesPrefix()
-    {
-        // Arrange
-        var input = "https://graph.microsoft.com/v1.0/users/{id}";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/users/{id}", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithBaseUrlPrefixCaseInsensitive_RemovesPrefix()
-    {
-        // Arrange
-        var input = "HTTPS://GRAPH.MICROSOFT.COM/V1.0/users/{id}";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/users/{id}", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithLeadingSlash_PreservesSlash()
-    {
-        // Arrange
-        var input = "/users/{id}";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/users/{id}", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithoutLeadingSlash_AddsSlash()
-    {
-        // Arrange
-        var input = "users/{id}";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/users/{id}", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithMultipleLeadingSlashes_NormalizesToSingleSlash()
-    {
-        // Arrange
-        var input = "///users/{id}";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/users/{id}", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithLeadingWhitespace_TrimsAndAddsSlash()
-    {
-        // Arrange
-        var input = "  users/{id}";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/users/{id}", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithTrailingWhitespace_TrimsWhitespace()
-    {
-        // Arrange
-        var input = "users/{id}  ";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/users/{id}", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithLeadingAndTrailingWhitespace_TrimsWhitespace()
-    {
-        // Arrange
-        var input = "  users/{id}  ";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/users/{id}", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithEmptyString_ReturnsRootSlash()
-    {
-        // Arrange
-        var input = "";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithOnlyWhitespace_ReturnsRootSlash()
-    {
-        // Arrange
-        var input = "   ";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithOnlyBaseUrlPlaceholder_ReturnsRootSlash()
-    {
-        // Arrange
-        var input = "{+baseurl}";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithOnlyBaseUrl_ReturnsRootSlash()
-    {
-        // Arrange
-        var input = "https://graph.microsoft.com/v1.0";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithBaseUrlAndTrailingSlash_ReturnsRootSlash()
-    {
-        // Arrange
-        var input = "https://graph.microsoft.com/v1.0/";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithComplexPath_NormalizesCorrectly()
-    {
-        // Arrange
-        var input = "{+baseurl}/users/{user-id}/messages/{message-id}/attachments";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/users/{user-id}/messages/{message-id}/attachments", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithQueryParameters_PreservesPath()
-    {
-        // Arrange - Note: query parameters should be removed before calling this method
-        var input = "/users/{id}";
-
-        // Act
-        var result = _requestAdapter.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/users/{id}", result);
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithBothPlaceholderAndBaseUrl_HandlesBothTransformations()
-    {
-        // Arrange
-        var input = "{+baseurl}/users";
-        var adapterWithBaseUrl = new HttpClientRequestAdapter(new AnonymousAuthenticationProvider());
-        adapterWithBaseUrl.BaseUrl = "https://api.example.com/v2";
-
-        // Act
-        var result = adapterWithBaseUrl.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/users", result);
-
-        // Cleanup
-        adapterWithBaseUrl.Dispose();
-    }
-
-    [Fact]
-    public void GetNormalizedHttpRoute_WithNullBaseUrl_OnlyRemovesPlaceholder()
-    {
-        // Arrange
-        var input = "{+baseurl}/users/{id}";
-        var adapterWithoutBaseUrl = new HttpClientRequestAdapter(new AnonymousAuthenticationProvider());
-
-        // Act
-        var result = adapterWithoutBaseUrl.GetNormalizedHttpRoute(input);
-
-        // Assert
-        Assert.Equal("/users/{id}", result);
-
-        // Cleanup
-        adapterWithoutBaseUrl.Dispose();
+        Assert.Equal(expected, result);
     }
 
     #endregion
 
     #region Activity Span Tag Tests
 
-    [Fact]
-    public async Task SendAsync_CreatesActivityWithHttpRouteTag()
+    [Theory]
+    [InlineData("{+baseurl}/users/{user%2Did}", "user%2Did", "john@contoso.com", "/users/{user-id}")]
+    [InlineData("{+baseurl}", null, null, "/")]
+    [InlineData("{+baseurl}/users/{id}{?%24select,%24expand}", "id", "123", "/users/{id}")]
+    [InlineData("{+baseurl}/users{?%24filter}", null, null, "/users")]
+    [InlineData("{+baseurl}/users/{user%2Did}/messages{?%24top,%24skip}", "user%2Did", "alice@contoso.com", "/users/{user-id}/messages")]
+    [InlineData("{+baseurl}/me/drive/items/{item%2Did}{?%24select}", "item%2Did", "item123", "/me/drive/items/{item-id}")]
+    [InlineData("{+baseurl}/groups/{group%2Did}/members{?%24count}", "group%2Did", "group456", "/groups/{group-id}/members")]
+    [InlineData("{+baseurl}/groups/{group%2Did}/members/$ref?@id={%40id}", "group%2Did", "group456", "/groups/{group-id}/members/$ref")]
+    [InlineData("{+baseurl}/groups/{group%2Did}/members/$ref{?%24count,%24filter}", "group%2Did", "group456", "/groups/{group-id}/members/$ref")]
+    [InlineData("{+baseurl}/users/{id}{?%24filter,q}", "id", "789", "/users/{id}")]
+    [InlineData("{+baseurl}/drive/items/{item%2Did}/workbook/worksheets/{worksheet%2Did}/range(address='{address}'){?%24select,%24expand,%24top}", "item%2Did", "book123", "/drive/items/{item-id}/workbook/worksheets/{worksheet-id}/range(address='{address}')")]
+    public async Task SendAsync_CreatesActivityWithHttpRouteTag(string urlTemplate, string? pathParamKey, string? pathParamValue, string expectedRoute)
     {
         // Arrange
         var mockHandler = new Mock<HttpMessageHandler>();
@@ -401,13 +170,12 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
         using var adapter = new HttpClientRequestAdapter(authProvider, httpClient: httpClient, observabilityOptions: observabilityOptions);
         adapter.BaseUrl = "https://graph.microsoft.com/v1.0";
 
-        var requestInfo = new RequestInformation
+        var pathParameters = new Dictionary<string, object>();
+        if(pathParamKey is not null && pathParamValue is not null)
         {
-            HttpMethod = Method.GET,
-            UrlTemplate = "{+baseurl}/users/{user%2Did}"
-        };
-        requestInfo.PathParameters.Add("user%2Did", "john@contoso.com");
-
+            pathParameters.Add(pathParamKey, pathParamValue);
+        }
+        var requestInfo = new RequestInformation(Method.GET, urlTemplate, pathParameters);
         // Clear any previously captured activities
         _capturedActivities.Clear();
 
@@ -420,11 +188,22 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
 
         var httpRouteTag = activity.Tags.FirstOrDefault(t => t.Key == "http.route");
         Assert.NotNull(httpRouteTag.Key);
-        Assert.Equal("/users/{user-id}", httpRouteTag.Value);
+        Assert.Equal(expectedRoute, httpRouteTag.Value);
     }
 
-    [Fact]
-    public async Task SendAsync_CreatesActivityWithUriTemplateTag()
+    [Theory]
+    [InlineData("{+baseurl}/users/{user%2Did}", "user%2Did", "john@contoso.com", "/users/{user-id}")]
+    [InlineData("{+baseurl}", null, null, "{+baseurl}")]
+    [InlineData("{+baseurl}/users/{id}{?%24select,%24expand}", "id", "123", "/users/{id}{?$select,$expand}")]
+    [InlineData("{+baseurl}/users{?%24filter}", null, null, "/users{?$filter}")]
+    [InlineData("{+baseurl}/users/{user%2Did}/messages{?%24top,%24skip}", "user%2Did", "alice@contoso.com", "/users/{user-id}/messages{?$top,$skip}")]
+    [InlineData("{+baseurl}/me/drive/items/{item%2Did}{?%24select}", "item%2Did", "item123", "/me/drive/items/{item-id}{?$select}")]
+    [InlineData("{+baseurl}/groups/{group%2Did}/members{?%24count}", "group%2Did", "group456", "/groups/{group-id}/members{?$count}")]
+    [InlineData("{+baseurl}/groups/{group%2Did}/members/$ref?@id={%40id}", "group%2Did", "group456", "members/$ref")]
+    [InlineData("{+baseurl}/groups/{group%2Did}/members/$ref{?%24count,%24filter}", "group%2Did", "group456", "/groups/{group-id}/members/$ref{?$count,$filter}")]
+    [InlineData("{+baseurl}/users/{id}{?%24filter,q}", "id", "789", "/users/{id}{?$filter,q}")]
+    [InlineData("{+baseurl}/drive/items/{item%2Did}/workbook/worksheets/{worksheet%2Did}/range(address='{address}'){?%24select,%24expand,%24top}", "item%2Did", "book123", "workbook/worksheets")]
+    public async Task SendAsync_CreatesActivityWithUriTemplateTag(string urlTemplate, string? pathParamKey, string? pathParamValue, string expectedSubstring)
     {
         // Arrange
         var mockHandler = new Mock<HttpMessageHandler>();
@@ -444,12 +223,12 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
         using var adapter = new HttpClientRequestAdapter(authProvider, httpClient: httpClient, observabilityOptions: observabilityOptions);
         adapter.BaseUrl = "https://graph.microsoft.com/v1.0";
 
-        var requestInfo = new RequestInformation
+        var pathParameters = new Dictionary<string, object>();
+        if(pathParamKey is not null && pathParamValue is not null)
         {
-            HttpMethod = Method.GET,
-            UrlTemplate = "{+baseurl}/users/{user%2Did}/messages"
-        };
-        requestInfo.PathParameters.Add("user%2Did", "john@contoso.com");
+            pathParameters.Add(pathParamKey, pathParamValue);
+        }
+        var requestInfo = new RequestInformation(Method.GET, urlTemplate, pathParameters);
 
         // Clear any previously captured activities
         _capturedActivities.Clear();
@@ -463,11 +242,18 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
 
         var uriTemplateTag = activity.Tags.FirstOrDefault(t => t.Key == "url.uri_template");
         Assert.NotNull(uriTemplateTag.Key);
-        Assert.Contains("/users/{user-id}/messages", uriTemplateTag.Value);
+        Assert.Contains(expectedSubstring, uriTemplateTag.Value);
     }
 
-    [Fact]
-    public async Task SendAsync_WithEmptyPath_SetsHttpRouteToRoot()
+    [Theory]
+    [InlineData(Method.GET, "GET")]
+    [InlineData(Method.POST, "POST")]
+    [InlineData(Method.PUT, "PUT")]
+    [InlineData(Method.PATCH, "PATCH")]
+    [InlineData(Method.DELETE, "DELETE")]
+    [InlineData(Method.HEAD, "HEAD")]
+    [InlineData(Method.OPTIONS, "OPTIONS")]
+    public async Task SendAsync_SetsHttpRequestMethodTag(Method httpMethod, string expectedMethodTag)
     {
         // Arrange
         var mockHandler = new Mock<HttpMessageHandler>();
@@ -489,49 +275,7 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
 
         var requestInfo = new RequestInformation
         {
-            HttpMethod = Method.GET,
-            UrlTemplate = "{+baseurl}"
-        };
-
-        // Clear any previously captured activities
-        _capturedActivities.Clear();
-
-        // Act
-        await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
-
-        // Assert
-        var activity = _capturedActivities.FirstOrDefault(a => a.OperationName.Contains("SendAsync"));
-        Assert.NotNull(activity);
-
-        var httpRouteTag = activity.Tags.FirstOrDefault(t => t.Key == "http.route");
-        Assert.NotNull(httpRouteTag.Key);
-        Assert.Equal("/", httpRouteTag.Value);
-    }
-
-    [Fact]
-    public async Task SendAsync_SetsHttpRequestMethodTag()
-    {
-        // Arrange
-        var mockHandler = new Mock<HttpMessageHandler>();
-        mockHandler.Protected()
-            .Setup<Task<HttpResponseMessage>>("SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<System.Threading.CancellationToken>())
-            .ReturnsAsync(() => new HttpResponseMessage
-            {
-                StatusCode = HttpStatusCode.OK,
-                Content = new StringContent("{\"id\":\"123\"}", Encoding.UTF8, "application/json")
-            });
-
-        var httpClient = new HttpClient(mockHandler.Object);
-        var authProvider = new AnonymousAuthenticationProvider();
-        var observabilityOptions = new ObservabilityOptions();
-        using var adapter = new HttpClientRequestAdapter(authProvider, httpClient: httpClient, observabilityOptions: observabilityOptions);
-        adapter.BaseUrl = "https://graph.microsoft.com/v1.0";
-
-        var requestInfo = new RequestInformation
-        {
-            HttpMethod = Method.POST,
+            HttpMethod = httpMethod,
             UrlTemplate = "{+baseurl}/users"
         };
 
@@ -545,7 +289,7 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
 
         var methodTag = GetTagFromActivities("http.request.method");
         Assert.NotNull(methodTag.Key);
-        Assert.Equal("POST", methodTag.Value);
+        Assert.Equal(expectedMethodTag, methodTag.Value);
     }
 
     [Fact]
