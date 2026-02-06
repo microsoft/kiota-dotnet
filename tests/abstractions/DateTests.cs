@@ -11,7 +11,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
         {
             var date = new Date(2025, 10, 24);
             var serialized = JsonSerializer.Serialize(date);
-            
+
             // System.Text.Json should serialize the Date object with its properties
             Assert.Contains("\"Year\":2025", serialized);
             Assert.Contains("\"Month\":10", serialized);
