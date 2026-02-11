@@ -33,6 +33,6 @@
   </ItemGroup>
   <!-- Include SourceLink Dependency for packages TO BE RELEASED-->
   <ItemGroup Condition="('$(IsTestProject)' != 'true') and ('$(IsAnalyzerProject)' != 'true')">
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.102" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.103" PrivateAssets="All" />
   </ItemGroup>
 </Project>
