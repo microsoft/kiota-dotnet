@@ -124,6 +124,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                         !newRequest.RequestUri.Scheme.Equals(request.RequestUri?.Scheme))
                         {
                             newRequest.Headers.Authorization = null;
+                            newRequest.Headers.ProxyAuthorization = null;
+                            newRequest.Headers.Remove("Cookie");
                         }
 
                         // If scheme has changed. Ensure that this has been opted in for security reasons

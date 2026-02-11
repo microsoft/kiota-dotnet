@@ -240,5 +240,125 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             Assert.Equal("Max redirects exceeded. Redirect count : 5", exception.InnerException?.Message);
             Assert.IsType<InvalidOperationException>(exception);
         }
+
+        [Theory]
+        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
+        [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308
+        public async Task RedirectWithDifferentHostShouldRemoveProxyAuthHeader(HttpStatusCode statusCode)
+        {
+            // Arrange
+            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
+            httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("fooAuth", "aparam");
+            var redirectResponse = new HttpResponseMessage(statusCode);
+            redirectResponse.Headers.Location = new Uri("http://example.net/bar");
+            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+            // Act
+            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            // Assert
+            Assert.NotSame(response.RequestMessage, httpRequestMessage);
+            Assert.NotSame(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
+            Assert.Null(response.RequestMessage?.Headers.ProxyAuthorization);
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
+        [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308
+        public async Task RedirectWithDifferentHostShouldRemoveCookieHeader(HttpStatusCode statusCode)
+        {
+            // Arrange
+            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
+            httpRequestMessage.Headers.Add("Cookie", "session=abc123");
+            var redirectResponse = new HttpResponseMessage(statusCode);
+            redirectResponse.Headers.Location = new Uri("http://example.net/bar");
+            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+            // Act
+            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            // Assert
+            Assert.NotSame(response.RequestMessage, httpRequestMessage);
+            Assert.NotSame(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
+            Assert.False(response.RequestMessage?.Headers.Contains("Cookie"));
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
+        [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308
+        public async Task RedirectWithDifferentSchemeShouldRemoveProxyAuthHeaderIfAllowRedirectOnSchemeChangeIsEnabled(HttpStatusCode statusCode)
+        {
+            // Arrange
+            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo");
+            httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("fooAuth", "aparam");
+            var redirectResponse = new HttpResponseMessage(statusCode);
+            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+            this._redirectHandler.RedirectOption.AllowRedirectOnSchemeChange = true;// Enable redirects on scheme change
+            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+            // Act
+            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            // Assert
+            Assert.NotSame(response.RequestMessage, httpRequestMessage);
+            Assert.NotSame(response.RequestMessage?.RequestUri?.Scheme, httpRequestMessage.RequestUri?.Scheme);
+            Assert.Null(response.RequestMessage?.Headers.ProxyAuthorization);
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
+        [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308
+        public async Task RedirectWithDifferentSchemeShouldRemoveCookieHeaderIfAllowRedirectOnSchemeChangeIsEnabled(HttpStatusCode statusCode)
+        {
+            // Arrange
+            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo");
+            httpRequestMessage.Headers.Add("Cookie", "session=abc123");
+            var redirectResponse = new HttpResponseMessage(statusCode);
+            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+            this._redirectHandler.RedirectOption.AllowRedirectOnSchemeChange = true;// Enable redirects on scheme change
+            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+            // Act
+            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            // Assert
+            Assert.NotSame(response.RequestMessage, httpRequestMessage);
+            Assert.NotSame(response.RequestMessage?.RequestUri?.Scheme, httpRequestMessage.RequestUri?.Scheme);
+            Assert.False(response.RequestMessage?.Headers.Contains("Cookie"));
+        }
+
+        [Fact]
+        public async Task RedirectWithSameHostShouldKeepProxyAuthHeader()
+        {
+            // Arrange
+            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo");
+            httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("fooAuth", "aparam");
+            var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
+            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+            // Act
+            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            // Assert
+            Assert.NotSame(response.RequestMessage, httpRequestMessage);
+            Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
+            Assert.NotNull(response.RequestMessage?.Headers.ProxyAuthorization);
+        }
+
+        [Fact]
+        public async Task RedirectWithSameHostShouldKeepCookieHeader()
+        {
+            // Arrange
+            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo");
+            httpRequestMessage.Headers.Add("Cookie", "session=abc123");
+            var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
+            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+            // Act
+            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            // Assert
+            Assert.NotSame(response.RequestMessage, httpRequestMessage);
+            Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
+            Assert.True(response.RequestMessage?.Headers.Contains("Cookie"));
+        }
     }
 }

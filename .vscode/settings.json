@@ -3,5 +3,6 @@
 		"Kiota"
 	],
 	"editor.formatOnSave": true,
-	"dotnet-test-explorer.testProjectPath": "**/*.Tests.csproj"
+	"dotnet-test-explorer.testProjectPath": "**/*.Tests.csproj",
+	"sarif-viewer.connectToGithubCodeScanning": "on"
 }
