@@ -270,17 +270,19 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         public async Task RedirectWithDifferentHostShouldRemoveCookieHeader(HttpStatusCode statusCode)
         {
             // Arrange
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
-            httpRequestMessage.Headers.Add("Cookie", "session=abc123");
-            var redirectResponse = new HttpResponseMessage(statusCode);
-            redirectResponse.Headers.Location = new Uri("http://example.net/bar");
-            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
-            // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
-            // Assert
-            Assert.NotSame(response.RequestMessage, httpRequestMessage);
-            Assert.NotSame(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
-            Assert.False(response.RequestMessage?.Headers.Contains("Cookie"));
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo"))
+            {
+                httpRequestMessage.Headers.Add("Cookie", "session=abc123");
+                var redirectResponse = new HttpResponseMessage(statusCode);
+                redirectResponse.Headers.Location = new Uri("http://example.net/bar");
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.NotSame(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
+                Assert.False(response.RequestMessage?.Headers.Contains("Cookie"));
+            }
         }
 
         [Theory]
