@@ -70,15 +70,17 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [Fact]
         public async Task OkStatusShouldPassThrough()
         {
-            // Arrange
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
-            var redirectResponse = new HttpResponseMessage(HttpStatusCode.OK);
-            this._testHttpMessageHandler.SetHttpResponse(redirectResponse); // sets the mock response
-            // Act
-            var response = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
-            // Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Same(response.RequestMessage, httpRequestMessage);
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo"))
+            {
+                // Arrange
+                var redirectResponse = new HttpResponseMessage(HttpStatusCode.OK);
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse); // sets the mock response
+                // Act
+                var response = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Same(response.RequestMessage, httpRequestMessage);
+            }
         }
 
         [Theory]
@@ -88,42 +90,44 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308 not available in netstandard
         public async Task ShouldRedirectSameMethodAndContent(HttpStatusCode statusCode)
         {
-            // Arrange
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo")
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
             {
-                Content = new StringContent("Hello World")
-            };
-            var redirectResponse = new HttpResponseMessage(statusCode);
-            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
-            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
-            // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
-            // Assert
-            Assert.Equal(response.RequestMessage?.Method, httpRequestMessage.Method);
-            Assert.NotSame(response.RequestMessage, httpRequestMessage);
-            Assert.NotNull(response.RequestMessage?.Content);
-            Assert.Equal("Hello World", await response.RequestMessage.Content.ReadAsStringAsync());
+                // Arrange
+                httpRequestMessage.Content = new StringContent("Hello World");
 
+                var redirectResponse = new HttpResponseMessage(statusCode);
+                redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.Equal(response.RequestMessage?.Method, httpRequestMessage.Method);
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.NotNull(response.RequestMessage?.Content);
+                Assert.Equal("Hello World", await response.RequestMessage.Content.ReadAsStringAsync());
+            }
         }
 
         [Fact]
         public async Task ShouldRedirectChangeMethodAndContent()
         {
-            // Arrange
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo")
+
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
             {
-                Content = new StringContent("Hello World")
-            };
-            var redirectResponse = new HttpResponseMessage(HttpStatusCode.SeeOther);
-            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
-            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
-            // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
-            // Assert
-            Assert.NotEqual(response.RequestMessage?.Method, httpRequestMessage.Method);
-            Assert.Equal(response.RequestMessage?.Method, HttpMethod.Get);
-            Assert.NotSame(response.RequestMessage, httpRequestMessage);
-            Assert.Null(response.RequestMessage?.Content);
+                // Arrange
+                httpRequestMessage.Content = new StringContent("Hello World");
+
+                var redirectResponse = new HttpResponseMessage(HttpStatusCode.SeeOther);
+                redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.NotEqual(response.RequestMessage?.Method, httpRequestMessage.Method);
+                Assert.Equal(response.RequestMessage?.Method, HttpMethod.Get);
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.Null(response.RequestMessage?.Content);
+            }
         }
 
         [Theory]
@@ -133,18 +137,20 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentHostShouldRemoveAuthHeader(HttpStatusCode statusCode)
         {
-            // Arrange
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
-            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("fooAuth", "aparam");
-            var redirectResponse = new HttpResponseMessage(statusCode);
-            redirectResponse.Headers.Location = new Uri("http://example.net/bar");
-            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
-            // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
-            // Assert
-            Assert.NotSame(response.RequestMessage, httpRequestMessage);
-            Assert.NotSame(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
-            Assert.Null(response.RequestMessage?.Headers.Authorization);
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo"))
+            {
+                // Arrange
+                httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("fooAuth", "aparam");
+                var redirectResponse = new HttpResponseMessage(statusCode);
+                redirectResponse.Headers.Location = new Uri("http://example.net/bar");
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.NotSame(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
+                Assert.Null(response.RequestMessage?.Headers.Authorization);
+            }
         }
 
         [Theory]
@@ -154,18 +160,21 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentSchemeThrowsInvalidOperationExceptionIfAllowRedirectOnSchemeChangeIsDisabled(HttpStatusCode statusCode)
         {
-            // Arrange
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo");
-            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("fooAuth", "aparam");
-            var redirectResponse = new HttpResponseMessage(statusCode);
-            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
-            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
-            // Act
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => this._invoker.SendAsync(httpRequestMessage, CancellationToken.None));
-            // Assert
-            Assert.Contains("Redirects with changing schemes not allowed by default", exception.Message);
-            Assert.Equal("Scheme changed from https to http.", exception.InnerException?.Message);
-            Assert.IsType<InvalidOperationException>(exception);
+
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo"))
+            {
+                // Arrange
+                httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("fooAuth", "aparam");
+                var redirectResponse = new HttpResponseMessage(statusCode);
+                redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => this._invoker.SendAsync(httpRequestMessage, CancellationToken.None));
+                // Assert
+                Assert.Contains("Redirects with changing schemes not allowed by default", exception.Message);
+                Assert.Equal("Scheme changed from https to http.", exception.InnerException?.Message);
+                Assert.IsType<InvalidOperationException>(exception);
+            }
         }
 
         [Theory]
@@ -175,70 +184,77 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentSchemeShouldRemoveAuthHeaderIfAllowRedirectOnSchemeChangeIsEnabled(HttpStatusCode statusCode)
         {
-            // Arrange
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo");
-            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("fooAuth", "aparam");
-            var redirectResponse = new HttpResponseMessage(statusCode);
-            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
-            this._redirectHandler.RedirectOption.AllowRedirectOnSchemeChange = true;// Enable redirects on scheme change
-            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
-            // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
-            // Assert
-            Assert.NotSame(response.RequestMessage, httpRequestMessage);
-            Assert.NotSame(response.RequestMessage?.RequestUri?.Scheme, httpRequestMessage.RequestUri?.Scheme);
-            Assert.Null(response.RequestMessage?.Headers.Authorization);
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo"))
+            {
+                // Arrange
+                httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("fooAuth", "aparam");
+                var redirectResponse = new HttpResponseMessage(statusCode);
+                redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+                this._redirectHandler.RedirectOption.AllowRedirectOnSchemeChange = true;// Enable redirects on scheme change
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.NotSame(response.RequestMessage?.RequestUri?.Scheme, httpRequestMessage.RequestUri?.Scheme);
+                Assert.Null(response.RequestMessage?.Headers.Authorization);
+            }
         }
 
         [Fact]
         public async Task RedirectWithSameHostShouldKeepAuthHeader()
         {
-            // Arrange
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo");
-            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("fooAuth", "aparam");
-            var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
-            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
-            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
-            // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
-            // Assert
-            Assert.NotSame(response.RequestMessage, httpRequestMessage);
-            Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
-            Assert.NotNull(response.RequestMessage?.Headers.Authorization);
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            {
+                // Arrange
+                httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("fooAuth", "aparam");
+                var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
+                redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
+                Assert.NotNull(response.RequestMessage?.Headers.Authorization);
+            }
         }
 
         [Fact]
         public async Task RedirectWithRelativeUrlShouldKeepRequestHost()
         {
-            // Arrange
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo");
-            var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
-            redirectResponse.Headers.Location = new Uri("/bar", UriKind.Relative);
-            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
-            // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
-            // Assert
-            Assert.NotSame(response.RequestMessage, httpRequestMessage);
-            Assert.Equal("http://example.org/bar", response.RequestMessage?.RequestUri?.AbsoluteUri);
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            {   // Arrange
+                var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
+                redirectResponse.Headers.Location = new Uri("/bar", UriKind.Relative);
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.Equal("http://example.org/bar", response.RequestMessage?.RequestUri?.AbsoluteUri);
+            }
         }
 
         [Fact]
         public async Task ExceedMaxRedirectsShouldThrowsException()
         {
-            // Arrange
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo");
-            var response1 = new HttpResponseMessage(HttpStatusCode.Redirect);
-            response1.Headers.Location = new Uri("http://example.org/bar");
-            var response2 = new HttpResponseMessage(HttpStatusCode.Redirect);
-            response2.Headers.Location = new Uri("http://example.org/foo");
-            this._testHttpMessageHandler.SetHttpResponse(response1, response2);// sets the mock response
-            // Act
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => this._invoker.SendAsync(
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            {
+                // Arrange
+                var response1 = new HttpResponseMessage(HttpStatusCode.Redirect);
+                response1.Headers.Location = new Uri("http://example.org/bar");
+                var response2 = new HttpResponseMessage(HttpStatusCode.Redirect);
+                response2.Headers.Location = new Uri("http://example.org/foo");
+                this._testHttpMessageHandler.SetHttpResponse(response1, response2);// sets the mock response
+                // Act
+                var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => this._invoker.SendAsync(
                    httpRequestMessage, CancellationToken.None));
-            // Assert
-            Assert.Equal("Too many redirects performed", exception.Message);
-            Assert.Equal("Max redirects exceeded. Redirect count : 5", exception.InnerException?.Message);
-            Assert.IsType<InvalidOperationException>(exception);
+                // Assert
+                Assert.Equal("Too many redirects performed", exception.Message);
+                Assert.Equal("Max redirects exceeded. Redirect count : 5", exception.InnerException?.Message);
+                Assert.IsType<InvalidOperationException>(exception);
+            }
         }
 
         [Theory]
@@ -248,18 +264,20 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentHostShouldRemoveProxyAuthHeader(HttpStatusCode statusCode)
         {
-            // Arrange
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
-            httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("fooAuth", "aparam");
-            var redirectResponse = new HttpResponseMessage(statusCode);
-            redirectResponse.Headers.Location = new Uri("http://example.net/bar");
-            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
-            // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
-            // Assert
-            Assert.NotSame(response.RequestMessage, httpRequestMessage);
-            Assert.NotSame(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
-            Assert.Null(response.RequestMessage?.Headers.ProxyAuthorization);
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo"))
+            {
+                // Arrange
+                httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("fooAuth", "aparam");
+                var redirectResponse = new HttpResponseMessage(statusCode);
+                redirectResponse.Headers.Location = new Uri("http://example.net/bar");
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.NotSame(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
+                Assert.Null(response.RequestMessage?.Headers.ProxyAuthorization);
+            }
         }
 
         [Theory]
@@ -269,9 +287,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentHostShouldRemoveCookieHeader(HttpStatusCode statusCode)
         {
-            // Arrange
-            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo"))
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo"))
             {
+                // Arrange
                 httpRequestMessage.Headers.Add("Cookie", "session=abc123");
                 var redirectResponse = new HttpResponseMessage(statusCode);
                 redirectResponse.Headers.Location = new Uri("http://example.net/bar");
@@ -292,19 +310,21 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentSchemeShouldRemoveProxyAuthHeaderIfAllowRedirectOnSchemeChangeIsEnabled(HttpStatusCode statusCode)
         {
-            // Arrange
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo");
-            httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("fooAuth", "aparam");
-            var redirectResponse = new HttpResponseMessage(statusCode);
-            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
-            this._redirectHandler.RedirectOption.AllowRedirectOnSchemeChange = true;// Enable redirects on scheme change
-            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
-            // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
-            // Assert
-            Assert.NotSame(response.RequestMessage, httpRequestMessage);
-            Assert.NotSame(response.RequestMessage?.RequestUri?.Scheme, httpRequestMessage.RequestUri?.Scheme);
-            Assert.Null(response.RequestMessage?.Headers.ProxyAuthorization);
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo"))
+            {
+                // Arrange
+                httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("fooAuth", "aparam");
+                var redirectResponse = new HttpResponseMessage(statusCode);
+                redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+                this._redirectHandler.RedirectOption.AllowRedirectOnSchemeChange = true;// Enable redirects on scheme change
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.NotSame(response.RequestMessage?.RequestUri?.Scheme, httpRequestMessage.RequestUri?.Scheme);
+                Assert.Null(response.RequestMessage?.Headers.ProxyAuthorization);
+            }
         }
 
         [Theory]
@@ -314,53 +334,59 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentSchemeShouldRemoveCookieHeaderIfAllowRedirectOnSchemeChangeIsEnabled(HttpStatusCode statusCode)
         {
-            // Arrange
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo");
-            httpRequestMessage.Headers.Add("Cookie", "session=abc123");
-            var redirectResponse = new HttpResponseMessage(statusCode);
-            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
-            this._redirectHandler.RedirectOption.AllowRedirectOnSchemeChange = true;// Enable redirects on scheme change
-            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
-            // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
-            // Assert
-            Assert.NotSame(response.RequestMessage, httpRequestMessage);
-            Assert.NotSame(response.RequestMessage?.RequestUri?.Scheme, httpRequestMessage.RequestUri?.Scheme);
-            Assert.False(response.RequestMessage?.Headers.Contains("Cookie"));
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo"))
+            {
+                // Arrange
+                httpRequestMessage.Headers.Add("Cookie", "session=abc123");
+                var redirectResponse = new HttpResponseMessage(statusCode);
+                redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+                this._redirectHandler.RedirectOption.AllowRedirectOnSchemeChange = true;// Enable redirects on scheme change
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.NotSame(response.RequestMessage?.RequestUri?.Scheme, httpRequestMessage.RequestUri?.Scheme);
+                Assert.False(response.RequestMessage?.Headers.Contains("Cookie"));
+            }
         }
 
         [Fact]
         public async Task RedirectWithSameHostShouldKeepProxyAuthHeader()
         {
-            // Arrange
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo");
-            httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("fooAuth", "aparam");
-            var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
-            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
-            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
-            // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
-            // Assert
-            Assert.NotSame(response.RequestMessage, httpRequestMessage);
-            Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
-            Assert.NotNull(response.RequestMessage?.Headers.ProxyAuthorization);
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            {
+                // Arrange
+                httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("fooAuth", "aparam");
+                var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
+                redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
+                Assert.NotNull(response.RequestMessage?.Headers.ProxyAuthorization);
+            }
         }
 
         [Fact]
         public async Task RedirectWithSameHostShouldKeepCookieHeader()
         {
-            // Arrange
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo");
-            httpRequestMessage.Headers.Add("Cookie", "session=abc123");
-            var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
-            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
-            this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
-            // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
-            // Assert
-            Assert.NotSame(response.RequestMessage, httpRequestMessage);
-            Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
-            Assert.True(response.RequestMessage?.Headers.Contains("Cookie"));
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            {
+                // Arrange
+                httpRequestMessage.Headers.Add("Cookie", "session=abc123");
+                var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
+                redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
+                Assert.True(response.RequestMessage?.Headers.Contains("Cookie"));
+            }
         }
     }
 }
