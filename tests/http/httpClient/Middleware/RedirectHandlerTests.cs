@@ -11,6 +11,68 @@ using Xunit;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 {
+    /// <summary>
+    /// A mock IWebProxy implementation for testing proxy bypass scenarios.
+    /// </summary>
+    internal class MockWebProxy : IWebProxy
+    {
+        private readonly Uri _proxyUri;
+        private readonly string[] _bypassList;
+
+        public MockWebProxy(Uri proxyUri, params string[] bypassList)
+        {
+            _proxyUri = proxyUri;
+            _bypassList = bypassList;
+        }
+
+        public ICredentials? Credentials { get; set; }
+
+        public Uri? GetProxy(Uri destination) => _proxyUri;
+
+        public bool IsBypassed(Uri host)
+        {
+            foreach(var bypass in _bypassList)
+            {
+                if(host.Host.Contains(bypass, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// A mock DelegatingHandler for testing that allows setting responses and proper chaining.
+    /// </summary>
+    internal class MockDelegatingRedirectHandler : DelegatingHandler
+    {
+        private HttpResponseMessage? _response1;
+        private HttpResponseMessage? _response2;
+        private bool _response1Sent;
+
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            if(!_response1Sent)
+            {
+                _response1Sent = true;
+                _response1!.RequestMessage = request;
+                return Task.FromResult(_response1);
+            }
+            else
+            {
+                _response1Sent = false;
+                _response2!.RequestMessage = request;
+                return Task.FromResult(_response2);
+            }
+        }
+
+        public void SetHttpResponse(HttpResponseMessage? response1, HttpResponseMessage? response2 = null)
+        {
+            _response1Sent = false;
+            _response1 = response1;
+            _response2 = response2;
+        }
+    }
+
     public sealed class RedirectHandlerTests : IDisposable
     {
         private readonly MockRedirectHandler _testHttpMessageHandler;
@@ -262,18 +324,18 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData(HttpStatusCode.Found)]  // 302
         [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
         [InlineData((HttpStatusCode)308)] // 308
-        public async Task RedirectWithDifferentHostShouldRemoveProxyAuthHeader(HttpStatusCode statusCode)
+        public async Task RedirectWithDifferentHostShouldRemoveProxyAuthHeaderWhenNoProxyConfigured(HttpStatusCode statusCode)
         {
             using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo"))
             {
-                // Arrange
+                // Arrange - No proxy is configured, so ProxyAuthorization should be removed
                 httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("fooAuth", "aparam");
                 var redirectResponse = new HttpResponseMessage(statusCode);
                 redirectResponse.Headers.Location = new Uri("http://example.net/bar");
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
                 var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
-                // Assert
+                // Assert - ProxyAuthorization is removed when no proxy is configured
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.NotSame(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
                 Assert.Null(response.RequestMessage?.Headers.ProxyAuthorization);
@@ -308,11 +370,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData(HttpStatusCode.Found)]  // 302
         [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
         [InlineData((HttpStatusCode)308)] // 308
-        public async Task RedirectWithDifferentSchemeShouldRemoveProxyAuthHeaderIfAllowRedirectOnSchemeChangeIsEnabled(HttpStatusCode statusCode)
+        public async Task RedirectWithDifferentSchemeShouldRemoveProxyAuthHeaderWhenNoProxyConfigured(HttpStatusCode statusCode)
         {
             using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo"))
             {
-                // Arrange
+                // Arrange - No proxy is configured, so ProxyAuthorization should be removed
                 httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("fooAuth", "aparam");
                 var redirectResponse = new HttpResponseMessage(statusCode);
                 redirectResponse.Headers.Location = new Uri("http://example.org/bar");
@@ -320,7 +382,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
                 var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
-                // Assert
+                // Assert - ProxyAuthorization is removed when no proxy is configured
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.NotSame(response.RequestMessage?.RequestUri?.Scheme, httpRequestMessage.RequestUri?.Scheme);
                 Assert.Null(response.RequestMessage?.Headers.ProxyAuthorization);
@@ -352,21 +414,21 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         }
 
         [Fact]
-        public async Task RedirectWithSameHostShouldKeepProxyAuthHeader()
+        public async Task RedirectWithSameHostShouldRemoveProxyAuthHeaderWhenNoProxyConfigured()
         {
             using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
             {
-                // Arrange
+                // Arrange - No proxy is configured, so ProxyAuthorization should be removed
                 httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("fooAuth", "aparam");
                 var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
                 redirectResponse.Headers.Location = new Uri("http://example.org/bar");
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
                 var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
-                // Assert
+                // Assert - ProxyAuthorization is removed when no proxy is configured
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
-                Assert.NotNull(response.RequestMessage?.Headers.ProxyAuthorization);
+                Assert.Null(response.RequestMessage?.Headers.ProxyAuthorization);
             }
         }
 
@@ -388,5 +450,107 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 Assert.True(response.RequestMessage?.Headers.Contains("Cookie"));
             }
         }
+
+#if !BROWSER
+        [Theory]
+        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
+        [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308
+        public async Task RedirectToBypassedProxyUrlShouldRemoveProxyAuthHeader(HttpStatusCode statusCode)
+        {
+            // Arrange - Create a handler chain with a proxy that bypasses "internal.local"
+            var mockProxy = new MockWebProxy(new Uri("http://proxy.example.com:8080"), "internal.local");
+            var httpClientHandler = new HttpClientHandler { Proxy = mockProxy };
+            var mockHandler = new MockDelegatingRedirectHandler
+            {
+                InnerHandler = httpClientHandler
+            };
+            var redirectHandler = new RedirectHandler
+            {
+                InnerHandler = mockHandler
+            };
+
+            using var invoker = new HttpMessageInvoker(redirectHandler);
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
+            httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("Basic", "creds");
+
+            var redirectResponse = new HttpResponseMessage(statusCode);
+            redirectResponse.Headers.Location = new Uri("http://internal.local/bar"); // Bypassed by proxy
+            mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
+
+            // Act
+            var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+
+            // Assert - ProxyAuthorization should be removed because internal.local is bypassed
+            Assert.NotSame(response.RequestMessage, httpRequestMessage);
+            Assert.Null(response.RequestMessage?.Headers.ProxyAuthorization);
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
+        [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308
+        public async Task RedirectToProxiedUrlShouldKeepProxyAuthHeader(HttpStatusCode statusCode)
+        {
+            // Arrange - Create a handler chain with a proxy that bypasses "internal.local"
+            var mockProxy = new MockWebProxy(new Uri("http://proxy.example.com:8080"), "internal.local");
+            var httpClientHandler = new HttpClientHandler { Proxy = mockProxy };
+            var mockHandler = new MockDelegatingRedirectHandler
+            {
+                InnerHandler = httpClientHandler
+            };
+            var redirectHandler = new RedirectHandler
+            {
+                InnerHandler = mockHandler
+            };
+
+            using var invoker = new HttpMessageInvoker(redirectHandler);
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
+            httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("Basic", "creds");
+
+            var redirectResponse = new HttpResponseMessage(statusCode);
+            redirectResponse.Headers.Location = new Uri("http://example.org/bar"); // NOT bypassed, requires proxy
+            mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
+
+            // Act
+            var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+
+            // Assert - ProxyAuthorization should be kept because example.org requires proxy
+            Assert.NotSame(response.RequestMessage, httpRequestMessage);
+            Assert.NotNull(response.RequestMessage?.Headers.ProxyAuthorization);
+        }
+
+        [Fact]
+        public async Task RedirectWithNoProxyConfiguredShouldRemoveProxyAuthHeader()
+        {
+            // Arrange - Create a handler chain without a proxy configured
+            var httpClientHandler = new HttpClientHandler { Proxy = null };
+            var mockHandler = new MockDelegatingRedirectHandler
+            {
+                InnerHandler = httpClientHandler
+            };
+            var redirectHandler = new RedirectHandler
+            {
+                InnerHandler = mockHandler
+            };
+
+            using var invoker = new HttpMessageInvoker(redirectHandler);
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
+            httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("Basic", "creds");
+
+            var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
+            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+            mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
+
+            // Act
+            var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+
+            // Assert - ProxyAuthorization should be removed when no proxy is configured
+            Assert.NotSame(response.RequestMessage, httpRequestMessage);
+            Assert.Null(response.RequestMessage?.Headers.ProxyAuthorization);
+        }
+#endif
     }
 }
