@@ -370,6 +370,106 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData(HttpStatusCode.Found)]  // 302
         [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
         [InlineData((HttpStatusCode)308)] // 308
+        public async Task RedirectWithDifferentHostShouldRemoveSensitiveHeaders(HttpStatusCode statusCode)
+        {
+            // Arrange - Configure sensitive headers to be removed on host change
+            var redirectOption = new RedirectHandlerOption
+            {
+                SensitiveHeaders = { "X-Api-Key", "X-Custom-Auth" }
+            };
+            var mockHandler = new MockRedirectHandler();
+            var redirectHandler = new RedirectHandler(redirectOption)
+            {
+                InnerHandler = mockHandler
+            };
+            using var invoker = new HttpMessageInvoker(redirectHandler);
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
+            httpRequestMessage.Headers.Add("X-Api-Key", "secret-api-key");
+            httpRequestMessage.Headers.Add("X-Custom-Auth", "custom-auth-value");
+            httpRequestMessage.Headers.Add("X-Safe-Header", "should-remain");
+
+            var redirectResponse = new HttpResponseMessage(statusCode);
+            redirectResponse.Headers.Location = new Uri("http://example.net/bar");
+            mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
+
+            // Act
+            var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+
+            // Assert - Sensitive headers should be removed, but non-sensitive should remain
+            Assert.NotSame(response.RequestMessage, httpRequestMessage);
+            Assert.False(response.RequestMessage?.Headers.Contains("X-Api-Key"));
+            Assert.False(response.RequestMessage?.Headers.Contains("X-Custom-Auth"));
+            Assert.True(response.RequestMessage?.Headers.Contains("X-Safe-Header"));
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
+        [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308
+        public async Task RedirectWithDifferentSchemeShouldRemoveSensitiveHeaders(HttpStatusCode statusCode)
+        {
+            // Arrange - Configure sensitive headers to be removed on scheme change
+            var redirectOption = new RedirectHandlerOption
+            {
+                AllowRedirectOnSchemeChange = true,
+                SensitiveHeaders = { "X-Api-Key" }
+            };
+            var mockHandler = new MockRedirectHandler();
+            var redirectHandler = new RedirectHandler(redirectOption)
+            {
+                InnerHandler = mockHandler
+            };
+            using var invoker = new HttpMessageInvoker(redirectHandler);
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo");
+            httpRequestMessage.Headers.Add("X-Api-Key", "secret-api-key");
+
+            var redirectResponse = new HttpResponseMessage(statusCode);
+            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+            mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
+
+            // Act
+            var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+
+            // Assert - Sensitive headers should be removed on scheme change
+            Assert.NotSame(response.RequestMessage, httpRequestMessage);
+            Assert.False(response.RequestMessage?.Headers.Contains("X-Api-Key"));
+        }
+
+        [Fact]
+        public async Task RedirectWithSameHostAndSchemeShouldKeepSensitiveHeaders()
+        {
+            // Arrange - Configure sensitive headers
+            var redirectOption = new RedirectHandlerOption
+            {
+                SensitiveHeaders = { "X-Api-Key" }
+            };
+            var mockHandler = new MockRedirectHandler();
+            var redirectHandler = new RedirectHandler(redirectOption)
+            {
+                InnerHandler = mockHandler
+            };
+            using var invoker = new HttpMessageInvoker(redirectHandler);
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
+            httpRequestMessage.Headers.Add("X-Api-Key", "secret-api-key");
+
+            var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
+            redirectResponse.Headers.Location = new Uri("http://example.org/bar"); // Same host and scheme
+            mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
+
+            // Act
+            var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+
+            // Assert - Sensitive headers should be kept when host and scheme are the same
+            Assert.NotSame(response.RequestMessage, httpRequestMessage);
+            Assert.True(response.RequestMessage?.Headers.Contains("X-Api-Key"));
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
+        [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentSchemeShouldRemoveProxyAuthHeaderWhenNoProxyConfigured(HttpStatusCode statusCode)
         {
             using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo"))

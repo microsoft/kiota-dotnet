@@ -125,6 +125,15 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                         {
                             newRequest.Headers.Authorization = null;
                             newRequest.Headers.Remove("Cookie");
+
+                            // Remove any additional sensitive headers configured in the options
+                            if(redirectOption.SensitiveHeaders.Count > 0)
+                            {
+                                foreach(var header in redirectOption.SensitiveHeaders)
+                                {
+                                    newRequest.Headers.Remove(header);
+                                }
+                            }
                         }
 
                         // Remove ProxyAuthorization if no proxy is configured or the URL is bypassed
