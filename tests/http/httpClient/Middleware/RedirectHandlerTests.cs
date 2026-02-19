@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
 using Microsoft.Kiota.Http.HttpClientLibrary.Tests.Mocks;
@@ -31,12 +32,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 
         public bool IsBypassed(Uri host)
         {
-            foreach(var bypass in _bypassList)
-            {
-                if(host.Host.Contains(bypass, StringComparison.OrdinalIgnoreCase))
-                    return true;
-            }
-            return false;
+            return _bypassList.Any(bypass => host.Host.Contains(bypass, StringComparison.OrdinalIgnoreCase));
         }
     }
 
