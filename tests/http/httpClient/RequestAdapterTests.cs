@@ -4,6 +4,7 @@ using System.Net.Http;
 #endif
 using System.Runtime.Serialization;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -1186,6 +1187,21 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             Assert.NotNull(adapter2);
             Assert.NotNull(adapter1.SerializationWriterFactory);
             Assert.NotNull(adapter2.SerializationWriterFactory);
+        }
+
+        [Fact]
+        public void ActivatorUtilitiesCanCreateAdapterWithSingleConstructor()
+        {
+            // Arrange
+            var services = new ServiceCollection();
+            services.AddSingleton<IAuthenticationProvider>(new AnonymousAuthenticationProvider());
+            var provider = services.BuildServiceProvider();
+
+            // Act - should not throw "Multiple constructors" exception
+            var adapter = ActivatorUtilities.CreateInstance<HttpClientRequestAdapter>(provider);
+
+            // Assert
+            Assert.NotNull(adapter);
         }
     }
 
