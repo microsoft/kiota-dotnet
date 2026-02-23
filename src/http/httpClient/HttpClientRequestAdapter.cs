@@ -18,6 +18,7 @@ using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Abstractions.Extensions;
@@ -74,6 +75,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <param name="observabilityOptions">The observability options.</param>
         /// <param name="httpVersion">The HTTP version.</param>
         /// </summary>
+        [ActivatorUtilitiesConstructor]
         public HttpClientRequestAdapter(IAuthenticationProvider authenticationProvider, IParseNodeFactory? parseNodeFactory = null, ISerializationWriterFactory? serializationWriterFactory = null, HttpClient? httpClient = null, ObservabilityOptions? observabilityOptions = null, Version? httpVersion = null)
         {
             authProvider = authenticationProvider ?? throw new ArgumentNullException(nameof(authenticationProvider));

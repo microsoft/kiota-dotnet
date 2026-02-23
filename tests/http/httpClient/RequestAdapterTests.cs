@@ -4,6 +4,7 @@ using System.Net.Http;
 #endif
 using System.Runtime.Serialization;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -1149,6 +1150,22 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             Assert.Equal(HttpVersion.Version11, requestMessage.Version);
         }
 #endif
+
+        [Fact]
+        public void AddHttpClientDIDoesNotThrow()
+        {
+            // Arrange - Reproduces the DI scenario where multiple constructors caused
+            // InvalidOperationException: Multiple constructors accepting all given argument types
+            var services = new ServiceCollection();
+            services.AddSingleton<IAuthenticationProvider>(new AnonymousAuthenticationProvider());
+            services.AddHttpClient<IRequestAdapter, HttpClientRequestAdapter>();
+
+            // Act & Assert - Should not throw "Multiple constructors accepting all given argument types"
+            using var provider = services.BuildServiceProvider();
+            var adapter = provider.GetRequiredService<IRequestAdapter>();
+            Assert.NotNull(adapter);
+            Assert.IsType<HttpClientRequestAdapter>(adapter);
+        }
 
         [Fact]
         public void ConstructorOverloadsWorkCorrectlyForCompatibility()
