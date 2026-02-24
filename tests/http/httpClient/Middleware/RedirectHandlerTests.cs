@@ -32,7 +32,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 
         public bool IsBypassed(Uri host)
         {
-            return _bypassList.Any(bypass => host.Host.Contains(bypass, StringComparison.OrdinalIgnoreCase));
+            return _bypassList.Any(bypass => host.Host.IndexOf(bypass, StringComparison.OrdinalIgnoreCase) >= 0);
         }
     }
 
