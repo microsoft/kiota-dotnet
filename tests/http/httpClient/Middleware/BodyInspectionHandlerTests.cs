@@ -29,7 +29,7 @@ public sealed class BodyInspectionHandlerTests : IDisposable
         {
             Content = new StringContent("request test")
         };
-        var response = await invoker.SendAsync(request, TestContext.Current.CancellationToken);
+        await invoker.SendAsync(request, TestContext.Current.CancellationToken);
 
         // Then
         Assert.Equal("request test", GetStringFromStream(option.RequestBody!));
