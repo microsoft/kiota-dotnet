@@ -425,7 +425,7 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
 
         // Assert - Verify various nested spans are created
         var resultingActivities = new HashSet<string>(
-            _capturedActivities.Where(a => a.TraceId == testRoot.TraceId).Select(static a => a.OperationName),
+            _capturedActivities.ToList().Where(a => a.TraceId == testRoot.TraceId).Select(static a => a.OperationName),
             StringComparer.Ordinal);
         Assert.Contains("SendAsync - {+baseurl}/users", resultingActivities);
         Assert.Contains("GetHttpResponseMessageAsync", resultingActivities);
