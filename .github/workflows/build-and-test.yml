@@ -16,7 +16,7 @@ jobs:
   build-and-test:
     runs-on: windows-latest
     env:
-      solutionName: Microsoft.Kiota.sln
+      solutionName: Microsoft.Kiota.slnx
     steps:
       - uses: actions/checkout@v6
       - name: Setup .NET

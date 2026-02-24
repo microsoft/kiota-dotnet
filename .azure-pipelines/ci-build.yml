@@ -81,7 +81,7 @@ extends:
           - task: DotNetCoreCLI@2
             displayName: 'Build projects in Microsoft.Kiota'
             inputs:
-              projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.sln'
+              projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.slnx'
               arguments: '--configuration $(BuildConfiguration) --no-incremental'
 
           # Run the Unit test
@@ -89,7 +89,7 @@ extends:
             displayName: 'Test projects in Microsoft.Kiota'
             inputs:
               command: test
-              projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.sln'
+              projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.slnx'
               arguments: '--configuration $(BuildConfiguration) --no-build --framework net9.0'
 
           - task: EsrpCodeSigning@5
