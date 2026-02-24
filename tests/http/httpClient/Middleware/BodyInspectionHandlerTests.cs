@@ -65,7 +65,7 @@ public sealed class BodyInspectionHandlerTests : IDisposable
             "application/octet-stream"
         );
 
-        var response = await invoker.SendAsync(request, TestContext.Current.CancellationToken);
+        await invoker.SendAsync(request, TestContext.Current.CancellationToken);
 
         // Then
         Assert.Equal("request test", GetStringFromStream(option.RequestBody!));
@@ -84,7 +84,7 @@ public sealed class BodyInspectionHandlerTests : IDisposable
 
         // When
         var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost");
-        var response = await invoker.SendAsync(request, TestContext.Current.CancellationToken);
+        await invoker.SendAsync(request, TestContext.Current.CancellationToken);
 
         // Then
         Assert.Same(Stream.Null, option.RequestBody);
@@ -120,7 +120,7 @@ public sealed class BodyInspectionHandlerTests : IDisposable
         var response = await httpClient.SendAsync(request, TestContext.Current.CancellationToken);
 
         // Then
-        if(response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
         {
             Assert.NotEqual(Stream.Null, option.ResponseBody);
             var jsonFromInspection = await JsonDocument.ParseAsync(option.ResponseBody, cancellationToken: TestContext.Current.CancellationToken);
@@ -133,7 +133,7 @@ public sealed class BodyInspectionHandlerTests : IDisposable
             Assert.True(jsonFromInspection.RootElement.TryGetProperty("owner", out _));
             Assert.True(jsonFromContent.RootElement.TryGetProperty("owner", out _));
         }
-        else if((int)response.StatusCode is 429 or 403)
+        else if ((int)response.StatusCode is 429 or 403)
         {
             // We've been throttled according to the docs below. No need to fail for now.
             // https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28#primary-rate-limit-for-unauthenticated-users
@@ -153,7 +153,7 @@ public sealed class BodyInspectionHandlerTests : IDisposable
 
         // When
         var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost");
-        var response = await invoker.SendAsync(request, TestContext.Current.CancellationToken);
+        await invoker.SendAsync(request, TestContext.Current.CancellationToken);
 
         // Then
         Assert.Same(Stream.Null, option.ResponseBody);
