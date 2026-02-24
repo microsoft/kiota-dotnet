@@ -98,11 +98,20 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
         _requestAdapter?.Dispose();
     }
 
-    private KeyValuePair<string, string?> GetTagFromActivities(string tagKey)
+    private KeyValuePair<string, string?> GetTagFromActivities(string tagKey, ActivityTraceId traceId)
     {
         return _capturedActivities
+            .Where(a => a.TraceId == traceId)
             .SelectMany(a => a.Tags)
             .FirstOrDefault(t => t.Key == tagKey);
+    }
+
+    private static Activity StartTestRootActivity()
+    {
+        var activity = new Activity("test");
+        activity.SetIdFormat(ActivityIdFormat.W3C);
+        activity.Start();
+        return activity;
     }
 
     #region GetNormalizedHttpRoute Tests
@@ -178,12 +187,13 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
         var requestInfo = new RequestInformation(Method.GET, urlTemplate, pathParameters);
         // Clear any previously captured activities
         _capturedActivities.Clear();
+        using var testRoot = StartTestRootActivity();
 
         // Act
         await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
 
         // Assert
-        var activity = _capturedActivities.FirstOrDefault(a => a.OperationName.Contains("SendAsync"));
+        var activity = _capturedActivities.FirstOrDefault(a => a.TraceId == testRoot.TraceId && a.OperationName.Contains("SendAsync"));
         Assert.NotNull(activity);
 
         var httpRouteTag = activity.Tags.FirstOrDefault(t => t.Key == "http.route");
@@ -232,12 +242,13 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
 
         // Clear any previously captured activities
         _capturedActivities.Clear();
+        using var testRoot = StartTestRootActivity();
 
         // Act
         await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
 
         // Assert
-        var activity = _capturedActivities.FirstOrDefault(a => a.OperationName.Contains("SendAsync"));
+        var activity = _capturedActivities.FirstOrDefault(a => a.TraceId == testRoot.TraceId && a.OperationName.Contains("SendAsync"));
         Assert.NotNull(activity);
 
         var uriTemplateTag = activity.Tags.FirstOrDefault(t => t.Key == "url.uri_template");
@@ -280,14 +291,16 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
         };
 
         _capturedActivities.Clear();
+        using var testRoot = StartTestRootActivity();
 
         // Act
         await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
 
         // Assert
-        Assert.NotEmpty(_capturedActivities);
+        var testActivities = _capturedActivities.Where(a => a.TraceId == testRoot.TraceId).ToList();
+        Assert.NotEmpty(testActivities);
 
-        var methodTag = GetTagFromActivities("http.request.method");
+        var methodTag = GetTagFromActivities("http.request.method", testRoot.TraceId);
         Assert.NotNull(methodTag.Key);
         Assert.Equal(expectedMethodTag, methodTag.Value);
     }
@@ -320,17 +333,19 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
         };
 
         _capturedActivities.Clear();
+        using var testRoot = StartTestRootActivity();
 
         // Act
         await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
 
         // Assert
-        Assert.NotEmpty(_capturedActivities);
+        var testActivities = _capturedActivities.Where(a => a.TraceId == testRoot.TraceId).ToList();
+        Assert.NotEmpty(testActivities);
 
-        var schemeTag = GetTagFromActivities("url.scheme");
+        var schemeTag = GetTagFromActivities("url.scheme", testRoot.TraceId);
         Assert.Equal("https", schemeTag.Value);
 
-        var serverTag = GetTagFromActivities("server.address");
+        var serverTag = GetTagFromActivities("server.address", testRoot.TraceId);
         Assert.Equal("graph.microsoft.com", serverTag.Value);
     }
 
@@ -362,14 +377,16 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
         };
 
         _capturedActivities.Clear();
+        using var testRoot = StartTestRootActivity();
 
         // Act
         await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
 
         // Assert
-        Assert.NotEmpty(_capturedActivities);
+        var testActivities = _capturedActivities.Where(a => a.TraceId == testRoot.TraceId).ToList();
+        Assert.NotEmpty(testActivities);
 
-        var urlFullTag = GetTagFromActivities("url.full");
+        var urlFullTag = GetTagFromActivities("url.full", testRoot.TraceId);
         Assert.Null(urlFullTag.Key);
     }
 
@@ -401,12 +418,15 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
         };
 
         _capturedActivities.Clear();
+        using var testRoot = StartTestRootActivity();
 
         // Act
         await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
 
         // Assert - Verify various nested spans are created
-        var resultingActivities = new HashSet<string>(_capturedActivities.Select(static a => a.OperationName), StringComparer.Ordinal);
+        var resultingActivities = new HashSet<string>(
+            _capturedActivities.ToList().Where(a => a.TraceId == testRoot.TraceId).Select(static a => a.OperationName),
+            StringComparer.Ordinal);
         Assert.Contains("SendAsync - {+baseurl}/users", resultingActivities);
         Assert.Contains("GetHttpResponseMessageAsync", resultingActivities);
         Assert.Contains("GetRequestMessageFromRequestInformation", resultingActivities);
