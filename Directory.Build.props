@@ -15,7 +15,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
     <IsPackable>false</IsPackable>
-    <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
     <!-- The target application is the one which will resolve the correct version.

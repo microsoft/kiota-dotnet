@@ -63,7 +63,7 @@ public class UriReplacementHandlerTests
         };
         var msg = new HttpRequestMessage(HttpMethod.Get, "http://localhost");
         var client = new HttpClient(handler);
-        await client.SendAsync(msg);
+        await client.SendAsync(msg, TestContext.Current.CancellationToken);
 
         mockReplacement.Verify(static x => x.Replace(It.IsAny<Uri>()), Times.Once());
     }
@@ -82,7 +82,7 @@ public class UriReplacementHandlerTests
         var msg = new HttpRequestMessage(HttpMethod.Get, "http://localhost");
         SetRequestOption(msg, mockReplacement.Object);
         var client = new HttpClient(handler);
-        await client.SendAsync(msg);
+        await client.SendAsync(msg, TestContext.Current.CancellationToken);
 
         mockReplacement.Verify(static x => x.Replace(It.IsAny<Uri>()), Times.Once());
     }

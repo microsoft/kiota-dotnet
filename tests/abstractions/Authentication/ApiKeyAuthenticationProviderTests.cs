@@ -14,7 +14,7 @@ public class ApiKeyAuthenticationProviderTests
         Assert.Throws<ArgumentNullException>(() => new ApiKeyAuthenticationProvider("key", null!, ApiKeyAuthenticationProvider.KeyLocation.Header));
 
         var value = new ApiKeyAuthenticationProvider("key", "param", ApiKeyAuthenticationProvider.KeyLocation.Header);
-        await Assert.ThrowsAsync<ArgumentNullException>(() => value.AuthenticateRequestAsync(null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => value.AuthenticateRequestAsync(null!, cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -25,7 +25,7 @@ public class ApiKeyAuthenticationProviderTests
         {
             UrlTemplate = "https://localhost{?param1}",
         };
-        await value.AuthenticateRequestAsync(request);
+        await value.AuthenticateRequestAsync(request, cancellationToken: TestContext.Current.CancellationToken);
         Assert.False(request.URI.ToString().EndsWith("param=key", StringComparison.OrdinalIgnoreCase));
         Assert.Contains("param", request.Headers.Keys);
     }
@@ -37,7 +37,7 @@ public class ApiKeyAuthenticationProviderTests
         {
             UrlTemplate = "https://localhost{?param1}",
         };
-        await value.AuthenticateRequestAsync(request);
+        await value.AuthenticateRequestAsync(request, cancellationToken: TestContext.Current.CancellationToken);
         Assert.EndsWith("?param=key", request.URI.ToString());
         Assert.DoesNotContain("param", request.Headers.Keys);
     }
@@ -50,7 +50,7 @@ public class ApiKeyAuthenticationProviderTests
             UrlTemplate = "https://localhost{?param1}",
         };
         request.QueryParameters.Add("param1", "value1");
-        await value.AuthenticateRequestAsync(request);
+        await value.AuthenticateRequestAsync(request, cancellationToken: TestContext.Current.CancellationToken);
         Assert.EndsWith("&param=key", request.URI.ToString());
         Assert.DoesNotContain("param", request.Headers.Keys);
     }

@@ -52,7 +52,7 @@ namespace Microsoft.Kiota.Serialization.Text.Tests
             using var content = new MemoryStream();
 
             // Act and Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => factory.GetRootParseNodeAsync(contentType!, content));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => factory.GetRootParseNodeAsync(contentType!, content, TestContext.Current.CancellationToken));
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace Microsoft.Kiota.Serialization.Text.Tests
             using var content = new MemoryStream();
 
             // Act and Assert
-            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => factory.GetRootParseNodeAsync(contentType, content));
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => factory.GetRootParseNodeAsync(contentType, content, TestContext.Current.CancellationToken));
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace Microsoft.Kiota.Serialization.Text.Tests
             Stream? content = null;
 
             // Act and Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => factory.GetRootParseNodeAsync(contentType, content!));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => factory.GetRootParseNodeAsync(contentType, content!, TestContext.Current.CancellationToken));
         }
     }
 }

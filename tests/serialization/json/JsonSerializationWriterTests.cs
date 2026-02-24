@@ -780,7 +780,11 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             writer.WriteObjectValue(null, value);
             var contentStream = writer.GetSerializedContent();
             using var reader = new StreamReader(contentStream, Encoding.UTF8);
-            var serializedString = await reader.ReadToEndAsync();
+            var serializedString = await reader.ReadToEndAsync(
+#if NET5_0_OR_GREATER
+                TestContext.Current.CancellationToken
+#endif
+            );
             var expected =
             """
             {

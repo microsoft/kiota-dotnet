@@ -32,7 +32,7 @@ public sealed class HeadersInspectionHandlerTests : IDisposable
         // When
         var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost");
         request.Headers.Add("test", "test");
-        var response = await invoker.SendAsync(request, default);
+        var response = await invoker.SendAsync(request, TestContext.Current.CancellationToken);
 
         // Then
         Assert.Equal("test", option.RequestHeaders["test"].First());
@@ -49,7 +49,7 @@ public sealed class HeadersInspectionHandlerTests : IDisposable
 
         // When
         var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost");
-        var response = await invoker.SendAsync(request, default);
+        var response = await invoker.SendAsync(request, TestContext.Current.CancellationToken);
 
         // Then
         Assert.Equal("test", option.ResponseHeaders["test"].First());
