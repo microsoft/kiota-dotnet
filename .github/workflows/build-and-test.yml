@@ -35,7 +35,7 @@ jobs:
         run: dotnet build ${{ env.solutionName }} --no-restore /p:UseSharedCompilation=false
       - name: Test for net472
         run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal --framework net472
-      - name: Test for net9.0 and collect coverage
-        run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=opencover --framework net9.0
+      - name: Test for net10.0 and collect coverage
+        run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=opencover --framework net10.0
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4

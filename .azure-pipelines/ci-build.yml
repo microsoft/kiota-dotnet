@@ -90,7 +90,7 @@ extends:
             inputs:
               command: test
               projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.slnx'
-              arguments: '--configuration $(BuildConfiguration) --no-build --framework net9.0'
+              arguments: '--configuration $(BuildConfiguration) --no-build --framework net10.0'
 
           - task: EsrpCodeSigning@5
             displayName: 'ESRP DLL Strong Name'
