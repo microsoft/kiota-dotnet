@@ -101,7 +101,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Serialization
             mockParseNodeFactory.Setup(parseNodeFactory => parseNodeFactory.GetRootParseNodeAsync(streamContentType, It.IsAny<Stream>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(mockParseNode.Object));
             _parseNodeFactoryRegistry.ContentTypeAssociatedFactories.TryAdd(streamContentType, mockParseNodeFactory.Object);
             // Act
-            var rootParseNode = await _parseNodeFactoryRegistry.GetRootParseNodeAsync(streamContentType, testStream);
+            var rootParseNode = await _parseNodeFactoryRegistry.GetRootParseNodeAsync(streamContentType, testStream, TestContext.Current.CancellationToken);
             // Assert
             Assert.NotNull(rootParseNode);
             Assert.Equal(mockParseNode.Object, rootParseNode);
@@ -117,7 +117,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Serialization
             mockParseNodeFactory.Setup(parseNodeFactory => parseNodeFactory.GetRootParseNodeAsync(applicationJsonContentType, It.IsAny<Stream>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(mockParseNode.Object));
             _parseNodeFactoryRegistry.ContentTypeAssociatedFactories.TryAdd(applicationJsonContentType, mockParseNodeFactory.Object);
             // Act
-            var rootParseNode = await _parseNodeFactoryRegistry.GetRootParseNodeAsync("application/vnd+json", testStream);
+            var rootParseNode = await _parseNodeFactoryRegistry.GetRootParseNodeAsync("application/vnd+json", testStream, TestContext.Current.CancellationToken);
             // Assert
             Assert.NotNull(rootParseNode);
             Assert.Equal(mockParseNode.Object, rootParseNode);
@@ -130,7 +130,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Serialization
             var streamContentType = "application/octet-stream";
             using var testStream = new MemoryStream(Encoding.UTF8.GetBytes("test input"));
             // Act
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await _parseNodeFactoryRegistry.GetRootParseNodeAsync(streamContentType, testStream));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await _parseNodeFactoryRegistry.GetRootParseNodeAsync(streamContentType, testStream, TestContext.Current.CancellationToken));
             // Assert
             Assert.NotNull(exception);
             Assert.Equal($"Content type {streamContentType} does not have a factory registered to be parsed", exception.Message);
@@ -144,7 +144,7 @@ namespace Microsoft.Kiota.Abstractions.Tests.Serialization
             // Arrange
             using var testStream = new MemoryStream(Encoding.UTF8.GetBytes("test input"));
             // Act
-            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _parseNodeFactoryRegistry.GetRootParseNodeAsync(contentType!, testStream));
+            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _parseNodeFactoryRegistry.GetRootParseNodeAsync(contentType!, testStream, TestContext.Current.CancellationToken));
             // Assert
             Assert.NotNull(exception);
             Assert.Equal("contentType", exception.ParamName);

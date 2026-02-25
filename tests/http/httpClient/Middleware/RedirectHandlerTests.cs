@@ -162,7 +162,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 Assert.Equal(response.RequestMessage?.Method, httpRequestMessage.Method);
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.NotNull(response.RequestMessage?.Content);
-                Assert.Equal("Hello World", await response.RequestMessage.Content.ReadAsStringAsync());
+                Assert.Equal("Hello World", await response.RequestMessage.Content.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                  TestContext.Current.CancellationToken
+#endif
+                ));
             }
         }
 

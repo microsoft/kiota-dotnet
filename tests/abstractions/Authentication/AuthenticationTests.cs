@@ -24,7 +24,7 @@ public class AuthenticationTests
         Assert.Empty(testRequest.Headers.Keys); // header collection is empty
 
         // Act
-        await anonymousAuthenticationProvider.AuthenticateRequestAsync(testRequest);
+        await anonymousAuthenticationProvider.AuthenticateRequestAsync(testRequest, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Empty(testRequest.Headers.Keys); // header collection is still empty
@@ -47,7 +47,7 @@ public class AuthenticationTests
         Assert.Empty(testRequest.Headers.Keys); // header collection is empty
 
         // Act
-        await testAuthProvider.AuthenticateRequestAsync(testRequest);
+        await testAuthProvider.AuthenticateRequestAsync(testRequest, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotEmpty(testRequest.Headers.Keys); // header collection is longer empty
@@ -158,7 +158,7 @@ public class AuthenticationTests
         };
 
         // Act - start the authentication task
-        var authTask = authProvider.AuthenticateRequestAsync(request);
+        var authTask = authProvider.AuthenticateRequestAsync(request, cancellationToken: TestContext.Current.CancellationToken);
 
         // Complete the token task to allow authentication to complete
         tokenTask.SetResult(expectedToken);

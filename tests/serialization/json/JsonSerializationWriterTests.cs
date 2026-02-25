@@ -612,7 +612,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             var serializedString = reader.ReadToEnd();
 
             // Assert
-#if NET462
+#if NET472
             Assert.Equal("36.799999999999997", serializedString);
 #else
             Assert.Equal("36.8", serializedString);
@@ -634,7 +634,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             var serializedString = reader.ReadToEnd();
 
             // Assert
-#if NET462
+#if NET472
             Assert.Equal("36.7999992", serializedString);
 #else
             Assert.Equal("36.8", serializedString);
@@ -780,7 +780,11 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             writer.WriteObjectValue(null, value);
             var contentStream = writer.GetSerializedContent();
             using var reader = new StreamReader(contentStream, Encoding.UTF8);
-            var serializedString = await reader.ReadToEndAsync();
+            var serializedString = await reader.ReadToEndAsync(
+#if NET5_0_OR_GREATER
+                TestContext.Current.CancellationToken
+#endif
+            );
             var expected =
             """
             {
