@@ -136,16 +136,14 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                             newRequest.Headers.ProxyAuthorization = null;
                         }
 
-                        if(isProxyInactive && isDifferentHost)
+                        if(isProxyInactive && isDifferentHost && redirectOption.SensitiveHeaders.Count > 0)
                         {
                             // Remove any additional sensitive headers configured in the options
-                            if(redirectOption.SensitiveHeaders.Count > 0)
+                            foreach(var header in redirectOption.SensitiveHeaders)
                             {
-                                foreach(var header in redirectOption.SensitiveHeaders)
-                                {
-                                    newRequest.Headers.Remove(header);
-                                }
+                                newRequest.Headers.Remove(header);
                             }
+
                         }
 
                         // If scheme has changed. Ensure that this has been opted in for security reasons
