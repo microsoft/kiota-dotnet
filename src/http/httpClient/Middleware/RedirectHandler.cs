@@ -122,12 +122,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                         // Remove Authorization and Cookie header if http request's scheme or host changes
                         var isDifferentHost = !newRequest.RequestUri.Host.Equals(request.RequestUri?.Host) ||
                         !newRequest.RequestUri.Scheme.Equals(request.RequestUri?.Scheme);
-                        
                         if(isDifferentHost)
                         {
                             newRequest.Headers.Authorization = null;
                             newRequest.Headers.Remove("Cookie");
-
                         }
 
                         // Remove ProxyAuthorization if no proxy is configured or the URL is bypassed

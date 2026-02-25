@@ -725,5 +725,68 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             Assert.Null(response.RequestMessage?.Headers.ProxyAuthorization);
         }
 #endif
+
+        [Theory]
+        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
+        [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308
+        public async Task RedirectResponseWithoutLocationHeaderShouldThrow(HttpStatusCode statusCode)
+        {
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
+            // Arrange - redirect response with no Location header set
+            var redirectResponse = new HttpResponseMessage(statusCode); // Location intentionally omitted
+            this._testHttpMessageHandler.SetHttpResponse(redirectResponse);
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => this._invoker.SendAsync(httpRequestMessage, CancellationToken.None));
+            Assert.Contains("Unable to perform redirect as Location Header is not set in response", exception.Message);
+            Assert.Contains(statusCode.ToString(), exception.InnerException?.Message);
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
+        [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308
+        public async Task ShouldNotRedirectWhenShouldRedirectDelegateReturnsFalse(HttpStatusCode statusCode)
+        {
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
+            // Arrange - ShouldRedirect delegate always returns false
+            this._redirectHandler.RedirectOption.ShouldRedirect = _ => false;
+            var redirectResponse = new HttpResponseMessage(statusCode);
+            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+            this._testHttpMessageHandler.SetHttpResponse(redirectResponse);
+
+            // Act
+            var response = await this._invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+
+            // Assert - response is returned as-is without following the redirect
+            Assert.Equal(statusCode, response.StatusCode);
+            Assert.Same(response.RequestMessage, httpRequestMessage);
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
+        [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308
+        public async Task ShouldNotRedirectWhenMaxRedirectIsZero(HttpStatusCode statusCode)
+        {
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
+            // Arrange - MaxRedirect = 0 disables redirects entirely
+            this._redirectHandler.RedirectOption.MaxRedirect = 0;
+            var redirectResponse = new HttpResponseMessage(statusCode);
+            redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+            this._testHttpMessageHandler.SetHttpResponse(redirectResponse);
+
+            // Act
+            var response = await this._invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+
+            // Assert - response is returned as-is without following the redirect
+            Assert.Equal(statusCode, response.StatusCode);
+            Assert.Same(response.RequestMessage, httpRequestMessage);
+        }
     }
 }
