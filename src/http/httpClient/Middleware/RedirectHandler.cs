@@ -3,13 +3,11 @@
 // ------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 using Microsoft.Kiota.Http.HttpClientLibrary.Extensions;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
 
@@ -122,29 +120,34 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                         }
 
                         // Remove Authorization and Cookie header if http request's scheme or host changes
-                        if(!newRequest.RequestUri.Host.Equals(request.RequestUri?.Host) ||
-                        !newRequest.RequestUri.Scheme.Equals(request.RequestUri?.Scheme))
+                        var isDifferentHost = !newRequest.RequestUri.Host.Equals(request.RequestUri?.Host) ||
+                        !newRequest.RequestUri.Scheme.Equals(request.RequestUri?.Scheme);
+                        
+                        if(isDifferentHost)
                         {
                             newRequest.Headers.Authorization = null;
                             newRequest.Headers.Remove("Cookie");
-                        }
 
-                        // Invoke the callback for every header to allow callers to strip additional headers
-                        if(redirectOption.ShouldRemoveHeader != null)
-                        {
-                            var headersToRemove = newRequest.Headers
-                                .Where(header => redirectOption.ShouldRemoveHeader(header.Key, newRequest.RequestUri, request.RequestUri))
-                                .Select(header => header.Key)
-                                .ToList();
-                            foreach(var headerName in headersToRemove)
-                                newRequest.Headers.Remove(headerName);
                         }
 
                         // Remove ProxyAuthorization if no proxy is configured or the URL is bypassed
                         var proxyResolver = GetProxyResolver();
-                        if(proxyResolver == null || proxyResolver(newRequest.RequestUri) == null)
+                        var isProxyInactive = proxyResolver == null || proxyResolver(newRequest.RequestUri) == null;
+                        if(isProxyInactive)
                         {
                             newRequest.Headers.ProxyAuthorization = null;
+                        }
+
+                        if(isProxyInactive && isDifferentHost)
+                        {
+                            // Remove any additional sensitive headers configured in the options
+                            if(redirectOption.SensitiveHeaders.Count > 0)
+                            {
+                                foreach(var header in redirectOption.SensitiveHeaders)
+                                {
+                                    newRequest.Headers.Remove(header);
+                                }
+                            }
                         }
 
                         // If scheme has changed. Ensure that this has been opted in for security reasons
