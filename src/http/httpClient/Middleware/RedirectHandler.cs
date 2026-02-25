@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 using Microsoft.Kiota.Http.HttpClientLibrary.Extensions;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
 
@@ -131,12 +132,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                         // Invoke the callback for every header to allow callers to strip additional headers
                         if(redirectOption.ShouldRemoveHeader != null)
                         {
-                            var headersToRemove = new List<string>();
-                            foreach(var header in newRequest.Headers)
-                            {
-                                if(redirectOption.ShouldRemoveHeader(header.Key, newRequest.RequestUri, request.RequestUri))
-                                    headersToRemove.Add(header.Key);
-                            }
+                            var headersToRemove = newRequest.Headers
+                                .Where(header => redirectOption.ShouldRemoveHeader(header.Key, newRequest.RequestUri, request.RequestUri))
+                                .Select(header => header.Key)
+                                .ToList();
                             foreach(var headerName in headersToRemove)
                                 newRequest.Headers.Remove(headerName);
                         }
