@@ -3,7 +3,6 @@
 // ------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using Microsoft.Kiota.Abstractions;
 
@@ -47,10 +46,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
         public bool AllowRedirectOnSchemeChange { get; set; } = false;
 
         /// <summary>
-        /// A collection of header names that should be removed when the host or scheme changes during a redirect.
-        /// This is useful for removing sensitive headers like API keys that should not be sent to different hosts.
+        /// An optional callback invoked for each request header on every redirect to determine whether the header
+        /// should be removed. Receives the header name, the new origin URI, and the original origin URI (which may
+        /// be null). Return true to strip the header from the redirected request.
         /// The Authorization and Cookie headers are always removed on host/scheme change regardless of this setting.
         /// </summary>
-        public ICollection<string> SensitiveHeaders { get; set; } = new List<string>();
+        public Func<string, Uri, Uri?, bool>? ShouldRemoveHeader { get; set; }
     }
 }

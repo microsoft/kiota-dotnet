@@ -372,10 +372,13 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentHostShouldRemoveSensitiveHeaders(HttpStatusCode statusCode)
         {
-            // Arrange - Configure sensitive headers to be removed on host change
+            // Arrange - callback removes specific headers when the host changes
             var redirectOption = new RedirectHandlerOption
             {
-                SensitiveHeaders = { "X-Api-Key", "X-Custom-Auth" }
+                ShouldRemoveHeader = (headerName, newOrigin, oldOrigin) =>
+                    !newOrigin.Host.Equals(oldOrigin?.Host, StringComparison.OrdinalIgnoreCase) &&
+                    (headerName.Equals("X-Api-Key", StringComparison.OrdinalIgnoreCase) ||
+                     headerName.Equals("X-Custom-Auth", StringComparison.OrdinalIgnoreCase))
             };
             var mockHandler = new MockRedirectHandler();
             var redirectHandler = new RedirectHandler(redirectOption)
@@ -409,11 +412,13 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentSchemeShouldRemoveSensitiveHeaders(HttpStatusCode statusCode)
         {
-            // Arrange - Configure sensitive headers to be removed on scheme change
+            // Arrange - callback removes specific headers when the scheme changes
             var redirectOption = new RedirectHandlerOption
             {
                 AllowRedirectOnSchemeChange = true,
-                SensitiveHeaders = { "X-Api-Key" }
+                ShouldRemoveHeader = (headerName, newOrigin, oldOrigin) =>
+                    !newOrigin.Scheme.Equals(oldOrigin?.Scheme, StringComparison.OrdinalIgnoreCase) &&
+                    headerName.Equals("X-Api-Key", StringComparison.OrdinalIgnoreCase)
             };
             var mockHandler = new MockRedirectHandler();
             var redirectHandler = new RedirectHandler(redirectOption)
@@ -439,10 +444,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [Fact]
         public async Task RedirectWithSameHostAndSchemeShouldKeepSensitiveHeaders()
         {
-            // Arrange - Configure sensitive headers
+            // Arrange - callback only removes the header when the host changes; same-host redirects should leave it intact
             var redirectOption = new RedirectHandlerOption
             {
-                SensitiveHeaders = { "X-Api-Key" }
+                ShouldRemoveHeader = (headerName, newOrigin, oldOrigin) =>
+                    !newOrigin.Host.Equals(oldOrigin?.Host, StringComparison.OrdinalIgnoreCase) &&
+                    headerName.Equals("X-Api-Key", StringComparison.OrdinalIgnoreCase)
             };
             var mockHandler = new MockRedirectHandler();
             var redirectHandler = new RedirectHandler(redirectOption)
@@ -463,6 +470,39 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             // Assert - Sensitive headers should be kept when host and scheme are the same
             Assert.NotSame(response.RequestMessage, httpRequestMessage);
             Assert.True(response.RequestMessage?.Headers.Contains("X-Api-Key"));
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
+        [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308
+        public async Task RedirectWithDifferentHostShouldRemoveSensitiveHeadersCaseInsensitively(HttpStatusCode statusCode)
+        {
+            // Arrange - callback matches header name case-insensitively
+            var redirectOption = new RedirectHandlerOption
+            {
+                ShouldRemoveHeader = (headerName, newOrigin, oldOrigin) =>
+                    headerName.Equals("x-api-key", StringComparison.OrdinalIgnoreCase) // lowercase in callback
+            };
+            var mockHandler = new MockRedirectHandler();
+            var redirectHandler = new RedirectHandler(redirectOption)
+            {
+                InnerHandler = mockHandler
+            };
+            using var invoker = new HttpMessageInvoker(redirectHandler);
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
+            httpRequestMessage.Headers.Add("X-Api-Key", "secret-api-key"); // mixed case on request
+
+            var redirectResponse = new HttpResponseMessage(statusCode);
+            redirectResponse.Headers.Location = new Uri("http://example.net/bar");
+            mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
+
+            // Act
+            var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+
+            // Assert - header should be removed regardless of casing difference between callback and request
+            Assert.False(response.RequestMessage?.Headers.Contains("X-Api-Key"));
         }
 
         [Theory]
