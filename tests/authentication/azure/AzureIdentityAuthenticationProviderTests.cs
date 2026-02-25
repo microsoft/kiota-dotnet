@@ -34,7 +34,7 @@ public class AzureIdentityAuthenticationProviderTests
         var azureIdentityAuthenticationProvider = new AzureIdentityAccessTokenProvider(mockTokenCredential.Object);
 
         // Act
-        var token = await azureIdentityAuthenticationProvider.GetAuthorizationTokenAsync(uri);
+        var token = await azureIdentityAuthenticationProvider.GetAuthorizationTokenAsync(uri, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(expectedToken, token);
@@ -60,7 +60,7 @@ public class AzureIdentityAuthenticationProviderTests
         Assert.Empty(testRequest.Headers); // header collection is empty
 
         // Act
-        await azureIdentityAuthenticationProvider.AuthenticateRequestAsync(testRequest);
+        await azureIdentityAuthenticationProvider.AuthenticateRequestAsync(testRequest, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         if(string.IsNullOrEmpty(expectedToken))
@@ -86,7 +86,7 @@ public class AzureIdentityAuthenticationProviderTests
         var nonHttpsUrl = "http://graph.microsoft.com";
 
         // Assert
-        var exception = await Assert.ThrowsAsync<ArgumentException>(() => azureIdentityAuthenticationProvider.GetAuthorizationTokenAsync(new Uri(nonHttpsUrl)));
+        var exception = await Assert.ThrowsAsync<ArgumentException>(() => azureIdentityAuthenticationProvider.GetAuthorizationTokenAsync(new Uri(nonHttpsUrl), cancellationToken: TestContext.Current.CancellationToken));
         Assert.Equal("Only https is supported", exception.Message);
     }
 
@@ -103,7 +103,7 @@ public class AzureIdentityAuthenticationProviderTests
         var azureIdentityAuthenticationProvider = new AzureIdentityAccessTokenProvider(mockTokenCredential.Object);
 
         // Assert
-        var token = await azureIdentityAuthenticationProvider.GetAuthorizationTokenAsync(new Uri(nonHttpsUrl));
+        var token = await azureIdentityAuthenticationProvider.GetAuthorizationTokenAsync(new Uri(nonHttpsUrl), cancellationToken: TestContext.Current.CancellationToken);
         Assert.Empty(token);
     }
     [Fact]
@@ -125,7 +125,7 @@ public class AzureIdentityAuthenticationProviderTests
         Assert.Empty(testRequest.Headers); // header collection is empty
 
         // Act
-        await azureIdentityAuthenticationProvider.AuthenticateRequestAsync(testRequest, new() { { "claims", "eyJhY2Nlc3NfdG9rZW4iOnsibmJmIjp7ImVzc2VudGlhbCI6dHJ1ZSwgInZhbHVlIjoiMTY1MjgxMzUwOCJ9fX0=" } });
+        await azureIdentityAuthenticationProvider.AuthenticateRequestAsync(testRequest, new() { { "claims", "eyJhY2Nlc3NfdG9rZW4iOnsibmJmIjp7ImVzc2VudGlhbCI6dHJ1ZSwgInZhbHVlIjoiMTY1MjgxMzUwOCJ9fX0=" } }, TestContext.Current.CancellationToken);
         mockTokenCredential.Verify(x => x.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 }

@@ -16,13 +16,13 @@ jobs:
   build-and-test:
     runs-on: windows-latest
     env:
-      solutionName: Microsoft.Kiota.sln
+      solutionName: Microsoft.Kiota.slnx
     steps:
       - uses: actions/checkout@v6
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 9.x
+          dotnet-version: 10.x
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
@@ -33,9 +33,9 @@ jobs:
         run: dotnet format ${{ env.solutionName }} --verify-no-changes
       - name: Build
         run: dotnet build ${{ env.solutionName }} --no-restore /p:UseSharedCompilation=false
-      - name: Test for net462
-        run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal --framework net462
-      - name: Test for net9.0 and collect coverage
-        run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=opencover --framework net9.0
+      - name: Test for net472
+        run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal --framework net472
+      - name: Test for net10.0 and collect coverage
+        run: dotnet test ${{ env.solutionName }} --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=opencover --framework net10.0
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4

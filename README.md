@@ -29,7 +29,7 @@ The Kiota Libraries releases notes are available from the [CHANGELOG](CHANGELOG.
 
 ## Debugging
 
-If you are using Visual Studio Code as your IDE, the **launch.json** file already contains the configuration to build and test the library. Otherwise, you can open the **Microsoft.Kiota.sln** with Visual Studio.
+If you are using Visual Studio Code as your IDE, the **launch.json** file already contains the configuration to build and test the library. Otherwise, you can open the **Microsoft.Kiota.slnx** with Visual Studio.
 
 ## Contributing
 

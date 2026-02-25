@@ -87,7 +87,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             };
 
             // Act
-            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -112,7 +112,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             _requestAdapter.BaseUrl = "http://localhost";
 
             // Act
-            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -136,7 +136,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             requestInfo.QueryParameters.Add(queryParam, queryParamObject!);
 
             // Act
-            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -158,7 +158,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             requestInfo.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes("contents")), "application/octet-stream");
 
             // Act
-            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -196,7 +196,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.NotNull(response);
             Assert.True(response.CanRead);
@@ -223,7 +223,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendAsync(requestInfo, MockEntity.Factory);
+            var response = await adapter.SendAsync(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Null(response);
         }
@@ -252,13 +252,17 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 UrlTemplate = "https://example.com"
             };
 
-            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.NotNull(response);
             Assert.True(response.CanRead);
             Assert.Equal(4, response.Length);
             var streamReader = new StreamReader(response);
-            var responseString = await streamReader.ReadToEndAsync();
+            var responseString = await streamReader.ReadToEndAsync(
+#if NET5_0_OR_GREATER
+                TestContext.Current.CancellationToken
+#endif
+            );
             Assert.Equal("Test", responseString);
         }
         [InlineData(HttpStatusCode.OK)]
@@ -284,7 +288,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 UrlTemplate = "https://example.com"
             };
 
-            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Null(response);
         }
@@ -312,7 +316,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 UrlTemplate = "https://example.com"
             };
 
-            await adapter.SendNoContentAsync(requestInfo);
+            await adapter.SendNoContentAsync(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
         }
         [InlineData(HttpStatusCode.OK)]
         [InlineData(HttpStatusCode.Created)]
@@ -338,7 +342,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 UrlTemplate = "https://example.com"
             };
 
-            var response = await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
+            var response = await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Null(response);
         }
@@ -368,7 +372,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 UrlTemplate = "https://example.com"
             };
 
-            var response = await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
+            var response = await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Null(response);
         }
@@ -403,7 +407,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 UrlTemplate = "https://example.com"
             };
 
-            var response = await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
+            var response = await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.NotNull(response);
         }
@@ -434,7 +438,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 UrlTemplate = "https://example.com"
             };
 
-            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.NotNull(response);
 
@@ -466,7 +470,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             };
             try
             {
-                var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo);
+                await adapter.SendPrimitiveAsync<Stream>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.Fail("Expected an ApiException to be thrown");
             }
             catch(ApiException e)
@@ -511,7 +515,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 {
                     { "XXX", (parseNode) => new MockError("A general error occured")},
                 };
-                var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo, errorMapping);
+                await adapter.SendPrimitiveAsync<Stream>(requestInfo, errorMapping, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.Fail("Expected an ApiException to be thrown");
             }
             catch(MockError mockError)
@@ -555,7 +559,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 {
                     { "4XX", (parseNode) => new MockError("A 4XX error occured") }//Only 4XX
                 };
-                var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo, errorMapping);
+                await adapter.SendPrimitiveAsync<Stream>(requestInfo, errorMapping, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.Fail("Expected an ApiException to be thrown");
             }
             catch(ApiException apiException)
@@ -591,7 +595,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnum>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnum>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnum.Value1, response);
         }
@@ -623,7 +627,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnum.Value1, response);
         }
@@ -655,7 +659,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnum>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnum>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnum.Value2, response);
         }
@@ -687,7 +691,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnum.Value2, response);
         }
@@ -719,7 +723,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnum>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnum>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnum.Value3, response);
         }
@@ -751,7 +755,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnum.Value3, response);
         }
@@ -783,7 +787,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Null(response);
         }
@@ -815,7 +819,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnumWithFlags.Value1 | TestEnumWithFlags.Value3, response);
         }
@@ -847,7 +851,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnumWithFlags.Value1 | TestEnumWithFlags.Value3, response);
         }
@@ -879,7 +883,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnumWithFlags.Value1 | TestEnumWithFlags.Value2, response);
         }
@@ -911,7 +915,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnumWithFlags.Value1 | TestEnumWithFlags.Value2, response);
         }
@@ -943,7 +947,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnumWithFlags.Value2 | TestEnumWithFlags.Value3, response);
         }
@@ -975,7 +979,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnumWithFlags.Value2 | TestEnumWithFlags.Value3, response);
         }
@@ -1007,7 +1011,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Null(response);
         }
@@ -1031,7 +1035,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             };
 
             // Act
-            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -1056,7 +1060,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             };
 
             // Act
-            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -1122,7 +1126,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             };
 
             // Act
-            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -1143,7 +1147,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             };
 
             // Act
-            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(requestMessage);

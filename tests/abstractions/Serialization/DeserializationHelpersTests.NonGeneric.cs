@@ -23,7 +23,7 @@ public partial class DeserializationHelpersTests
         mockJsonParseNodeFactory.Setup(x => x.ValidContentType).Returns(_jsonContentType);
         ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockJsonParseNodeFactory.Object;
 
-        var result = (TestEntity?)await KiotaSerializer.DeserializeAsync(typeof(TestEntity), _jsonContentType, strValue);
+        var result = (TestEntity?)await KiotaSerializer.DeserializeAsync(typeof(TestEntity), _jsonContentType, strValue, TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal("123", result.Id);
@@ -45,7 +45,7 @@ public partial class DeserializationHelpersTests
         mockJsonParseNodeFactory.Setup(x => x.ValidContentType).Returns(_jsonContentType);
         ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockJsonParseNodeFactory.Object;
 
-        var result = await KiotaSerializer.DeserializeCollectionAsync(typeof(TestEntity), _jsonContentType, strValue);
+        var result = await KiotaSerializer.DeserializeCollectionAsync(typeof(TestEntity), _jsonContentType, strValue, TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Single(result);

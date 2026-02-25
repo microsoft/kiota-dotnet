@@ -190,7 +190,7 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
         using var testRoot = StartTestRootActivity();
 
         // Act
-        await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
+        await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         var activity = _capturedActivities.FirstOrDefault(a => a.TraceId == testRoot.TraceId && a.OperationName.Contains("SendAsync"));
@@ -245,7 +245,7 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
         using var testRoot = StartTestRootActivity();
 
         // Act
-        await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
+        await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         var activity = _capturedActivities.FirstOrDefault(a => a.TraceId == testRoot.TraceId && a.OperationName.Contains("SendAsync"));
@@ -294,7 +294,7 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
         using var testRoot = StartTestRootActivity();
 
         // Act
-        await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
+        await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         var testActivities = _capturedActivities.Where(a => a.TraceId == testRoot.TraceId).ToList();
@@ -336,7 +336,7 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
         using var testRoot = StartTestRootActivity();
 
         // Act
-        await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
+        await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         var testActivities = _capturedActivities.Where(a => a.TraceId == testRoot.TraceId).ToList();
@@ -380,7 +380,7 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
         using var testRoot = StartTestRootActivity();
 
         // Act
-        await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
+        await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         var testActivities = _capturedActivities.Where(a => a.TraceId == testRoot.TraceId).ToList();
@@ -421,7 +421,7 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
         using var testRoot = StartTestRootActivity();
 
         // Act
-        await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
+        await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert - Verify various nested spans are created
         var resultingActivities = new HashSet<string>(

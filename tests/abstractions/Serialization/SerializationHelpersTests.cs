@@ -37,7 +37,7 @@ public class SerializationHelpersTests
         var result = await KiotaSerializer.SerializeAsStringAsync(_jsonContentType, new TestEntity()
         {
             Id = "123"
-        });
+        }, TestContext.Current.CancellationToken);
 
         Assert.Equal("{'id':'123'}", result);
 
@@ -59,7 +59,7 @@ public class SerializationHelpersTests
             {
                 Id = "123"
             }
-        });
+        }, TestContext.Current.CancellationToken);
 
         Assert.Equal("[{'id':'123'}]", result);
 
