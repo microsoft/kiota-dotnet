@@ -47,7 +47,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            if(!_response1Sent)
+            if (!_response1Sent)
             {
                 _response1Sent = true;
                 _response1!.RequestMessage = request;
@@ -128,7 +128,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [Fact]
         public async Task OkStatusShouldPassThrough()
         {
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo"))
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo"))
             {
                 // Arrange
                 var redirectResponse = new HttpResponseMessage(HttpStatusCode.OK);
@@ -148,7 +148,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308 not available in netstandard
         public async Task ShouldRedirectSameMethodAndContent(HttpStatusCode statusCode)
         {
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
             {
                 // Arrange
                 httpRequestMessage.Content = new StringContent("Hello World");
@@ -174,7 +174,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         public async Task ShouldRedirectChangeMethodAndContent()
         {
 
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
             {
                 // Arrange
                 httpRequestMessage.Content = new StringContent("Hello World");
@@ -199,7 +199,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentHostShouldRemoveAuthHeader(HttpStatusCode statusCode)
         {
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo"))
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo"))
             {
                 // Arrange
                 httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("fooAuth", "aparam");
@@ -223,7 +223,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         public async Task RedirectWithDifferentSchemeThrowsInvalidOperationExceptionIfAllowRedirectOnSchemeChangeIsDisabled(HttpStatusCode statusCode)
         {
 
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo"))
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo"))
             {
                 // Arrange
                 httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("fooAuth", "aparam");
@@ -246,7 +246,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentSchemeShouldRemoveAuthHeaderIfAllowRedirectOnSchemeChangeIsEnabled(HttpStatusCode statusCode)
         {
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo"))
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo"))
             {
                 // Arrange
                 httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("fooAuth", "aparam");
@@ -266,7 +266,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [Fact]
         public async Task RedirectWithSameHostShouldKeepAuthHeader()
         {
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
             {
                 // Arrange
                 httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("fooAuth", "aparam");
@@ -285,7 +285,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [Fact]
         public async Task RedirectWithRelativeUrlShouldKeepRequestHost()
         {
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
             {   // Arrange
                 var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
                 redirectResponse.Headers.Location = new Uri("/bar", UriKind.Relative);
@@ -301,7 +301,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [Fact]
         public async Task ExceedMaxRedirectsShouldThrowsException()
         {
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
             {
                 // Arrange
                 var response1 = new HttpResponseMessage(HttpStatusCode.Redirect);
@@ -326,7 +326,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentHostShouldRemoveProxyAuthHeaderWhenNoProxyConfigured(HttpStatusCode statusCode)
         {
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo"))
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo"))
             {
                 // Arrange - No proxy is configured, so ProxyAuthorization should be removed
                 httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("fooAuth", "aparam");
@@ -349,7 +349,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentHostShouldRemoveCookieHeader(HttpStatusCode statusCode)
         {
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo"))
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo"))
             {
                 // Arrange
                 httpRequestMessage.Headers.Add("Cookie", "session=abc123");
@@ -370,12 +370,25 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData(HttpStatusCode.Found)]  // 302
         [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
         [InlineData((HttpStatusCode)308)] // 308
-        public async Task RedirectWithDifferentHostShouldRemoveSensitiveHeaders(HttpStatusCode statusCode)
+        public async Task RedirectWithDifferentHostShouldRemoveCustomHeadersWithCustomCallback(HttpStatusCode statusCode)
         {
-            // Arrange - Configure sensitive headers to be removed on host change
+            // Arrange - Custom callback that removes additional headers on host change
             var redirectOption = new RedirectHandlerOption
             {
-                SensitiveHeaders = { "X-Api-Key", "X-Custom-Auth" }
+                ScrubSensitiveHeaders = (request, originalUri, newUri, proxyResolver) =>
+                {
+                    // Call default implementation first
+                    RedirectHandlerOption.DefaultScrubSensitiveHeaders(request, originalUri, newUri, proxyResolver);
+
+                    // Then add custom logic for additional headers
+                    var isDifferentHostOrScheme = !newUri.Host.Equals(originalUri.Host, StringComparison.OrdinalIgnoreCase) ||
+                        !newUri.Scheme.Equals(originalUri.Scheme, StringComparison.OrdinalIgnoreCase);
+                    if (isDifferentHostOrScheme)
+                    {
+                        request.Headers.Remove("X-Api-Key");
+                        request.Headers.Remove("X-Custom-Auth");
+                    }
+                }
             };
             var mockHandler = new MockRedirectHandler();
             var redirectHandler = new RedirectHandler(redirectOption)
@@ -395,7 +408,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             // Act
             var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
 
-            // Assert - Sensitive headers should be removed, but non-sensitive should remain
+            // Assert - Custom headers should be removed, but non-sensitive should remain
             Assert.NotSame(response.RequestMessage, httpRequestMessage);
             Assert.False(response.RequestMessage?.Headers.Contains("X-Api-Key"));
             Assert.False(response.RequestMessage?.Headers.Contains("X-Custom-Auth"));
@@ -407,13 +420,23 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData(HttpStatusCode.Found)]  // 302
         [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
         [InlineData((HttpStatusCode)308)] // 308
-        public async Task RedirectWithDifferentSchemeShouldRemoveSensitiveHeaders(HttpStatusCode statusCode)
+        public async Task RedirectWithDifferentSchemeShouldRemoveCustomHeadersWithCustomCallback(HttpStatusCode statusCode)
         {
-            // Arrange - Configure sensitive headers to be removed on scheme change
+            // Arrange - Custom callback that removes additional headers on scheme change
             var redirectOption = new RedirectHandlerOption
             {
                 AllowRedirectOnSchemeChange = true,
-                SensitiveHeaders = { "X-Api-Key" }
+                ScrubSensitiveHeaders = (request, originalUri, newUri, proxyResolver) =>
+                {
+                    RedirectHandlerOption.DefaultScrubSensitiveHeaders(request, originalUri, newUri, proxyResolver);
+
+                    var isDifferentHostOrScheme = !newUri.Host.Equals(originalUri.Host, StringComparison.OrdinalIgnoreCase) ||
+                        !newUri.Scheme.Equals(originalUri.Scheme, StringComparison.OrdinalIgnoreCase);
+                    if (isDifferentHostOrScheme)
+                    {
+                        request.Headers.Remove("X-Api-Key");
+                    }
+                }
             };
             var mockHandler = new MockRedirectHandler();
             var redirectHandler = new RedirectHandler(redirectOption)
@@ -431,18 +454,28 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             // Act
             var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
 
-            // Assert - Sensitive headers should be removed on scheme change
+            // Assert - Custom headers should be removed on scheme change
             Assert.NotSame(response.RequestMessage, httpRequestMessage);
             Assert.False(response.RequestMessage?.Headers.Contains("X-Api-Key"));
         }
 
         [Fact]
-        public async Task RedirectWithSameHostAndSchemeShouldKeepSensitiveHeaders()
+        public async Task RedirectWithSameHostAndSchemeCustomCallbackShouldKeepCustomHeaders()
         {
-            // Arrange - Configure sensitive headers
+            // Arrange - Custom callback that only removes headers on host/scheme change
             var redirectOption = new RedirectHandlerOption
             {
-                SensitiveHeaders = { "X-Api-Key" }
+                ScrubSensitiveHeaders = (request, originalUri, newUri, proxyResolver) =>
+                {
+                    RedirectHandlerOption.DefaultScrubSensitiveHeaders(request, originalUri, newUri, proxyResolver);
+
+                    var isDifferentHostOrScheme = !newUri.Host.Equals(originalUri.Host, StringComparison.OrdinalIgnoreCase) ||
+                        !newUri.Scheme.Equals(originalUri.Scheme, StringComparison.OrdinalIgnoreCase);
+                    if (isDifferentHostOrScheme)
+                    {
+                        request.Headers.Remove("X-Api-Key");
+                    }
+                }
             };
             var mockHandler = new MockRedirectHandler();
             var redirectHandler = new RedirectHandler(redirectOption)
@@ -460,22 +493,19 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             // Act
             var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
 
-            // Assert - Sensitive headers should be kept when host and scheme are the same
+            // Assert - Custom headers should be kept when host and scheme are the same
             Assert.NotSame(response.RequestMessage, httpRequestMessage);
             Assert.True(response.RequestMessage?.Headers.Contains("X-Api-Key"));
         }
 
-        [Theory]
-        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
-        [InlineData(HttpStatusCode.Found)]  // 302
-        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
-        [InlineData((HttpStatusCode)308)] // 308
-        public async Task RedirectWithDifferentHostShouldRemoveSensitiveHeadersCaseInsensitively(HttpStatusCode statusCode)
+        [Fact]
+        public async Task DefaultScrubSensitiveHeadersMethodCanBeReferencedDirectly()
         {
-            // Arrange - header name in options uses different casing than the actual request header
+            // Arrange - Verify that the default static method can be referenced and used
             var redirectOption = new RedirectHandlerOption
             {
-                SensitiveHeaders = { "x-api-key" } // lowercase in options
+                // Explicitly set to default to verify it's accessible
+                ScrubSensitiveHeaders = RedirectHandlerOption.DefaultScrubSensitiveHeaders
             };
             var mockHandler = new MockRedirectHandler();
             var redirectHandler = new RedirectHandler(redirectOption)
@@ -484,17 +514,17 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             };
             using var invoker = new HttpMessageInvoker(redirectHandler);
             using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
-            httpRequestMessage.Headers.Add("X-Api-Key", "secret-api-key"); // mixed case on request
+            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token");
 
-            var redirectResponse = new HttpResponseMessage(statusCode);
+            var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
             redirectResponse.Headers.Location = new Uri("http://example.net/bar");
             mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
 
             // Act
             var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
 
-            // Assert - header should be removed regardless of casing difference between option and request
-            Assert.False(response.RequestMessage?.Headers.Contains("X-Api-Key"));
+            // Assert - Default behavior should remove Authorization on host change
+            Assert.Null(response.RequestMessage?.Headers.Authorization);
         }
 
 #if !BROWSER
@@ -503,9 +533,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData(HttpStatusCode.Found)]  // 302
         [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
         [InlineData((HttpStatusCode)308)] // 308
-        public async Task RedirectWithActiveProxyAndDifferentHostShouldKeepSensitiveHeaders(HttpStatusCode statusCode)
+        public async Task CustomCallbackCanUseProxyResolverToKeepHeadersWhenProxyActive(HttpStatusCode statusCode)
         {
-            // Arrange - proxy is active for the redirect target, so sensitive headers should be preserved
+            // Arrange - Custom callback that only removes custom headers when proxy is inactive
             var mockProxy = new MockWebProxy(new Uri("http://proxy.example.com:8080")); // no bypasses
             var httpClientHandler = new HttpClientHandler { Proxy = mockProxy };
             var mockHandler = new MockDelegatingRedirectHandler
@@ -514,7 +544,20 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             };
             var redirectOption = new RedirectHandlerOption
             {
-                SensitiveHeaders = { "X-Api-Key" }
+                ScrubSensitiveHeaders = (request, originalUri, newUri, proxyResolver) =>
+                {
+                    // Call default implementation
+                    RedirectHandlerOption.DefaultScrubSensitiveHeaders(request, originalUri, newUri, proxyResolver);
+
+                    // Only remove X-Api-Key if proxy is inactive (like ProxyAuthorization logic)
+                    var isProxyInactive = proxyResolver == null || proxyResolver(newUri) == null;
+                    var isDifferentHostOrScheme = !newUri.Host.Equals(originalUri.Host, StringComparison.OrdinalIgnoreCase) ||
+                        !newUri.Scheme.Equals(originalUri.Scheme, StringComparison.OrdinalIgnoreCase);
+                    if (isProxyInactive && isDifferentHostOrScheme)
+                    {
+                        request.Headers.Remove("X-Api-Key");
+                    }
+                }
             };
             var redirectHandler = new RedirectHandler(redirectOption)
             {
@@ -532,7 +575,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             // Act
             var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
 
-            // Assert - sensitive header should be kept because an active proxy is routing the request
+            // Assert - X-Api-Key should be kept because proxy is active
             Assert.NotSame(response.RequestMessage, httpRequestMessage);
             Assert.True(response.RequestMessage?.Headers.Contains("X-Api-Key"));
         }
@@ -545,7 +588,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentSchemeShouldRemoveProxyAuthHeaderWhenNoProxyConfigured(HttpStatusCode statusCode)
         {
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo"))
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo"))
             {
                 // Arrange - No proxy is configured, so ProxyAuthorization should be removed
                 httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("fooAuth", "aparam");
@@ -569,7 +612,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentSchemeShouldRemoveCookieHeaderIfAllowRedirectOnSchemeChangeIsEnabled(HttpStatusCode statusCode)
         {
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo"))
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.org/foo"))
             {
                 // Arrange
                 httpRequestMessage.Headers.Add("Cookie", "session=abc123");
@@ -589,7 +632,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [Fact]
         public async Task RedirectWithSameHostShouldRemoveProxyAuthHeaderWhenNoProxyConfigured()
         {
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
             {
                 // Arrange - No proxy is configured, so ProxyAuthorization should be removed
                 httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("fooAuth", "aparam");
@@ -608,7 +651,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [Fact]
         public async Task RedirectWithSameHostShouldKeepCookieHeader()
         {
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
             {
                 // Arrange
                 httpRequestMessage.Headers.Add("Cookie", "session=abc123");
