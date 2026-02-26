@@ -119,32 +119,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                             newRequest.RequestUri = new Uri(baseAddress + response.Headers.Location);
                         }
 
-                        // Remove Authorization and Cookie header if http request's scheme or host changes
-                        var isDifferentHost = !newRequest.RequestUri.Host.Equals(request.RequestUri?.Host) ||
-                        !newRequest.RequestUri.Scheme.Equals(request.RequestUri?.Scheme);
-                        if(isDifferentHost)
-                        {
-                            newRequest.Headers.Authorization = null;
-                            newRequest.Headers.Remove("Cookie");
-                        }
-
-                        // Remove ProxyAuthorization if no proxy is configured or the URL is bypassed
+                        // Scrub sensitive headers before following the redirect
                         var proxyResolver = GetProxyResolver();
-                        var isProxyInactive = proxyResolver == null || proxyResolver(newRequest.RequestUri) == null;
-                        if(isProxyInactive)
-                        {
-                            newRequest.Headers.ProxyAuthorization = null;
-                        }
-
-                        if(isProxyInactive && isDifferentHost && redirectOption.SensitiveHeaders.Count > 0)
-                        {
-                            // Remove any additional sensitive headers configured in the options
-                            foreach(var header in redirectOption.SensitiveHeaders)
-                            {
-                                newRequest.Headers.Remove(header);
-                            }
-
-                        }
+                        redirectOption.ScrubSensitiveHeaders(newRequest, request.RequestUri!, newRequest.RequestUri, proxyResolver);
 
                         // If scheme has changed. Ensure that this has been opted in for security reasons
                         if(!newRequest.RequestUri.Scheme.Equals(request.RequestUri?.Scheme) && !redirectOption.AllowRedirectOnSchemeChange)
