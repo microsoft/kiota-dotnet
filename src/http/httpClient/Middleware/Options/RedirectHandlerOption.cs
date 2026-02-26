@@ -28,7 +28,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
             }
             set
             {
-                if(value > MaxMaxRedirect)
+                if (value > MaxMaxRedirect)
                     throw new InvalidOperationException($"Maximum value for {nameof(MaxRedirect)} property exceeded ");
 
                 _maxRedirect = value;
@@ -64,14 +64,14 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
         /// <param name="proxyResolver">A function that returns the proxy URI for a destination, or null if no proxy applies. Can be null if no proxy is configured.</param>
         public static void DefaultScrubSensitiveHeaders(HttpRequestMessage request, Uri originalUri, Uri newUri, Func<Uri, Uri?>? proxyResolver)
         {
-            if(request == null) throw new ArgumentNullException(nameof(request));
-            if(originalUri == null) throw new ArgumentNullException(nameof(originalUri));
-            if(newUri == null) throw new ArgumentNullException(nameof(newUri));
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (originalUri == null) throw new ArgumentNullException(nameof(originalUri));
+            if (newUri == null) throw new ArgumentNullException(nameof(newUri));
 
             // Remove Authorization and Cookie headers if http request's scheme or host changes
             var isDifferentHostOrScheme = !newUri.Host.Equals(originalUri.Host, StringComparison.OrdinalIgnoreCase) ||
                 !newUri.Scheme.Equals(originalUri.Scheme, StringComparison.OrdinalIgnoreCase);
-            if(isDifferentHostOrScheme)
+            if (isDifferentHostOrScheme)
             {
                 request.Headers.Authorization = null;
                 request.Headers.Remove("Cookie");
@@ -79,7 +79,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
 
             // Remove ProxyAuthorization if no proxy is configured or the URL is bypassed
             var isProxyInactive = proxyResolver == null || proxyResolver(newUri) == null;
-            if(isProxyInactive)
+            if (isProxyInactive)
             {
                 request.Headers.ProxyAuthorization = null;
             }

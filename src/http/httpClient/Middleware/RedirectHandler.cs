@@ -43,13 +43,13 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
         /// <returns>The <see cref="HttpResponseMessage"/>.</returns>
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            if(request == null) throw new ArgumentNullException(nameof(request));
+            if (request == null) throw new ArgumentNullException(nameof(request));
 
             var redirectOption = request.GetRequestOption<RedirectHandlerOption>() ?? RedirectOption;
 
             ActivitySource? activitySource;
             Activity? activity;
-            if(request.GetRequestOption<ObservabilityOptions>() is { } obsOptions)
+            if (request.GetRequestOption<ObservabilityOptions>() is { } obsOptions)
             {
                 activitySource = ActivitySourceRegistry.DefaultInstance.GetOrCreateActivitySource(obsOptions.TracerInstrumentationName);
                 activity = activitySource?.StartActivity($"{nameof(RedirectHandler)}_{nameof(SendAsync)}");
@@ -67,9 +67,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
                 // check response status code and redirect handler option
-                if(ShouldRedirect(response, redirectOption))
+                if (ShouldRedirect(response, redirectOption))
                 {
-                    if(response.Headers.Location == null)
+                    if (response.Headers.Location == null)
                     {
                         throw new InvalidOperationException(
                             "Unable to perform redirect as Location Header is not set in response",
@@ -78,13 +78,13 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
 
                     var redirectCount = 0;
 
-                    while(redirectCount < redirectOption.MaxRedirect)
+                    while (redirectCount < redirectOption.MaxRedirect)
                     {
                         using var redirectActivity = activitySource?.StartActivity($"{nameof(RedirectHandler)}_{nameof(SendAsync)} - redirect {redirectCount}");
                         redirectActivity?.SetTag("com.microsoft.kiota.handler.redirect.count", redirectCount);
                         redirectActivity?.SetTag("http.response.status_code", response.StatusCode);
                         // Drain response content to free responses.
-                        if(response.Content != null)
+                        if (response.Content != null)
                         {
 #if NET5_0_OR_GREATER
                             await response.Content.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false);
@@ -95,21 +95,21 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
 
                         // general clone request with internal CloneAsync (see CloneAsync for details) extension method
                         var originalRequest = response.RequestMessage;
-                        if(originalRequest == null)
+                        if (originalRequest == null)
                         {
                             return response;// We can't clone the original request to replay it.
                         }
                         var newRequest = await originalRequest.CloneAsync(cancellationToken).ConfigureAwait(false);
 
                         // status code == 303: change request method from post to get and content to be null
-                        if(response.StatusCode == HttpStatusCode.SeeOther)
+                        if (response.StatusCode == HttpStatusCode.SeeOther)
                         {
                             newRequest.Content = null;
                             newRequest.Method = HttpMethod.Get;
                         }
 
                         // Set newRequestUri from response
-                        if(response.Headers.Location?.IsAbsoluteUri ?? false)
+                        if (response.Headers.Location?.IsAbsoluteUri ?? false)
                         {
                             newRequest.RequestUri = response.Headers.Location;
                         }
@@ -124,7 +124,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                         redirectOption.ScrubSensitiveHeaders(newRequest, request.RequestUri!, newRequest.RequestUri, proxyResolver);
 
                         // If scheme has changed. Ensure that this has been opted in for security reasons
-                        if(!newRequest.RequestUri.Scheme.Equals(request.RequestUri?.Scheme) && !redirectOption.AllowRedirectOnSchemeChange)
+                        if (!newRequest.RequestUri.Scheme.Equals(request.RequestUri?.Scheme) && !redirectOption.AllowRedirectOnSchemeChange)
                         {
                             throw new InvalidOperationException(
                                 $"Redirects with changing schemes not allowed by default. You can change this by modifying the {nameof(redirectOption.AllowRedirectOnSchemeChange)} option",
@@ -135,7 +135,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                         response = await base.SendAsync(newRequest, cancellationToken).ConfigureAwait(false);
 
                         // Check response status code
-                        if(ShouldRedirect(response, redirectOption))
+                        if (ShouldRedirect(response, redirectOption))
                         {
                             redirectCount++;
                         }
@@ -187,7 +187,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
         private Func<Uri, Uri?>? GetProxyResolver()
         {
             var proxy = GetProxyFromFinalHandler();
-            if(proxy == null)
+            if (proxy == null)
                 return null;
             return destination => proxy.IsBypassed(destination) ? null : proxy.GetProxy(destination);
         }
@@ -203,19 +203,19 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
             return null;
 #else
             var handler = InnerHandler;
-            while(handler != null)
+            while (handler != null)
             {
 #if NETFRAMEWORK
                 if(handler is WinHttpHandler winHttpHandler)
                     return winHttpHandler.Proxy;
 #endif
 #if NET5_0_OR_GREATER
-                if(handler is SocketsHttpHandler socketsHandler)
+                if (handler is SocketsHttpHandler socketsHandler)
                     return socketsHandler.Proxy;
 #endif
-                if(handler is HttpClientHandler httpClientHandler)
+                if (handler is HttpClientHandler httpClientHandler)
                     return httpClientHandler.Proxy;
-                if(handler is DelegatingHandler delegatingHandler)
+                if (handler is DelegatingHandler delegatingHandler)
                     handler = delegatingHandler.InnerHandler;
                 else
                     break;
