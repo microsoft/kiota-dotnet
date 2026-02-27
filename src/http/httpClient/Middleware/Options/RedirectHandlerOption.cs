@@ -55,7 +55,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
 
         /// <summary>
         /// The default implementation for scrubbing sensitive headers during redirects.
-        /// This method removes Authorization and Cookie headers when the host or scheme changes,
+        /// This method removes Authorization and Cookie headers when the host, scheme, or port changes,
         /// and removes ProxyAuthorization headers when no proxy is configured or the proxy is bypassed for the new URI.
         /// </summary>
         /// <param name="request">The HTTP request message to modify.</param>
@@ -68,10 +68,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
             if(originalUri == null) throw new ArgumentNullException(nameof(originalUri));
             if(newUri == null) throw new ArgumentNullException(nameof(newUri));
 
-            // Remove Authorization and Cookie headers if http request's scheme or host changes
-            var isDifferentHostOrScheme = !newUri.Host.Equals(originalUri.Host, StringComparison.OrdinalIgnoreCase) ||
-                !newUri.Scheme.Equals(originalUri.Scheme, StringComparison.OrdinalIgnoreCase);
-            if(isDifferentHostOrScheme)
+            // Remove Authorization and Cookie headers if http request's scheme, host, or port changes
+            var isDifferentOrigin = !newUri.Host.Equals(originalUri.Host, StringComparison.OrdinalIgnoreCase) ||
+                !newUri.Scheme.Equals(originalUri.Scheme, StringComparison.OrdinalIgnoreCase) ||
+                newUri.Port != originalUri.Port;
+            if(isDifferentOrigin)
             {
                 request.Headers.Authorization = null;
                 request.Headers.Remove("Cookie");
