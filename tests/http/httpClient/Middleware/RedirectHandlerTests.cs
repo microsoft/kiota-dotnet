@@ -282,6 +282,74 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             }
         }
 
+        [Theory]
+        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
+        [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308
+        public async Task RedirectWithDifferentPortShouldRemoveAuthHeader(HttpStatusCode statusCode)
+        {
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org:8080/foo"))
+            {
+                // Arrange
+                httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("fooAuth", "aparam");
+                var redirectResponse = new HttpResponseMessage(statusCode);
+                redirectResponse.Headers.Location = new Uri("http://example.org:9090/bar");
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
+                Assert.NotEqual(response.RequestMessage?.RequestUri?.Port, httpRequestMessage.RequestUri?.Port);
+                Assert.Null(response.RequestMessage?.Headers.Authorization);
+            }
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
+        [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308
+        public async Task RedirectWithDifferentPortShouldRemoveCookieHeader(HttpStatusCode statusCode)
+        {
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org:8080/foo"))
+            {
+                // Arrange
+                httpRequestMessage.Headers.Add("Cookie", "session=abc123");
+                var redirectResponse = new HttpResponseMessage(statusCode);
+                redirectResponse.Headers.Location = new Uri("http://example.org:9090/bar");
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
+                Assert.NotEqual(response.RequestMessage?.RequestUri?.Port, httpRequestMessage.RequestUri?.Port);
+                Assert.False(response.RequestMessage?.Headers.Contains("Cookie"));
+            }
+        }
+
+        [Fact]
+        public async Task RedirectWithSamePortShouldKeepAuthHeader()
+        {
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org:8080/foo"))
+            {
+                // Arrange
+                httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("fooAuth", "aparam");
+                var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
+                redirectResponse.Headers.Location = new Uri("http://example.org:8080/bar");
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
+                Assert.Equal(response.RequestMessage?.RequestUri?.Port, httpRequestMessage.RequestUri?.Port);
+                Assert.NotNull(response.RequestMessage?.Headers.Authorization);
+            }
+        }
+
         [Fact]
         public async Task RedirectWithRelativeUrlShouldKeepRequestHost()
         {
