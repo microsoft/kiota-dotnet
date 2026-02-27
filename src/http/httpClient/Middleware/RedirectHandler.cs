@@ -196,7 +196,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
         /// Traverses the handler chain to find the final handler and extract its proxy settings.
         /// </summary>
         /// <returns>The IWebProxy from the final handler, or null if not found.</returns>
-        private static IWebProxy? GetProxyFromFinalHandler()
+        private IWebProxy? GetProxyFromFinalHandler()
         {
 #if BROWSER
             // Browser platform does not support proxy configuration
