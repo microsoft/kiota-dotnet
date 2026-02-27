@@ -184,7 +184,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
         /// Gets a callback that resolves the proxy URI for a given destination URI.
         /// </summary>
         /// <returns>A function that takes a destination URI and returns the proxy URI, or null if no proxy is configured or the destination is bypassed.</returns>
-        private static Func<Uri, Uri?>? GetProxyResolver()
+        private Func<Uri, Uri?>? GetProxyResolver()
         {
             var proxy = GetProxyFromFinalHandler();
             if(proxy == null)
