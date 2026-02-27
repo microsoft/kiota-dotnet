@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.22.0](https://github.com/microsoft/kiota-dotnet/compare/v1.21.3...v1.22.0) (2026-02-27)
+
+
+### Features
+
+* add http.route attribute to open telemetry on requests ([#640](https://github.com/microsoft/kiota-dotnet/issues/640)) ([b92c9c0](https://github.com/microsoft/kiota-dotnet/commit/b92c9c0dd157e68f51f6144afc71e628b5cc44b9))
+
+
+### Bug Fixes
+
+* add removal of auth headers if port changes ([#666](https://github.com/microsoft/kiota-dotnet/issues/666)) ([b31c1f4](https://github.com/microsoft/kiota-dotnet/commit/b31c1f497e49fa930c8cd8bd430c0d344732d3a5))
+* multiple constructors break DI registration for HttpClientRequestAdapter ([#656](https://github.com/microsoft/kiota-dotnet/issues/656)) ([21d58b0](https://github.com/microsoft/kiota-dotnet/commit/21d58b009c89bcfd9855d2b94e7c4532b917c040))
+* **security:** remove proxy and cookie auth headers on insecure redirect ([#653](https://github.com/microsoft/kiota-dotnet/issues/653)) ([57d6b36](https://github.com/microsoft/kiota-dotnet/commit/57d6b36f52695594ccb0772ca7ea80e54522df78))
+
 ## [1.21.3](https://github.com/microsoft/kiota-dotnet/compare/v1.21.2...v1.21.3) (2026-02-05)
 
 
