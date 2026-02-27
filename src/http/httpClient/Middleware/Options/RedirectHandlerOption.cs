@@ -44,5 +44,45 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
         /// A boolean value to determine if we redirects are allowed if the scheme changes(e.g. https to http). Defaults to false.
         /// </summary>
         public bool AllowRedirectOnSchemeChange { get; set; } = false;
+
+        /// <summary>
+        /// A callback that is invoked to scrub sensitive headers from the request before following a redirect.
+        /// This callback receives the request being modified, the original URI, the new redirect URI, and a proxy resolver function.
+        /// The proxy resolver returns the proxy URI for a given destination, or null if no proxy applies.
+        /// Defaults to <see cref="DefaultScrubSensitiveHeaders"/>.
+        /// </summary>
+        public Action<HttpRequestMessage, Uri, Uri, Func<Uri, Uri?>?> ScrubSensitiveHeaders { get; set; } = DefaultScrubSensitiveHeaders;
+
+        /// <summary>
+        /// The default implementation for scrubbing sensitive headers during redirects.
+        /// This method removes Authorization and Cookie headers when the host or scheme changes,
+        /// and removes ProxyAuthorization headers when no proxy is configured or the proxy is bypassed for the new URI.
+        /// </summary>
+        /// <param name="request">The HTTP request message to modify.</param>
+        /// <param name="originalUri">The original request URI.</param>
+        /// <param name="newUri">The new redirect URI.</param>
+        /// <param name="proxyResolver">A function that returns the proxy URI for a destination, or null if no proxy applies. Can be null if no proxy is configured.</param>
+        public static void DefaultScrubSensitiveHeaders(HttpRequestMessage request, Uri originalUri, Uri newUri, Func<Uri, Uri?>? proxyResolver)
+        {
+            if(request == null) throw new ArgumentNullException(nameof(request));
+            if(originalUri == null) throw new ArgumentNullException(nameof(originalUri));
+            if(newUri == null) throw new ArgumentNullException(nameof(newUri));
+
+            // Remove Authorization and Cookie headers if http request's scheme or host changes
+            var isDifferentHostOrScheme = !newUri.Host.Equals(originalUri.Host, StringComparison.OrdinalIgnoreCase) ||
+                !newUri.Scheme.Equals(originalUri.Scheme, StringComparison.OrdinalIgnoreCase);
+            if(isDifferentHostOrScheme)
+            {
+                request.Headers.Authorization = null;
+                request.Headers.Remove("Cookie");
+            }
+
+            // Remove ProxyAuthorization if no proxy is configured or the URL is bypassed
+            var isProxyInactive = proxyResolver == null || proxyResolver(newUri) == null;
+            if(isProxyInactive)
+            {
+                request.Headers.ProxyAuthorization = null;
+            }
+        }
     }
 }
