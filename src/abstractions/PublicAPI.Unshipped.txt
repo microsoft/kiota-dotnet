@@ -1,5 +1,1 @@
 #nullable enable
-static Microsoft.Kiota.Abstractions.Time.implicit operator Microsoft.Kiota.Abstractions.Time(System.TimeOnly time) -> Microsoft.Kiota.Abstractions.Time
-static Microsoft.Kiota.Abstractions.Time.implicit operator System.TimeOnly(Microsoft.Kiota.Abstractions.Time time) -> System.TimeOnly
-static Microsoft.Kiota.Abstractions.Date.implicit operator Microsoft.Kiota.Abstractions.Date(System.DateOnly date) -> Microsoft.Kiota.Abstractions.Date
-static Microsoft.Kiota.Abstractions.Date.implicit operator System.DateOnly(Microsoft.Kiota.Abstractions.Date date) -> System.DateOnly

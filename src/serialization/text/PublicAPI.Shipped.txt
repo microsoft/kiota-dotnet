@@ -1,1 +1,69 @@
 #nullable enable
+Microsoft.Kiota.Serialization.Text.TextParseNode
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetBoolValue() -> bool?
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetByteArrayValue() -> byte[]?
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetByteValue() -> byte?
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetChildNode(string! identifier) -> Microsoft.Kiota.Abstractions.Serialization.IParseNode!
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetCollectionOfEnumValues<T>() -> System.Collections.Generic.IEnumerable<T?>!
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetCollectionOfObjectValues<T>(Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! factory) -> System.Collections.Generic.IEnumerable<T>!
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetCollectionOfPrimitiveValues<T>() -> System.Collections.Generic.IEnumerable<T>!
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetDateTimeOffsetValue() -> System.DateTimeOffset?
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetDateValue() -> Microsoft.Kiota.Abstractions.Date?
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetDecimalValue() -> decimal?
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetDoubleValue() -> double?
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetEnumValue<T>() -> T?
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetFloatValue() -> float?
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetGuidValue() -> System.Guid?
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetIntValue() -> int?
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetLongValue() -> long?
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetObjectValue<T>(Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! factory) -> T
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetSbyteValue() -> sbyte?
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetStringValue() -> string?
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetTimeSpanValue() -> System.TimeSpan?
+Microsoft.Kiota.Serialization.Text.TextParseNode.GetTimeValue() -> Microsoft.Kiota.Abstractions.Time?
+Microsoft.Kiota.Serialization.Text.TextParseNode.OnAfterAssignFieldValues.get -> System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>?
+Microsoft.Kiota.Serialization.Text.TextParseNode.OnAfterAssignFieldValues.set -> void
+Microsoft.Kiota.Serialization.Text.TextParseNode.OnBeforeAssignFieldValues.get -> System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>?
+Microsoft.Kiota.Serialization.Text.TextParseNode.OnBeforeAssignFieldValues.set -> void
+Microsoft.Kiota.Serialization.Text.TextParseNode.TextParseNode(string? text) -> void
+Microsoft.Kiota.Serialization.Text.TextParseNodeFactory
+Microsoft.Kiota.Serialization.Text.TextParseNodeFactory.GetRootParseNode(string! contentType, System.IO.Stream! content) -> Microsoft.Kiota.Abstractions.Serialization.IParseNode!
+Microsoft.Kiota.Serialization.Text.TextParseNodeFactory.GetRootParseNodeAsync(string! contentType, System.IO.Stream! content, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Microsoft.Kiota.Abstractions.Serialization.IParseNode!>!
+Microsoft.Kiota.Serialization.Text.TextParseNodeFactory.TextParseNodeFactory() -> void
+Microsoft.Kiota.Serialization.Text.TextParseNodeFactory.ValidContentType.get -> string!
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.Dispose() -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.GetSerializedContent() -> System.IO.Stream!
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.OnAfterObjectSerialization.get -> System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>?
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.OnAfterObjectSerialization.set -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.OnBeforeObjectSerialization.get -> System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>?
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.OnBeforeObjectSerialization.set -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.OnStartObjectSerialization.get -> System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!, Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter!>?
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.OnStartObjectSerialization.set -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.TextSerializationWriter() -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteAdditionalData(System.Collections.Generic.IDictionary<string!, object!>! value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteBoolValue(string? key, bool? value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteByteArrayValue(string? key, byte[]? value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteByteValue(string? key, byte? value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteCollectionOfEnumValues<T>(string? key, System.Collections.Generic.IEnumerable<T?>? values) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteCollectionOfObjectValues<T>(string? key, System.Collections.Generic.IEnumerable<T>? values) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteCollectionOfPrimitiveValues<T>(string? key, System.Collections.Generic.IEnumerable<T>? values) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteDateTimeOffsetValue(string? key, System.DateTimeOffset? value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteDateValue(string? key, Microsoft.Kiota.Abstractions.Date? value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteDecimalValue(string? key, decimal? value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteDoubleValue(string? key, double? value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteEnumValue<T>(string? key, T? value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteFloatValue(string? key, float? value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteGuidValue(string? key, System.Guid? value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteIntValue(string? key, int? value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteLongValue(string? key, long? value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteNullValue(string? key) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteObjectValue<T>(string? key, T? value, params Microsoft.Kiota.Abstractions.Serialization.IParsable?[]! additionalValuesToMerge) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteSbyteValue(string? key, sbyte? value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteStringValue(string? key, string? value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteTimeSpanValue(string? key, System.TimeSpan? value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriter.WriteTimeValue(string? key, Microsoft.Kiota.Abstractions.Time? value) -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriterFactory
+Microsoft.Kiota.Serialization.Text.TextSerializationWriterFactory.GetSerializationWriter(string! contentType) -> Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter!
+Microsoft.Kiota.Serialization.Text.TextSerializationWriterFactory.TextSerializationWriterFactory() -> void
+Microsoft.Kiota.Serialization.Text.TextSerializationWriterFactory.ValidContentType.get -> string!

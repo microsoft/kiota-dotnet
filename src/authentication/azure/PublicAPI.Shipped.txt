@@ -1,1 +1,14 @@
 #nullable enable
+Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProvider
+Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProvider.AllowedHostsValidator.get -> Microsoft.Kiota.Abstractions.Authentication.AllowedHostsValidator!
+Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProvider.AllowedHostsValidator.set -> void
+Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProvider.AzureIdentityAccessTokenProvider(Azure.Core.TokenCredential! credential, string![]? allowedHosts = null, Microsoft.Kiota.Authentication.Azure.ObservabilityOptions? observabilityOptions = null, bool isCaeEnabled = true, params string![]! scopes) -> void
+Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProvider.AzureIdentityAccessTokenProvider(Azure.Core.TokenCredential! credential, string![]? allowedHosts, Microsoft.Kiota.Authentication.Azure.ObservabilityOptions? observabilityOptions, params string![]! scopes) -> void
+Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProvider.Dispose() -> void
+Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProvider.GetAuthorizationTokenAsync(System.Uri! uri, System.Collections.Generic.Dictionary<string!, object!>? additionalAuthenticationContext = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+Microsoft.Kiota.Authentication.Azure.AzureIdentityAuthenticationProvider
+Microsoft.Kiota.Authentication.Azure.AzureIdentityAuthenticationProvider.AzureIdentityAuthenticationProvider(Azure.Core.TokenCredential! credential, string![]? allowedHosts = null, Microsoft.Kiota.Authentication.Azure.ObservabilityOptions? observabilityOptions = null, bool isCaeEnabled = true, params string![]! scopes) -> void
+Microsoft.Kiota.Authentication.Azure.AzureIdentityAuthenticationProvider.AzureIdentityAuthenticationProvider(Azure.Core.TokenCredential! credential, string![]? allowedHosts, Microsoft.Kiota.Authentication.Azure.ObservabilityOptions? observabilityOptions, params string![]! scopes) -> void
+Microsoft.Kiota.Authentication.Azure.ObservabilityOptions
+Microsoft.Kiota.Authentication.Azure.ObservabilityOptions.ObservabilityOptions() -> void
+Microsoft.Kiota.Authentication.Azure.ObservabilityOptions.TracerInstrumentationName.get -> string!
