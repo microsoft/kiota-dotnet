@@ -1,0 +1,447 @@
+#nullable enable
+Microsoft.Kiota.Abstractions.ApiClientBuilder
+Microsoft.Kiota.Abstractions.ApiException
+Microsoft.Kiota.Abstractions.ApiException.ApiException() -> void
+Microsoft.Kiota.Abstractions.ApiException.ApiException(string! message) -> void
+Microsoft.Kiota.Abstractions.ApiException.ApiException(string! message, System.Exception! innerException) -> void
+Microsoft.Kiota.Abstractions.ApiException.ResponseHeaders.get -> System.Collections.Generic.IDictionary<string!, System.Collections.Generic.IEnumerable<string!>!>!
+Microsoft.Kiota.Abstractions.ApiException.ResponseHeaders.set -> void
+Microsoft.Kiota.Abstractions.ApiException.ResponseStatusCode.get -> int
+Microsoft.Kiota.Abstractions.ApiException.ResponseStatusCode.set -> void
+Microsoft.Kiota.Abstractions.Authentication.AllowedHostsValidator
+Microsoft.Kiota.Abstractions.Authentication.AllowedHostsValidator.AllowedHosts.get -> System.Collections.Generic.IEnumerable<string!>!
+Microsoft.Kiota.Abstractions.Authentication.AllowedHostsValidator.AllowedHosts.set -> void
+Microsoft.Kiota.Abstractions.Authentication.AllowedHostsValidator.AllowedHostsValidator(System.Collections.Generic.IEnumerable<string!>? validHosts = null) -> void
+Microsoft.Kiota.Abstractions.Authentication.AllowedHostsValidator.IsUrlHostValid(System.Uri! uri) -> bool
+Microsoft.Kiota.Abstractions.Authentication.AnonymousAuthenticationProvider
+Microsoft.Kiota.Abstractions.Authentication.AnonymousAuthenticationProvider.AnonymousAuthenticationProvider() -> void
+Microsoft.Kiota.Abstractions.Authentication.AnonymousAuthenticationProvider.AuthenticateRequestAsync(Microsoft.Kiota.Abstractions.RequestInformation! request, System.Collections.Generic.Dictionary<string!, object!>? additionalAuthenticationContext = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Microsoft.Kiota.Abstractions.Authentication.ApiKeyAuthenticationProvider
+Microsoft.Kiota.Abstractions.Authentication.ApiKeyAuthenticationProvider.ApiKeyAuthenticationProvider(string! apiKey, string! parameterName, Microsoft.Kiota.Abstractions.Authentication.ApiKeyAuthenticationProvider.KeyLocation keyLocation, params string![]! allowedHosts) -> void
+Microsoft.Kiota.Abstractions.Authentication.ApiKeyAuthenticationProvider.AuthenticateRequestAsync(Microsoft.Kiota.Abstractions.RequestInformation! request, System.Collections.Generic.Dictionary<string!, object!>? additionalAuthenticationContext = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Microsoft.Kiota.Abstractions.Authentication.ApiKeyAuthenticationProvider.KeyLocation
+Microsoft.Kiota.Abstractions.Authentication.ApiKeyAuthenticationProvider.KeyLocation.Header = 1 -> Microsoft.Kiota.Abstractions.Authentication.ApiKeyAuthenticationProvider.KeyLocation
+Microsoft.Kiota.Abstractions.Authentication.ApiKeyAuthenticationProvider.KeyLocation.QueryParameter = 0 -> Microsoft.Kiota.Abstractions.Authentication.ApiKeyAuthenticationProvider.KeyLocation
+Microsoft.Kiota.Abstractions.Authentication.BaseBearerTokenAuthenticationProvider
+Microsoft.Kiota.Abstractions.Authentication.BaseBearerTokenAuthenticationProvider.AccessTokenProvider.get -> Microsoft.Kiota.Abstractions.Authentication.IAccessTokenProvider!
+Microsoft.Kiota.Abstractions.Authentication.BaseBearerTokenAuthenticationProvider.AuthenticateRequestAsync(Microsoft.Kiota.Abstractions.RequestInformation! request, System.Collections.Generic.Dictionary<string!, object!>? additionalAuthenticationContext = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Microsoft.Kiota.Abstractions.Authentication.BaseBearerTokenAuthenticationProvider.BaseBearerTokenAuthenticationProvider(Microsoft.Kiota.Abstractions.Authentication.IAccessTokenProvider! accessTokenProvider) -> void
+Microsoft.Kiota.Abstractions.Authentication.BasicAuthenticationProvider
+Microsoft.Kiota.Abstractions.Authentication.BasicAuthenticationProvider.AuthenticateRequestAsync(Microsoft.Kiota.Abstractions.RequestInformation! request, System.Collections.Generic.Dictionary<string!, object!>? additionalAuthenticationContext = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Microsoft.Kiota.Abstractions.Authentication.BasicAuthenticationProvider.BasicAuthenticationProvider(string! username, string! password) -> void
+Microsoft.Kiota.Abstractions.Authentication.IAccessTokenProvider
+Microsoft.Kiota.Abstractions.Authentication.IAccessTokenProvider.AllowedHostsValidator.get -> Microsoft.Kiota.Abstractions.Authentication.AllowedHostsValidator!
+Microsoft.Kiota.Abstractions.Authentication.IAccessTokenProvider.GetAuthorizationTokenAsync(System.Uri! uri, System.Collections.Generic.Dictionary<string!, object!>? additionalAuthenticationContext = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+Microsoft.Kiota.Abstractions.Authentication.IAuthenticationProvider
+Microsoft.Kiota.Abstractions.Authentication.IAuthenticationProvider.AuthenticateRequestAsync(Microsoft.Kiota.Abstractions.RequestInformation! request, System.Collections.Generic.Dictionary<string!, object!>? additionalAuthenticationContext = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Microsoft.Kiota.Abstractions.BaseRequestBuilder
+Microsoft.Kiota.Abstractions.BaseRequestBuilder.BaseRequestBuilder(Microsoft.Kiota.Abstractions.IRequestAdapter! requestAdapter, string! urlTemplate, string! rawUrl) -> void
+Microsoft.Kiota.Abstractions.BaseRequestBuilder.BaseRequestBuilder(Microsoft.Kiota.Abstractions.IRequestAdapter! requestAdapter, string! urlTemplate, System.Collections.Generic.Dictionary<string!, object!>! pathParameters) -> void
+Microsoft.Kiota.Abstractions.BaseRequestBuilder.PathParameters.get -> System.Collections.Generic.Dictionary<string!, object!>!
+Microsoft.Kiota.Abstractions.BaseRequestBuilder.PathParameters.set -> void
+Microsoft.Kiota.Abstractions.BaseRequestBuilder.RequestAdapter.get -> Microsoft.Kiota.Abstractions.IRequestAdapter!
+Microsoft.Kiota.Abstractions.BaseRequestBuilder.RequestAdapter.set -> void
+Microsoft.Kiota.Abstractions.BaseRequestBuilder.UrlTemplate.get -> string!
+Microsoft.Kiota.Abstractions.BaseRequestBuilder.UrlTemplate.set -> void
+Microsoft.Kiota.Abstractions.Date
+Microsoft.Kiota.Abstractions.Date.Date() -> void
+Microsoft.Kiota.Abstractions.Date.Date(int year, int month, int day) -> void
+Microsoft.Kiota.Abstractions.Date.Date(System.DateTime dateTime) -> void
+Microsoft.Kiota.Abstractions.Date.DateTime.get -> System.DateTime
+Microsoft.Kiota.Abstractions.Date.Day.get -> int
+Microsoft.Kiota.Abstractions.Date.Month.get -> int
+Microsoft.Kiota.Abstractions.Date.Year.get -> int
+Microsoft.Kiota.Abstractions.DefaultQueryParameters
+Microsoft.Kiota.Abstractions.DefaultQueryParameters.DefaultQueryParameters() -> void
+Microsoft.Kiota.Abstractions.Extensions.IDictionaryExtensions
+Microsoft.Kiota.Abstractions.Extensions.IEnumerableExtensions
+Microsoft.Kiota.Abstractions.Extensions.StringExtensions
+Microsoft.Kiota.Abstractions.Helpers.EnumHelpers
+Microsoft.Kiota.Abstractions.IRequestAdapter
+Microsoft.Kiota.Abstractions.IRequestAdapter.BaseUrl.get -> string?
+Microsoft.Kiota.Abstractions.IRequestAdapter.BaseUrl.set -> void
+Microsoft.Kiota.Abstractions.IRequestAdapter.ConvertToNativeRequestAsync<T>(Microsoft.Kiota.Abstractions.RequestInformation! requestInfo, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<T?>!
+Microsoft.Kiota.Abstractions.IRequestAdapter.EnableBackingStore(Microsoft.Kiota.Abstractions.Store.IBackingStoreFactory! backingStoreFactory) -> void
+Microsoft.Kiota.Abstractions.IRequestAdapter.SendAsync<ModelType>(Microsoft.Kiota.Abstractions.RequestInformation! requestInfo, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<ModelType>! factory, System.Collections.Generic.Dictionary<string!, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<Microsoft.Kiota.Abstractions.Serialization.IParsable!>!>? errorMapping = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<ModelType?>!
+Microsoft.Kiota.Abstractions.IRequestAdapter.SendCollectionAsync<ModelType>(Microsoft.Kiota.Abstractions.RequestInformation! requestInfo, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<ModelType>! factory, System.Collections.Generic.Dictionary<string!, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<Microsoft.Kiota.Abstractions.Serialization.IParsable!>!>? errorMapping = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<ModelType>?>!
+Microsoft.Kiota.Abstractions.IRequestAdapter.SendNoContentAsync(Microsoft.Kiota.Abstractions.RequestInformation! requestInfo, System.Collections.Generic.Dictionary<string!, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<Microsoft.Kiota.Abstractions.Serialization.IParsable!>!>? errorMapping = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Microsoft.Kiota.Abstractions.IRequestAdapter.SendPrimitiveAsync<ModelType>(Microsoft.Kiota.Abstractions.RequestInformation! requestInfo, System.Collections.Generic.Dictionary<string!, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<Microsoft.Kiota.Abstractions.Serialization.IParsable!>!>? errorMapping = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<ModelType?>!
+Microsoft.Kiota.Abstractions.IRequestAdapter.SendPrimitiveCollectionAsync<ModelType>(Microsoft.Kiota.Abstractions.RequestInformation! requestInfo, System.Collections.Generic.Dictionary<string!, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<Microsoft.Kiota.Abstractions.Serialization.IParsable!>!>? errorMapping = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<ModelType>?>!
+Microsoft.Kiota.Abstractions.IRequestAdapter.SerializationWriterFactory.get -> Microsoft.Kiota.Abstractions.Serialization.ISerializationWriterFactory!
+Microsoft.Kiota.Abstractions.IRequestOption
+Microsoft.Kiota.Abstractions.IResponseHandler
+Microsoft.Kiota.Abstractions.IResponseHandler.HandleResponseAsync<NativeResponseType, ModelType>(NativeResponseType response, System.Collections.Generic.Dictionary<string!, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<Microsoft.Kiota.Abstractions.Serialization.IParsable!>!>? errorMappings) -> System.Threading.Tasks.Task<ModelType?>!
+Microsoft.Kiota.Abstractions.Method
+Microsoft.Kiota.Abstractions.Method.CONNECT = 7 -> Microsoft.Kiota.Abstractions.Method
+Microsoft.Kiota.Abstractions.Method.DELETE = 3 -> Microsoft.Kiota.Abstractions.Method
+Microsoft.Kiota.Abstractions.Method.GET = 0 -> Microsoft.Kiota.Abstractions.Method
+Microsoft.Kiota.Abstractions.Method.HEAD = 6 -> Microsoft.Kiota.Abstractions.Method
+Microsoft.Kiota.Abstractions.Method.OPTIONS = 4 -> Microsoft.Kiota.Abstractions.Method
+Microsoft.Kiota.Abstractions.Method.PATCH = 2 -> Microsoft.Kiota.Abstractions.Method
+Microsoft.Kiota.Abstractions.Method.POST = 1 -> Microsoft.Kiota.Abstractions.Method
+Microsoft.Kiota.Abstractions.Method.PUT = 5 -> Microsoft.Kiota.Abstractions.Method
+Microsoft.Kiota.Abstractions.Method.TRACE = 8 -> Microsoft.Kiota.Abstractions.Method
+Microsoft.Kiota.Abstractions.MultipartBody
+Microsoft.Kiota.Abstractions.MultipartBody.AddOrReplacePart<T>(string! partName, string! contentType, T partValue, string? fileName = null) -> void
+Microsoft.Kiota.Abstractions.MultipartBody.Boundary.get -> string!
+Microsoft.Kiota.Abstractions.MultipartBody.GetFieldDeserializers() -> System.Collections.Generic.IDictionary<string!, System.Action<Microsoft.Kiota.Abstractions.Serialization.IParseNode!>!>!
+Microsoft.Kiota.Abstractions.MultipartBody.GetPartValue<T>(string! partName) -> T?
+Microsoft.Kiota.Abstractions.MultipartBody.GetPartValue<T>(string! partName, string? fileName) -> T?
+Microsoft.Kiota.Abstractions.MultipartBody.MultipartBody() -> void
+Microsoft.Kiota.Abstractions.MultipartBody.RemovePart(string! partName) -> bool
+Microsoft.Kiota.Abstractions.MultipartBody.RemovePart(string! partName, string? fileName) -> bool
+Microsoft.Kiota.Abstractions.MultipartBody.RequestAdapter.get -> Microsoft.Kiota.Abstractions.IRequestAdapter?
+Microsoft.Kiota.Abstractions.MultipartBody.RequestAdapter.set -> void
+Microsoft.Kiota.Abstractions.MultipartBody.Serialize(Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter! writer) -> void
+Microsoft.Kiota.Abstractions.NativeResponseHandler
+Microsoft.Kiota.Abstractions.NativeResponseHandler.ErrorMappings.get -> System.Collections.Generic.Dictionary<string!, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<Microsoft.Kiota.Abstractions.Serialization.IParsable!>!>?
+Microsoft.Kiota.Abstractions.NativeResponseHandler.ErrorMappings.set -> void
+Microsoft.Kiota.Abstractions.NativeResponseHandler.HandleResponseAsync<NativeResponseType, ModelType>(NativeResponseType response, System.Collections.Generic.Dictionary<string!, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<Microsoft.Kiota.Abstractions.Serialization.IParsable!>!>? errorMappings) -> System.Threading.Tasks.Task<ModelType?>!
+Microsoft.Kiota.Abstractions.NativeResponseHandler.NativeResponseHandler() -> void
+Microsoft.Kiota.Abstractions.NativeResponseHandler.Value -> object?
+Microsoft.Kiota.Abstractions.NativeResponseWrapper
+Microsoft.Kiota.Abstractions.NativeResponseWrapper.NativeResponseWrapper() -> void
+Microsoft.Kiota.Abstractions.QueryParameterAttribute
+Microsoft.Kiota.Abstractions.QueryParameterAttribute.QueryParameterAttribute(string! templateName) -> void
+Microsoft.Kiota.Abstractions.QueryParameterAttribute.TemplateName.get -> string!
+Microsoft.Kiota.Abstractions.RequestConfiguration<T>
+Microsoft.Kiota.Abstractions.RequestConfiguration<T>.Headers.get -> Microsoft.Kiota.Abstractions.RequestHeaders!
+Microsoft.Kiota.Abstractions.RequestConfiguration<T>.Headers.set -> void
+Microsoft.Kiota.Abstractions.RequestConfiguration<T>.Options.get -> System.Collections.Generic.IList<Microsoft.Kiota.Abstractions.IRequestOption!>!
+Microsoft.Kiota.Abstractions.RequestConfiguration<T>.Options.set -> void
+Microsoft.Kiota.Abstractions.RequestConfiguration<T>.QueryParameters.get -> T!
+Microsoft.Kiota.Abstractions.RequestConfiguration<T>.QueryParameters.set -> void
+Microsoft.Kiota.Abstractions.RequestConfiguration<T>.RequestConfiguration() -> void
+Microsoft.Kiota.Abstractions.RequestHeaders
+Microsoft.Kiota.Abstractions.RequestHeaders.Add(string! headerName, params string![]! headerValues) -> void
+Microsoft.Kiota.Abstractions.RequestHeaders.Add(string! key, System.Collections.Generic.IEnumerable<string!>! value) -> void
+Microsoft.Kiota.Abstractions.RequestHeaders.Add(System.Collections.Generic.KeyValuePair<string!, System.Collections.Generic.IEnumerable<string!>!> item) -> void
+Microsoft.Kiota.Abstractions.RequestHeaders.AddAll(Microsoft.Kiota.Abstractions.RequestHeaders! headers) -> void
+Microsoft.Kiota.Abstractions.RequestHeaders.Clear() -> void
+Microsoft.Kiota.Abstractions.RequestHeaders.Contains(System.Collections.Generic.KeyValuePair<string!, System.Collections.Generic.IEnumerable<string!>!> item) -> bool
+Microsoft.Kiota.Abstractions.RequestHeaders.ContainsKey(string! key) -> bool
+Microsoft.Kiota.Abstractions.RequestHeaders.CopyTo(System.Collections.Generic.KeyValuePair<string!, System.Collections.Generic.IEnumerable<string!>!>[]! array, int arrayIndex) -> void
+Microsoft.Kiota.Abstractions.RequestHeaders.Count.get -> int
+Microsoft.Kiota.Abstractions.RequestHeaders.GetEnumerator() -> System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<string!, System.Collections.Generic.IEnumerable<string!>!>>!
+Microsoft.Kiota.Abstractions.RequestHeaders.IsReadOnly.get -> bool
+Microsoft.Kiota.Abstractions.RequestHeaders.Keys.get -> System.Collections.Generic.ICollection<string!>!
+Microsoft.Kiota.Abstractions.RequestHeaders.Remove(string! headerName, string! headerValue) -> bool
+Microsoft.Kiota.Abstractions.RequestHeaders.Remove(string! key) -> bool
+Microsoft.Kiota.Abstractions.RequestHeaders.Remove(System.Collections.Generic.KeyValuePair<string!, System.Collections.Generic.IEnumerable<string!>!> item) -> bool
+Microsoft.Kiota.Abstractions.RequestHeaders.RequestHeaders() -> void
+Microsoft.Kiota.Abstractions.RequestHeaders.this[string! key].get -> System.Collections.Generic.IEnumerable<string!>!
+Microsoft.Kiota.Abstractions.RequestHeaders.this[string! key].set -> void
+Microsoft.Kiota.Abstractions.RequestHeaders.TryAdd(string! headerName, string! headerValue) -> bool
+Microsoft.Kiota.Abstractions.RequestHeaders.TryGetValue(string! key, out System.Collections.Generic.IEnumerable<string!>! value) -> bool
+Microsoft.Kiota.Abstractions.RequestHeaders.Values.get -> System.Collections.Generic.ICollection<System.Collections.Generic.IEnumerable<string!>!>!
+Microsoft.Kiota.Abstractions.RequestInformation
+Microsoft.Kiota.Abstractions.RequestInformation.AddHeaders(Microsoft.Kiota.Abstractions.RequestHeaders! headers) -> void
+Microsoft.Kiota.Abstractions.RequestInformation.AddQueryParameters<T>(T source) -> void
+Microsoft.Kiota.Abstractions.RequestInformation.AddRequestOptions(System.Collections.Generic.IEnumerable<Microsoft.Kiota.Abstractions.IRequestOption!>! options) -> void
+Microsoft.Kiota.Abstractions.RequestInformation.Configure<T>(System.Action<Microsoft.Kiota.Abstractions.RequestConfiguration<T!>!>? requestConfiguration) -> void
+Microsoft.Kiota.Abstractions.RequestInformation.Content.get -> System.IO.Stream!
+Microsoft.Kiota.Abstractions.RequestInformation.Content.set -> void
+Microsoft.Kiota.Abstractions.RequestInformation.GetRequestOption<T>() -> T?
+Microsoft.Kiota.Abstractions.RequestInformation.Headers.get -> Microsoft.Kiota.Abstractions.RequestHeaders!
+Microsoft.Kiota.Abstractions.RequestInformation.HttpMethod.get -> Microsoft.Kiota.Abstractions.Method
+Microsoft.Kiota.Abstractions.RequestInformation.HttpMethod.set -> void
+Microsoft.Kiota.Abstractions.RequestInformation.PathParameters.get -> System.Collections.Generic.IDictionary<string!, object!>!
+Microsoft.Kiota.Abstractions.RequestInformation.PathParameters.set -> void
+Microsoft.Kiota.Abstractions.RequestInformation.QueryParameters.get -> System.Collections.Generic.IDictionary<string!, object!>!
+Microsoft.Kiota.Abstractions.RequestInformation.QueryParameters.set -> void
+Microsoft.Kiota.Abstractions.RequestInformation.RemoveRequestOptions(params Microsoft.Kiota.Abstractions.IRequestOption![]! options) -> void
+Microsoft.Kiota.Abstractions.RequestInformation.RequestInformation() -> void
+Microsoft.Kiota.Abstractions.RequestInformation.RequestInformation(Microsoft.Kiota.Abstractions.Method method, string! urlTemplate, System.Collections.Generic.IDictionary<string!, object!>! pathParameters) -> void
+Microsoft.Kiota.Abstractions.RequestInformation.RequestOptions.get -> System.Collections.Generic.IEnumerable<Microsoft.Kiota.Abstractions.IRequestOption!>!
+Microsoft.Kiota.Abstractions.RequestInformation.SetContentFromEnum<T>(Microsoft.Kiota.Abstractions.IRequestAdapter! requestAdapter, string! contentType, T? item) -> void
+Microsoft.Kiota.Abstractions.RequestInformation.SetContentFromEnumCollection<T>(Microsoft.Kiota.Abstractions.IRequestAdapter! requestAdapter, string! contentType, System.Collections.Generic.IEnumerable<T?>! items) -> void
+Microsoft.Kiota.Abstractions.RequestInformation.SetContentFromParsable<T>(Microsoft.Kiota.Abstractions.IRequestAdapter! requestAdapter, string! contentType, System.Collections.Generic.IEnumerable<T>! items) -> void
+Microsoft.Kiota.Abstractions.RequestInformation.SetContentFromParsable<T>(Microsoft.Kiota.Abstractions.IRequestAdapter! requestAdapter, string! contentType, T item) -> void
+Microsoft.Kiota.Abstractions.RequestInformation.SetContentFromScalar<T>(Microsoft.Kiota.Abstractions.IRequestAdapter! requestAdapter, string! contentType, T item) -> void
+Microsoft.Kiota.Abstractions.RequestInformation.SetContentFromScalarCollection<T>(Microsoft.Kiota.Abstractions.IRequestAdapter! requestAdapter, string! contentType, System.Collections.Generic.IEnumerable<T>! items) -> void
+Microsoft.Kiota.Abstractions.RequestInformation.SetResponseHandler(Microsoft.Kiota.Abstractions.IResponseHandler! responseHandler) -> void
+Microsoft.Kiota.Abstractions.RequestInformation.SetStreamContent(System.IO.Stream! content) -> void
+Microsoft.Kiota.Abstractions.RequestInformation.SetStreamContent(System.IO.Stream! content, string! contentType) -> void
+Microsoft.Kiota.Abstractions.RequestInformation.URI.get -> System.Uri!
+Microsoft.Kiota.Abstractions.RequestInformation.URI.set -> void
+Microsoft.Kiota.Abstractions.RequestInformation.UrlTemplate.get -> string?
+Microsoft.Kiota.Abstractions.RequestInformation.UrlTemplate.set -> void
+Microsoft.Kiota.Abstractions.ResponseHandlerOption
+Microsoft.Kiota.Abstractions.ResponseHandlerOption.ResponseHandler.get -> Microsoft.Kiota.Abstractions.IResponseHandler?
+Microsoft.Kiota.Abstractions.ResponseHandlerOption.ResponseHandler.set -> void
+Microsoft.Kiota.Abstractions.ResponseHandlerOption.ResponseHandlerOption() -> void
+Microsoft.Kiota.Abstractions.Serialization.IAdditionalDataHolder
+Microsoft.Kiota.Abstractions.Serialization.IAdditionalDataHolder.AdditionalData.get -> System.Collections.Generic.IDictionary<string!, object!>!
+Microsoft.Kiota.Abstractions.Serialization.IAdditionalDataHolder.AdditionalData.set -> void
+Microsoft.Kiota.Abstractions.Serialization.IAsyncParseNodeFactory
+Microsoft.Kiota.Abstractions.Serialization.IAsyncParseNodeFactory.GetRootParseNodeAsync(string! contentType, System.IO.Stream! content, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Microsoft.Kiota.Abstractions.Serialization.IParseNode!>!
+Microsoft.Kiota.Abstractions.Serialization.IComposedTypeWrapper
+Microsoft.Kiota.Abstractions.Serialization.IParsable
+Microsoft.Kiota.Abstractions.Serialization.IParsable.GetFieldDeserializers() -> System.Collections.Generic.IDictionary<string!, System.Action<Microsoft.Kiota.Abstractions.Serialization.IParseNode!>!>!
+Microsoft.Kiota.Abstractions.Serialization.IParsable.Serialize(Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter! writer) -> void
+Microsoft.Kiota.Abstractions.Serialization.IParseNode
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetBoolValue() -> bool?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetByteArrayValue() -> byte[]?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetByteValue() -> byte?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetChildNode(string! identifier) -> Microsoft.Kiota.Abstractions.Serialization.IParseNode?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetCollectionOfEnumValues<T>() -> System.Collections.Generic.IEnumerable<T?>!
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetCollectionOfObjectValues<T>(Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! factory) -> System.Collections.Generic.IEnumerable<T>!
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetCollectionOfPrimitiveValues<T>() -> System.Collections.Generic.IEnumerable<T>!
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetDateTimeOffsetValue() -> System.DateTimeOffset?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetDateValue() -> Microsoft.Kiota.Abstractions.Date?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetDecimalValue() -> decimal?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetDoubleValue() -> double?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetEnumValue<T>() -> T?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetFloatValue() -> float?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetGuidValue() -> System.Guid?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetIntValue() -> int?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetLongValue() -> long?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetObjectValue<T>(Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! factory) -> T
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetSbyteValue() -> sbyte?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetStringValue() -> string?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetTimeSpanValue() -> System.TimeSpan?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.GetTimeValue() -> Microsoft.Kiota.Abstractions.Time?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.OnAfterAssignFieldValues.get -> System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.OnAfterAssignFieldValues.set -> void
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.OnBeforeAssignFieldValues.get -> System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>?
+Microsoft.Kiota.Abstractions.Serialization.IParseNode.OnBeforeAssignFieldValues.set -> void
+Microsoft.Kiota.Abstractions.Serialization.IParseNodeFactory
+Microsoft.Kiota.Abstractions.Serialization.IParseNodeFactory.GetRootParseNode(string! contentType, System.IO.Stream! content) -> Microsoft.Kiota.Abstractions.Serialization.IParseNode!
+Microsoft.Kiota.Abstractions.Serialization.IParseNodeFactory.ValidContentType.get -> string!
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.GetSerializedContent() -> System.IO.Stream!
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.OnAfterObjectSerialization.get -> System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>?
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.OnAfterObjectSerialization.set -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.OnBeforeObjectSerialization.get -> System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>?
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.OnBeforeObjectSerialization.set -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.OnStartObjectSerialization.get -> System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!, Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter!>?
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.OnStartObjectSerialization.set -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteAdditionalData(System.Collections.Generic.IDictionary<string!, object!>! value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteBoolValue(string? key, bool? value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteByteArrayValue(string? key, byte[]? value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteByteValue(string? key, byte? value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteCollectionOfEnumValues<T>(string? key, System.Collections.Generic.IEnumerable<T?>? values) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteCollectionOfObjectValues<T>(string? key, System.Collections.Generic.IEnumerable<T>? values) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteCollectionOfPrimitiveValues<T>(string? key, System.Collections.Generic.IEnumerable<T>? values) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteDateTimeOffsetValue(string? key, System.DateTimeOffset? value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteDateValue(string? key, Microsoft.Kiota.Abstractions.Date? value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteDecimalValue(string? key, decimal? value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteDoubleValue(string? key, double? value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteEnumValue<T>(string? key, T? value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteFloatValue(string? key, float? value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteGuidValue(string? key, System.Guid? value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteIntValue(string? key, int? value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteLongValue(string? key, long? value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteNullValue(string? key) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteObjectValue<T>(string? key, T? value, params Microsoft.Kiota.Abstractions.Serialization.IParsable?[]! additionalValuesToMerge) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteSbyteValue(string? key, sbyte? value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteStringValue(string? key, string? value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteTimeSpanValue(string? key, System.TimeSpan? value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter.WriteTimeValue(string? key, Microsoft.Kiota.Abstractions.Time? value) -> void
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriterFactory
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriterFactory.GetSerializationWriter(string! contentType) -> Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter!
+Microsoft.Kiota.Abstractions.Serialization.ISerializationWriterFactory.ValidContentType.get -> string!
+Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer
+Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer
+Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>
+Microsoft.Kiota.Abstractions.Serialization.ParseNodeFactoryRegistry
+Microsoft.Kiota.Abstractions.Serialization.ParseNodeFactoryRegistry.ContentTypeAssociatedFactories.get -> System.Collections.Concurrent.ConcurrentDictionary<string!, Microsoft.Kiota.Abstractions.Serialization.IParseNodeFactory!>!
+Microsoft.Kiota.Abstractions.Serialization.ParseNodeFactoryRegistry.ContentTypeAssociatedFactories.set -> void
+Microsoft.Kiota.Abstractions.Serialization.ParseNodeFactoryRegistry.GetFactory<T>(string! contentType) -> (T, string! ContentType)
+Microsoft.Kiota.Abstractions.Serialization.ParseNodeFactoryRegistry.GetRootParseNode(string! contentType, System.IO.Stream! content) -> Microsoft.Kiota.Abstractions.Serialization.IParseNode!
+Microsoft.Kiota.Abstractions.Serialization.ParseNodeFactoryRegistry.GetRootParseNodeAsync(string! contentType, System.IO.Stream! content, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Microsoft.Kiota.Abstractions.Serialization.IParseNode!>!
+Microsoft.Kiota.Abstractions.Serialization.ParseNodeFactoryRegistry.ParseNodeFactoryRegistry() -> void
+Microsoft.Kiota.Abstractions.Serialization.ParseNodeFactoryRegistry.ValidContentType.get -> string!
+Microsoft.Kiota.Abstractions.Serialization.ParseNodeHelper
+Microsoft.Kiota.Abstractions.Serialization.ParseNodeProxyFactory
+Microsoft.Kiota.Abstractions.Serialization.ParseNodeProxyFactory.GetRootParseNode(string! contentType, System.IO.Stream! content) -> Microsoft.Kiota.Abstractions.Serialization.IParseNode!
+Microsoft.Kiota.Abstractions.Serialization.ParseNodeProxyFactory.GetRootParseNodeAsync(string! contentType, System.IO.Stream! content, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Microsoft.Kiota.Abstractions.Serialization.IParseNode!>!
+Microsoft.Kiota.Abstractions.Serialization.ParseNodeProxyFactory.ParseNodeProxyFactory(Microsoft.Kiota.Abstractions.Serialization.IParseNodeFactory! concrete, System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>! onBefore, System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>! onAfter) -> void
+Microsoft.Kiota.Abstractions.Serialization.ParseNodeProxyFactory.ValidContentType.get -> string!
+Microsoft.Kiota.Abstractions.Serialization.SerializationWriterFactoryRegistry
+Microsoft.Kiota.Abstractions.Serialization.SerializationWriterFactoryRegistry.ContentTypeAssociatedFactories.get -> System.Collections.Concurrent.ConcurrentDictionary<string!, Microsoft.Kiota.Abstractions.Serialization.ISerializationWriterFactory!>!
+Microsoft.Kiota.Abstractions.Serialization.SerializationWriterFactoryRegistry.ContentTypeAssociatedFactories.set -> void
+Microsoft.Kiota.Abstractions.Serialization.SerializationWriterFactoryRegistry.GetSerializationWriter(string! contentType) -> Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter!
+Microsoft.Kiota.Abstractions.Serialization.SerializationWriterFactoryRegistry.GetSerializationWriter(string! contentType, bool serializeOnlyChangedValues) -> Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter!
+Microsoft.Kiota.Abstractions.Serialization.SerializationWriterFactoryRegistry.SerializationWriterFactoryRegistry() -> void
+Microsoft.Kiota.Abstractions.Serialization.SerializationWriterFactoryRegistry.ValidContentType.get -> string!
+Microsoft.Kiota.Abstractions.Serialization.SerializationWriterProxyFactory
+Microsoft.Kiota.Abstractions.Serialization.SerializationWriterProxyFactory.GetSerializationWriter(string! contentType) -> Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter!
+Microsoft.Kiota.Abstractions.Serialization.SerializationWriterProxyFactory.SerializationWriterProxyFactory(Microsoft.Kiota.Abstractions.Serialization.ISerializationWriterFactory! factoryToWrap, System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>! onBeforeSerialization, System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>! onAfterSerialization, System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!, Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter!>! onStartSerialization) -> void
+Microsoft.Kiota.Abstractions.Serialization.SerializationWriterProxyFactory.ValidContentType.get -> string!
+Microsoft.Kiota.Abstractions.Serialization.UntypedArray
+Microsoft.Kiota.Abstractions.Serialization.UntypedArray.GetValue() -> System.Collections.Generic.IEnumerable<Microsoft.Kiota.Abstractions.Serialization.UntypedNode!>!
+Microsoft.Kiota.Abstractions.Serialization.UntypedArray.UntypedArray(System.Collections.Generic.IEnumerable<Microsoft.Kiota.Abstractions.Serialization.UntypedNode!>! value) -> void
+Microsoft.Kiota.Abstractions.Serialization.UntypedBoolean
+Microsoft.Kiota.Abstractions.Serialization.UntypedBoolean.GetValue() -> bool
+Microsoft.Kiota.Abstractions.Serialization.UntypedBoolean.UntypedBoolean(bool value) -> void
+Microsoft.Kiota.Abstractions.Serialization.UntypedDecimal
+Microsoft.Kiota.Abstractions.Serialization.UntypedDecimal.GetValue() -> decimal
+Microsoft.Kiota.Abstractions.Serialization.UntypedDecimal.UntypedDecimal(decimal value) -> void
+Microsoft.Kiota.Abstractions.Serialization.UntypedDouble
+Microsoft.Kiota.Abstractions.Serialization.UntypedDouble.GetValue() -> double
+Microsoft.Kiota.Abstractions.Serialization.UntypedDouble.UntypedDouble(double value) -> void
+Microsoft.Kiota.Abstractions.Serialization.UntypedFloat
+Microsoft.Kiota.Abstractions.Serialization.UntypedFloat.GetValue() -> float
+Microsoft.Kiota.Abstractions.Serialization.UntypedFloat.UntypedFloat(float value) -> void
+Microsoft.Kiota.Abstractions.Serialization.UntypedInteger
+Microsoft.Kiota.Abstractions.Serialization.UntypedInteger.GetValue() -> int
+Microsoft.Kiota.Abstractions.Serialization.UntypedInteger.UntypedInteger(int value) -> void
+Microsoft.Kiota.Abstractions.Serialization.UntypedLong
+Microsoft.Kiota.Abstractions.Serialization.UntypedLong.GetValue() -> long
+Microsoft.Kiota.Abstractions.Serialization.UntypedLong.UntypedLong(long value) -> void
+Microsoft.Kiota.Abstractions.Serialization.UntypedNode
+Microsoft.Kiota.Abstractions.Serialization.UntypedNode.GetValue() -> object?
+Microsoft.Kiota.Abstractions.Serialization.UntypedNode.UntypedNode() -> void
+Microsoft.Kiota.Abstractions.Serialization.UntypedNull
+Microsoft.Kiota.Abstractions.Serialization.UntypedNull.GetValue() -> object?
+Microsoft.Kiota.Abstractions.Serialization.UntypedNull.UntypedNull() -> void
+Microsoft.Kiota.Abstractions.Serialization.UntypedObject
+Microsoft.Kiota.Abstractions.Serialization.UntypedObject.GetValue() -> System.Collections.Generic.IDictionary<string!, Microsoft.Kiota.Abstractions.Serialization.UntypedNode!>!
+Microsoft.Kiota.Abstractions.Serialization.UntypedObject.UntypedObject(System.Collections.Generic.IDictionary<string!, Microsoft.Kiota.Abstractions.Serialization.UntypedNode!>! properties) -> void
+Microsoft.Kiota.Abstractions.Serialization.UntypedString
+Microsoft.Kiota.Abstractions.Serialization.UntypedString.GetValue() -> string?
+Microsoft.Kiota.Abstractions.Serialization.UntypedString.UntypedString(string? value) -> void
+Microsoft.Kiota.Abstractions.Store.BackingStoreFactorySingleton
+Microsoft.Kiota.Abstractions.Store.BackingStoreFactorySingleton.BackingStoreFactorySingleton() -> void
+Microsoft.Kiota.Abstractions.Store.BackingStoreParseNodeFactory
+Microsoft.Kiota.Abstractions.Store.BackingStoreParseNodeFactory.BackingStoreParseNodeFactory(Microsoft.Kiota.Abstractions.Serialization.IParseNodeFactory! concrete) -> void
+Microsoft.Kiota.Abstractions.Store.BackingStoreSerializationWriterProxyFactory
+Microsoft.Kiota.Abstractions.Store.BackingStoreSerializationWriterProxyFactory.BackingStoreSerializationWriterProxyFactory(Microsoft.Kiota.Abstractions.Serialization.ISerializationWriterFactory! concrete) -> void
+Microsoft.Kiota.Abstractions.Store.BackingStoreSerializationWriterProxyFactory.GetSerializationWriter(string! contentType, bool serializeOnlyChangedValues) -> Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter!
+Microsoft.Kiota.Abstractions.Store.IBackedModel
+Microsoft.Kiota.Abstractions.Store.IBackedModel.BackingStore.get -> Microsoft.Kiota.Abstractions.Store.IBackingStore!
+Microsoft.Kiota.Abstractions.Store.IBackingStore
+Microsoft.Kiota.Abstractions.Store.IBackingStore.Clear() -> void
+Microsoft.Kiota.Abstractions.Store.IBackingStore.Enumerate() -> System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string!, object?>>!
+Microsoft.Kiota.Abstractions.Store.IBackingStore.EnumerateKeysForValuesChangedToNull() -> System.Collections.Generic.IEnumerable<string!>!
+Microsoft.Kiota.Abstractions.Store.IBackingStore.Get<T>(string! key) -> T?
+Microsoft.Kiota.Abstractions.Store.IBackingStore.InitializationCompleted.get -> bool
+Microsoft.Kiota.Abstractions.Store.IBackingStore.InitializationCompleted.set -> void
+Microsoft.Kiota.Abstractions.Store.IBackingStore.ReturnOnlyChangedValues.get -> bool
+Microsoft.Kiota.Abstractions.Store.IBackingStore.ReturnOnlyChangedValues.set -> void
+Microsoft.Kiota.Abstractions.Store.IBackingStore.Set<T>(string! key, T? value) -> void
+Microsoft.Kiota.Abstractions.Store.IBackingStore.Subscribe(System.Action<string!, object?, object?>! callback) -> string!
+Microsoft.Kiota.Abstractions.Store.IBackingStore.Subscribe(System.Action<string!, object?, object?>! callback, string! subscriptionId) -> void
+Microsoft.Kiota.Abstractions.Store.IBackingStore.Unsubscribe(string! subscriptionId) -> void
+Microsoft.Kiota.Abstractions.Store.IBackingStoreFactory
+Microsoft.Kiota.Abstractions.Store.IBackingStoreFactory.CreateBackingStore() -> Microsoft.Kiota.Abstractions.Store.IBackingStore!
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStore
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStore.Clear() -> void
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStore.Enumerate() -> System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string!, object?>>!
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStore.EnumerateKeysForValuesChangedToNull() -> System.Collections.Generic.IEnumerable<string!>!
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStore.Get<T>(string! key) -> T?
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStore.InitializationCompleted.get -> bool
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStore.InitializationCompleted.set -> void
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStore.InMemoryBackingStore() -> void
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStore.ReturnOnlyChangedValues.get -> bool
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStore.ReturnOnlyChangedValues.set -> void
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStore.Set<T>(string! key, T? value) -> void
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStore.Subscribe(System.Action<string!, object?, object?>! callback) -> string!
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStore.Subscribe(System.Action<string!, object?, object?>! callback, string! subscriptionId) -> void
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStore.Unsubscribe(string! subscriptionId) -> void
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStoreFactory
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStoreFactory.CreateBackingStore() -> Microsoft.Kiota.Abstractions.Store.IBackingStore!
+Microsoft.Kiota.Abstractions.Store.InMemoryBackingStoreFactory.InMemoryBackingStoreFactory() -> void
+Microsoft.Kiota.Abstractions.Time
+Microsoft.Kiota.Abstractions.Time.DateTime.get -> System.DateTime
+Microsoft.Kiota.Abstractions.Time.Equals(Microsoft.Kiota.Abstractions.Time other) -> bool
+Microsoft.Kiota.Abstractions.Time.Hour.get -> int
+Microsoft.Kiota.Abstractions.Time.Minute.get -> int
+Microsoft.Kiota.Abstractions.Time.Second.get -> int
+Microsoft.Kiota.Abstractions.Time.Time() -> void
+Microsoft.Kiota.Abstractions.Time.Time(int hour, int minute, int second) -> void
+Microsoft.Kiota.Abstractions.Time.Time(System.DateTime dateTime) -> void
+Microsoft.Kiota.Serialization.ParsableExtensions
+override Microsoft.Kiota.Abstractions.Date.ToString() -> string!
+override Microsoft.Kiota.Abstractions.Time.Equals(object? o) -> bool
+override Microsoft.Kiota.Abstractions.Time.GetHashCode() -> int
+override Microsoft.Kiota.Abstractions.Time.ToString() -> string!
+readonly Microsoft.Kiota.Abstractions.Serialization.SerializationWriterProxyFactory.ProxiedSerializationWriterFactory -> Microsoft.Kiota.Abstractions.Serialization.ISerializationWriterFactory!
+static Microsoft.Kiota.Abstractions.ApiClientBuilder.EnableBackingStoreForParseNodeFactory(Microsoft.Kiota.Abstractions.Serialization.IParseNodeFactory! original) -> Microsoft.Kiota.Abstractions.Serialization.IParseNodeFactory!
+static Microsoft.Kiota.Abstractions.ApiClientBuilder.EnableBackingStoreForSerializationWriterFactory(Microsoft.Kiota.Abstractions.Serialization.ISerializationWriterFactory! original) -> Microsoft.Kiota.Abstractions.Serialization.ISerializationWriterFactory!
+static Microsoft.Kiota.Abstractions.ApiClientBuilder.RegisterDefaultDeserializer<T>() -> void
+static Microsoft.Kiota.Abstractions.ApiClientBuilder.RegisterDefaultSerializer<T>() -> void
+static Microsoft.Kiota.Abstractions.Extensions.IDictionaryExtensions.AddOrReplace<TKey, TValue>(this System.Collections.Generic.IDictionary<TKey, TValue>! dictionary, TKey key, TValue value) -> TValue?
+static Microsoft.Kiota.Abstractions.Extensions.IDictionaryExtensions.TryAdd<TKey, TValue>(this System.Collections.Generic.IDictionary<TKey, TValue>! dictionary, TKey key, TValue value) -> bool
+static Microsoft.Kiota.Abstractions.Extensions.IEnumerableExtensions.AsArray<T>(this System.Collections.Generic.IEnumerable<T>? e) -> T[]?
+static Microsoft.Kiota.Abstractions.Extensions.IEnumerableExtensions.AsList<T>(this System.Collections.Generic.IEnumerable<T>? e) -> System.Collections.Generic.List<T>?
+static Microsoft.Kiota.Abstractions.Extensions.StringExtensions.ToFirstCharacterLowerCase(this string? input) -> string?
+static Microsoft.Kiota.Abstractions.Helpers.EnumHelpers.GetEnumStringValue<T>(T value) -> string?
+static Microsoft.Kiota.Abstractions.Helpers.EnumHelpers.GetEnumValue(System.Type? type, string! rawValue) -> object?
+static Microsoft.Kiota.Abstractions.Helpers.EnumHelpers.GetEnumValue<T>(string! rawValue) -> T?
+static Microsoft.Kiota.Abstractions.NativeResponseWrapper.CallAndGetNativeType<ModelType, NativeResponseType, QueryParametersType, RequestBodyType>(System.Func<RequestBodyType, System.Action<QueryParametersType>?, System.Action<System.Collections.Generic.IDictionary<string!, string!>!>?, System.Collections.Generic.IEnumerable<Microsoft.Kiota.Abstractions.IRequestOption!>?, Microsoft.Kiota.Abstractions.IResponseHandler!, System.Threading.Tasks.Task<ModelType>!>! originalCall, RequestBodyType requestBody, System.Action<QueryParametersType>? q = null, System.Action<System.Collections.Generic.IDictionary<string!, string!>!>? h = null, System.Collections.Generic.IEnumerable<Microsoft.Kiota.Abstractions.IRequestOption!>? o = null) -> System.Threading.Tasks.Task<NativeResponseType?>!
+static Microsoft.Kiota.Abstractions.NativeResponseWrapper.CallAndGetNativeType<ModelType, NativeResponseType, QueryParametersType>(System.Func<System.Action<QueryParametersType>?, System.Action<System.Collections.Generic.IDictionary<string!, string!>!>?, System.Collections.Generic.IEnumerable<Microsoft.Kiota.Abstractions.IRequestOption!>?, Microsoft.Kiota.Abstractions.IResponseHandler!, System.Threading.Tasks.Task<ModelType>!>! originalCall, System.Action<QueryParametersType>? q = null, System.Action<System.Collections.Generic.IDictionary<string!, string!>!>? h = null, System.Collections.Generic.IEnumerable<Microsoft.Kiota.Abstractions.IRequestOption!>? o = null) -> System.Threading.Tasks.Task<NativeResponseType?>!
+static Microsoft.Kiota.Abstractions.NativeResponseWrapper.CallAndGetNativeTypeAsync<ModelType, NativeResponseType, QueryParametersType, RequestBodyType>(System.Func<RequestBodyType, System.Action<QueryParametersType>?, System.Action<System.Collections.Generic.IDictionary<string!, string!>!>?, System.Collections.Generic.IEnumerable<Microsoft.Kiota.Abstractions.IRequestOption!>?, Microsoft.Kiota.Abstractions.IResponseHandler!, System.Threading.CancellationToken, System.Threading.Tasks.Task<ModelType>!>! originalCall, RequestBodyType requestBody, System.Action<QueryParametersType>? q = null, System.Action<System.Collections.Generic.IDictionary<string!, string!>!>? h = null, System.Collections.Generic.IEnumerable<Microsoft.Kiota.Abstractions.IRequestOption!>? o = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<NativeResponseType?>!
+static Microsoft.Kiota.Abstractions.NativeResponseWrapper.CallAndGetNativeTypeAsync<ModelType, NativeResponseType, QueryParametersType>(System.Func<System.Action<QueryParametersType>?, System.Action<System.Collections.Generic.IDictionary<string!, string!>!>?, System.Collections.Generic.IEnumerable<Microsoft.Kiota.Abstractions.IRequestOption!>?, Microsoft.Kiota.Abstractions.IResponseHandler!, System.Threading.CancellationToken, System.Threading.Tasks.Task<ModelType>!>! originalCall, System.Action<QueryParametersType>? q = null, System.Action<System.Collections.Generic.IDictionary<string!, string!>!>? h = null, System.Collections.Generic.IEnumerable<Microsoft.Kiota.Abstractions.IRequestOption!>? o = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<NativeResponseType?>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.Deserialize<T>(string! serializedRepresentation) -> T?
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.Deserialize<T>(string! serializedRepresentation, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! parsableFactory) -> T?
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.Deserialize<T>(System.IO.Stream! stream) -> T?
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.Deserialize<T>(System.IO.Stream! stream, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! parsableFactory) -> T?
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.DeserializeAsync(System.Type! targetType, string! serializedRepresentation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Microsoft.Kiota.Abstractions.Serialization.IParsable?>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.DeserializeAsync(System.Type! targetType, System.IO.Stream! stream, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Microsoft.Kiota.Abstractions.Serialization.IParsable?>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.DeserializeAsync<T>(string! serializedRepresentation, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! parsableFactory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<T?>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.DeserializeAsync<T>(string! serializedRepresentation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<T?>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.DeserializeAsync<T>(System.IO.Stream! stream, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! parsableFactory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<T?>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.DeserializeAsync<T>(System.IO.Stream! stream, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<T?>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.DeserializeCollection<T>(string! serializedRepresentation) -> System.Collections.Generic.IEnumerable<T>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.DeserializeCollection<T>(string! serializedRepresentation, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! parsableFactory) -> System.Collections.Generic.IEnumerable<T>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.DeserializeCollection<T>(System.IO.Stream! stream) -> System.Collections.Generic.IEnumerable<T>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.DeserializeCollection<T>(System.IO.Stream! stream, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! parsableFactory) -> System.Collections.Generic.IEnumerable<T>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.DeserializeCollectionAsync(System.Type! targetType, string! serializedRepresentation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Microsoft.Kiota.Abstractions.Serialization.IParsable!>!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.DeserializeCollectionAsync(System.Type! targetType, System.IO.Stream! stream, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Microsoft.Kiota.Abstractions.Serialization.IParsable!>!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.DeserializeCollectionAsync<T>(string! serializedRepresentation, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! parsableFactory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.DeserializeCollectionAsync<T>(string! serializedRepresentation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.DeserializeCollectionAsync<T>(System.IO.Stream! stream, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! parsableFactory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.DeserializeCollectionAsync<T>(System.IO.Stream! stream, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.SerializeAsStream<T>(System.Collections.Generic.IEnumerable<T>! value, bool serializeOnlyChangedValues = true) -> System.IO.Stream!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.SerializeAsStream<T>(T value, bool serializeOnlyChangedValues = true) -> System.IO.Stream!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.SerializeAsString<T>(System.Collections.Generic.IEnumerable<T>! value) -> string!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.SerializeAsString<T>(T value) -> string!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.SerializeAsStringAsync<T>(System.Collections.Generic.IEnumerable<T>! value, bool serializeOnlyChangedValues = true, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.SerializeAsStringAsync<T>(System.Collections.Generic.IEnumerable<T>! value, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<string!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.SerializeAsStringAsync<T>(T value, bool serializeOnlyChangedValues = true, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaJsonSerializer.SerializeAsStringAsync<T>(T value, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<string!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.Deserialize<T>(string! contentType, string! serializedRepresentation) -> T?
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.Deserialize<T>(string! contentType, string! serializedRepresentation, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! parsableFactory) -> T?
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.Deserialize<T>(string! contentType, System.IO.Stream! stream) -> T?
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.Deserialize<T>(string! contentType, System.IO.Stream! stream, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! parsableFactory) -> T?
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.DeserializeAsync(System.Type! type, string! contentType, string! serializedRepresentation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Microsoft.Kiota.Abstractions.Serialization.IParsable?>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.DeserializeAsync(System.Type! type, string! contentType, System.IO.Stream! stream, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Microsoft.Kiota.Abstractions.Serialization.IParsable?>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.DeserializeAsync<T>(string! contentType, string! serializedRepresentation, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! parsableFactory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<T?>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.DeserializeAsync<T>(string! contentType, string! serializedRepresentation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<T?>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.DeserializeAsync<T>(string! contentType, System.IO.Stream! stream, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! parsableFactory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<T?>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.DeserializeAsync<T>(string! contentType, System.IO.Stream! stream, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<T?>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.DeserializeCollection<T>(string! contentType, string! serializedRepresentation) -> System.Collections.Generic.IEnumerable<T>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.DeserializeCollection<T>(string! contentType, string! serializedRepresentation, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! parsableFactory) -> System.Collections.Generic.IEnumerable<T>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.DeserializeCollection<T>(string! contentType, System.IO.Stream! stream) -> System.Collections.Generic.IEnumerable<T>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.DeserializeCollection<T>(string! contentType, System.IO.Stream! stream, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! parsableFactory) -> System.Collections.Generic.IEnumerable<T>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.DeserializeCollectionAsync(System.Type! type, string! contentType, string! serializedRepresentation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Microsoft.Kiota.Abstractions.Serialization.IParsable!>!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.DeserializeCollectionAsync(System.Type! type, string! contentType, System.IO.Stream! stream, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Microsoft.Kiota.Abstractions.Serialization.IParsable!>!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.DeserializeCollectionAsync<T>(string! contentType, string! serializedRepresentation, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! parsableFactory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.DeserializeCollectionAsync<T>(string! contentType, string! serializedRepresentation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.DeserializeCollectionAsync<T>(string! contentType, System.IO.Stream! stream, Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! parsableFactory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.DeserializeCollectionAsync<T>(string! contentType, System.IO.Stream! stream, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.SerializeAsStream<T>(string! contentType, System.Collections.Generic.IEnumerable<T>! value, bool serializeOnlyChangedValues = true) -> System.IO.Stream!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.SerializeAsStream<T>(string! contentType, T value, bool serializeOnlyChangedValues = true) -> System.IO.Stream!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.SerializeAsString<T>(string! contentType, System.Collections.Generic.IEnumerable<T>! value) -> string!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.SerializeAsString<T>(string! contentType, T value) -> string!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.SerializeAsStringAsync<T>(string! contentType, System.Collections.Generic.IEnumerable<T>! value, bool serializeOnlyChangedValues = true, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.SerializeAsStringAsync<T>(string! contentType, System.Collections.Generic.IEnumerable<T>! value, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<string!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.SerializeAsStringAsync<T>(string! contentType, T value, bool serializeOnlyChangedValues = true, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+static Microsoft.Kiota.Abstractions.Serialization.KiotaSerializer.SerializeAsStringAsync<T>(string! contentType, T value, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<string!>!
+static Microsoft.Kiota.Abstractions.Serialization.ParseNodeHelper.MergeDeserializersForIntersectionWrapper(params Microsoft.Kiota.Abstractions.Serialization.IParsable?[]! targets) -> System.Collections.Generic.IDictionary<string!, System.Action<Microsoft.Kiota.Abstractions.Serialization.IParseNode!>!>!
+static Microsoft.Kiota.Abstractions.Serialization.UntypedNode.CreateFromDiscriminatorValue(Microsoft.Kiota.Abstractions.Serialization.IParseNode! parseNode) -> Microsoft.Kiota.Abstractions.Serialization.UntypedNode!
+static Microsoft.Kiota.Abstractions.Store.BackingStoreFactorySingleton.Instance.get -> Microsoft.Kiota.Abstractions.Store.IBackingStoreFactory!
+static Microsoft.Kiota.Abstractions.Store.BackingStoreFactorySingleton.Instance.set -> void
+static Microsoft.Kiota.Serialization.ParsableExtensions.SerializeAsStream<T>(this System.Collections.Generic.IEnumerable<T>! value, string! contentType, bool serializeOnlyChangedValues = false) -> System.IO.Stream!
+static Microsoft.Kiota.Serialization.ParsableExtensions.SerializeAsStream<T>(this T value, string! contentType, bool serializeOnlyChangedValues = false) -> System.IO.Stream!
+static Microsoft.Kiota.Serialization.ParsableExtensions.SerializeAsStream<T>(this T[]! value, string! contentType, bool serializeOnlyChangedValues = false) -> System.IO.Stream!
+static Microsoft.Kiota.Serialization.ParsableExtensions.SerializeAsStringAsync<T>(this System.Collections.Generic.IEnumerable<T>! value, string! contentType, bool serializeOnlyChangedValues = false, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+static Microsoft.Kiota.Serialization.ParsableExtensions.SerializeAsStringAsync<T>(this T value, string! contentType, bool serializeOnlyChangedValues = false, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+static Microsoft.Kiota.Serialization.ParsableExtensions.SerializeAsStringAsync<T>(this T[]! value, string! contentType, bool serializeOnlyChangedValues = false, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+static readonly Microsoft.Kiota.Abstractions.Serialization.ParseNodeFactoryRegistry.DefaultInstance -> Microsoft.Kiota.Abstractions.Serialization.ParseNodeFactoryRegistry!
+static readonly Microsoft.Kiota.Abstractions.Serialization.SerializationWriterFactoryRegistry.DefaultInstance -> Microsoft.Kiota.Abstractions.Serialization.SerializationWriterFactoryRegistry!
+virtual Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>.Invoke(Microsoft.Kiota.Abstractions.Serialization.IParseNode! node) -> T
+virtual Microsoft.Kiota.Abstractions.Serialization.UntypedNode.GetFieldDeserializers() -> System.Collections.Generic.IDictionary<string!, System.Action<Microsoft.Kiota.Abstractions.Serialization.IParseNode!>!>!
+virtual Microsoft.Kiota.Abstractions.Serialization.UntypedNode.Serialize(Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter! writer) -> void

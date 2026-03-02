@@ -1,0 +1,82 @@
+#nullable enable
+Microsoft.Kiota.Serialization.Json.JsonParseNode
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetBoolValue() -> bool?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetByteArrayValue() -> byte[]?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetByteValue() -> byte?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetChildNode(string! identifier) -> Microsoft.Kiota.Abstractions.Serialization.IParseNode?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetCollectionOfEnumValues<T>() -> System.Collections.Generic.IEnumerable<T?>!
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetCollectionOfObjectValues<T>(Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! factory) -> System.Collections.Generic.IEnumerable<T>!
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetCollectionOfPrimitiveValues<T>() -> System.Collections.Generic.IEnumerable<T>!
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetDateTimeOffsetValue() -> System.DateTimeOffset?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetDateValue() -> Microsoft.Kiota.Abstractions.Date?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetDecimalValue() -> decimal?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetDoubleValue() -> double?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetEnumValue<T>() -> T?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetFloatValue() -> float?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetGuidValue() -> System.Guid?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetIntValue() -> int?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetLongValue() -> long?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetObjectValue<T>(Microsoft.Kiota.Abstractions.Serialization.ParsableFactory<T>! factory) -> T
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetSbyteValue() -> sbyte?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetStringValue() -> string?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetTimeSpanValue() -> System.TimeSpan?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.GetTimeValue() -> Microsoft.Kiota.Abstractions.Time?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.JsonParseNode(System.Text.Json.JsonElement node) -> void
+Microsoft.Kiota.Serialization.Json.JsonParseNode.JsonParseNode(System.Text.Json.JsonElement node, Microsoft.Kiota.Serialization.Json.KiotaJsonSerializationContext! jsonSerializerContext) -> void
+Microsoft.Kiota.Serialization.Json.JsonParseNode.OnAfterAssignFieldValues.get -> System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.OnAfterAssignFieldValues.set -> void
+Microsoft.Kiota.Serialization.Json.JsonParseNode.OnBeforeAssignFieldValues.get -> System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>?
+Microsoft.Kiota.Serialization.Json.JsonParseNode.OnBeforeAssignFieldValues.set -> void
+Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory
+Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory.GetRootParseNode(string! contentType, System.IO.Stream! content) -> Microsoft.Kiota.Abstractions.Serialization.IParseNode!
+Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory.GetRootParseNodeAsync(string! contentType, System.IO.Stream! content, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Microsoft.Kiota.Abstractions.Serialization.IParseNode!>!
+Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory.JsonParseNodeFactory() -> void
+Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory.JsonParseNodeFactory(Microsoft.Kiota.Serialization.Json.KiotaJsonSerializationContext! jsonJsonSerializationContext) -> void
+Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory.ValidContentType.get -> string!
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.Dispose() -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.GetSerializedContent() -> System.IO.Stream!
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.JsonSerializationWriter() -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.JsonSerializationWriter(Microsoft.Kiota.Serialization.Json.KiotaJsonSerializationContext! kiotaJsonSerializationContext) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.OnAfterObjectSerialization.get -> System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>?
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.OnAfterObjectSerialization.set -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.OnBeforeObjectSerialization.get -> System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>?
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.OnBeforeObjectSerialization.set -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.OnStartObjectSerialization.get -> System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!, Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter!>?
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.OnStartObjectSerialization.set -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteAdditionalData(System.Collections.Generic.IDictionary<string!, object!>! value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteBoolValue(string? key, bool? value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteByteArrayValue(string? key, byte[]? value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteByteValue(string? key, byte? value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteCollectionOfEnumValues<T>(string? key, System.Collections.Generic.IEnumerable<T?>? values) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteCollectionOfObjectValues<T>(string? key, System.Collections.Generic.IEnumerable<T>? values) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteCollectionOfPrimitiveValues<T>(string? key, System.Collections.Generic.IEnumerable<T>? values) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteDateTimeOffsetValue(string? key, System.DateTimeOffset? value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteDateValue(string? key, Microsoft.Kiota.Abstractions.Date? value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteDecimalValue(string? key, decimal? value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteDoubleValue(string? key, double? value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteEnumValue<T>(string? key, T? value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteFloatValue(string? key, float? value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteGuidValue(string? key, System.Guid? value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteIntValue(string? key, int? value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteLongValue(string? key, long? value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteNullValue(string? key) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteObjectValue<T>(string? key, T? value, params Microsoft.Kiota.Abstractions.Serialization.IParsable?[]! additionalValuesToMerge) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteSbyteValue(string? key, sbyte? value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteStringValue(string? key, string? value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteTimeSpanValue(string? key, System.TimeSpan? value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.WriteTimeValue(string? key, Microsoft.Kiota.Abstractions.Time? value) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriterFactory
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriterFactory.GetSerializationWriter(string! contentType) -> Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter!
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriterFactory.JsonSerializationWriterFactory() -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriterFactory.JsonSerializationWriterFactory(Microsoft.Kiota.Serialization.Json.KiotaJsonSerializationContext! kiotaJsonSerializationContext) -> void
+Microsoft.Kiota.Serialization.Json.JsonSerializationWriterFactory.ValidContentType.get -> string!
+Microsoft.Kiota.Serialization.Json.KiotaJsonSerializationContext
+Microsoft.Kiota.Serialization.ParsableJsonExtensions
+readonly Microsoft.Kiota.Serialization.Json.JsonSerializationWriter.writer -> System.Text.Json.Utf8JsonWriter!
+static Microsoft.Kiota.Serialization.ParsableJsonExtensions.SerializeAsJsonStream<T>(this System.Collections.Generic.IEnumerable<T>! value, bool serializeOnlyChangedValues = false) -> System.IO.Stream!
+static Microsoft.Kiota.Serialization.ParsableJsonExtensions.SerializeAsJsonStream<T>(this T value, bool serializeOnlyChangedValues = false) -> System.IO.Stream!
+static Microsoft.Kiota.Serialization.ParsableJsonExtensions.SerializeAsJsonStream<T>(this T[]! value, bool serializeOnlyChangedValues = false) -> System.IO.Stream!
+static Microsoft.Kiota.Serialization.ParsableJsonExtensions.SerializeAsJsonStringAsync<T>(this System.Collections.Generic.IEnumerable<T>! value, bool serializeOnlyChangedValues = false, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+static Microsoft.Kiota.Serialization.ParsableJsonExtensions.SerializeAsJsonStringAsync<T>(this T value, bool serializeOnlyChangedValues = false, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+static Microsoft.Kiota.Serialization.ParsableJsonExtensions.SerializeAsJsonStringAsync<T>(this T[]! value, bool serializeOnlyChangedValues = false, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
