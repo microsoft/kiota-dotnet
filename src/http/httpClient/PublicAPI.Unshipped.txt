@@ -5,6 +5,7 @@ const Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter.ErrorMappi
 const Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter.EventResponseHandlerInvokedKey = "com.microsoft.kiota.response_handler_invoked" -> string!
 const Microsoft.Kiota.Http.HttpClientLibrary.Middleware.ChaosHandler.ChaosHandlerTriggeredEventKey = "com.microsoft.kiota.chaos_handler_triggered" -> string!
 Microsoft.Kiota.Http.Generated.Version
+Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options.RedirectHandlerOption.ScrubSensitiveHeaders.get -> System.Action<System.Net.Http.HttpRequestMessage!, System.Uri!, System.Func<System.Uri!, System.Uri?>?>!
 static Microsoft.Kiota.Http.Generated.Version.Current() -> string!
 Microsoft.Kiota.Http.HttpClientLibrary.Extensions.HttpRequestMessageExtensions
 Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter
@@ -75,7 +76,6 @@ Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options.RedirectHandlerOption.
 Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options.RedirectHandlerOption.MaxRedirect.get -> int
 Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options.RedirectHandlerOption.MaxRedirect.set -> void
 Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options.RedirectHandlerOption.RedirectHandlerOption() -> void
-Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options.RedirectHandlerOption.ScrubSensitiveHeaders.get -> System.Action<System.Net.Http.HttpRequestMessage!, System.Uri!, System.Uri!, System.Func<System.Uri!, System.Uri?>?>!
 Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options.RedirectHandlerOption.ScrubSensitiveHeaders.set -> void
 Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options.RedirectHandlerOption.ShouldRedirect.get -> System.Func<System.Net.Http.HttpResponseMessage!, bool>!
 Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options.RedirectHandlerOption.ShouldRedirect.set -> void
@@ -151,5 +151,5 @@ static Microsoft.Kiota.Http.HttpClientLibrary.Middleware.ChaosHandler.Create500I
 static Microsoft.Kiota.Http.HttpClientLibrary.Middleware.ChaosHandler.Create502BadGatewayResponse() -> System.Net.Http.HttpResponseMessage!
 static Microsoft.Kiota.Http.HttpClientLibrary.Middleware.ChaosHandler.Create503Response(System.TimeSpan retry) -> System.Net.Http.HttpResponseMessage!
 static Microsoft.Kiota.Http.HttpClientLibrary.Middleware.ChaosHandler.Create504GatewayTimeoutResponse(System.TimeSpan retry) -> System.Net.Http.HttpResponseMessage!
-static Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options.RedirectHandlerOption.DefaultScrubSensitiveHeaders(System.Net.Http.HttpRequestMessage! request, System.Uri! originalUri, System.Uri! newUri, System.Func<System.Uri!, System.Uri?>? proxyResolver) -> void
+static Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options.RedirectHandlerOption.DefaultScrubSensitiveHeaders(System.Net.Http.HttpRequestMessage! newRequest, System.Uri! originalUri, System.Func<System.Uri!, System.Uri?>? proxyResolver) -> void
 virtual Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter.Dispose(bool disposing) -> void
