@@ -443,12 +443,13 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             // Arrange - Custom callback that removes additional headers on host change
             var redirectOption = new RedirectHandlerOption
             {
-                ScrubSensitiveHeaders = (request, originalUri, newUri, proxyResolver) =>
+                ScrubSensitiveHeaders = (request, originalUri, proxyResolver) =>
                 {
                     // Call default implementation first
-                    RedirectHandlerOption.DefaultScrubSensitiveHeaders(request, originalUri, newUri, proxyResolver);
+                    RedirectHandlerOption.DefaultScrubSensitiveHeaders(request, originalUri, proxyResolver);
 
                     // Then add custom logic for additional headers
+                    var newUri = request.RequestUri ?? throw new InvalidOperationException("The request URI cannot be null.");
                     var isDifferentHostOrScheme = !newUri.Host.Equals(originalUri.Host, StringComparison.OrdinalIgnoreCase) ||
                         !newUri.Scheme.Equals(originalUri.Scheme, StringComparison.OrdinalIgnoreCase);
                     if(isDifferentHostOrScheme)
@@ -494,10 +495,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             var redirectOption = new RedirectHandlerOption
             {
                 AllowRedirectOnSchemeChange = true,
-                ScrubSensitiveHeaders = (request, originalUri, newUri, proxyResolver) =>
+                ScrubSensitiveHeaders = (request, originalUri, proxyResolver) =>
                 {
-                    RedirectHandlerOption.DefaultScrubSensitiveHeaders(request, originalUri, newUri, proxyResolver);
+                    RedirectHandlerOption.DefaultScrubSensitiveHeaders(request, originalUri, proxyResolver);
 
+                    var newUri = request.RequestUri ?? throw new InvalidOperationException("The request URI cannot be null.");
                     var isDifferentHostOrScheme = !newUri.Host.Equals(originalUri.Host, StringComparison.OrdinalIgnoreCase) ||
                         !newUri.Scheme.Equals(originalUri.Scheme, StringComparison.OrdinalIgnoreCase);
                     if(isDifferentHostOrScheme)
@@ -533,10 +535,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             // Arrange - Custom callback that only removes headers on host/scheme change
             var redirectOption = new RedirectHandlerOption
             {
-                ScrubSensitiveHeaders = (request, originalUri, newUri, proxyResolver) =>
+                ScrubSensitiveHeaders = (request, originalUri, proxyResolver) =>
                 {
-                    RedirectHandlerOption.DefaultScrubSensitiveHeaders(request, originalUri, newUri, proxyResolver);
+                    RedirectHandlerOption.DefaultScrubSensitiveHeaders(request, originalUri, proxyResolver);
 
+                    var newUri = request.RequestUri ?? throw new InvalidOperationException("The request URI cannot be null.");
                     var isDifferentHostOrScheme = !newUri.Host.Equals(originalUri.Host, StringComparison.OrdinalIgnoreCase) ||
                         !newUri.Scheme.Equals(originalUri.Scheme, StringComparison.OrdinalIgnoreCase);
                     if(isDifferentHostOrScheme)
@@ -612,11 +615,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             };
             var redirectOption = new RedirectHandlerOption
             {
-                ScrubSensitiveHeaders = (request, originalUri, newUri, proxyResolver) =>
+                ScrubSensitiveHeaders = (request, originalUri, proxyResolver) =>
                 {
                     // Call default implementation
-                    RedirectHandlerOption.DefaultScrubSensitiveHeaders(request, originalUri, newUri, proxyResolver);
+                    RedirectHandlerOption.DefaultScrubSensitiveHeaders(request, originalUri, proxyResolver);
 
+                    var newUri = request.RequestUri ?? throw new InvalidOperationException("The request URI cannot be null.");
                     // Only remove X-Api-Key if proxy is inactive (like ProxyAuthorization logic)
                     var isProxyInactive = proxyResolver == null || proxyResolver(newUri) == null;
                     var isDifferentHostOrScheme = !newUri.Host.Equals(originalUri.Host, StringComparison.OrdinalIgnoreCase) ||

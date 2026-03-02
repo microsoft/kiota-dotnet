@@ -121,7 +121,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
 
                         // Scrub sensitive headers before following the redirect
                         var proxyResolver = GetProxyResolver();
-                        redirectOption.ScrubSensitiveHeaders(newRequest, request.RequestUri!, newRequest.RequestUri, proxyResolver);
+                        redirectOption.ScrubSensitiveHeaders(newRequest, request.RequestUri!, proxyResolver);
 
                         // If scheme has changed. Ensure that this has been opted in for security reasons
                         if(!newRequest.RequestUri.Scheme.Equals(request.RequestUri?.Scheme) && !redirectOption.AllowRedirectOnSchemeChange)
