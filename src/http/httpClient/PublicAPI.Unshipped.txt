@@ -4,6 +4,8 @@ const Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter.ErrorBodyF
 const Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter.ErrorMappingFoundAttributeName = "com.microsoft.kiota.error.mapping_found" -> string!
 const Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter.EventResponseHandlerInvokedKey = "com.microsoft.kiota.response_handler_invoked" -> string!
 const Microsoft.Kiota.Http.HttpClientLibrary.Middleware.ChaosHandler.ChaosHandlerTriggeredEventKey = "com.microsoft.kiota.chaos_handler_triggered" -> string!
+Microsoft.Kiota.Http.Generated.Version
+static Microsoft.Kiota.Http.Generated.Version.Current() -> string!
 Microsoft.Kiota.Http.HttpClientLibrary.Extensions.HttpRequestMessageExtensions
 Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter
 Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter.BaseUrl.get -> string?
