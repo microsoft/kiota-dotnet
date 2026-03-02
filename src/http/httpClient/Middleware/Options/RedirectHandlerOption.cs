@@ -51,22 +51,21 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
         /// The proxy resolver returns the proxy URI for a given destination, or null if no proxy applies.
         /// Defaults to <see cref="DefaultScrubSensitiveHeaders"/>.
         /// </summary>
-        public Action<HttpRequestMessage, Uri, Uri, Func<Uri, Uri?>?> ScrubSensitiveHeaders { get; set; } = DefaultScrubSensitiveHeaders;
+        public Action<HttpRequestMessage, Uri, Func<Uri, Uri?>?> ScrubSensitiveHeaders { get; set; } = DefaultScrubSensitiveHeaders;
 
         /// <summary>
         /// The default implementation for scrubbing sensitive headers during redirects.
         /// This method removes Authorization and Cookie headers when the host, scheme, or port changes,
         /// and removes ProxyAuthorization headers when no proxy is configured or the proxy is bypassed for the new URI.
         /// </summary>
-        /// <param name="request">The HTTP request message to modify.</param>
+        /// <param name="newRequest">The HTTP request message to modify.</param>
         /// <param name="originalUri">The original request URI.</param>
-        /// <param name="newUri">The new redirect URI.</param>
         /// <param name="proxyResolver">A function that returns the proxy URI for a destination, or null if no proxy applies. Can be null if no proxy is configured.</param>
-        public static void DefaultScrubSensitiveHeaders(HttpRequestMessage request, Uri originalUri, Uri newUri, Func<Uri, Uri?>? proxyResolver)
+        public static void DefaultScrubSensitiveHeaders(HttpRequestMessage newRequest, Uri originalUri, Func<Uri, Uri?>? proxyResolver)
         {
-            if(request == null) throw new ArgumentNullException(nameof(request));
+            if(newRequest == null) throw new ArgumentNullException(nameof(newRequest));
             if(originalUri == null) throw new ArgumentNullException(nameof(originalUri));
-            if(newUri == null) throw new ArgumentNullException(nameof(newUri));
+            var newUri = newRequest.RequestUri ?? throw new InvalidOperationException("The request URI cannot be null.");
 
             // Remove Authorization and Cookie headers if http request's scheme, host, or port changes
             var isDifferentOrigin = !newUri.Host.Equals(originalUri.Host, StringComparison.OrdinalIgnoreCase) ||
@@ -74,15 +73,15 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
                 newUri.Port != originalUri.Port;
             if(isDifferentOrigin)
             {
-                request.Headers.Authorization = null;
-                request.Headers.Remove("Cookie");
+                newRequest.Headers.Authorization = null;
+                newRequest.Headers.Remove("Cookie");
             }
 
             // Remove ProxyAuthorization if no proxy is configured or the URL is bypassed
             var isProxyInactive = proxyResolver == null || proxyResolver(newUri) == null;
             if(isProxyInactive)
             {
-                request.Headers.ProxyAuthorization = null;
+                newRequest.Headers.ProxyAuthorization = null;
             }
         }
     }
