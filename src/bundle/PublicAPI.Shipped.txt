@@ -1,0 +1,3 @@
+#nullable enable
+Microsoft.Kiota.Bundle.DefaultRequestAdapter
+Microsoft.Kiota.Bundle.DefaultRequestAdapter.DefaultRequestAdapter(Microsoft.Kiota.Abstractions.Authentication.IAuthenticationProvider! authenticationProvider, Microsoft.Kiota.Abstractions.Serialization.IParseNodeFactory? parseNodeFactory = null, Microsoft.Kiota.Abstractions.Serialization.ISerializationWriterFactory? serializationWriterFactory = null, System.Net.Http.HttpClient? httpClient = null, Microsoft.Kiota.Http.HttpClientLibrary.ObservabilityOptions? observabilityOptions = null) -> void
