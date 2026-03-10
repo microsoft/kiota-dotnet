@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Microsoft.Kiota.Abstractions.Extensions;
@@ -147,7 +148,7 @@ namespace Microsoft.Kiota.Abstractions.Helpers
             valueName = string.Empty;
             foreach(var field in type.GetFields())
             {
-                if(field.GetCustomAttribute<EnumMemberAttribute>() is { } attr && rawValue.Equals(attr.Value, StringComparison.Ordinal))
+                if(field.GetFieldMemberName() is { } attr && rawValue.Equals(attr, StringComparison.Ordinal))
                 {
                     valueName = field.Name;
                     return true;
@@ -174,10 +175,28 @@ namespace Microsoft.Kiota.Abstractions.Helpers
             if(Enum.GetName(type, value) is not { } name)
                 throw new ArgumentException($"Invalid Enum value {value} for enum of type {type}");
 
-            if(type.GetField(name)?.GetCustomAttribute<EnumMemberAttribute>() is { } attribute)
-                return attribute.Value;
+            if(type.GetField(name)?.GetFieldMemberName() is { } attributeValue)
+                return attributeValue;
 
             return name;
+        }
+        /// <summary>
+        /// GetCustomAttribute is extremely costly and leads to a lot of string allocations, so we cache the results in a thread static dictionary to minimize the performance impact. Since the number of enum fields is expected to be low, this should not lead to significant memory usage.
+        /// </summary>
+        [ThreadStatic]
+        private static Dictionary<FieldInfo, string>? _enumMemberCache;
+        private static string? GetFieldMemberName(this FieldInfo field)
+        {
+            _enumMemberCache ??= [];
+            if(_enumMemberCache.TryGetValue(field, out var cachedValue))
+                return cachedValue;
+            if(field.GetCustomAttribute<EnumMemberAttribute>() is { Value: not null } attribute)
+            {
+                _enumMemberCache[field] = attribute.Value;
+                return attribute.Value;
+            }
+
+            return null;
         }
     }
 }
