@@ -92,26 +92,24 @@ namespace Microsoft.Kiota.Abstractions.Helpers
             if(enumType.IsDefined(typeof(FlagsAttribute)))
             {
                 int intValue = 0;
-                while(rawValue.Length > 0)
+                ReadOnlySpan<char> valueSpan = rawValue.AsSpan();
+                while(valueSpan.Length > 0)
                 {
-                    int commaIndex = rawValue.IndexOf(',');
-                    var valueName = commaIndex < 0 ? rawValue : rawValue.Substring(0, commaIndex);
-                    if(TryGetFieldValueName(enumType, valueName, out var value))
-                    {
-                        valueName = value;
-                    }
+                    int commaIndex = valueSpan.IndexOf(',');
+                    ReadOnlySpan<char> valueNameSpan = commaIndex < 0 ? valueSpan : valueSpan.Slice(0, commaIndex);
+                    if(TryGetFieldValueName(enumType, valueNameSpan, out var valueName))
+                        valueNameSpan = valueName.AsSpan();
 #if NET5_0_OR_GREATER
-                    if(Enum.TryParse(enumType, valueName, true, out var enumPartResult))
+                    if(Enum.TryParse(enumType, valueNameSpan.ToString(), true, out var enumPartResult))
                         intValue |= (int)enumPartResult!;
 #else
                     try
                     {
-                        intValue |= (int)Enum.Parse(enumType, valueName, true);
+                        intValue |= (int)Enum.Parse(enumType, valueNameSpan.ToString(), true);
                     }
                     catch { }
 #endif
-
-                    rawValue = commaIndex < 0 ? string.Empty : rawValue.Substring(commaIndex + 1);
+                    valueSpan = commaIndex < 0 ? ReadOnlySpan<char>.Empty : valueSpan.Slice(commaIndex + 1);
                 }
                 result = intValue > 0 ? Enum.Parse(enumType, intValue.ToString(), true) : null;
             }
@@ -154,6 +152,25 @@ namespace Microsoft.Kiota.Abstractions.Helpers
                     return true;
                 }
             }
+            return false;
+        }
+
+#if NET5_0_OR_GREATER
+        private static bool TryGetFieldValueName([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type type, ReadOnlySpan<char> rawValue, out string valueName)
+#else
+        private static bool TryGetFieldValueName(Type type, ReadOnlySpan<char> rawValue, out string valueName)
+#endif
+        {
+            valueName = string.Empty;
+            foreach(var field in type.GetFields())
+            {
+                if(field.GetFieldMemberName() is { } attr && rawValue.Equals(attr.AsSpan(), StringComparison.Ordinal))
+                {
+                    valueName = field.Name;
+                    return true;
+                }
+            }
+
             return false;
         }
 
