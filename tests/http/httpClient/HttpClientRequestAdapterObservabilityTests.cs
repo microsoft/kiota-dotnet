@@ -1,8 +1,8 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Collections.Concurrent;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Http.HttpClientLibrary.Tests.Mocks;
