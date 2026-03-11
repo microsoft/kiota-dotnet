@@ -531,23 +531,6 @@ namespace Microsoft.Kiota.Serialization.Json
             return default;
         }
 
-#if NET5_0_OR_GREATER
-        private static string ToEnumRawName<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(string value) where T : struct, Enum
-#else
-        private static string ToEnumRawName<T>(string value) where T : struct, Enum
-#endif
-        {
-            foreach(var field in typeof(T).GetFields())
-            {
-                if(field.GetCustomAttribute<EnumMemberAttribute>() is { } attr && value.Equals(attr.Value, StringComparison.Ordinal))
-                {
-                    return field.Name;
-                }
-            }
-
-            return value;
-        }
-
         private static bool TryGetUsingTypeInfo<T>(JsonElement currentElement, JsonTypeInfo<T>? typeInfo, out T? deserializedValue)
         {
             try
