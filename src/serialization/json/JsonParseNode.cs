@@ -391,7 +391,7 @@ namespace Microsoft.Kiota.Serialization.Json
         private T? GetEnumValue<T>(JsonElement jsonElement) where T : struct, Enum
 #endif
         {
-            var rawValue = GetStringValue(jsonElement);
+            var rawValue = jsonElement.GetString();
             return EnumHelpers.GetEnumValue<T>(rawValue!);
         }
 
@@ -421,16 +421,7 @@ namespace Microsoft.Kiota.Serialization.Json
             {
                 foreach(var objectValue in jsonNode.EnumerateObject())
                 {
-                    JsonElement property = objectValue.Value;
-                    if(objectValue.Value.ValueKind == JsonValueKind.Object)
-                    {
-                        var objectVal = GetPropertiesOfUntypedObject(objectValue.Value);
-                        properties[objectValue.Name] = new UntypedObject(objectVal);
-                    }
-                    else
-                    {
-                        properties[objectValue.Name] = GetUntypedValue(property);
-                    }
+                    properties[objectValue.Name] = GetUntypedValue(objectValue.Value);
                 }
             }
             return properties;
