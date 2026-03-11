@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
@@ -66,8 +67,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests;
 public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
 {
     private readonly HttpClientRequestAdapter _requestAdapter;
-    private readonly ActivityListener _activityListener;
-    private readonly List<Activity> _capturedActivities;
 
     public HttpClientRequestAdapterObservabilityTests()
     {
@@ -77,30 +76,34 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
 
         var authProvider = new AnonymousAuthenticationProvider();
         var observabilityOptions = new ObservabilityOptions();
-        _requestAdapter = new HttpClientRequestAdapter(authProvider, observabilityOptions: observabilityOptions);
-        _requestAdapter.BaseUrl = "https://graph.microsoft.com/v1.0";
-
-        // Setup activity listener to capture activities from all Kiota sources
-        _capturedActivities = new List<Activity>();
-        _activityListener = new ActivityListener
+        _requestAdapter = new HttpClientRequestAdapter(authProvider, observabilityOptions: observabilityOptions)
         {
-            ShouldListenTo = source => source.Name.StartsWith("Microsoft.Kiota", StringComparison.OrdinalIgnoreCase),
-            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
-            ActivityStarted = activity => _capturedActivities.Add(activity),
-            ActivityStopped = activity => { } // Capture stopped activities to ensure tags are set
+            BaseUrl = "https://graph.microsoft.com/v1.0"
         };
-        ActivitySource.AddActivityListener(_activityListener);
     }
 
     public void Dispose()
     {
-        _activityListener?.Dispose();
         _requestAdapter?.Dispose();
     }
 
-    private KeyValuePair<string, string?> GetTagFromActivities(string tagKey, ActivityTraceId traceId)
+    private static (ActivityListener Listener, ConcurrentQueue<Activity> CapturedActivities) CreateActivityCapture()
     {
-        return _capturedActivities
+        var capturedActivities = new ConcurrentQueue<Activity>();
+        var activityListener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name.StartsWith("Microsoft.Kiota", StringComparison.OrdinalIgnoreCase),
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+            ActivityStarted = activity => capturedActivities.Enqueue(activity),
+            ActivityStopped = activity => { } // Capture stopped activities to ensure tags are set
+        };
+        ActivitySource.AddActivityListener(activityListener);
+        return (activityListener, capturedActivities);
+    }
+
+    private static KeyValuePair<string, string?> GetTagFromActivities(IEnumerable<Activity> capturedActivities, string tagKey, ActivityTraceId traceId)
+    {
+        return capturedActivities
             .Where(a => a.TraceId == traceId)
             .SelectMany(a => a.Tags)
             .FirstOrDefault(t => t.Key == tagKey);
@@ -162,6 +165,8 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
     public async Task SendAsync_CreatesActivityWithHttpRouteTag(string urlTemplate, string? pathParamKey, string? pathParamValue, string expectedRoute)
     {
         // Arrange
+        var (activityListener, capturedActivities) = CreateActivityCapture();
+        using var listener = activityListener;
         var mockHandler = new Mock<HttpMessageHandler>();
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync",
@@ -185,15 +190,13 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
             pathParameters.Add(pathParamKey, pathParamValue);
         }
         var requestInfo = new RequestInformation(Method.GET, urlTemplate, pathParameters);
-        // Clear any previously captured activities
-        _capturedActivities.Clear();
         using var testRoot = StartTestRootActivity();
 
         // Act
         await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        var activity = _capturedActivities.FirstOrDefault(a => a.TraceId == testRoot.TraceId && a.OperationName.Contains("SendAsync"));
+        var activity = capturedActivities.FirstOrDefault(a => a.TraceId == testRoot.TraceId && a.OperationName.Contains("SendAsync"));
         Assert.NotNull(activity);
 
         var httpRouteTag = activity.Tags.FirstOrDefault(t => t.Key == "http.route");
@@ -216,6 +219,8 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
     public async Task SendAsync_CreatesActivityWithUriTemplateTag(string urlTemplate, string? pathParamKey, string? pathParamValue, string expectedSubstring)
     {
         // Arrange
+        var (activityListener, capturedActivities) = CreateActivityCapture();
+        using var listener = activityListener;
         var mockHandler = new Mock<HttpMessageHandler>();
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync",
@@ -239,16 +244,13 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
             pathParameters.Add(pathParamKey, pathParamValue);
         }
         var requestInfo = new RequestInformation(Method.GET, urlTemplate, pathParameters);
-
-        // Clear any previously captured activities
-        _capturedActivities.Clear();
         using var testRoot = StartTestRootActivity();
 
         // Act
         await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        var activity = _capturedActivities.FirstOrDefault(a => a.TraceId == testRoot.TraceId && a.OperationName.Contains("SendAsync"));
+        var activity = capturedActivities.FirstOrDefault(a => a.TraceId == testRoot.TraceId && a.OperationName.Contains("SendAsync"));
         Assert.NotNull(activity);
 
         var uriTemplateTag = activity.Tags.FirstOrDefault(t => t.Key == "url.uri_template");
@@ -267,6 +269,8 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
     public async Task SendAsync_SetsHttpRequestMethodTag(Method httpMethod, string expectedMethodTag)
     {
         // Arrange
+        var (activityListener, capturedActivities) = CreateActivityCapture();
+        using var listener = activityListener;
         var mockHandler = new Mock<HttpMessageHandler>();
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync",
@@ -290,17 +294,16 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
             UrlTemplate = "{+baseurl}/users"
         };
 
-        _capturedActivities.Clear();
         using var testRoot = StartTestRootActivity();
 
         // Act
         await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        var testActivities = _capturedActivities.Where(a => a.TraceId == testRoot.TraceId).ToList();
+        var testActivities = capturedActivities.Where(a => a.TraceId == testRoot.TraceId).ToList();
         Assert.NotEmpty(testActivities);
 
-        var methodTag = GetTagFromActivities("http.request.method", testRoot.TraceId);
+        var methodTag = GetTagFromActivities(capturedActivities, "http.request.method", testRoot.TraceId);
         Assert.NotNull(methodTag.Key);
         Assert.Equal(expectedMethodTag, methodTag.Value);
     }
@@ -309,6 +312,8 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
     public async Task SendAsync_SetsUrlSchemeAndServerAddressTags()
     {
         // Arrange
+        var (activityListener, capturedActivities) = CreateActivityCapture();
+        using var listener = activityListener;
         var mockHandler = new Mock<HttpMessageHandler>();
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync",
@@ -332,20 +337,19 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
             UrlTemplate = "{+baseurl}/users"
         };
 
-        _capturedActivities.Clear();
         using var testRoot = StartTestRootActivity();
 
         // Act
         await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        var testActivities = _capturedActivities.Where(a => a.TraceId == testRoot.TraceId).ToList();
+        var testActivities = capturedActivities.Where(a => a.TraceId == testRoot.TraceId).ToList();
         Assert.NotEmpty(testActivities);
 
-        var schemeTag = GetTagFromActivities("url.scheme", testRoot.TraceId);
+        var schemeTag = GetTagFromActivities(capturedActivities, "url.scheme", testRoot.TraceId);
         Assert.Equal("https", schemeTag.Value);
 
-        var serverTag = GetTagFromActivities("server.address", testRoot.TraceId);
+        var serverTag = GetTagFromActivities(capturedActivities, "server.address", testRoot.TraceId);
         Assert.Equal("graph.microsoft.com", serverTag.Value);
     }
 
@@ -353,6 +357,8 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
     public async Task SendAsync_WithoutIncludeEUIIAttributes_DoesNotSetUrlFullTag()
     {
         // Arrange
+        var (activityListener, capturedActivities) = CreateActivityCapture();
+        using var listener = activityListener;
         var mockHandler = new Mock<HttpMessageHandler>();
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync",
@@ -376,17 +382,16 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
             UrlTemplate = "{+baseurl}/users"
         };
 
-        _capturedActivities.Clear();
         using var testRoot = StartTestRootActivity();
 
         // Act
         await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        var testActivities = _capturedActivities.Where(a => a.TraceId == testRoot.TraceId).ToList();
+        var testActivities = capturedActivities.Where(a => a.TraceId == testRoot.TraceId).ToList();
         Assert.NotEmpty(testActivities);
 
-        var urlFullTag = GetTagFromActivities("url.full", testRoot.TraceId);
+        var urlFullTag = GetTagFromActivities(capturedActivities, "url.full", testRoot.TraceId);
         Assert.Null(urlFullTag.Key);
     }
 
@@ -394,6 +399,8 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
     public async Task SendAsync_CreatesNestedActivitySpans()
     {
         // Arrange
+        var (activityListener, capturedActivities) = CreateActivityCapture();
+        using var listener = activityListener;
         var mockHandler = new Mock<HttpMessageHandler>();
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync",
@@ -417,7 +424,6 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
             UrlTemplate = "{+baseurl}/users"
         };
 
-        _capturedActivities.Clear();
         using var testRoot = StartTestRootActivity();
 
         // Act
@@ -425,7 +431,7 @@ public sealed class HttpClientRequestAdapterObservabilityTests : IDisposable
 
         // Assert - Verify various nested spans are created
         var resultingActivities = new HashSet<string>(
-            _capturedActivities.ToList().Where(a => a.TraceId == testRoot.TraceId).Select(static a => a.OperationName),
+            capturedActivities.Where(a => a.TraceId == testRoot.TraceId).Select(static a => a.OperationName),
             StringComparer.Ordinal);
         Assert.Contains("SendAsync - {+baseurl}/users", resultingActivities);
         Assert.Contains("GetHttpResponseMessageAsync", resultingActivities);
