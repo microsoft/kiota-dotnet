@@ -209,12 +209,7 @@ namespace Microsoft.Kiota.Serialization.Json
                 var enumerator = _jsonNode.EnumerateArray();
                 while(enumerator.MoveNext())
                 {
-                    var currentParseNode = new JsonParseNode(enumerator.Current, _jsonSerializerContext)
-                    {
-                        OnAfterAssignFieldValues = OnAfterAssignFieldValues,
-                        OnBeforeAssignFieldValues = OnBeforeAssignFieldValues
-                    };
-                    yield return currentParseNode.GetEnumValue<T>();
+                    yield return GetEnumValue<T>(enumerator.Current);
                 }
             }
         }
@@ -390,6 +385,16 @@ namespace Microsoft.Kiota.Serialization.Json
             return null;
         }
 
+#if NET5_0_OR_GREATER
+        private T? GetEnumValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(JsonElement jsonElement) where T : struct, Enum
+#else
+        private T? GetEnumValue<T>(JsonElement jsonElement) where T : struct, Enum
+#endif
+        {
+            var rawValue = GetStringValue(jsonElement);
+            return EnumHelpers.GetEnumValue<T>(rawValue!);
+        }
+
         /// <summary>
         /// Gets the collection of untyped values of the node.
         /// </summary>
@@ -400,12 +405,7 @@ namespace Microsoft.Kiota.Serialization.Json
             {
                 foreach(var collectionValue in jsonNode.EnumerateArray())
                 {
-                    var currentParseNode = new JsonParseNode(collectionValue)
-                    {
-                        OnBeforeAssignFieldValues = OnBeforeAssignFieldValues,
-                        OnAfterAssignFieldValues = OnAfterAssignFieldValues
-                    };
-                    yield return currentParseNode.GetUntypedValue();
+                    yield return GetUntypedValue(collectionValue);
                 }
             }
         }
@@ -424,12 +424,7 @@ namespace Microsoft.Kiota.Serialization.Json
                     JsonElement property = objectValue.Value;
                     if(objectValue.Value.ValueKind == JsonValueKind.Object)
                     {
-                        var childNode = new JsonParseNode(objectValue.Value)
-                        {
-                            OnBeforeAssignFieldValues = OnBeforeAssignFieldValues,
-                            OnAfterAssignFieldValues = OnAfterAssignFieldValues
-                        };
-                        var objectVal = childNode.GetPropertiesOfUntypedObject(childNode._jsonNode);
+                        var objectVal = GetPropertiesOfUntypedObject(objectValue.Value);
                         properties[objectValue.Name] = new UntypedObject(objectVal);
                     }
                     else
