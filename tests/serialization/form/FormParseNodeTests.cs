@@ -399,4 +399,48 @@ public class FormParseNodeTests
         // Assert
         Assert.Equal([TestEnum.Sixteen, TestEnum.Eight], result);
     }
+
+    [Fact]
+    public void GetCollectionOfLongPrimitiveValuesFromForm()
+    {
+        string TestFormData = "values=1000000000&" +
+                              "values=2000000000&" +
+                              "values=3000000000&";
+        var formParseNode = new FormParseNode(TestFormData);
+        var node = formParseNode.GetChildNode("values");
+        var collection = node?.GetCollectionOfPrimitiveValues<long?>();
+        Assert.NotNull(collection);
+        Assert.Equal(3, collection.Count());
+        Assert.Equal(1000000000L, collection.First());
+    }
+
+    [Fact]
+    public void GetCollectionOfDateTimeOffsetPrimitiveValuesFromForm()
+    {
+        string TestFormData = "values=2021-11-30T12%3A24%3A36%2B03%3A00&" +
+                              "values=2022-06-15T08%3A00%3A00Z&";
+        var formParseNode = new FormParseNode(TestFormData);
+        var node = formParseNode.GetChildNode("values");
+        var collection = node?.GetCollectionOfPrimitiveValues<DateTimeOffset?>();
+        Assert.NotNull(collection);
+        var items = collection.ToArray();
+        Assert.Equal(2, items.Length);
+        Assert.Equal(new DateTimeOffset(2021, 11, 30, 12, 24, 36, TimeSpan.FromHours(3)), items[0]);
+        Assert.Equal(new DateTimeOffset(2022, 6, 15, 8, 0, 0, TimeSpan.Zero), items[1]);
+    }
+
+    [Fact]
+    public void GetCollectionOfDatePrimitiveValuesFromForm()
+    {
+        string TestFormData = "values=2021-11-30&" +
+                              "values=2022-06-15&";
+        var formParseNode = new FormParseNode(TestFormData);
+        var node = formParseNode.GetChildNode("values");
+        var collection = node?.GetCollectionOfPrimitiveValues<Date?>();
+        Assert.NotNull(collection);
+        var items = collection.ToArray();
+        Assert.Equal(2, items.Length);
+        Assert.Equal(new Date(2021, 11, 30), items[0]);
+        Assert.Equal(new Date(2022, 6, 15), items[1]);
+    }
 }
