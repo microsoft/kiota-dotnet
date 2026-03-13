@@ -864,7 +864,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         }
 
         [Fact]
-        public void GetByteArrayValue_ReturnsNullForNonBase64String()
+        public void GetByteArrayValue_ReturnsNullForInvalidBase64String()
         {
             // Arrange
             using var jsonDocument = JsonDocument.Parse("\"not-base64!\"");
