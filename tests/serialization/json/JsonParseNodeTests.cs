@@ -750,5 +750,226 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                 Assert.StartsWith(expectedExceptionMessage, exception.Message);
             }
         }
+
+        [Fact]
+        public void GetBoolValue_ReturnsTrueForTrueJson()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("true");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetBoolValue();
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void GetBoolValue_ReturnsFalseForFalseJson()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("false");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetBoolValue();
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void GetBoolValue_ReturnsNullForNonBoolJson()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"true\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetBoolValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetByteValue_ReturnsByteValue()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("42");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetByteValue();
+
+            // Assert
+            Assert.Equal((byte)42, result);
+        }
+
+        [Fact]
+        public void GetByteValue_ReturnsNullForNonNumberJson()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"42\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetByteValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetSbyteValue_ReturnsSbyteValue()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("-5");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetSbyteValue();
+
+            // Assert
+            Assert.Equal((sbyte)-5, result);
+        }
+
+        [Fact]
+        public void GetSbyteValue_ReturnsNullForNonNumberJson()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"-5\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetSbyteValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetByteArrayValue_ReturnsByteArray()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"dGV4dA==\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetByteArrayValue();
+
+            // Assert
+            Assert.Equal([0x74, 0x65, 0x78, 0x74], result);
+        }
+
+        [Fact]
+        public void GetByteArrayValue_ReturnsNullForInvalidBase64String()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"not-base64!\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetByteArrayValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetByteArrayValue_ReturnsNullForNonStringJson()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("42");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetByteArrayValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetCollectionOfEnumValues_ReturnsEnumCollection()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse(TestCollectionOfEnumsJson);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetCollectionOfEnumValues<TestNamingEnum>().ToArray();
+
+            // Assert
+            Assert.Equal(2, result.Length);
+            Assert.Equal(TestNamingEnum.Item2SubItem1, result[0]);
+            Assert.Equal(TestNamingEnum.Item3SubItem1, result[1]);
+        }
+
+        [Fact]
+        public void GetCollectionOfEnumValues_ReturnsEmptyForNonArrayJson()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"Item2:SubItem1\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetCollectionOfEnumValues<TestNamingEnum>().ToArray();
+
+            // Assert
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void GetCollectionOfPrimitiveValues_ReturnsBoolCollection()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("[true, false, true]");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetCollectionOfPrimitiveValues<bool?>().ToArray();
+
+            // Assert
+            Assert.Equal(3, result.Length);
+            Assert.True(result[0]);
+            Assert.False(result[1]);
+            Assert.True(result[2]);
+        }
+
+        [Fact]
+        public void GetCollectionOfPrimitiveValues_ReturnsByteCollection()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("[1, 2, 3]");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetCollectionOfPrimitiveValues<byte?>().ToArray();
+
+            // Assert
+            Assert.Equal(3, result.Length);
+            Assert.Equal((byte)1, result[0]);
+            Assert.Equal((byte)2, result[1]);
+            Assert.Equal((byte)3, result[2]);
+        }
+
+        [Fact]
+        public void GetCollectionOfPrimitiveValues_ReturnsSbyteCollection()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("[-1, 0, 1]");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetCollectionOfPrimitiveValues<sbyte?>().ToArray();
+
+            // Assert
+            Assert.Equal(3, result.Length);
+            Assert.Equal((sbyte)-1, result[0]);
+            Assert.Equal((sbyte)0, result[1]);
+            Assert.Equal((sbyte)1, result[2]);
+        }
     }
 }
