@@ -56,75 +56,56 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the string value from the json node
         /// </summary>
         /// <returns>A string value</returns>
-        public string? GetStringValue() => _jsonNode.ValueKind == JsonValueKind.String
-            ? _jsonNode.Deserialize(_jsonSerializerContext.String)
-            : null;
+        public string? GetStringValue() => GetStringValue(_jsonNode);
 
         /// <summary>
         /// Get the boolean value from the json node
         /// </summary>
         /// <returns>A boolean value</returns>
-        public bool? GetBoolValue() =>
-            _jsonNode.ValueKind == JsonValueKind.True || _jsonNode.ValueKind == JsonValueKind.False
-                ? _jsonNode.Deserialize(_jsonSerializerContext.Boolean)
-                : null;
+        public bool? GetBoolValue() => GetBoolValue(_jsonNode);
 
         /// <summary>
         /// Get the byte value from the json node
         /// </summary>
         /// <returns>A byte value</returns>
-        public byte? GetByteValue() => _jsonNode.ValueKind == JsonValueKind.Number
-            ? _jsonNode.Deserialize(_jsonSerializerContext.Byte)
-            : null;
+        public byte? GetByteValue() => GetByteValue(_jsonNode);
 
         /// <summary>
         /// Get the sbyte value from the json node
         /// </summary>
         /// <returns>A sbyte value</returns>
-        public sbyte? GetSbyteValue() => _jsonNode.ValueKind == JsonValueKind.Number
-            ? _jsonNode.Deserialize(_jsonSerializerContext.SByte)
-            : null;
+        public sbyte? GetSbyteValue() => GetSbyteValue(_jsonNode);
 
         /// <summary>
         /// Get the int value from the json node
         /// </summary>
         /// <returns>A int value</returns>
-        public int? GetIntValue() => ShouldBeDeserializableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
-            ? _jsonNode.Deserialize(_jsonSerializerContext.Int32)
-            : null;
+        public int? GetIntValue() => GetIntValue(_jsonNode);
 
 
         /// <summary>
         /// Get the float value from the json node
         /// </summary>
         /// <returns>A float value</returns>
-        public float? GetFloatValue() => ShouldBeDeserializableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
-            ? _jsonNode.Deserialize(_jsonSerializerContext.Single)
-            : null;
+        public float? GetFloatValue() => GetFloatValue(_jsonNode);
 
         /// <summary>
         /// Get the Long value from the json node
         /// </summary>
         /// <returns>A Long value</returns>
-        public long? GetLongValue() => ShouldBeDeserializableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
-            ? _jsonNode.Deserialize(_jsonSerializerContext.Int64)
-            : null;
+        public long? GetLongValue() => GetLongValue(_jsonNode);
 
         /// <summary>
         /// Get the double value from the json node
         /// </summary>
         /// <returns>A double value</returns>
-        public double? GetDoubleValue() => ShouldBeDeserializableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
-            ? _jsonNode.Deserialize(_jsonSerializerContext.Double)
-            : null;
+        public double? GetDoubleValue() => GetDoubleValue(_jsonNode);
 
         /// <summary>
         /// Get the decimal value from the json node
         /// </summary>
         /// <returns>A decimal value</returns>
-        public decimal? GetDecimalValue() => ShouldBeDeserializableNumber(_jsonNode.ValueKind, _jsonSerializerContext.Options.NumberHandling)
-            ? _jsonNode.Deserialize(_jsonSerializerContext.Decimal)
-            : null;
+        public decimal? GetDecimalValue() => GetDecimalValue(_jsonNode);
 
         private static bool ShouldBeDeserializableNumber(JsonValueKind valueKind, JsonNumberHandling numberHandling) => valueKind switch
         {
@@ -139,16 +120,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <returns>A guid value</returns>
         public Guid? GetGuidValue()
         {
-            if(_jsonNode.ValueKind != JsonValueKind.String)
-                return null;
-
-            if(_jsonNode.TryGetGuid(out var guid))
-                return guid;
-
-            if(string.IsNullOrEmpty(_jsonNode.GetString()))
-                return null;
-
-            return _jsonNode.Deserialize(_jsonSerializerContext.Guid);
+            return GetGuidValue(_jsonNode);
         }
 
         /// <summary>
@@ -157,14 +129,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <returns>A <see cref="DateTimeOffset"/> value</returns>
         public DateTimeOffset? GetDateTimeOffsetValue()
         {
-            if(_jsonNode.ValueKind != JsonValueKind.String)
-                return null;
-
-            if(TryGetUsingTypeInfo(_jsonNode, _jsonSerializerContext.DateTimeOffset, out var dateTimeOffset))
-                return dateTimeOffset;
-            else if(DateTimeOffset.TryParse(_jsonNode.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dto))
-                return dto;
-            else return null;
+            return GetDateTimeOffsetValue(_jsonNode);
         }
 
         /// <summary>
@@ -173,12 +138,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <returns>A <see cref="TimeSpan"/> value</returns>
         public TimeSpan? GetTimeSpanValue()
         {
-            var jsonString = _jsonNode.GetString();
-            if(string.IsNullOrEmpty(jsonString))
-                return null;
-
-            // Parse an ISO8601 duration.http://en.wikipedia.org/wiki/ISO_8601#Durations to a TimeSpan
-            return XmlConvert.ToTimeSpan(jsonString);
+            return GetTimeSpanValue(_jsonNode);
         }
 
         /// <summary>
@@ -187,14 +147,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <returns>A <see cref="Date"/> value</returns>
         public Date? GetDateValue()
         {
-            if(_jsonNode.ValueKind != JsonValueKind.String)
-                return null;
-
-            if(TryGetUsingTypeInfo(_jsonNode, _jsonSerializerContext.Date, out var date))
-                return date;
-            else if(DateTime.TryParse(_jsonNode.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dt))
-                return new Date(dt);
-            else return null;
+            return GetDateValue(_jsonNode);
         }
 
         /// <summary>
@@ -203,14 +156,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// <returns>A <see cref="Time"/> value</returns>
         public Time? GetTimeValue()
         {
-            if(_jsonNode.ValueKind != JsonValueKind.String)
-                return null;
-
-            if(TryGetUsingTypeInfo(_jsonNode, _jsonSerializerContext.Time, out var time))
-                return time;
-            if(DateTime.TryParse(_jsonNode.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result))
-                return new Time(result);
-            else return null;
+            return GetTimeValue(_jsonNode);
         }
 
         /// <summary>
@@ -263,12 +209,7 @@ namespace Microsoft.Kiota.Serialization.Json
                 var enumerator = _jsonNode.EnumerateArray();
                 while(enumerator.MoveNext())
                 {
-                    var currentParseNode = new JsonParseNode(enumerator.Current, _jsonSerializerContext)
-                    {
-                        OnAfterAssignFieldValues = OnAfterAssignFieldValues,
-                        OnBeforeAssignFieldValues = OnBeforeAssignFieldValues
-                    };
-                    yield return currentParseNode.GetEnumValue<T>();
+                    yield return GetEnumValue<T>(enumerator.Current);
                 }
             }
         }
@@ -304,38 +245,33 @@ namespace Microsoft.Kiota.Serialization.Json
                 var genericType = typeof(T);
                 foreach(var collectionValue in _jsonNode.EnumerateArray())
                 {
-                    var currentParseNode = new JsonParseNode(collectionValue, _jsonSerializerContext)
-                    {
-                        OnBeforeAssignFieldValues = OnBeforeAssignFieldValues,
-                        OnAfterAssignFieldValues = OnAfterAssignFieldValues
-                    };
                     if(genericType == TypeConstants.BooleanType)
-                        yield return (T)(object)currentParseNode.GetBoolValue()!;
+                        yield return (T)(object)GetBoolValue(collectionValue)!;
                     else if(genericType == TypeConstants.ByteType)
-                        yield return (T)(object)currentParseNode.GetByteValue()!;
+                        yield return (T)(object)GetByteValue(collectionValue)!;
                     else if(genericType == TypeConstants.SbyteType)
-                        yield return (T)(object)currentParseNode.GetSbyteValue()!;
+                        yield return (T)(object)GetSbyteValue(collectionValue)!;
                     else if(genericType == TypeConstants.StringType)
-                        yield return (T)(object)currentParseNode.GetStringValue()!;
+                        yield return (T)(object)GetStringValue(collectionValue)!;
                     else if(genericType == TypeConstants.IntType)
-                        yield return (T)(object)currentParseNode.GetIntValue()!;
+                        yield return (T)(object)GetIntValue(collectionValue)!;
                     else if(genericType == TypeConstants.FloatType)
-                        yield return (T)(object)currentParseNode.GetFloatValue()!;
+                        yield return (T)(object)GetFloatValue(collectionValue)!;
                     else if(genericType == TypeConstants.LongType)
-                        yield return (T)(object)currentParseNode.GetLongValue()!;
+                        yield return (T)(object)GetLongValue(collectionValue)!;
                     else if(genericType == TypeConstants.DoubleType)
-                        yield return (T)(object)currentParseNode.GetDoubleValue()!;
+                        yield return (T)(object)GetDoubleValue(collectionValue)!;
                     else if(genericType == TypeConstants.GuidType)
-                        yield return (T)(object)currentParseNode.GetGuidValue()!;
+                        yield return (T)(object)GetGuidValue(collectionValue)!;
                     else if(genericType == TypeConstants.DateTimeOffsetType)
-                        yield return (T)(object)currentParseNode.GetDateTimeOffsetValue()!;
+                        yield return (T)(object)GetDateTimeOffsetValue(collectionValue)!;
                     else if(genericType == TypeConstants.TimeSpanType)
-                        yield return (T)(object)currentParseNode.GetTimeSpanValue()!;
+                        yield return (T)(object)GetTimeSpanValue(collectionValue)!;
                     else if(genericType == TypeConstants.DateType)
-                        yield return (T)(object)currentParseNode.GetDateValue()!;
+                        yield return (T)(object)GetDateValue(collectionValue)!;
                     else if(genericType == TypeConstants.TimeType)
-                        yield return (T)(object)currentParseNode.GetTimeValue()!;
-                    else if(currentParseNode.GetStringValue() is { Length: > 0 } rawValue)
+                        yield return (T)(object)GetTimeValue(collectionValue)!;
+                    else if(GetStringValue(collectionValue) is { Length: > 0 } rawValue)
                     {
                         yield return (T)EnumHelpers.GetEnumValue(genericType, rawValue)!;
                     }
@@ -343,6 +279,120 @@ namespace Microsoft.Kiota.Serialization.Json
                         throw new InvalidOperationException($"unknown type for deserialization {genericType.FullName}");
                 }
             }
+        }
+
+        private string? GetStringValue(JsonElement jsonElement) => jsonElement.ValueKind == JsonValueKind.String
+            ? jsonElement.Deserialize(_jsonSerializerContext.String)
+            : null;
+
+        private bool? GetBoolValue(JsonElement jsonElement) =>
+            jsonElement.ValueKind == JsonValueKind.True || jsonElement.ValueKind == JsonValueKind.False
+                ? jsonElement.Deserialize(_jsonSerializerContext.Boolean)
+                : null;
+
+        private byte? GetByteValue(JsonElement jsonElement) => jsonElement.ValueKind == JsonValueKind.Number
+            ? jsonElement.Deserialize(_jsonSerializerContext.Byte)
+            : null;
+
+        private sbyte? GetSbyteValue(JsonElement jsonElement) => jsonElement.ValueKind == JsonValueKind.Number
+            ? jsonElement.Deserialize(_jsonSerializerContext.SByte)
+            : null;
+
+        private int? GetIntValue(JsonElement jsonElement) => ShouldBeDeserializableNumber(jsonElement.ValueKind, _jsonSerializerContext.Options.NumberHandling)
+            ? jsonElement.Deserialize(_jsonSerializerContext.Int32)
+            : null;
+
+        private float? GetFloatValue(JsonElement jsonElement) => ShouldBeDeserializableNumber(jsonElement.ValueKind, _jsonSerializerContext.Options.NumberHandling)
+            ? jsonElement.Deserialize(_jsonSerializerContext.Single)
+            : null;
+
+        private long? GetLongValue(JsonElement jsonElement) => ShouldBeDeserializableNumber(jsonElement.ValueKind, _jsonSerializerContext.Options.NumberHandling)
+            ? jsonElement.Deserialize(_jsonSerializerContext.Int64)
+            : null;
+
+        private double? GetDoubleValue(JsonElement jsonElement) => ShouldBeDeserializableNumber(jsonElement.ValueKind, _jsonSerializerContext.Options.NumberHandling)
+            ? jsonElement.Deserialize(_jsonSerializerContext.Double)
+            : null;
+
+        private decimal? GetDecimalValue(JsonElement jsonElement) => ShouldBeDeserializableNumber(jsonElement.ValueKind, _jsonSerializerContext.Options.NumberHandling)
+            ? jsonElement.Deserialize(_jsonSerializerContext.Decimal)
+            : null;
+
+        private Guid? GetGuidValue(JsonElement jsonElement)
+        {
+            if(jsonElement.ValueKind != JsonValueKind.String)
+                return null;
+
+            if(jsonElement.TryGetGuid(out var guid))
+                return guid;
+
+            if(string.IsNullOrEmpty(jsonElement.GetString()))
+                return null;
+
+            return jsonElement.Deserialize(_jsonSerializerContext.Guid);
+        }
+
+        private DateTimeOffset? GetDateTimeOffsetValue(JsonElement jsonElement)
+        {
+            if(jsonElement.ValueKind != JsonValueKind.String)
+                return null;
+
+            if(jsonElement.TryGetDateTimeOffset(out var dateTimeOffset))
+                return dateTimeOffset;
+
+            if(TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.DateTimeOffset, out var convertedDateTimeOffset))
+                return convertedDateTimeOffset;
+
+            if(DateTimeOffset.TryParse(jsonElement.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dto))
+                return dto;
+
+            return null;
+        }
+
+        private static TimeSpan? GetTimeSpanValue(JsonElement jsonElement)
+        {
+            var jsonString = jsonElement.GetString();
+            if(string.IsNullOrEmpty(jsonString))
+                return null;
+
+            // Parse an ISO8601 duration.http://en.wikipedia.org/wiki/ISO_8601#Durations to a TimeSpan
+            return XmlConvert.ToTimeSpan(jsonString);
+        }
+
+        private Date? GetDateValue(JsonElement jsonElement)
+        {
+            if(jsonElement.ValueKind != JsonValueKind.String)
+                return null;
+
+            if(TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.Date, out var date))
+                return date;
+            if(DateTime.TryParse(jsonElement.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dt))
+                return new Date(dt);
+
+            return null;
+        }
+
+        private Time? GetTimeValue(JsonElement jsonElement)
+        {
+            if(jsonElement.ValueKind != JsonValueKind.String)
+                return null;
+
+            if(TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.Time, out var time))
+                return time;
+            if(DateTime.TryParse(jsonElement.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result))
+                return new Time(result);
+
+            return null;
+        }
+
+#if NET5_0_OR_GREATER
+        private T? GetEnumValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(JsonElement jsonElement) where T : struct, Enum
+#else
+        private T? GetEnumValue<T>(JsonElement jsonElement) where T : struct, Enum
+#endif
+        {
+            var rawValue = jsonElement.GetString();
+            return EnumHelpers.GetEnumValue<T>(rawValue!);
         }
 
         /// <summary>
@@ -355,12 +405,7 @@ namespace Microsoft.Kiota.Serialization.Json
             {
                 foreach(var collectionValue in jsonNode.EnumerateArray())
                 {
-                    var currentParseNode = new JsonParseNode(collectionValue)
-                    {
-                        OnBeforeAssignFieldValues = OnBeforeAssignFieldValues,
-                        OnAfterAssignFieldValues = OnAfterAssignFieldValues
-                    };
-                    yield return currentParseNode.GetUntypedValue();
+                    yield return GetUntypedValue(collectionValue);
                 }
             }
         }
@@ -376,21 +421,7 @@ namespace Microsoft.Kiota.Serialization.Json
             {
                 foreach(var objectValue in jsonNode.EnumerateObject())
                 {
-                    JsonElement property = objectValue.Value;
-                    if(objectValue.Value.ValueKind == JsonValueKind.Object)
-                    {
-                        var childNode = new JsonParseNode(objectValue.Value)
-                        {
-                            OnBeforeAssignFieldValues = OnBeforeAssignFieldValues,
-                            OnAfterAssignFieldValues = OnAfterAssignFieldValues
-                        };
-                        var objectVal = childNode.GetPropertiesOfUntypedObject(childNode._jsonNode);
-                        properties[objectValue.Name] = new UntypedObject(objectVal);
-                    }
-                    else
-                    {
-                        properties[objectValue.Name] = GetUntypedValue(property);
-                    }
+                    properties[objectValue.Name] = GetUntypedValue(objectValue.Value);
                 }
             }
             return properties;

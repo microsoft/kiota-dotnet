@@ -107,37 +107,33 @@ public class FormParseNode : IParseNode
         var primitiveValueCollection = DecodedValue.Split(ComaSeparator, StringSplitOptions.RemoveEmptyEntries);
         foreach(var collectionValue in primitiveValueCollection)
         {
-            var currentParseNode = new FormParseNode(collectionValue)
-            {
-                OnBeforeAssignFieldValues = OnBeforeAssignFieldValues,
-                OnAfterAssignFieldValues = OnAfterAssignFieldValues
-            };
+            var decodedCollectionValue = Uri.UnescapeDataString(collectionValue);
             if(genericType == booleanType)
-                yield return (T)(object)currentParseNode.GetBoolValue()!;
+                yield return (T)(object)GetBoolValue(decodedCollectionValue)!;
             else if(genericType == byteType)
-                yield return (T)(object)currentParseNode.GetByteValue()!;
+                yield return (T)(object)GetByteValue(decodedCollectionValue)!;
             else if(genericType == sbyteType)
-                yield return (T)(object)currentParseNode.GetSbyteValue()!;
+                yield return (T)(object)GetSbyteValue(decodedCollectionValue)!;
             else if(genericType == stringType)
-                yield return (T)(object)currentParseNode.GetStringValue()!;
+                yield return (T)(object)decodedCollectionValue;
             else if(genericType == intType)
-                yield return (T)(object)currentParseNode.GetIntValue()!;
+                yield return (T)(object)GetIntValue(decodedCollectionValue)!;
             else if(genericType == floatType)
-                yield return (T)(object)currentParseNode.GetFloatValue()!;
+                yield return (T)(object)GetFloatValue(decodedCollectionValue)!;
             else if(genericType == doubleType)
-                yield return (T)(object)currentParseNode.GetDoubleValue()!;
+                yield return (T)(object)GetDoubleValue(decodedCollectionValue)!;
             else if(genericType == decimalType)
-                yield return (T)(object)currentParseNode.GetDecimalValue()!;
+                yield return (T)(object)GetDecimalValue(decodedCollectionValue)!;
             else if(genericType == guidType)
-                yield return (T)(object)currentParseNode.GetGuidValue()!;
+                yield return (T)(object)GetGuidValue(decodedCollectionValue)!;
             else if(genericType == dateTimeOffsetType)
-                yield return (T)(object)currentParseNode.GetDateTimeOffsetValue()!;
+                yield return (T)(object)GetDateTimeOffsetValue(decodedCollectionValue)!;
             else if(genericType == timeSpanType)
-                yield return (T)(object)currentParseNode.GetTimeSpanValue()!;
+                yield return (T)(object)GetTimeSpanValue(decodedCollectionValue)!;
             else if(genericType == dateType)
-                yield return (T)(object)currentParseNode.GetDateValue()!;
+                yield return (T)(object)GetDateValue(decodedCollectionValue)!;
             else if(genericType == timeType)
-                yield return (T)(object)currentParseNode.GetTimeValue()!;
+                yield return (T)(object)GetTimeValue(decodedCollectionValue)!;
             else
                 throw new InvalidOperationException($"unknown type for deserialization {genericType.FullName}");
         }
@@ -223,6 +219,26 @@ public class FormParseNode : IParseNode
 
     /// <inheritdoc/>
     public Time? GetTimeValue() => DateTime.TryParse(DecodedValue, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? new Time(result) : null;
+
+    private static bool? GetBoolValue(string value) => bool.TryParse(value, out var result) && result;
+    private static byte? GetByteValue(string value) => byte.TryParse(value, out var result) ? result : null;
+    private static sbyte? GetSbyteValue(string value) => sbyte.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
+    private static int? GetIntValue(string value) => int.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
+    private static float? GetFloatValue(string value) => float.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
+    private static double? GetDoubleValue(string value) => double.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
+    private static decimal? GetDecimalValue(string value) => decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
+    private static Guid? GetGuidValue(string value) => Guid.TryParse(value, out var result) ? result : null;
+    private static DateTimeOffset? GetDateTimeOffsetValue(string value) => DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? result : null;
+    private static Date? GetDateValue(string value) => DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? new Date(result) : null;
+    private static Time? GetTimeValue(string value) => DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? new Time(result) : null;
+    private static TimeSpan? GetTimeSpanValue(string value)
+    {
+        if(string.IsNullOrEmpty(value))
+            return null;
+
+        // Parse an ISO8601 duration.http://en.wikipedia.org/wiki/ISO_8601#Durations to a TimeSpan
+        return XmlConvert.ToTimeSpan(value);
+    }
 
     /// <inheritdoc/>
 #if NET5_0_OR_GREATER
