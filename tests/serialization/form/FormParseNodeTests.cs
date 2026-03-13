@@ -408,7 +408,8 @@ public class FormParseNodeTests
                               "values=3000000000&";
         var formParseNode = new FormParseNode(TestFormData);
         var node = formParseNode.GetChildNode("values");
-        var collection = node?.GetCollectionOfPrimitiveValues<long?>();
+        Assert.NotNull(node);
+        var collection = node.GetCollectionOfPrimitiveValues<long?>();
         Assert.NotNull(collection);
         Assert.Equal(3, collection.Count());
         Assert.Equal(1000000000L, collection.First());
@@ -421,7 +422,8 @@ public class FormParseNodeTests
                               "values=2022-06-15T08%3A00%3A00Z&";
         var formParseNode = new FormParseNode(TestFormData);
         var node = formParseNode.GetChildNode("values");
-        var collection = node?.GetCollectionOfPrimitiveValues<DateTimeOffset?>();
+        Assert.NotNull(node);
+        var collection = node.GetCollectionOfPrimitiveValues<DateTimeOffset?>();
         Assert.NotNull(collection);
         var items = collection.ToArray();
         Assert.Equal(2, items.Length);
@@ -436,7 +438,8 @@ public class FormParseNodeTests
                               "values=2022-06-15&";
         var formParseNode = new FormParseNode(TestFormData);
         var node = formParseNode.GetChildNode("values");
-        var collection = node?.GetCollectionOfPrimitiveValues<Date?>();
+        Assert.NotNull(node);
+        var collection = node.GetCollectionOfPrimitiveValues<Date?>();
         Assert.NotNull(collection);
         var items = collection.ToArray();
         Assert.Equal(2, items.Length);
