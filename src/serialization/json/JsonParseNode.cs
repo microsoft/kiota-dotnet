@@ -386,9 +386,9 @@ namespace Microsoft.Kiota.Serialization.Json
         }
 
 #if NET5_0_OR_GREATER
-        private T? GetEnumValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(JsonElement jsonElement) where T : struct, Enum
+        private static T? GetEnumValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(JsonElement jsonElement) where T : struct, Enum
 #else
-        private T? GetEnumValue<T>(JsonElement jsonElement) where T : struct, Enum
+        private static T? GetEnumValue<T>(JsonElement jsonElement) where T : struct, Enum
 #endif
         {
             var rawValue = jsonElement.GetString();
