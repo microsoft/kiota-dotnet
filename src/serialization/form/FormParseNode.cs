@@ -83,6 +83,7 @@ public class FormParseNode : IParseNode
     private static readonly Type sbyteType = typeof(sbyte?);
     private static readonly Type stringType = typeof(string);
     private static readonly Type intType = typeof(int?);
+    private static readonly Type longType = typeof(long?);
     private static readonly Type decimalType = typeof(decimal?);
     private static readonly Type floatType = typeof(float?);
     private static readonly Type doubleType = typeof(double?);
@@ -118,6 +119,8 @@ public class FormParseNode : IParseNode
                 yield return (T)(object)decodedCollectionValue;
             else if(genericType == intType)
                 yield return (T)(object)GetIntValue(decodedCollectionValue)!;
+            else if(genericType == longType)
+                yield return (T)(object)GetLongValue(decodedCollectionValue)!;
             else if(genericType == floatType)
                 yield return (T)(object)GetFloatValue(decodedCollectionValue)!;
             else if(genericType == doubleType)
@@ -224,6 +227,7 @@ public class FormParseNode : IParseNode
     private static byte? GetByteValue(string value) => byte.TryParse(value, out var result) ? result : null;
     private static sbyte? GetSbyteValue(string value) => sbyte.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     private static int? GetIntValue(string value) => int.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
+    private static long? GetLongValue(string value) => long.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     private static float? GetFloatValue(string value) => float.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     private static double? GetDoubleValue(string value) => double.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     private static decimal? GetDecimalValue(string value) => decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
