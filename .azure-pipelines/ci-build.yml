@@ -85,7 +85,7 @@ extends:
               arguments: '--configuration $(BuildConfiguration) --no-incremental'
 
           # Run the Unit test
-          - pwsh: dotnet test $(Build.SourcesDirectory)\Microsoft.Kiota.slnx --configuration $(BuildConfiguration) --no-build --framework net10.0
+          - pwsh: dotnet test --solution $(Build.SourcesDirectory)\Microsoft.Kiota.slnx --configuration $(BuildConfiguration) --no-build --framework net10.0
             displayName: 'Test projects in Microsoft.Kiota'
 
           - task: EsrpCodeSigning@5
