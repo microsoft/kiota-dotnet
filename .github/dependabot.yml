@@ -15,10 +15,6 @@ updates:
       coverlet:
         patterns:
           - coverlet*
-      mstest:
-        patterns:
-          - Microsoft.NET.Test.Sdk
-          - Microsoft.TestPlatform.ObjectModel
   - package-ecosystem: github-actions
     directory: "/"
     schedule:

@@ -85,12 +85,8 @@ extends:
               arguments: '--configuration $(BuildConfiguration) --no-incremental'
 
           # Run the Unit test
-          - task: DotNetCoreCLI@2
+          - pwsh: dotnet test --solution $(Build.SourcesDirectory)\Microsoft.Kiota.slnx --configuration $(BuildConfiguration) --no-build --framework net10.0
             displayName: 'Test projects in Microsoft.Kiota'
-            inputs:
-              command: test
-              projects: '$(Build.SourcesDirectory)\Microsoft.Kiota.slnx'
-              arguments: '--configuration $(BuildConfiguration) --no-build --framework net10.0'
 
           - task: EsrpCodeSigning@5
             displayName: 'ESRP DLL Strong Name'
