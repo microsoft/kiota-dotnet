@@ -58,10 +58,11 @@ jobs:
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: pwsh
         run: |
-          dotnet tool run dotnet-sonarscanner begin /k:"microsoft_kiota-abstractions-dotnet" /o:"microsoft" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="tests/abstractions/bin/Debug/net10.0/TestResults/coverage.opencover.xml,tests/authentication/azure/bin/Debug/net10.0/TestResults/coverage.opencover.xml,tests/http/httpClient/bin/Debug/net10.0/TestResults/coverage.opencover.xml,tests/serialization/json/bin/Debug/net10.0/TestResults/coverage.opencover.xml,tests/serialization/text/bin/Debug/net10.0/TestResults/coverage.opencover.xml,tests/serialization/form/bin/Debug/net10.0/TestResults/coverage.opencover.xml,tests/serialization/multipart/bin/Debug/net10.0/TestResults/coverage.opencover.xml,tests/bundle/bin/Debug/net10.0/TestResults/coverage.opencover.xml"
+          dotnet tool run dotnet-sonarscanner begin /k:"microsoft_kiota-abstractions-dotnet" /o:"microsoft" /d:sonar.token="$env:SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="tests/abstractions/bin/Debug/net10.0/TestResults/coverage.opencover.xml,tests/authentication/azure/bin/Debug/net10.0/TestResults/coverage.opencover.xml,tests/http/httpClient/bin/Debug/net10.0/TestResults/coverage.opencover.xml,tests/serialization/json/bin/Debug/net10.0/TestResults/coverage.opencover.xml,tests/serialization/text/bin/Debug/net10.0/TestResults/coverage.opencover.xml,tests/serialization/form/bin/Debug/net10.0/TestResults/coverage.opencover.xml,tests/serialization/multipart/bin/Debug/net10.0/TestResults/coverage.opencover.xml,tests/bundle/bin/Debug/net10.0/TestResults/coverage.opencover.xml"
           dotnet workload restore
           dotnet build
           dotnet test --solution Microsoft.Kiota.slnx --no-build --verbosity normal --framework net10.0 -- --coverlet --coverlet-output-format opencover
-          dotnet tool run dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          dotnet tool run dotnet-sonarscanner end /d:sonar.token="$env:SONAR_TOKEN"
