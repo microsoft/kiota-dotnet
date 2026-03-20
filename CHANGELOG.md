@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.22.1](https://github.com/microsoft/kiota-dotnet/compare/v1.22.0...v1.22.1) (2026-03-19)
+
+
+### Bug Fixes
+
+* adds missing parentheses in pattern matching ([#671](https://github.com/microsoft/kiota-dotnet/issues/671)) ([50d535e](https://github.com/microsoft/kiota-dotnet/commit/50d535ef0d5689581758254bec3b776f02033a4d))
+* performance issue with enum parsing during deserialization ([#670](https://github.com/microsoft/kiota-dotnet/issues/670)) ([3a09234](https://github.com/microsoft/kiota-dotnet/commit/3a092341a372a26ffb3def12dacc094a60cab3da))
+
 ## [1.22.0](https://github.com/microsoft/kiota-dotnet/compare/v1.21.3...v1.22.0) (2026-03-02)
 
 
