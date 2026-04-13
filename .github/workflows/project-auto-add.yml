@@ -21,7 +21,7 @@ jobs:
         id: generate_token
         uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ secrets.GRAPHBOT_APP_ID }}
+          client-id: ${{ secrets.GRAPHBOT_APP_ID }}
           private-key: ${{ secrets.GRAPHBOT_APP_PEM }}
 
       - name: Get project data
