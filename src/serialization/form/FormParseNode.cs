@@ -204,6 +204,7 @@ public class FormParseNode : IParseNode
     }
 
     /// <inheritdoc/>
+    [CLSCompliant(false)]
     public sbyte? GetSbyteValue() => sbyte.TryParse(DecodedValue, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
 
     /// <inheritdoc/>

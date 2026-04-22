@@ -64,6 +64,7 @@ public class TextParseNode : IParseNode
     /// <inheritdoc />
     public T GetObjectValue<T>(ParsableFactory<T> factory) where T : IParsable => throw new InvalidOperationException(NoStructuredDataMessage);
     /// <inheritdoc />
+    [CLSCompliant(false)]
     public sbyte? GetSbyteValue() => sbyte.TryParse(Text, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     /// <inheritdoc />
     public string? GetStringValue() => Text;

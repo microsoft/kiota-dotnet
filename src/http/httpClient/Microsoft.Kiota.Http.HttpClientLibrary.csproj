@@ -9,6 +9,12 @@
     <GenerateCompatibilitySuppressionFile>false</GenerateCompatibilitySuppressionFile>
   </PropertyGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.CLSCompliantAttribute">
+      <_Parameter1>true</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
   <!-- NET 5 target to be removed on next major version-->
   <ItemGroup Condition="'$(TargetFramework)' == 'net5.0' or '$(TargetFramework)'== 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1' or '$(TargetFramework)' == 'net462'">
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="[6.0,)" />
