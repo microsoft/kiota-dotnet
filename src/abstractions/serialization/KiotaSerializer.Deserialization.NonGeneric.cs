@@ -47,6 +47,9 @@ static internal class KiotaDeserializationWrapperFactory
 #if NET7_0_OR_GREATER
     [RequiresDynamicCode("Activator creates an instance of a generic class with the Target Type as the generic type argument.")]
 #endif
+#if NET5_0_OR_GREATER
+    [UnconditionalSuppressMessage("Trimming", "IL2111", Justification = "CreateInternal is invoked with the same type that is validated as IParsable at the call site; DynamicallyAccessedMembers requirements are satisfied by callers.")]
+#endif
     static internal IKiotaDeserializationWrapper Create(Type type) => IsIParsable(type) ? _deserializers.GetOrAdd(type, CreateInternal) : throw new ArgumentException("The given Type is not of IParsable", nameof(type));
 
 #if NET7_0_OR_GREATER
