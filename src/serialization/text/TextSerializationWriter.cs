@@ -89,6 +89,7 @@ public class TextSerializationWriter : ISerializationWriter, IDisposable
     /// <inheritdoc />
     public void WriteObjectValue<T>(string? key, T? value, params IParsable?[] additionalValuesToMerge) where T : IParsable => throw new InvalidOperationException(TextParseNode.NoStructuredDataMessage);
     /// <inheritdoc />
+    [CLSCompliant(false)]
     public void WriteSbyteValue(string? key, sbyte? value) => WriteStringValue(key, value?.ToString(CultureInfo.InvariantCulture));
     /// <inheritdoc />
     public void WriteStringValue(string? key, string? value)

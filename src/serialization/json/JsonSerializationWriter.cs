@@ -138,6 +138,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// </summary>
         /// <param name="key">The key of the json node</param>
         /// <param name="value">The sbyte value</param>
+        [CLSCompliant(false)]
         public void WriteSbyteValue(string? key, sbyte? value)
         {
             if(!string.IsNullOrEmpty(key) && value.HasValue)
