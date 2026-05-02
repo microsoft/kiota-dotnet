@@ -2,8 +2,6 @@
   <PropertyGroup>
     <Description>Kiota authentication provider implementation with Azure Identity.</Description>
     <AssemblyTitle>Kiota Azure Identity Authentication Library for dotnet</AssemblyTitle>
-    <!-- NET 5 target to be removed on next major version-->
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0;net6.0;net8.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <EnablePackageValidation>true</EnablePackageValidation>
     <GenerateCompatibilitySuppressionFile>false</GenerateCompatibilitySuppressionFile>
@@ -11,16 +9,15 @@
 
   <!-- Package references -->
   <ItemGroup>
-    <PackageReference Include="Azure.Core" Version="1.50.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.14.15">
+    <PackageReference Include="Azure.Core" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <ProjectReference Include="..\..\abstractions\Microsoft.Kiota.Abstractions.csproj" />
   </ItemGroup>
 
-  <!-- NET 5 target to be removed on next major version-->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0' or '$(TargetFramework)'== 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1'">
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="[8.0.1,)" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" />
   </ItemGroup>
 </Project>

@@ -2,23 +2,20 @@
   <PropertyGroup>
     <Description>Abstractions library for the Kiota generated SDKs in dotnet.</Description>
     <AssemblyTitle>Kiota Abstractions Library for dotnet</AssemblyTitle>
-    <!-- NET 5 target to be removed on next major version-->
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0;net6.0;net8.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <EnablePackageValidation>true</EnablePackageValidation>
     <GenerateCompatibilitySuppressionFile>false</GenerateCompatibilitySuppressionFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.14.15">
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Std.UriTemplate" Version="2.0.8" />
+    <PackageReference Include="Std.UriTemplate" />
   </ItemGroup>
 
-  <!-- NET 5 target to be removed on next major version-->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0' or '$(TargetFramework)'== 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1'">
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="[6.0,)" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" />
   </ItemGroup>
 </Project>

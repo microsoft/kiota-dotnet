@@ -3,9 +3,9 @@ name: Build and Test
 on:
   workflow_dispatch:
   push:
-    branches: ["main", "dev", "feature/*"]
+    branches: [ "main", "dev", "feature/*" ]
   pull_request:
-    branches: ["main", "dev"]
+    branches: [ "main", "dev" ]
 
 permissions:
   contents: read #those permissions are required to run the codeql analysis
@@ -19,10 +19,13 @@ jobs:
       solutionName: Microsoft.Kiota.slnx
     steps:
       - uses: actions/checkout@v6
-      - name: Setup .NET
+
+      - name: Setup .NET 8 and 10
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 10.x
+          dotnet-version: |
+            8.x
+            10.x
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
@@ -32,10 +35,14 @@ jobs:
       - name: Check formatting
         run: dotnet format ${{ env.solutionName }} --verify-no-changes
       - name: Build
-        run: dotnet build ${{ env.solutionName }} --no-restore /p:UseSharedCompilation=false
+        run: dotnet build ${{ env.solutionName }} --no-restore
+          /p:UseSharedCompilation=false
       - name: Test for net472
-        run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity normal --framework net472
+        run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity
+          normal --framework net472
       - name: Test for net10.0 and collect coverage
-        run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity normal --framework net10.0 -- --coverlet --coverlet-output-format opencover
+        run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity
+          normal --framework net10.0 -- --coverlet --coverlet-output-format
+          opencover
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4

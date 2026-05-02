@@ -1,5 +1,8 @@
 <Project>
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net10.0</TargetFrameworks>
+  </PropertyGroup>
   <!-- Common project properties for PACKAGED projects TO BE RELEASED-->
   <PropertyGroup Condition="('$(IsTestProject)' != 'true') and ('$(IsAnalyzerProject)' != 'true')">
     <Authors>Microsoft</Authors>
@@ -19,7 +22,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>$(NoWarn);NU5048;NETSDK1138;</NoWarn>
-    <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)','net5.0'))">true</IsTrimmable>
+    <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)','net8.0'))">true</IsTrimmable>
     <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)','net8.0'))">true</IsAotCompatible>
     <ContinuousIntegrationBuild Condition="'$(TF_BUILD)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
@@ -30,7 +33,7 @@
       <PackagePath>
       </PackagePath>
     </None>
-    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="4.14.0" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)','net8.0'))">
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Condition="'$(TargetFramework)' == 'net8.0'">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
