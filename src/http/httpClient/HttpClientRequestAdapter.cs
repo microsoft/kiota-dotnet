@@ -614,10 +614,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
 #endif
             if(contentStream == Stream.Null || (contentStream.CanSeek && contentStream.Length == 0))
                 return null;// ensure a useful stream is passed to the factory
-#pragma warning disable CS0618 // Type or member is obsolete
-            //TODO remove with v2
-            var rootNode = pNodeFactory is IAsyncParseNodeFactory asyncParseNodeFactory ? await asyncParseNodeFactory.GetRootParseNodeAsync(responseContentType!, contentStream, cancellationToken).ConfigureAwait(false) : pNodeFactory.GetRootParseNode(responseContentType!, contentStream);
-#pragma warning restore CS0618 // Type or member is obsolete
+            var rootNode = await pNodeFactory.GetRootParseNodeAsync(responseContentType!, contentStream, cancellationToken).ConfigureAwait(false);
             return rootNode;
         }
         private const string ClaimsKey = "claims";
