@@ -112,17 +112,5 @@ public class MultipartBodyTests
         Assert.Equal("fileContent2", body.GetPartValue<string>("file", "file2.json"));
     }
 
-    [Fact]
-    public void MultiPartBodyExistingGetAndRemoveStillWork()
-    {
-        var body = new MultipartBody();
 
-        body.AddOrReplacePart("file", "application/json", "fileContent", "file.json");
-
-        // existing usecase, file should still be able to be retreived
-        Assert.Equal("fileContent", body.GetPartValue<string>("file"));
-
-        // existing usecase, file should be sucesfully removed
-        Assert.True(body.RemovePart("file"));
-    }
 }

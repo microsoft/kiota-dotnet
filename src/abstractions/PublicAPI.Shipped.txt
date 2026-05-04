@@ -86,10 +86,8 @@ Microsoft.Kiota.Abstractions.MultipartBody.AddOrReplacePart<T>(string! partName,
 Microsoft.Kiota.Abstractions.MultipartBody.Boundary.get -> string!
 Microsoft.Kiota.Abstractions.MultipartBody.GetFieldDeserializers() -> System.Collections.Generic.IDictionary<string!, System.Action<Microsoft.Kiota.Abstractions.Serialization.IParseNode!>!>!
 Microsoft.Kiota.Abstractions.MultipartBody.GetPartValue<T>(string! partName, string? fileName) -> T?
-Microsoft.Kiota.Abstractions.MultipartBody.GetPartValue<T>(string! partName) -> T?
 Microsoft.Kiota.Abstractions.MultipartBody.MultipartBody() -> void
 Microsoft.Kiota.Abstractions.MultipartBody.RemovePart(string! partName, string? fileName) -> bool
-Microsoft.Kiota.Abstractions.MultipartBody.RemovePart(string! partName) -> bool
 Microsoft.Kiota.Abstractions.MultipartBody.RequestAdapter.get -> Microsoft.Kiota.Abstractions.IRequestAdapter?
 Microsoft.Kiota.Abstractions.MultipartBody.RequestAdapter.set -> void
 Microsoft.Kiota.Abstractions.MultipartBody.Serialize(Microsoft.Kiota.Abstractions.Serialization.ISerializationWriter! writer) -> void
