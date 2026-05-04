@@ -61,7 +61,6 @@ Microsoft.Kiota.Serialization.Json.JsonParseNode.OnAfterAssignFieldValues.set ->
 Microsoft.Kiota.Serialization.Json.JsonParseNode.OnBeforeAssignFieldValues.get -> System.Action<Microsoft.Kiota.Abstractions.Serialization.IParsable!>?
 Microsoft.Kiota.Serialization.Json.JsonParseNode.OnBeforeAssignFieldValues.set -> void
 Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory
-Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory.GetRootParseNode(string! contentType, System.IO.Stream! content) -> Microsoft.Kiota.Abstractions.Serialization.IParseNode!
 Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory.GetRootParseNodeAsync(string! contentType, System.IO.Stream! content, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Microsoft.Kiota.Abstractions.Serialization.IParseNode!>!
 Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory.JsonParseNodeFactory() -> void
 Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory.JsonParseNodeFactory(Microsoft.Kiota.Serialization.Json.KiotaJsonSerializationContext! jsonJsonSerializationContext) -> void
