@@ -18,7 +18,7 @@ public partial class DeserializationHelpersTests
         {
             Id = "123"
         });
-        var mockJsonParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+        var mockJsonParseNodeFactory = new Mock<IParseNodeFactory>();
         mockJsonParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(mockParseNode.Object));
         mockJsonParseNodeFactory.Setup(x => x.ValidContentType).Returns(_jsonContentType);
         ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockJsonParseNodeFactory.Object;
@@ -40,7 +40,7 @@ public partial class DeserializationHelpersTests
                 Id = "123"
             }
         });
-        var mockJsonParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+        var mockJsonParseNodeFactory = new Mock<IParseNodeFactory>();
         mockJsonParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(mockParseNode.Object));
         mockJsonParseNodeFactory.Setup(x => x.ValidContentType).Returns(_jsonContentType);
         ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockJsonParseNodeFactory.Object;
