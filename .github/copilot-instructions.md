@@ -1,5 +1,9 @@
 # Copilot Instructions
 
+## Upgrade Guide
+
+When working on code that consumes the Kiota .NET libraries, or when encountering build errors after a version update, refer to [`docs/upgrade-guide-v1-to-v2.md`](../docs/upgrade-guide-v1-to-v2.md) for breaking changes, migration steps, and compiler error mappings between v1.x and v2.x.
+
 ## Commit Message Format
 
 Always use conventional commits format when creating commits. Follow this structure:

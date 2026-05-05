@@ -1,3 +1,24 @@
+---
+title: "Kiota .NET Libraries Upgrade Guide: v1.x to v2.x"
+applies-to: microsoft/kiota-dotnet
+from-version: "1.x"
+to-version: "2.x"
+breaking-changes:
+  - removed-interface: IAsyncParseNodeFactory
+  - removed-method: IParseNodeFactory.GetRootParseNode
+  - removed-method: KiotaSerializer.Deserialize
+  - removed-method: KiotaSerializer.DeserializeCollection
+  - removed-method: KiotaJsonSerializer.Deserialize
+  - removed-method: KiotaJsonSerializer.DeserializeCollection
+  - removed-method: MultipartBody.GetPartValue<T>(string)
+  - removed-method: MultipartBody.RemovePart(string)
+  - removed-method: ParseNodeFactoryRegistry.GetFactory<T>
+  - changed-target-frameworks: [net8.0, net10.0, netstandard2.0, netstandard2.1]
+  - removed-target-frameworks: [net5.0, net6.0]
+  - minimum-dependency: Microsoft.Extensions.DependencyInjection.Abstractions >= 8.0
+  - minimum-dependency: System.Text.Json >= 8.0
+---
+
 # Upgrade Guide: Kiota .NET Libraries v1.x to v2.x
 
 This guide covers the breaking changes introduced in version 2.0 of the Kiota .NET libraries and provides instructions for updating your code.
@@ -216,3 +237,84 @@ The method now returns a tuple of `(IParseNodeFactory Factory, string ContentTyp
 | `KiotaJsonSerializer.DeserializeCollection<T>(...)` | `await KiotaJsonSerializer.DeserializeCollectionAsync<T>(...)` |
 | `.GetPartValue<T>(partName)` | `.GetPartValue<T>(partName, fileName)` |
 | `.RemovePart(partName)` | `.RemovePart(partName, fileName)` |
+
+---
+
+## Common Compiler Errors After Upgrading
+
+Use this section to match build errors to the appropriate migration step above.
+
+### CS0234 / CS0246 — Type or namespace not found
+
+```
+error CS0246: The type or namespace name 'IAsyncParseNodeFactory' could not be found
+```
+
+**Fix:** Replace `IAsyncParseNodeFactory` with `IParseNodeFactory`. See [IParseNodeFactory Interface Consolidation](#iparsenodeFactory-interface-consolidation).
+
+---
+
+### CS0535 — Interface member not implemented
+
+```
+error CS0535: 'MyFactory' does not implement interface member 'IParseNodeFactory.GetRootParseNodeAsync(string, Stream, CancellationToken)'
+```
+
+**Fix:** Add a `GetRootParseNodeAsync` method to your class. If you previously had `GetRootParseNode`, rename it, change the return type to `Task<IParseNode>`, and add a `CancellationToken` parameter.
+
+---
+
+### CS0117 — Type does not contain a definition
+
+```
+error CS0117: 'KiotaSerializer' does not contain a definition for 'Deserialize'
+error CS0117: 'KiotaSerializer' does not contain a definition for 'DeserializeCollection'
+error CS0117: 'KiotaJsonSerializer' does not contain a definition for 'Deserialize'
+error CS0117: 'KiotaJsonSerializer' does not contain a definition for 'DeserializeCollection'
+```
+
+**Fix:** Replace with the async equivalents (`DeserializeAsync`, `DeserializeCollectionAsync`). Ensure the calling method is `async`. See [KiotaSerializer Deserialization Methods](#kiotaserializer-deserialization-methods).
+
+---
+
+### CS0117 — MultipartBody method not found
+
+```
+error CS0117: 'MultipartBody' does not contain a definition for 'GetPartValue' (single parameter)
+error CS0117: 'MultipartBody' does not contain a definition for 'RemovePart' (single parameter)
+```
+
+**Fix:** Add the `fileName` parameter (or pass `null`). See [MultipartBody Method Changes](#multipartbody-method-changes).
+
+---
+
+### CS1501 — No overload takes 1 argument
+
+```
+error CS1501: No overload for method 'GetPartValue' takes 1 arguments
+error CS1501: No overload for method 'RemovePart' takes 1 arguments
+```
+
+**Fix:** Same as above — use the two-parameter overload: `.GetPartValue<T>(partName, fileName)` or `.RemovePart(partName, fileName)`.
+
+---
+
+### CS0311 / CS0246 — ParseNodeFactoryRegistry.GetFactory generic
+
+```
+error CS0311: The type 'T' cannot be used as type parameter in the generic method 'GetFactory<T>'
+error CS0246: The type or namespace name 'GetFactory<T>' could not be found
+```
+
+**Fix:** Replace `registry.GetFactory<IParseNodeFactory>(contentType)` with `registry.GetFactory(contentType)`. The method now returns a `(IParseNodeFactory Factory, string ContentType)` tuple. See [ParseNodeFactoryRegistry Changes](#parsenodeFactoryregistry-changes).
+
+---
+
+### NETSDK1045 / NETSDK1005 — Target framework not supported
+
+```
+error NETSDK1045: The current .NET SDK does not support targeting .NET 5.0 or .NET 6.0
+```
+
+**Fix:** Update your project's `<TargetFramework>` to `net8.0` or later. See [Target Framework Changes](#target-framework-changes).
+
