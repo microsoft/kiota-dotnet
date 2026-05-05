@@ -28,7 +28,6 @@ Microsoft.Kiota.Serialization.Form.FormParseNode.OnBeforeAssignFieldValues.get -
 Microsoft.Kiota.Serialization.Form.FormParseNode.OnBeforeAssignFieldValues.set -> void
 Microsoft.Kiota.Serialization.Form.FormParseNodeFactory
 Microsoft.Kiota.Serialization.Form.FormParseNodeFactory.FormParseNodeFactory() -> void
-Microsoft.Kiota.Serialization.Form.FormParseNodeFactory.GetRootParseNode(string! contentType, System.IO.Stream! content) -> Microsoft.Kiota.Abstractions.Serialization.IParseNode!
 Microsoft.Kiota.Serialization.Form.FormParseNodeFactory.GetRootParseNodeAsync(string! contentType, System.IO.Stream! content, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Microsoft.Kiota.Abstractions.Serialization.IParseNode!>!
 Microsoft.Kiota.Serialization.Form.FormParseNodeFactory.ValidContentType.get -> string!
 Microsoft.Kiota.Serialization.Form.FormSerializationWriter

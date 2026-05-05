@@ -14,28 +14,25 @@ public partial class DeserializationHelpersTests
 {
     private const string _jsonContentType = "application/json";
     [Fact]
-    [Obsolete]
-    public void DefensiveObject()
+    public async Task DefensiveObject()
     {
-        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.Deserialize<TestEntity>(null!, (Stream)null!, null!));
-        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.Deserialize<TestEntity>(_jsonContentType, (Stream)null!, null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await KiotaSerializer.DeserializeAsync<TestEntity>(null!, (Stream)null!, null!, TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await KiotaSerializer.DeserializeAsync<TestEntity>(_jsonContentType, (Stream)null!, null!, TestContext.Current.CancellationToken));
         using var stream = new MemoryStream();
-        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.Deserialize<TestEntity>(_jsonContentType, stream, null!));
-        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.Deserialize<TestEntity>(_jsonContentType, "", null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await KiotaSerializer.DeserializeAsync<TestEntity>(_jsonContentType, stream, null!, TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await KiotaSerializer.DeserializeAsync<TestEntity>(_jsonContentType, "", null!, TestContext.Current.CancellationToken));
     }
     [Fact]
-    [Obsolete]
-    public void DefensiveObjectCollection()
+    public async Task DefensiveObjectCollection()
     {
-        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.DeserializeCollection<TestEntity>(null!, (Stream)null!, null!));
-        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.DeserializeCollection<TestEntity>(_jsonContentType, (Stream)null!, null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await KiotaSerializer.DeserializeCollectionAsync<TestEntity>(null!, (Stream)null!, null!, TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await KiotaSerializer.DeserializeCollectionAsync<TestEntity>(_jsonContentType, (Stream)null!, null!, TestContext.Current.CancellationToken));
         using var stream = new MemoryStream();
-        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.DeserializeCollection<TestEntity>(_jsonContentType, stream, null!));
-        Assert.Throws<ArgumentNullException>(() => KiotaSerializer.DeserializeCollection<TestEntity>(_jsonContentType, "", null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await KiotaSerializer.DeserializeCollectionAsync<TestEntity>(_jsonContentType, stream, null!, TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await KiotaSerializer.DeserializeCollectionAsync<TestEntity>(_jsonContentType, "", null!, TestContext.Current.CancellationToken));
     }
     [Fact]
-    [Obsolete]
-    public void DeserializesObjectWithoutReflection()
+    public async Task DeserializesObjectWithoutReflection()
     {
         var strValue = "{'id':'123'}";
         var mockParseNode = new Mock<IParseNode>();
@@ -43,18 +40,17 @@ public partial class DeserializationHelpersTests
         {
             Id = "123"
         });
-        var mockJsonParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
-        mockJsonParseNodeFactory.Setup(x => x.GetRootParseNode(It.IsAny<string>(), It.IsAny<Stream>())).Returns(mockParseNode.Object);
+        var mockJsonParseNodeFactory = new Mock<IParseNodeFactory>();
+        mockJsonParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>())).ReturnsAsync(mockParseNode.Object);
         mockJsonParseNodeFactory.Setup(x => x.ValidContentType).Returns(_jsonContentType);
         ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockJsonParseNodeFactory.Object;
 
-        var result = KiotaSerializer.Deserialize(_jsonContentType, strValue, TestEntity.CreateFromDiscriminatorValue);
+        var result = await KiotaSerializer.DeserializeAsync(_jsonContentType, strValue, TestEntity.CreateFromDiscriminatorValue, TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
     }
     [Fact]
-    [Obsolete]
-    public void DeserializesObjectWithReflection()
+    public async Task DeserializesObjectWithReflection()
     {
         var strValue = "{'id':'123'}";
         var mockParseNode = new Mock<IParseNode>();
@@ -62,18 +58,17 @@ public partial class DeserializationHelpersTests
         {
             Id = "123"
         });
-        var mockJsonParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
-        mockJsonParseNodeFactory.Setup(x => x.GetRootParseNode(It.IsAny<string>(), It.IsAny<Stream>())).Returns(mockParseNode.Object);
+        var mockJsonParseNodeFactory = new Mock<IParseNodeFactory>();
+        mockJsonParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>())).ReturnsAsync(mockParseNode.Object);
         mockJsonParseNodeFactory.Setup(x => x.ValidContentType).Returns(_jsonContentType);
         ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockJsonParseNodeFactory.Object;
 
-        var result = KiotaSerializer.Deserialize<TestEntity>(_jsonContentType, strValue);
+        var result = await KiotaSerializer.DeserializeAsync<TestEntity>(_jsonContentType, strValue, TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
     }
     [Fact]
-    [Obsolete]
-    public void DeserializesCollectionOfObject()
+    public async Task DeserializesCollectionOfObject()
     {
         var strValue = "{'id':'123'}";
         var mockParseNode = new Mock<IParseNode>();
@@ -83,12 +78,12 @@ public partial class DeserializationHelpersTests
                 Id = "123"
             }
         });
-        var mockJsonParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
-        mockJsonParseNodeFactory.Setup(x => x.GetRootParseNode(It.IsAny<string>(), It.IsAny<Stream>())).Returns(mockParseNode.Object);
+        var mockJsonParseNodeFactory = new Mock<IParseNodeFactory>();
+        mockJsonParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>())).ReturnsAsync(mockParseNode.Object);
         mockJsonParseNodeFactory.Setup(x => x.ValidContentType).Returns(_jsonContentType);
         ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockJsonParseNodeFactory.Object;
 
-        var result = KiotaSerializer.DeserializeCollection(_jsonContentType, strValue, TestEntity.CreateFromDiscriminatorValue);
+        var result = await KiotaSerializer.DeserializeCollectionAsync(_jsonContentType, strValue, TestEntity.CreateFromDiscriminatorValue, TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Single(result);
@@ -123,8 +118,8 @@ public partial class DeserializationHelpersTests
         {
             Id = "123"
         });
-        var mockJsonParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
-        mockJsonParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(mockParseNode.Object));
+        var mockJsonParseNodeFactory = new Mock<IParseNodeFactory>();
+        mockJsonParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>())).ReturnsAsync(mockParseNode.Object);
         mockJsonParseNodeFactory.Setup(x => x.ValidContentType).Returns(_jsonContentType);
         ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockJsonParseNodeFactory.Object;
 
@@ -141,8 +136,8 @@ public partial class DeserializationHelpersTests
         {
             Id = "123"
         });
-        var mockJsonParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
-        mockJsonParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(mockParseNode.Object));
+        var mockJsonParseNodeFactory = new Mock<IParseNodeFactory>();
+        mockJsonParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>())).ReturnsAsync(mockParseNode.Object);
         mockJsonParseNodeFactory.Setup(x => x.ValidContentType).Returns(_jsonContentType);
         ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockJsonParseNodeFactory.Object;
 
@@ -161,8 +156,8 @@ public partial class DeserializationHelpersTests
                 Id = "123"
             }
         });
-        var mockJsonParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
-        mockJsonParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(mockParseNode.Object));
+        var mockJsonParseNodeFactory = new Mock<IParseNodeFactory>();
+        mockJsonParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>())).ReturnsAsync(mockParseNode.Object);
         mockJsonParseNodeFactory.Setup(x => x.ValidContentType).Returns(_jsonContentType);
         ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[_jsonContentType] = mockJsonParseNodeFactory.Object;
 
@@ -172,3 +167,4 @@ public partial class DeserializationHelpersTests
         Assert.Single(result);
     }
 }
+

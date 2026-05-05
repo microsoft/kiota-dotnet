@@ -54,31 +54,6 @@ public class MultipartBody : IParsable
             _parts[key] = value;
         }
     }
-    // TODO: Remove with next major release
-    /// <summary>
-    /// Gets the value of a part from the multipart body.
-    /// </summary>
-    /// <typeparam name="T">The type of the part value.</typeparam>
-    /// <param name="partName">The name of the part.</param>
-    /// <returns>The value of the part.</returns>
-    public T? GetPartValue<T>(string partName)
-    {
-        var value = GetPartValue<T>(partName, null);
-
-        if(EqualityComparer<T?>.Default.Equals(value, default))
-        {
-            foreach(var key in _parts.Keys)
-            {
-                if(key.Item1 == partName)
-                {
-                    value = GetPartValue<T>(partName, key.Item2);
-                    break;
-                }
-            }
-        }
-
-        return value;
-    }
     /// <summary>
     /// Gets the value of a part from the multipart body.
     /// </summary>
@@ -101,31 +76,6 @@ public class MultipartBody : IParsable
         }
         return default;
     }
-    // TODO: Remove with next major release
-    /// <summary>
-    /// Removes a part from the multipart body.
-    /// </summary>
-    /// <param name="partName">The name of the part.</param>
-    /// <returns>True if the part was removed, false otherwise.</returns>   
-    public bool RemovePart(string partName)
-    {
-        bool success = RemovePart(partName, null);
-
-        if(!success)
-        {
-            foreach(var key in _parts.Keys)
-            {
-                if(key.Item1 == partName)
-                {
-                    success = RemovePart(partName, key.Item2);
-                    break;
-                }
-            }
-        }
-
-        return success;
-    }
-
     /// <summary>
     /// Removes a part from the multipart body.
     /// </summary>
