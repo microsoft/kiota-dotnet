@@ -30,6 +30,18 @@ public static partial class KiotaSerializer
         return (ParsableFactory<T>)factoryMethod.CreateDelegate(typeof(ParsableFactory<T>));
     }
 
+    private static async Task<Stream> GetStreamFromStringAsync(string source)
+    {
+        var stream = new MemoryStream();
+        using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true);
+
+        // Some clients enforce async stream processing.
+        await writer.WriteAsync(source).ConfigureAwait(false);
+        await writer.FlushAsync().ConfigureAwait(false);
+        stream.Position = 0;
+        return stream;
+    }
+
     /// <summary>
     /// Deserializes the given stream into an object based on the content type.
     /// </summary>
@@ -43,17 +55,6 @@ public static partial class KiotaSerializer
         if(string.IsNullOrEmpty(serializedRepresentation)) throw new ArgumentNullException(nameof(serializedRepresentation));
         using var stream = await GetStreamFromStringAsync(serializedRepresentation).ConfigureAwait(false);
         return await DeserializeAsync(contentType, stream, parsableFactory, cancellationToken).ConfigureAwait(false);
-    }
-    private static async Task<Stream> GetStreamFromStringAsync(string source)
-    {
-        var stream = new MemoryStream();
-        using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true);
-
-        // Some clients enforce async stream processing.
-        await writer.WriteAsync(source).ConfigureAwait(false);
-        await writer.FlushAsync().ConfigureAwait(false);
-        stream.Position = 0;
-        return stream;
     }
 
     /// <summary>
