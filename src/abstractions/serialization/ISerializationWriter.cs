@@ -39,7 +39,9 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// </summary>
         /// <param name="key">The key to be used for the written value. May be null.</param>
         /// <param name="value">The sbyte value to be written.</param>
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
         void WriteSbyteValue(string? key, sbyte? value);
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
         /// <summary>
         /// Writes the specified byte integer value to the stream with an optional given key.
         /// </summary>

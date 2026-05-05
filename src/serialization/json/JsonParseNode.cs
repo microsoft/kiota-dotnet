@@ -74,6 +74,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// Get the sbyte value from the json node
         /// </summary>
         /// <returns>A sbyte value</returns>
+        [CLSCompliant(false)]
         public sbyte? GetSbyteValue() => GetSbyteValue(_jsonNode);
 
         /// <summary>

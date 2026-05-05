@@ -40,7 +40,9 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         ///  Gets the sbyte value of the node.
         /// </summary>
         /// <returns>The sbyte value of the node.</returns>
+#pragma warning disable CS3002 // Return type is not CLS-compliant
         sbyte? GetSbyteValue();
+#pragma warning restore CS3002 // Return type is not CLS-compliant
         /// <summary>
         ///  Gets the integer value of the node.
         /// </summary>
