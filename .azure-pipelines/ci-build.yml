@@ -1,16 +1,18 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+# This pipeline is used to release this library.
 
 name: $(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 
 trigger:
   branches:
-    include:
-      - main
-pr:
-  branches:
-    include:
-      - main
+    exclude: # prevents normal branch CI runs
+      - '*'
+  tags:
+    include: # ex v1.22.0
+      - "v*"
+
+pr: none
 
 variables:
   buildPlatform: "Any CPU"
