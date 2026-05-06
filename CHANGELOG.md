@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0](https://github.com/microsoft/kiota-dotnet/compare/v1.22.2...v2.0.0) (2026-05-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* net5.0 and net6.0 TFMs dropped; net8.0 and net10.0 added.
+* update target frameworks, merge IAsyncParseNodeFactory, and remove obsolete APIs ([#708](https://github.com/microsoft/kiota-dotnet/issues/708))
+* **abstractions:** IAsyncParseNodeFactory removed; implement IParseNodeFactory.GetRootParseNodeAsync directly.
+* **abstractions:** Use DeserializeAsync/DeserializeCollectionAsync instead.
+* **abstractions:** GetPartValue<T>(string) and RemovePart(string) removed; use the overloads that accept (partName, contentType).
+
+### Features
+
+* update target frameworks to net8.0 and net10.0, drop net5.0 and net6.0 ([c41f7e0](https://github.com/microsoft/kiota-dotnet/commit/c41f7e0c10b30dbc5d9b17633efad91f035fce5d))
+* update target frameworks, merge IAsyncParseNodeFactory, and remove obsolete APIs ([#708](https://github.com/microsoft/kiota-dotnet/issues/708)) ([c41f7e0](https://github.com/microsoft/kiota-dotnet/commit/c41f7e0c10b30dbc5d9b17633efad91f035fce5d))
+
+
+### Bug Fixes
+
+* **build:** update package version lower bounds from 6.0 to 8.0 ([c41f7e0](https://github.com/microsoft/kiota-dotnet/commit/c41f7e0c10b30dbc5d9b17633efad91f035fce5d))
+* **ci:** use glob pattern for timestamped coverlet coverage report paths ([c41f7e0](https://github.com/microsoft/kiota-dotnet/commit/c41f7e0c10b30dbc5d9b17633efad91f035fce5d))
+* resolve trim analysis warnings and pin PublicApiAnalyzers to net8.0 ([c41f7e0](https://github.com/microsoft/kiota-dotnet/commit/c41f7e0c10b30dbc5d9b17633efad91f035fce5d))
+
+
+### Code Refactoring
+
+* **abstractions:** merge IAsyncParseNodeFactory into IParseNodeFactory ([c41f7e0](https://github.com/microsoft/kiota-dotnet/commit/c41f7e0c10b30dbc5d9b17633efad91f035fce5d))
+* **abstractions:** remove deprecated single-param MultipartBody.GetPartValue and RemovePart overloads ([c41f7e0](https://github.com/microsoft/kiota-dotnet/commit/c41f7e0c10b30dbc5d9b17633efad91f035fce5d))
+* **abstractions:** remove synchronous Deserialize and DeserializeCollection from KiotaSerializer ([c41f7e0](https://github.com/microsoft/kiota-dotnet/commit/c41f7e0c10b30dbc5d9b17633efad91f035fce5d))
+
 ## [1.22.2](https://github.com/microsoft/kiota-dotnet/compare/v1.22.1...v1.22.2) (2026-05-05)
 
 
