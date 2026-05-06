@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.22.2](https://github.com/microsoft/kiota-dotnet/compare/v1.22.1...v1.22.2) (2026-05-05)
+
+
+### Bug Fixes
+
+* Set CLSCompliant attribute where possible ([#705](https://github.com/microsoft/kiota-dotnet/issues/705)) ([f6c21e4](https://github.com/microsoft/kiota-dotnet/commit/f6c21e4e49b56d36686c52fa7d43f6162f802c36))
+
 ## [1.22.1](https://github.com/microsoft/kiota-dotnet/compare/v1.22.0...v1.22.1) (2026-03-19)
 
 
