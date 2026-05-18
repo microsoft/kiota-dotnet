@@ -214,6 +214,7 @@ public class FormSerializationWriter : ISerializationWriter
             OnAfterObjectSerialization?.Invoke(value);
     }
     /// <inheritdoc/>
+    [CLSCompliant(false)]
     public void WriteSbyteValue(string? key, sbyte? value)
     {
         if(value.HasValue)

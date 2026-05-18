@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware;
 
-public class HeadersInspectionHandlerTests : IDisposable
+public sealed class HeadersInspectionHandlerTests : IDisposable
 {
     private readonly List<IDisposable> _disposables = new();
     [Fact]
@@ -32,7 +32,7 @@ public class HeadersInspectionHandlerTests : IDisposable
         // When
         var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost");
         request.Headers.Add("test", "test");
-        var response = await invoker.SendAsync(request, default);
+        await invoker.SendAsync(request, TestContext.Current.CancellationToken);
 
         // Then
         Assert.Equal("test", option.RequestHeaders["test"].First());
@@ -49,7 +49,7 @@ public class HeadersInspectionHandlerTests : IDisposable
 
         // When
         var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost");
-        var response = await invoker.SendAsync(request, default);
+        await invoker.SendAsync(request, TestContext.Current.CancellationToken);
 
         // Then
         Assert.Equal("test", option.ResponseHeaders["test"].First());

@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -19,61 +18,6 @@ namespace Microsoft.Kiota.Abstractions.Serialization;
 
 public static partial class KiotaSerializer
 {
-    /// <summary>
-    /// Deserializes the given stream into an object based on the content type.
-    /// </summary>
-    /// <param name="contentType">The content type of the stream.</param>
-    /// <param name="parsableFactory">The factory to create the object.</param>
-    /// <param name="serializedRepresentation">The serialized representation of the object.</param>
-    [Obsolete("Use DeserializeAsync instead")]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public static T? Deserialize<T>(string contentType, string serializedRepresentation, ParsableFactory<T> parsableFactory) where T : IParsable
-    {
-        if(string.IsNullOrEmpty(serializedRepresentation)) throw new ArgumentNullException(nameof(serializedRepresentation));
-        using var stream = GetStreamFromString(serializedRepresentation);
-        return Deserialize(contentType, stream, parsableFactory);
-    }
-    [Obsolete("Use GetStreamFromStringAsync instead")]
-    private static Stream GetStreamFromString(string source)
-    {
-        var stream = new MemoryStream();
-        using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true);
-
-        writer.Write(source);
-        writer.Flush();
-        stream.Position = 0;
-        return stream;
-    }
-
-    /// <summary>
-    /// Deserializes the given stream into an object based on the content type.
-    /// </summary>
-    /// <param name="contentType">The content type of the stream.</param>
-    /// <param name="stream">The stream to deserialize.</param>
-    /// <param name="parsableFactory">The factory to create the object.</param>
-    [Obsolete("Use DeserializeAsync instead")]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public static T? Deserialize<T>(string contentType, Stream stream, ParsableFactory<T> parsableFactory) where T : IParsable
-    {
-        if(string.IsNullOrEmpty(contentType)) throw new ArgumentNullException(nameof(contentType));
-        if(stream == null) throw new ArgumentNullException(nameof(stream));
-        if(parsableFactory == null) throw new ArgumentNullException(nameof(parsableFactory));
-        var parseNode = ParseNodeFactoryRegistry.DefaultInstance.GetRootParseNode(contentType, stream);
-        return parseNode.GetObjectValue(parsableFactory);
-    }
-    /// <summary>
-    /// Deserializes the given stream into an object based on the content type.
-    /// </summary>
-    /// <param name="contentType">The content type of the stream.</param>
-    /// <param name="stream">The stream to deserialize.</param>
-    [Obsolete("Use DeserializeAsync instead")]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-#if NET5_0_OR_GREATER
-    public static T? Deserialize<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string contentType, Stream stream) where T : IParsable
-#else
-    public static T? Deserialize<T>(string contentType, Stream stream) where T : IParsable
-#endif
-    => Deserialize(contentType, stream, GetFactoryFromType<T>());
 #if NET5_0_OR_GREATER
     private static ParsableFactory<T> GetFactoryFromType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>() where T : IParsable
 #else
@@ -85,76 +29,18 @@ public static partial class KiotaSerializer
                             throw new InvalidOperationException($"No factory method found for type {type.Name}");
         return (ParsableFactory<T>)factoryMethod.CreateDelegate(typeof(ParsableFactory<T>));
     }
-    /// <summary>
-    /// Deserializes the given stream into an object based on the content type.
-    /// </summary>
-    /// <param name="contentType">The content type of the stream.</param>
-    /// <param name="serializedRepresentation">The serialized representation of the object.</param>
-    [Obsolete("Use DeserializeAsync instead")]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-#if NET5_0_OR_GREATER
-    public static T? Deserialize<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string contentType, string serializedRepresentation) where T : IParsable
-#else
-    public static T? Deserialize<T>(string contentType, string serializedRepresentation) where T : IParsable
-#endif
-    => Deserialize(contentType, serializedRepresentation, GetFactoryFromType<T>());
 
-    /// <summary>
-    /// Deserializes the given stream into a collection of objects based on the content type.
-    /// </summary>
-    /// <param name="contentType">The content type of the stream.</param>
-    /// <param name="stream">The stream to deserialize.</param>
-    /// <param name="parsableFactory">The factory to create the object.</param>
-    [Obsolete("Use DeserializeCollectionAsync instead")]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public static IEnumerable<T> DeserializeCollection<T>(string contentType, Stream stream, ParsableFactory<T> parsableFactory) where T : IParsable
+    private static async Task<Stream> GetStreamFromStringAsync(string source)
     {
-        if(string.IsNullOrEmpty(contentType)) throw new ArgumentNullException(nameof(contentType));
-        if(stream == null) throw new ArgumentNullException(nameof(stream));
-        if(parsableFactory == null) throw new ArgumentNullException(nameof(parsableFactory));
-        var parseNode = ParseNodeFactoryRegistry.DefaultInstance.GetRootParseNode(contentType, stream);
-        return parseNode.GetCollectionOfObjectValues(parsableFactory);
+        var stream = new MemoryStream();
+        using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true);
+
+        // Some clients enforce async stream processing.
+        await writer.WriteAsync(source).ConfigureAwait(false);
+        await writer.FlushAsync().ConfigureAwait(false);
+        stream.Position = 0;
+        return stream;
     }
-    /// <summary>
-    /// Deserializes the given stream into a collection of objects based on the content type.
-    /// </summary>
-    /// <param name="contentType">The content type of the stream.</param>
-    /// <param name="serializedRepresentation">The serialized representation of the objects.</param>
-    /// <param name="parsableFactory">The factory to create the object.</param>
-    [Obsolete("Use DeserializeCollectionAsync instead")]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public static IEnumerable<T> DeserializeCollection<T>(string contentType, string serializedRepresentation, ParsableFactory<T> parsableFactory) where T : IParsable
-    {
-        if(string.IsNullOrEmpty(serializedRepresentation)) throw new ArgumentNullException(nameof(serializedRepresentation));
-        using var stream = GetStreamFromString(serializedRepresentation);
-        return DeserializeCollection(contentType, stream, parsableFactory);
-    }
-    /// <summary>
-    /// Deserializes the given stream into a collection of objects based on the content type.
-    /// </summary>
-    /// <param name="contentType">The content type of the stream.</param>
-    /// <param name="stream">The stream to deserialize.</param>
-    [Obsolete("Use DeserializeCollectionAsync instead")]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-#if NET5_0_OR_GREATER
-    public static IEnumerable<T> DeserializeCollection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string contentType, Stream stream) where T : IParsable
-#else
-    public static IEnumerable<T> DeserializeCollection<T>(string contentType, Stream stream) where T : IParsable
-#endif
-    => DeserializeCollection(contentType, stream, GetFactoryFromType<T>());
-    /// <summary>
-    /// Deserializes the given stream into a collection of objects based on the content type.
-    /// </summary>
-    /// <param name="contentType">The content type of the stream.</param>
-    /// <param name="serializedRepresentation">The serialized representation of the object.</param>
-    [Obsolete("Use DeserializeCollectionAsync instead")]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-#if NET5_0_OR_GREATER
-    public static IEnumerable<T> DeserializeCollection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] T>(string contentType, string serializedRepresentation) where T : IParsable
-#else
-    public static IEnumerable<T> DeserializeCollection<T>(string contentType, string serializedRepresentation) where T : IParsable
-#endif
-    => DeserializeCollection(contentType, serializedRepresentation, GetFactoryFromType<T>());
 
     /// <summary>
     /// Deserializes the given stream into an object based on the content type.
@@ -169,17 +55,6 @@ public static partial class KiotaSerializer
         if(string.IsNullOrEmpty(serializedRepresentation)) throw new ArgumentNullException(nameof(serializedRepresentation));
         using var stream = await GetStreamFromStringAsync(serializedRepresentation).ConfigureAwait(false);
         return await DeserializeAsync(contentType, stream, parsableFactory, cancellationToken).ConfigureAwait(false);
-    }
-    private static async Task<Stream> GetStreamFromStringAsync(string source)
-    {
-        var stream = new MemoryStream();
-        using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true);
-
-        // Some clients enforce async stream processing.
-        await writer.WriteAsync(source).ConfigureAwait(false);
-        await writer.FlushAsync().ConfigureAwait(false);
-        stream.Position = 0;
-        return stream;
     }
 
     /// <summary>

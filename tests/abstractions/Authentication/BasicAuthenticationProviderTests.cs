@@ -12,7 +12,7 @@ public class BasicAuthenticationProviderTests
         Assert.Throws<ArgumentNullException>(() => new BasicAuthenticationProvider("username", null!));
 
         var value = new BasicAuthenticationProvider("username", "password");
-        await Assert.ThrowsAsync<ArgumentNullException>(() => value.AuthenticateRequestAsync(null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => value.AuthenticateRequestAsync(null!, cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -27,7 +27,7 @@ public class BasicAuthenticationProviderTests
         {
             UrlTemplate = "https://localhost{?param1}",
         };
-        await value.AuthenticateRequestAsync(request);
+        await value.AuthenticateRequestAsync(request, cancellationToken: TestContext.Current.CancellationToken);
 
 
         Assert.True(request.Headers.TryGetValue("Authorization", out var authHeader));

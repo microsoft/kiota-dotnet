@@ -5,6 +5,66 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0](https://github.com/microsoft/kiota-dotnet/compare/v1.22.2...v2.0.0) (2026-05-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* net5.0 and net6.0 TFMs dropped; net8.0 and net10.0 added.
+* update target frameworks, merge IAsyncParseNodeFactory, and remove obsolete APIs ([#708](https://github.com/microsoft/kiota-dotnet/issues/708))
+* **abstractions:** IAsyncParseNodeFactory removed; implement IParseNodeFactory.GetRootParseNodeAsync directly.
+* **abstractions:** Use DeserializeAsync/DeserializeCollectionAsync instead.
+* **abstractions:** GetPartValue<T>(string) and RemovePart(string) removed; use the overloads that accept (partName, contentType).
+
+### Features
+
+* update target frameworks to net8.0 and net10.0, drop net5.0 and net6.0 ([c41f7e0](https://github.com/microsoft/kiota-dotnet/commit/c41f7e0c10b30dbc5d9b17633efad91f035fce5d))
+* update target frameworks, merge IAsyncParseNodeFactory, and remove obsolete APIs ([#708](https://github.com/microsoft/kiota-dotnet/issues/708)) ([c41f7e0](https://github.com/microsoft/kiota-dotnet/commit/c41f7e0c10b30dbc5d9b17633efad91f035fce5d))
+
+
+### Bug Fixes
+
+* **build:** update package version lower bounds from 6.0 to 8.0 ([c41f7e0](https://github.com/microsoft/kiota-dotnet/commit/c41f7e0c10b30dbc5d9b17633efad91f035fce5d))
+* **ci:** use glob pattern for timestamped coverlet coverage report paths ([c41f7e0](https://github.com/microsoft/kiota-dotnet/commit/c41f7e0c10b30dbc5d9b17633efad91f035fce5d))
+* resolve trim analysis warnings and pin PublicApiAnalyzers to net8.0 ([c41f7e0](https://github.com/microsoft/kiota-dotnet/commit/c41f7e0c10b30dbc5d9b17633efad91f035fce5d))
+
+
+### Code Refactoring
+
+* **abstractions:** merge IAsyncParseNodeFactory into IParseNodeFactory ([c41f7e0](https://github.com/microsoft/kiota-dotnet/commit/c41f7e0c10b30dbc5d9b17633efad91f035fce5d))
+* **abstractions:** remove deprecated single-param MultipartBody.GetPartValue and RemovePart overloads ([c41f7e0](https://github.com/microsoft/kiota-dotnet/commit/c41f7e0c10b30dbc5d9b17633efad91f035fce5d))
+* **abstractions:** remove synchronous Deserialize and DeserializeCollection from KiotaSerializer ([c41f7e0](https://github.com/microsoft/kiota-dotnet/commit/c41f7e0c10b30dbc5d9b17633efad91f035fce5d))
+
+## [1.22.2](https://github.com/microsoft/kiota-dotnet/compare/v1.22.1...v1.22.2) (2026-05-05)
+
+
+### Bug Fixes
+
+* Set CLSCompliant attribute where possible ([#705](https://github.com/microsoft/kiota-dotnet/issues/705)) ([f6c21e4](https://github.com/microsoft/kiota-dotnet/commit/f6c21e4e49b56d36686c52fa7d43f6162f802c36))
+
+## [1.22.1](https://github.com/microsoft/kiota-dotnet/compare/v1.22.0...v1.22.1) (2026-03-19)
+
+
+### Bug Fixes
+
+* adds missing parentheses in pattern matching ([#671](https://github.com/microsoft/kiota-dotnet/issues/671)) ([50d535e](https://github.com/microsoft/kiota-dotnet/commit/50d535ef0d5689581758254bec3b776f02033a4d))
+* performance issue with enum parsing during deserialization ([#670](https://github.com/microsoft/kiota-dotnet/issues/670)) ([3a09234](https://github.com/microsoft/kiota-dotnet/commit/3a092341a372a26ffb3def12dacc094a60cab3da))
+
+## [1.22.0](https://github.com/microsoft/kiota-dotnet/compare/v1.21.3...v1.22.0) (2026-03-02)
+
+
+### Features
+
+* add http.route attribute to open telemetry on requests ([#640](https://github.com/microsoft/kiota-dotnet/issues/640)) ([b92c9c0](https://github.com/microsoft/kiota-dotnet/commit/b92c9c0dd157e68f51f6144afc71e628b5cc44b9))
+
+
+### Bug Fixes
+
+* add removal of auth headers if port changes ([#666](https://github.com/microsoft/kiota-dotnet/issues/666)) ([b31c1f4](https://github.com/microsoft/kiota-dotnet/commit/b31c1f497e49fa930c8cd8bd430c0d344732d3a5))
+* multiple constructors break DI registration for HttpClientRequestAdapter ([#656](https://github.com/microsoft/kiota-dotnet/issues/656)) ([21d58b0](https://github.com/microsoft/kiota-dotnet/commit/21d58b009c89bcfd9855d2b94e7c4532b917c040))
+* removes duplicated parameter for request scrubbing ([#667](https://github.com/microsoft/kiota-dotnet/issues/667)) ([ef3fb54](https://github.com/microsoft/kiota-dotnet/commit/ef3fb549f7ec184abb23baf62bfad6cd8f13fb66))
+* **security:** remove proxy and cookie auth headers on insecure redirect ([#653](https://github.com/microsoft/kiota-dotnet/issues/653)) ([57d6b36](https://github.com/microsoft/kiota-dotnet/commit/57d6b36f52695594ccb0772ca7ea80e54522df78))
+
 ## [1.21.3](https://github.com/microsoft/kiota-dotnet/compare/v1.21.2...v1.21.3) (2026-02-05)
 
 

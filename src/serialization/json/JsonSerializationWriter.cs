@@ -138,6 +138,7 @@ namespace Microsoft.Kiota.Serialization.Json
         /// </summary>
         /// <param name="key">The key of the json node</param>
         /// <param name="value">The sbyte value</param>
+        [CLSCompliant(false)]
         public void WriteSbyteValue(string? key, sbyte? value)
         {
             if(!string.IsNullOrEmpty(key) && value.HasValue)
@@ -481,6 +482,7 @@ namespace Microsoft.Kiota.Serialization.Json
         }
 
 #if NET5_0_OR_GREATER
+        [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "This method reflects over arbitrary object types at runtime. Callers that require trim/AOT compatibility should use the KiotaJsonSerializationContext source-generated path instead.")]
         private void WriteNonParsableObjectValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(string? key, T value)
 #else
         private void WriteNonParsableObjectValue<T>(string? key, T value)

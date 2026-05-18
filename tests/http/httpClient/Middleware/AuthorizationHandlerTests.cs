@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 {
-    public class AuthorizationHandlerTests : IDisposable
+    public sealed class AuthorizationHandlerTests : IDisposable
     {
         private readonly MockRedirectHandler _testHttpMessageHandler;
         private const string _expectedAccessToken = "token";
@@ -140,7 +140,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             Assert.True(response.RequestMessage.Headers.Contains("Authorization"));
             Assert.Single(response.RequestMessage.Headers.GetValues("Authorization"));
             Assert.Equal($"Bearer {_expectedAccessTokenAfterCAE}", response.RequestMessage.Headers.GetValues("Authorization").First());
-            Assert.Equal("test", await response.RequestMessage.Content!.ReadAsStringAsync());
+            Assert.Equal("test", await response.RequestMessage.Content!.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                TestContext.Current.CancellationToken
+#endif
+            ));
         }
 
         [Fact]
@@ -160,7 +164,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 
             // Assert
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
-            Assert.Equal("test", await response.RequestMessage!.Content!.ReadAsStringAsync());
+            Assert.Equal("test", await response.RequestMessage!.Content!.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                TestContext.Current.CancellationToken
+#endif
+            ));
         }
     }
 }

@@ -1,9 +1,10 @@
-﻿using System.Net;
+using System.Net;
 #if !NET5_0_OR_GREATER
 using System.Net.Http;
 #endif
 using System.Runtime.Serialization;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -86,7 +87,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             };
 
             // Act
-            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -111,7 +112,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             _requestAdapter.BaseUrl = "http://localhost";
 
             // Act
-            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -135,7 +136,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             requestInfo.QueryParameters.Add(queryParam, queryParamObject!);
 
             // Act
-            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -157,7 +158,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             requestInfo.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes("contents")), "application/octet-stream");
 
             // Act
-            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await _requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -195,7 +196,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.NotNull(response);
             Assert.True(response.CanRead);
@@ -222,7 +223,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendAsync(requestInfo, MockEntity.Factory);
+            var response = await adapter.SendAsync(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Null(response);
         }
@@ -251,13 +252,17 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 UrlTemplate = "https://example.com"
             };
 
-            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.NotNull(response);
             Assert.True(response.CanRead);
             Assert.Equal(4, response.Length);
             var streamReader = new StreamReader(response);
-            var responseString = await streamReader.ReadToEndAsync();
+            var responseString = await streamReader.ReadToEndAsync(
+#if NET5_0_OR_GREATER
+                TestContext.Current.CancellationToken
+#endif
+            );
             Assert.Equal("Test", responseString);
         }
         [InlineData(HttpStatusCode.OK)]
@@ -283,7 +288,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 UrlTemplate = "https://example.com"
             };
 
-            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Null(response);
         }
@@ -311,7 +316,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 UrlTemplate = "https://example.com"
             };
 
-            await adapter.SendNoContentAsync(requestInfo);
+            await adapter.SendNoContentAsync(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
         }
         [InlineData(HttpStatusCode.OK)]
         [InlineData(HttpStatusCode.Created)]
@@ -337,7 +342,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 UrlTemplate = "https://example.com"
             };
 
-            var response = await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
+            var response = await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Null(response);
         }
@@ -367,7 +372,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 UrlTemplate = "https://example.com"
             };
 
-            var response = await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
+            var response = await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Null(response);
         }
@@ -392,9 +397,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             var mockParseNode = new Mock<IParseNode>();
             mockParseNode.Setup(x => x.GetObjectValue(It.IsAny<ParsableFactory<MockEntity>>()))
             .Returns(new MockEntity());
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client, parseNodeFactory: mockParseNodeFactory.Object);
             var requestInfo = new RequestInformation
             {
@@ -402,7 +407,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 UrlTemplate = "https://example.com"
             };
 
-            var response = await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory);
+            var response = await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.NotNull(response);
         }
@@ -433,7 +438,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 UrlTemplate = "https://example.com"
             };
 
-            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.NotNull(response);
 
@@ -465,7 +470,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             };
             try
             {
-                var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo);
+                await adapter.SendPrimitiveAsync<Stream>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.Fail("Expected an ApiException to be thrown");
             }
             catch(ApiException e)
@@ -495,9 +500,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             var mockParseNode = new Mock<IParseNode>();
             mockParseNode.Setup(x => x.GetObjectValue(It.IsAny<ParsableFactory<IParsable>>()))
             .Returns(new MockError("A general error occured"));
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
             var requestInfo = new RequestInformation
             {
@@ -510,7 +515,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 {
                     { "XXX", (parseNode) => new MockError("A general error occured")},
                 };
-                var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo, errorMapping);
+                await adapter.SendPrimitiveAsync<Stream>(requestInfo, errorMapping, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.Fail("Expected an ApiException to be thrown");
             }
             catch(MockError mockError)
@@ -539,9 +544,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             var mockParseNode = new Mock<IParseNode>();
             mockParseNode.Setup(x => x.GetObjectValue(It.IsAny<ParsableFactory<IParsable>>()))
             .Returns(new MockError("A general error occured: " + statusCode.ToString()));
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
             var requestInfo = new RequestInformation
             {
@@ -554,7 +559,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 {
                     { "4XX", (parseNode) => new MockError("A 4XX error occured") }//Only 4XX
                 };
-                var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo, errorMapping);
+                await adapter.SendPrimitiveAsync<Stream>(requestInfo, errorMapping, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.Fail("Expected an ApiException to be thrown");
             }
             catch(ApiException apiException)
@@ -580,9 +585,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             mockParseNode.Setup(x => x.GetStringValue())
             .Returns("Value1");
 
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
             var requestInfo = new RequestInformation
             {
@@ -590,7 +595,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnum>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnum>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnum.Value1, response);
         }
@@ -612,9 +617,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             mockParseNode.Setup(x => x.GetStringValue())
             .Returns("Value1");
 
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
             var requestInfo = new RequestInformation
             {
@@ -622,7 +627,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnum.Value1, response);
         }
@@ -644,9 +649,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             mockParseNode.Setup(x => x.GetStringValue())
             .Returns("1");
 
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
             var requestInfo = new RequestInformation
             {
@@ -654,7 +659,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnum>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnum>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnum.Value2, response);
         }
@@ -676,9 +681,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             mockParseNode.Setup(x => x.GetStringValue())
             .Returns("1");
 
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
             var requestInfo = new RequestInformation
             {
@@ -686,7 +691,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnum.Value2, response);
         }
@@ -708,9 +713,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             mockParseNode.Setup(x => x.GetStringValue())
             .Returns("Value__3");
 
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
             var requestInfo = new RequestInformation
             {
@@ -718,7 +723,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnum>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnum>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnum.Value3, response);
         }
@@ -740,9 +745,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             mockParseNode.Setup(x => x.GetStringValue())
             .Returns("Value__3");
 
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
             var requestInfo = new RequestInformation
             {
@@ -750,7 +755,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnum.Value3, response);
         }
@@ -772,9 +777,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             mockParseNode.Setup(x => x.GetStringValue())
             .Returns("Value0");
 
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
             var requestInfo = new RequestInformation
             {
@@ -782,7 +787,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnum?>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Null(response);
         }
@@ -804,9 +809,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             mockParseNode.Setup(x => x.GetStringValue())
             .Returns("Value1,Value3");
 
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
             var requestInfo = new RequestInformation
             {
@@ -814,7 +819,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnumWithFlags.Value1 | TestEnumWithFlags.Value3, response);
         }
@@ -836,9 +841,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             mockParseNode.Setup(x => x.GetStringValue())
             .Returns("Value1,Value3");
 
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
             var requestInfo = new RequestInformation
             {
@@ -846,7 +851,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnumWithFlags.Value1 | TestEnumWithFlags.Value3, response);
         }
@@ -868,9 +873,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             mockParseNode.Setup(x => x.GetStringValue())
             .Returns("1,2");
 
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
             var requestInfo = new RequestInformation
             {
@@ -878,7 +883,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnumWithFlags.Value1 | TestEnumWithFlags.Value2, response);
         }
@@ -900,9 +905,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             mockParseNode.Setup(x => x.GetStringValue())
             .Returns("1,2");
 
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
             var requestInfo = new RequestInformation
             {
@@ -910,7 +915,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnumWithFlags.Value1 | TestEnumWithFlags.Value2, response);
         }
@@ -932,9 +937,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             mockParseNode.Setup(x => x.GetStringValue())
             .Returns("Value__3,Value__2");
 
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
             var requestInfo = new RequestInformation
             {
@@ -942,7 +947,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnumWithFlags.Value2 | TestEnumWithFlags.Value3, response);
         }
@@ -964,9 +969,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             mockParseNode.Setup(x => x.GetStringValue())
             .Returns("Value__3,Value__2");
 
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
             var requestInfo = new RequestInformation
             {
@@ -974,7 +979,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(TestEnumWithFlags.Value2 | TestEnumWithFlags.Value3, response);
         }
@@ -996,9 +1001,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             mockParseNode.Setup(x => x.GetStringValue())
             .Returns("Value0");
 
-            var mockParseNodeFactory = new Mock<IAsyncParseNodeFactory>();
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockParseNode.Object));
+                .ReturnsAsync(mockParseNode.Object);
             var adapter = new HttpClientRequestAdapter(_authenticationProvider, mockParseNodeFactory.Object, httpClient: client);
             var requestInfo = new RequestInformation
             {
@@ -1006,7 +1011,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 URI = new Uri("https://example.com")
             };
 
-            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo);
+            var response = await adapter.SendPrimitiveAsync<TestEnumWithFlags?>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Null(response);
         }
@@ -1030,7 +1035,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             };
 
             // Act
-            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -1055,7 +1060,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             };
 
             // Act
-            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -1121,7 +1126,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             };
 
             // Act
-            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(requestMessage);
@@ -1142,13 +1147,29 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             };
 
             // Act
-            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(requestMessage);
             Assert.Equal(HttpVersion.Version11, requestMessage.Version);
         }
 #endif
+
+        [Fact]
+        public void AddHttpClientDIDoesNotThrow()
+        {
+            // Arrange - Reproduces the DI scenario where multiple constructors caused
+            // InvalidOperationException: Multiple constructors accepting all given argument types
+            var services = new ServiceCollection();
+            services.AddSingleton<IAuthenticationProvider>(new AnonymousAuthenticationProvider());
+            services.AddHttpClient<IRequestAdapter, HttpClientRequestAdapter>();
+
+            // Act & Assert - Should not throw "Multiple constructors accepting all given argument types"
+            using var provider = services.BuildServiceProvider();
+            var adapter = provider.GetRequiredService<IRequestAdapter>();
+            Assert.NotNull(adapter);
+            Assert.IsType<HttpClientRequestAdapter>(adapter);
+        }
 
         [Fact]
         public void ConstructorOverloadsWorkCorrectlyForCompatibility()
@@ -1210,3 +1231,4 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         Value3 = 0x04
     }
 }
+

@@ -2,9 +2,9 @@
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------
 
-using System;
-using System.ComponentModel;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.Kiota.Abstractions.Serialization
 {
@@ -22,9 +22,8 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// </summary>
         /// <param name="content">The stream to read the parse node from.</param>
         /// <param name="contentType">The content type of the parse node.</param>
+        /// <param name="cancellationToken">The cancellation token for the task.</param>
         /// <returns>A parse node.</returns>
-        [Obsolete("Use GetRootParseNodeAsync instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        IParseNode GetRootParseNode(string contentType, Stream content);
+        Task<IParseNode> GetRootParseNodeAsync(string contentType, Stream content, CancellationToken cancellationToken = default);
     }
 }

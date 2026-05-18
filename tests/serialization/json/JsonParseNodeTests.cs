@@ -561,21 +561,15 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [InlineData("42", 42)]
         [InlineData("null", null)]
         [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Int32.")]
-#if NET5_0_OR_GREATER
         [InlineData("\"42\"", 42)]
-#else
-        // below net5, JsonNumberHandling.AllowReadingFromString is not fully supported, so we are expecting an exception in this case
-        // see https://github.com/microsoft/kiota-dotnet/pull/551#issuecomment-2981322976
-        [InlineData("\"42\"", null, "The JSON value could not be converted to System.Int32.")]
-#endif
-        public void GetIntValue_CanReadNumber_AsString(string input, int? expectedValue, string? expectexpectedExceptionMessage = null)
+        public void GetIntValue_CanReadNumber_AsString(string input, int? expectedValue, string? expectedExceptionMessage = null)
         {
             // Arrange
             using var jsonDocument = JsonDocument.Parse(input);
             var parseNode = new JsonParseNode(jsonDocument.RootElement, ReadNumbersAsStringsContext);
 
             // Act, Assert
-            Assert_CanReadNumber(parseNode.GetIntValue, expectedValue, expectexpectedExceptionMessage);
+            Assert_CanReadNumber(parseNode.GetIntValue, expectedValue, expectedExceptionMessage);
         }
 
         [Theory]
@@ -597,13 +591,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [InlineData("42", 42L)]
         [InlineData("null", null)]
         [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Int64.")]
-#if NET5_0_OR_GREATER
         [InlineData("\"42\"", 42L)]
-#else
-        // below net5, JsonNumberHandling.AllowReadingFromString is not fully supported, so we are expecting an exception in this case
-        // see https://github.com/microsoft/kiota-dotnet/pull/551#issuecomment-2981322976
-        [InlineData("\"42\"", null, "The JSON value could not be converted to System.Int64.")]
-#endif
         public void GetLongValue_CanReadNumber_AsString(string input, long? expectedValue, string? expectedExceptionMessage = null)
         {
             // Arrange
@@ -633,13 +621,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [InlineData("13.37", 13.37F)]
         [InlineData("null", null)]
         [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Single.")]
-#if NET5_0_OR_GREATER
         [InlineData("\"13.37\"", 13.37F)]
-#else
-        // below net5, JsonNumberHandling.AllowReadingFromString is not fully supported, so we are expecting an exception in this case
-        // see https://github.com/microsoft/kiota-dotnet/pull/551#issuecomment-2981322976
-        [InlineData("\"13.37\"", null, "The JSON value could not be converted to System.Single.")]
-#endif
         public void GetFloatValue_CanReadNumber_AsString(string input, float? expectedValue, string? expectedExceptionMessage = null)
         {
             // Arrange
@@ -669,13 +651,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [InlineData("13.37", 13.37D)]
         [InlineData("null", null)]
         [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Double.")]
-#if NET5_0_OR_GREATER
         [InlineData("\"13.37\"", 13.37D)]
-#else
-        // below net5, JsonNumberHandling.AllowReadingFromString is not fully supported, so we are expecting an exception in this case
-        // see https://github.com/microsoft/kiota-dotnet/pull/551#issuecomment-2981322976
-        [InlineData("\"13.37\"", null, "The JSON value could not be converted to System.Double.")]
-#endif
         public void GetDoubleValue_CanReadNumber_AsString(string input, double? expectedValue, string? expectedExceptionMessage = null)
         {
             // Arrange
@@ -709,11 +685,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [InlineData("13.37", 13.37)]
         [InlineData("null", null)]
         [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Decimal.")]
-#if NET5_0_OR_GREATER
         [InlineData("\"13.37\"", 13.37)]
-#else
-        [InlineData("\"13.37\"", null, "The JSON value could not be converted to System.Decimal.")]
-#endif
         public void GetDecimalValue_CanReadNumber_AsString(string input, double? expectedDouble, string? expectedExceptionMessage = null)
         {
             // Arrange
@@ -749,6 +721,227 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
                 var exception = Assert.Throws<JsonException>(() => act());
                 Assert.StartsWith(expectedExceptionMessage, exception.Message);
             }
+        }
+
+        [Fact]
+        public void GetBoolValue_ReturnsTrueForTrueJson()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("true");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetBoolValue();
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void GetBoolValue_ReturnsFalseForFalseJson()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("false");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetBoolValue();
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void GetBoolValue_ReturnsNullForNonBoolJson()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"true\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetBoolValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetByteValue_ReturnsByteValue()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("42");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetByteValue();
+
+            // Assert
+            Assert.Equal((byte)42, result);
+        }
+
+        [Fact]
+        public void GetByteValue_ReturnsNullForNonNumberJson()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"42\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetByteValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetSbyteValue_ReturnsSbyteValue()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("-5");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetSbyteValue();
+
+            // Assert
+            Assert.Equal((sbyte)-5, result);
+        }
+
+        [Fact]
+        public void GetSbyteValue_ReturnsNullForNonNumberJson()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"-5\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetSbyteValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetByteArrayValue_ReturnsByteArray()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"dGV4dA==\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetByteArrayValue();
+
+            // Assert
+            Assert.Equal([0x74, 0x65, 0x78, 0x74], result);
+        }
+
+        [Fact]
+        public void GetByteArrayValue_ReturnsNullForInvalidBase64String()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"not-base64!\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetByteArrayValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetByteArrayValue_ReturnsNullForNonStringJson()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("42");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetByteArrayValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetCollectionOfEnumValues_ReturnsEnumCollection()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse(TestCollectionOfEnumsJson);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetCollectionOfEnumValues<TestNamingEnum>().ToArray();
+
+            // Assert
+            Assert.Equal(2, result.Length);
+            Assert.Equal(TestNamingEnum.Item2SubItem1, result[0]);
+            Assert.Equal(TestNamingEnum.Item3SubItem1, result[1]);
+        }
+
+        [Fact]
+        public void GetCollectionOfEnumValues_ReturnsEmptyForNonArrayJson()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("\"Item2:SubItem1\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetCollectionOfEnumValues<TestNamingEnum>().ToArray();
+
+            // Assert
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void GetCollectionOfPrimitiveValues_ReturnsBoolCollection()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("[true, false, true]");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetCollectionOfPrimitiveValues<bool?>().ToArray();
+
+            // Assert
+            Assert.Equal(3, result.Length);
+            Assert.True(result[0]);
+            Assert.False(result[1]);
+            Assert.True(result[2]);
+        }
+
+        [Fact]
+        public void GetCollectionOfPrimitiveValues_ReturnsByteCollection()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("[1, 2, 3]");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetCollectionOfPrimitiveValues<byte?>().ToArray();
+
+            // Assert
+            Assert.Equal(3, result.Length);
+            Assert.Equal((byte)1, result[0]);
+            Assert.Equal((byte)2, result[1]);
+            Assert.Equal((byte)3, result[2]);
+        }
+
+        [Fact]
+        public void GetCollectionOfPrimitiveValues_ReturnsSbyteCollection()
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse("[-1, 0, 1]");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var result = parseNode.GetCollectionOfPrimitiveValues<sbyte?>().ToArray();
+
+            // Assert
+            Assert.Equal(3, result.Length);
+            Assert.Equal((sbyte)-1, result[0]);
+            Assert.Equal((sbyte)0, result[1]);
+            Assert.Equal((sbyte)1, result[2]);
         }
     }
 }

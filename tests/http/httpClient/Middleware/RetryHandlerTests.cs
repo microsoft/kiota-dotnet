@@ -16,7 +16,7 @@ using Xunit;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 {
-    public class RetryHandlerTests : IDisposable
+    public sealed class RetryHandlerTests : IDisposable
     {
         private readonly MockRedirectHandler _testHttpMessageHandler;
         private readonly RetryHandler _retryHandler;
@@ -137,7 +137,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             Assert.NotNull(response.RequestMessage);
             Assert.NotNull(response.RequestMessage.Content);
             Assert.NotNull(response.RequestMessage.Content.Headers.ContentLength);
-            Assert.Equal("Hello World", await response.RequestMessage.Content.ReadAsStringAsync());
+            Assert.Equal("Hello World", await response.RequestMessage.Content.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                TestContext.Current.CancellationToken
+#endif
+            ));
         }
 
         [Theory]

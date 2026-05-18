@@ -1,0 +1,29 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="CHANGELOG.md" />
+    <File Path="CODE_OF_CONDUCT.md" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path="SECURITY.md" />
+    <File Path="SUPPORT.md" />
+  </Folder>
+  <Project Path="src/abstractions/Microsoft.Kiota.Abstractions.csproj" />
+  <Project Path="src/authentication/azure/Microsoft.Kiota.Authentication.Azure.csproj" />
+  <Project Path="src/bundle/Microsoft.Kiota.Bundle.csproj" />
+  <Project Path="src/generated/KiotaGenerated.csproj" />
+  <Project Path="src/http/httpClient/Microsoft.Kiota.Http.HttpClientLibrary.csproj" />
+  <Project Path="src/serialization/form/Microsoft.Kiota.Serialization.Form.csproj" />
+  <Project Path="src/serialization/json/Microsoft.Kiota.Serialization.Json.csproj" />
+  <Project Path="src/serialization/multipart/Microsoft.Kiota.Serialization.Multipart.csproj" />
+  <Project Path="src/serialization/text/Microsoft.Kiota.Serialization.Text.csproj" />
+  <Project Path="tests/abstractions/Microsoft.Kiota.Abstractions.Tests.csproj" />
+  <Project Path="tests/authentication/azure/Microsoft.Kiota.Authentication.Azure.Tests.csproj" />
+  <Project Path="tests/bundle/Microsoft.Kiota.Bundle.Tests.csproj" />
+  <Project Path="tests/http/httpClient/Microsoft.Kiota.Http.HttpClientLibrary.Tests.csproj" />
+  <Project Path="tests/serialization/form/Microsoft.Kiota.Serialization.Form.Tests.csproj" />
+  <Project Path="tests/serialization/json/Microsoft.Kiota.Serialization.Json.Tests.csproj" />
+  <Project Path="tests/serialization/multipart/Microsoft.Kiota.Serialization.Multipart.Tests.csproj" />
+  <Project Path="tests/serialization/text/Microsoft.Kiota.Serialization.Text.Tests.csproj" />
+  <Project Path="tests/trimming/Microsoft.Kiota.Trimming.Validation/Microsoft.Kiota.Trimming.Validation.csproj" />
+</Solution>

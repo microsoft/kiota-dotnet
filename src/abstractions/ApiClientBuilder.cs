@@ -69,7 +69,7 @@ namespace Microsoft.Kiota.Abstractions
                 EnableBackingStoreForParseNodeRegistry(ParseNodeFactoryRegistry.DefaultInstance);
             var keysToUpdate = registry
                                 .ContentTypeAssociatedFactories
-                                .Where(static x => x.Value is not BackingStoreParseNodeFactory or ParseNodeFactoryRegistry)
+                                .Where(static x => x.Value is not (BackingStoreParseNodeFactory or ParseNodeFactoryRegistry))
                                 .Select(static x => x.Key)
                                 .ToArray();
             foreach(var key in keysToUpdate)
@@ -85,7 +85,7 @@ namespace Microsoft.Kiota.Abstractions
                 EnableBackingStoreForSerializationRegistry(SerializationWriterFactoryRegistry.DefaultInstance);
             var keysToUpdate = registry
                 .ContentTypeAssociatedFactories
-                .Where(static x => x.Value is not BackingStoreSerializationWriterProxyFactory or SerializationWriterFactoryRegistry)
+                .Where(static x => x.Value is not (BackingStoreSerializationWriterProxyFactory or SerializationWriterFactoryRegistry))
                 .Select(static x => x.Key)
                 .ToArray();
 

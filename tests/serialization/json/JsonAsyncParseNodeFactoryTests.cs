@@ -20,7 +20,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         public async Task GetsWriterForJsonContentType()
         {
             using var jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(TestJsonString));
-            var jsonWriter = await _jsonParseNodeFactory.GetRootParseNodeAsync(_jsonParseNodeFactory.ValidContentType, jsonStream);
+            var jsonWriter = await _jsonParseNodeFactory.GetRootParseNodeAsync(_jsonParseNodeFactory.ValidContentType, jsonStream, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(jsonWriter);
@@ -33,7 +33,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             var streamContentType = "application/octet-stream";
             using var jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(TestJsonString));
             var exception = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
-                async () => await _jsonParseNodeFactory.GetRootParseNodeAsync(streamContentType, jsonStream));
+                async () => await _jsonParseNodeFactory.GetRootParseNodeAsync(streamContentType, jsonStream, TestContext.Current.CancellationToken));
 
             // Assert
             Assert.NotNull(exception);
@@ -47,7 +47,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         {
             using var jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(TestJsonString));
             var exception = await Assert.ThrowsAsync<ArgumentNullException>(
-                async () => await _jsonParseNodeFactory.GetRootParseNodeAsync(contentType!, jsonStream));
+                async () => await _jsonParseNodeFactory.GetRootParseNodeAsync(contentType!, jsonStream, TestContext.Current.CancellationToken));
 
             // Assert
             Assert.NotNull(exception);

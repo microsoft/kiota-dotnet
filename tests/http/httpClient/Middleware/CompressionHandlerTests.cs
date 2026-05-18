@@ -13,7 +13,7 @@ using Xunit;
 namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 {
     [Obsolete("kiota clients now rely on the HttpClientHandler to handle decompression")]
-    public class CompressionHandlerTests : IDisposable
+    public sealed class CompressionHandlerTests : IDisposable
     {
         private readonly MockRedirectHandler _testHttpMessageHandler;
         private readonly CompressionHandler _compressionHandler;
@@ -72,7 +72,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             this._testHttpMessageHandler.SetHttpResponse(httpResponse);// set the mock response
             // Act
             HttpResponseMessage decompressedResponse = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
-            string responseContentString = await decompressedResponse.Content.ReadAsStringAsync();
+            string responseContentString = await decompressedResponse.Content.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                TestContext.Current.CancellationToken
+#endif
+            );
             // Assert
             Assert.Same(httpResponse, decompressedResponse);
             Assert.Same(httpRequestMessage, decompressedResponse.RequestMessage);
@@ -92,7 +96,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             this._testHttpMessageHandler.SetHttpResponse(httpResponse);// set the mock response
             // Act
             HttpResponseMessage compressedResponse = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
-            string responseContentString = await compressedResponse.Content.ReadAsStringAsync();
+            string responseContentString = await compressedResponse.Content.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                TestContext.Current.CancellationToken
+#endif
+            );
             // Assert
             Assert.Same(httpResponse, compressedResponse);
             Assert.Same(httpRequestMessage, compressedResponse.RequestMessage);
@@ -121,7 +129,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             this._testHttpMessageHandler.SetHttpResponse(httpResponse);// set the mock response
             // Arrange
             HttpResponseMessage compressedResponse = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
-            string decompressedResponseString = await compressedResponse.Content.ReadAsStringAsync();
+            string decompressedResponseString = await compressedResponse.Content.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                TestContext.Current.CancellationToken
+#endif
+            );
             // Assert
             Assert.Equal(decompressedResponseString, stringToCompress);
             // Ensure that headers in the compressedResponse are the same as in the original, expected response.

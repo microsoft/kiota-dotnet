@@ -118,6 +118,7 @@ public class MultipartSerializationWriter : ISerializationWriter
             throw new InvalidOperationException($"Expected a MultiPartBody instance, but got {value?.GetType().Name ?? "null"}");
     }
     /// <inheritdoc/>
+    [CLSCompliant(false)]
     public void WriteSbyteValue(string? key, sbyte? value) => throw new NotImplementedException();
     /// <inheritdoc/>
     public void WriteStringValue(string? key, string? value)

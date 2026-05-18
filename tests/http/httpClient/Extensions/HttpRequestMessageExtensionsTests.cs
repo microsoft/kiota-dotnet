@@ -34,7 +34,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
             };
             requestInfo.AddRequestOptions(new IRequestOption[] { redirectHandlerOption });
             // Act and get a request message
-            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var requestMessage = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
             Assert.NotNull(requestMessage);
 
             var extractedOption = requestMessage.GetRequestOption<RedirectHandlerOption>();
@@ -52,10 +52,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
                 HttpMethod = Method.GET,
                 URI = new Uri("http://localhost")
             };
-            var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
             Assert.NotNull(originalRequest);
 
-            HttpRequestMessage clonedRequest = await originalRequest.CloneAsync();
+            HttpRequestMessage clonedRequest = await originalRequest.CloneAsync(TestContext.Current.CancellationToken);
 
             Assert.NotNull(clonedRequest);
             Assert.Equal(originalRequest.Method, clonedRequest.Method);
@@ -71,14 +71,22 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
                 HttpMethod = Method.GET,
                 URI = new Uri("http://localhost")
             };
-            var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
             Assert.NotNull(originalRequest);
 
             originalRequest.Content = new StringContent("contents");
 
-            var clonedRequest = await originalRequest.CloneAsync();
-            var originalContents = await originalRequest.Content.ReadAsStringAsync();
-            var clonedRequestContents = await clonedRequest.Content!.ReadAsStringAsync();
+            var clonedRequest = await originalRequest.CloneAsync(TestContext.Current.CancellationToken);
+            var originalContents = await originalRequest.Content.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                TestContext.Current.CancellationToken
+#endif
+            );
+            var clonedRequestContents = await clonedRequest.Content!.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                TestContext.Current.CancellationToken
+#endif
+            );
 
             Assert.NotNull(clonedRequest);
             Assert.Equal(originalRequest.Method, clonedRequest.Method);
@@ -96,12 +104,20 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
                 URI = new Uri("http://localhost")
             };
             requestInfo.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes("contents")), "application/octet-stream");
-            var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
             Assert.NotNull(originalRequest);
 
-            var clonedRequest = await originalRequest.CloneAsync();
-            var originalContents = await originalRequest.Content!.ReadAsStringAsync();
-            var clonedRequestContents = await clonedRequest.Content!.ReadAsStringAsync();
+            var clonedRequest = await originalRequest.CloneAsync(TestContext.Current.CancellationToken);
+            var originalContents = await originalRequest.Content!.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                TestContext.Current.CancellationToken
+#endif
+            );
+            var clonedRequestContents = await clonedRequest.Content!.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                TestContext.Current.CancellationToken
+#endif
+            );
 
             Assert.NotNull(clonedRequest);
             Assert.Equal(originalRequest.Method, clonedRequest.Method);
@@ -123,12 +139,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
                 MaxRedirect = 7
             };
             requestInfo.AddRequestOptions(new IRequestOption[] { redirectHandlerOption });
-            var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
             Assert.NotNull(originalRequest);
 
             originalRequest.Content = new StringContent("contents");
 
-            var clonedRequest = await originalRequest.CloneAsync();
+            var clonedRequest = await originalRequest.CloneAsync(TestContext.Current.CancellationToken);
 
             Assert.NotNull(clonedRequest);
             Assert.Equal(originalRequest.Method, clonedRequest.Method);
@@ -152,7 +168,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
                 HttpMethod = Method.GET,
                 URI = new Uri("http://localhost")
             };
-            var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
             Assert.NotNull(originalRequest);
 
             // Act
@@ -169,7 +185,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
                 HttpMethod = Method.POST,
                 URI = new Uri("http://localhost")
             };
-            var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
             Assert.NotNull(originalRequest);
 
             // Act
@@ -188,7 +204,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
                 URI = new Uri("http://localhost"),
                 Content = new MemoryStream(data)
             };
-            var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo);
+            var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
             Assert.NotNull(originalRequest);
 
             // Act

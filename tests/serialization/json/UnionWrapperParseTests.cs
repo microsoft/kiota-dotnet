@@ -17,7 +17,7 @@ public class UnionWrapperParseTests
     {
         // Given
         using var payload = new MemoryStream(Encoding.UTF8.GetBytes("{\"@odata.type\":\"#microsoft.graph.testEntity\",\"officeLocation\":\"Montreal\", \"id\": \"opaque\"}"));
-        var parseNode = await _parseNodeFactory.GetRootParseNodeAsync(contentType, payload);
+        var parseNode = await _parseNodeFactory.GetRootParseNodeAsync(contentType, payload, TestContext.Current.CancellationToken);
 
         // When
         var result = parseNode.GetObjectValue<UnionTypeMock>(UnionTypeMock.CreateFromDiscriminator);
@@ -35,7 +35,7 @@ public class UnionWrapperParseTests
     {
         // Given
         using var payload = new MemoryStream(Encoding.UTF8.GetBytes("{\"@odata.type\":\"#microsoft.graph.secondTestEntity\",\"officeLocation\":\"Montreal\", \"id\": 10}"));
-        var parseNode = await _parseNodeFactory.GetRootParseNodeAsync(contentType, payload);
+        var parseNode = await _parseNodeFactory.GetRootParseNodeAsync(contentType, payload, TestContext.Current.CancellationToken);
 
         // When
         var result = parseNode.GetObjectValue<UnionTypeMock>(UnionTypeMock.CreateFromDiscriminator);
@@ -53,7 +53,7 @@ public class UnionWrapperParseTests
     {
         // Given
         using var payload = new MemoryStream(Encoding.UTF8.GetBytes("[{\"@odata.type\":\"#microsoft.graph.TestEntity\",\"officeLocation\":\"Ottawa\", \"id\": \"11\"}, {\"@odata.type\":\"#microsoft.graph.TestEntity\",\"officeLocation\":\"Montreal\", \"id\": \"10\"}]"));
-        var parseNode = await _parseNodeFactory.GetRootParseNodeAsync(contentType, payload);
+        var parseNode = await _parseNodeFactory.GetRootParseNodeAsync(contentType, payload, TestContext.Current.CancellationToken);
 
         // When
         var result = parseNode.GetObjectValue<UnionTypeMock>(UnionTypeMock.CreateFromDiscriminator);
@@ -72,7 +72,7 @@ public class UnionWrapperParseTests
     {
         // Given
         using var payload = new MemoryStream(Encoding.UTF8.GetBytes("\"officeLocation\""));
-        var parseNode = await _parseNodeFactory.GetRootParseNodeAsync(contentType, payload);
+        var parseNode = await _parseNodeFactory.GetRootParseNodeAsync(contentType, payload, TestContext.Current.CancellationToken);
 
         // When
         var result = parseNode.GetObjectValue<UnionTypeMock>(UnionTypeMock.CreateFromDiscriminator);

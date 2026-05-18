@@ -17,7 +17,7 @@ public class IntersectionWrapperParseTests
     {
         // Given
         using var payload = new MemoryStream(Encoding.UTF8.GetBytes("{\"displayName\":\"McGill\",\"officeLocation\":\"Montreal\", \"id\": \"opaque\"}"));
-        var parseNode = await _parseNodeFactory.GetRootParseNodeAsync(contentType, payload);
+        var parseNode = await _parseNodeFactory.GetRootParseNodeAsync(contentType, payload, TestContext.Current.CancellationToken);
 
         // When
         var result = parseNode.GetObjectValue<IntersectionTypeMock>(IntersectionTypeMock.CreateFromDiscriminator);
@@ -36,7 +36,7 @@ public class IntersectionWrapperParseTests
     {
         // Given
         using var payload = new MemoryStream(Encoding.UTF8.GetBytes("{\"displayName\":\"McGill\",\"officeLocation\":\"Montreal\", \"id\": 10}"));
-        var parseNode = await _parseNodeFactory.GetRootParseNodeAsync(contentType, payload);
+        var parseNode = await _parseNodeFactory.GetRootParseNodeAsync(contentType, payload, TestContext.Current.CancellationToken);
 
         // When
         var result = parseNode.GetObjectValue<IntersectionTypeMock>(IntersectionTypeMock.CreateFromDiscriminator);
@@ -56,7 +56,7 @@ public class IntersectionWrapperParseTests
     {
         // Given
         using var payload = new MemoryStream(Encoding.UTF8.GetBytes("[{\"@odata.type\":\"#microsoft.graph.TestEntity\",\"officeLocation\":\"Ottawa\", \"id\": \"11\"}, {\"@odata.type\":\"#microsoft.graph.TestEntity\",\"officeLocation\":\"Montreal\", \"id\": \"10\"}]"));
-        var parseNode = await _parseNodeFactory.GetRootParseNodeAsync(contentType, payload);
+        var parseNode = await _parseNodeFactory.GetRootParseNodeAsync(contentType, payload, TestContext.Current.CancellationToken);
 
         // When
         var result = parseNode.GetObjectValue<IntersectionTypeMock>(IntersectionTypeMock.CreateFromDiscriminator);
@@ -75,7 +75,7 @@ public class IntersectionWrapperParseTests
     {
         // Given
         using var payload = new MemoryStream(Encoding.UTF8.GetBytes("\"officeLocation\""));
-        var parseNode = await _parseNodeFactory.GetRootParseNodeAsync(contentType, payload);
+        var parseNode = await _parseNodeFactory.GetRootParseNodeAsync(contentType, payload, TestContext.Current.CancellationToken);
 
         // When
         var result = parseNode.GetObjectValue<IntersectionTypeMock>(IntersectionTypeMock.CreateFromDiscriminator);
