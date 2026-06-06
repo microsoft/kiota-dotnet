@@ -833,6 +833,123 @@ namespace Microsoft.Kiota.Abstractions.Tests
             Assert.Throws<ArgumentException>(() => requestInfo.URI.OriginalString);
         }
 
+        [Fact]
+        public void SetsDictionaryQueryParameterExpandsToKeyValuePairs()
+        {
+            // Arrange
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/articles{?query*}"
+            };
+
+            // Act — directly set a non-null dictionary; {?query*} explodes it into individual key=value pairs
+            requestInfo.QueryParameters.Add("query", new Dictionary<string, string?>
+            {
+                ["filter"] = "equals(published,'true')",
+                ["sort"] = "-createdAt"
+            });
+
+            // Assert
+            var url = requestInfo.URI.OriginalString;
+            Assert.Contains("filter=equals", url);
+            Assert.Contains("sort=-createdAt", url);
+        }
+
+        [Fact]
+        public void SetsDictionaryQueryParameterSkipsNullValues()
+        {
+            // Arrange
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/articles{?query*}"
+            };
+
+            // Act — null value for "include" must be silently dropped (RFC 6570 §2.3 undefined semantics)
+            requestInfo.QueryParameters.Add("query", new Dictionary<string, string?>
+            {
+                ["filter"] = "equals(published,'true')",
+                ["include"] = null,
+                ["sort"] = "-createdAt"
+            });
+
+            // Assert
+            var url = requestInfo.URI.OriginalString;
+            Assert.DoesNotContain("include", url);
+            Assert.Contains("filter=equals", url);
+            Assert.Contains("sort=-createdAt", url);
+        }
+
+        [Fact]
+        public void SetsDictionaryQueryParameterIncludesEmptyStringValues()
+        {
+            // Arrange
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/articles{?query*}"
+            };
+
+            // Act — an explicit empty string must produce ?key= (key present with empty value)
+            requestInfo.QueryParameters.Add("query", new Dictionary<string, string?>
+            {
+                ["filter"] = ""
+            });
+
+            // Assert
+            Assert.Contains("filter=", requestInfo.URI.OriginalString);
+        }
+
+        [Fact]
+        public void SetsDictionaryQueryParameterWithAllNullValuesProducesNoQueryString()
+        {
+            // Arrange
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/articles{?query*}"
+            };
+
+            // Act — when every value is null, SanitizeDictionary returns an empty dict and
+            // Std.UriTemplate omits the variable entirely (no '?' in the output)
+            requestInfo.QueryParameters.Add("query", new Dictionary<string, string?>
+            {
+                ["filter"] = null,
+                ["sort"] = null
+            });
+
+            // Assert
+            Assert.Equal("http://localhost/articles", requestInfo.URI.OriginalString);
+        }
+
+        [Fact]
+        public void SetsDictionaryQueryParameterViaAddQueryParameters()
+        {
+            // Arrange
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/articles{?query*}"
+            };
+
+            // Act — exercise the AddQueryParameters → QueryParameters → GetSanitizedValues path
+            requestInfo.AddQueryParameters(new GetQueryParameters
+            {
+                Query = new Dictionary<string, string?>
+                {
+                    ["page[size]"] = "10",
+                    ["include"] = "author"
+                }
+            });
+
+            // Assert
+            var url = requestInfo.URI.OriginalString;
+            Assert.Contains("include=author", url);
+            // page[size] key is percent-encoded by RFC 6570 {?} operator
+            Assert.Contains("page", url);
+            Assert.Contains("10", url);
+        }
 
     }
 
@@ -872,5 +989,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
         public object? Item { get; set; }
         [QueryParameter("items")]
         public object[]? Items { get; set; }
+        [QueryParameter("query")]
+        public IDictionary<string, string?>? Query { get; set; }
     }
 }

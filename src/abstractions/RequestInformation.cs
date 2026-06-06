@@ -114,8 +114,27 @@ namespace Microsoft.Kiota.Abstractions
         private static object GetSanitizedValues(object value) => value switch
         {
             Array array => ExpandArray(array),
+            IDictionary dict => SanitizeDictionary(dict),
             _ => GetSanitizedValue(value),
         };
+
+        /// <summary>
+        /// Pre-processes an <see cref="IDictionary"/> for <c>Std.UriTemplate</c> expansion.
+        /// Null values are skipped: RFC 6570 §2.3 states "if the value is undefined,
+        /// the variable expansion results in no output". Use <c>""</c> to send <c>?key=</c> (empty value).
+        /// </summary>
+        private static Dictionary<string, string> SanitizeDictionary(IDictionary dict)
+        {
+            var result = new Dictionary<string, string>(dict.Count);
+            foreach(DictionaryEntry entry in dict)
+            {
+                if(entry.Value is not null)
+                {
+                    result[(string)entry.Key] = GetSanitizedValue(entry.Value).ToString()!;
+                }
+            }
+            return result;
+        }
 
         /// <summary>
         /// Sanitizes objects in order to appear appropriately in the URL
