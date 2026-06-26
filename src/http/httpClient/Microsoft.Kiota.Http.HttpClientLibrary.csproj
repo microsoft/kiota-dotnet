@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>Kiota Http provider implementation for dotnet with HttpClient.</Description>
     <AssemblyTitle>Kiota Http Library for dotnet</AssemblyTitle>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net10.0;net462;net8.0-browser</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net10.0;net462;net8.0-browser;net10.0-browser</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <EnablePackageValidation>true</EnablePackageValidation>
     <GenerateCompatibilitySuppressionFile>false</GenerateCompatibilitySuppressionFile>
