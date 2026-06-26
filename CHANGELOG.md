@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1](https://github.com/microsoft/kiota-dotnet/compare/v2.0.0...v2.0.1) (2026-06-26)
+
+
+### Bug Fixes
+
+* Added net10-browser as a target to enable the BROWSER directive ([#728](https://github.com/microsoft/kiota-dotnet/issues/728)) ([4ab20a0](https://github.com/microsoft/kiota-dotnet/commit/4ab20a02eec82ff3cdc31e88c96d790cbe33629c))
+
 ## [2.0.0](https://github.com/microsoft/kiota-dotnet/compare/v1.22.2...v2.0.0) (2026-05-06)
 
 
