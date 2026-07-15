@@ -17,7 +17,7 @@
     <PackageVersion Include="System.Text.Json" Version="[8.0,)" />
     <!-- Test packages -->
     <PackageVersion Include="coverlet.MTP" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.9" />
     <PackageVersion Include="Microsoft.Testing.Extensions.Telemetry" Version="2.3.1" />
     <PackageVersion Include="Microsoft.Testing.Platform" Version="2.3.2" />
