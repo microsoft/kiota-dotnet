@@ -14,7 +14,7 @@
     <PackageVersion Include="Std.UriTemplate" Version="2.0.11" />
     <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="[8.0.1,)" />
     <PackageVersion Include="System.Net.Http.WinHttpHandler" Version="[10.0,)" />
-    <PackageVersion Include="System.Text.Json" Version="[8.0,)" />
+    <PackageVersion Include="System.Text.Json" Version="[8.0.5,)" />
     <!-- Test packages -->
     <PackageVersion Include="coverlet.MTP" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
