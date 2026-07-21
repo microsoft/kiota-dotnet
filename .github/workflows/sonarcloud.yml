@@ -9,6 +9,8 @@ on:
     types: [opened, synchronize, reopened]
     paths-ignore: [".vscode/**"]
   merge_group:
+    branches:
+      - main
 
 permissions:
   contents: read
