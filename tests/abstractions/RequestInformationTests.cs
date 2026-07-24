@@ -936,7 +936,7 @@ namespace Microsoft.Kiota.Abstractions.Tests
             // Act — exercise the AddQueryParameters → QueryParameters → GetSanitizedValues path
             requestInfo.AddQueryParameters(new GetQueryParameters
             {
-                Query = new Dictionary<string, string?>
+                Query = new Dictionary<string, object?>
                 {
                     ["page[size]"] = "10",
                     ["include"] = "author"
@@ -949,6 +949,31 @@ namespace Microsoft.Kiota.Abstractions.Tests
             // page[size] key is percent-encoded by RFC 6570 {?} operator
             Assert.Contains("page", url);
             Assert.Contains("10", url);
+        }
+
+        [Fact]
+        public void SetsDictionaryQueryParameterWithNonStringValues()
+        {
+            // Arrange
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/articles{?query*}"
+            };
+
+            // Act — dictionary containing numbers, booleans, and dates
+            requestInfo.QueryParameters.Add("query", new Dictionary<string, object?>
+            {
+                ["page"] = 2,
+                ["active"] = true,
+                ["created"] = new DateTimeOffset(2026, 7, 24, 0, 0, 0, TimeSpan.Zero)
+            });
+
+            // Assert
+            var url = requestInfo.URI.OriginalString;
+            Assert.Contains("page=2", url);
+            Assert.Contains("active=true", url);
+            Assert.Contains("created=2026", url);
         }
 
     }
@@ -990,6 +1015,6 @@ namespace Microsoft.Kiota.Abstractions.Tests
         [QueryParameter("items")]
         public object[]? Items { get; set; }
         [QueryParameter("query")]
-        public IDictionary<string, string?>? Query { get; set; }
+        public IDictionary<string, object?>? Query { get; set; }
     }
 }
