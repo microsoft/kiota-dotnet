@@ -109,40 +109,37 @@ public sealed class BodyInspectionHandlerTests : IDisposable
         )); // response from option is separate from "normal" response stream
     }
 
-    [Fact(Skip = "Test can potentially be flaky due to usage limitations on Github. Enable to verify.")]
-    public async Task BodyInspectionHandlerGetsResponseBodyStreamFromGithub()
+    [Fact]
+    public async Task BodyInspectionHandlerGetsResponseBodyStreamFromKiotaClientFactory()
     {
         var option = new BodyInspectionHandlerOption { InspectResponseBody = true, InspectRequestBody = true };
-        var httpClient = KiotaClientFactory.Create(optionsForHandlers: [option]);
+        var messageHandler = new MockRedirectHandler();
+        _disposables.Add(messageHandler);
+        var responseMessage = new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+        {
+            Content = new StringContent("""{"owner":{"login":"microsoft"}}""")
+        };
+        _disposables.Add(responseMessage);
+        messageHandler.SetHttpResponse(responseMessage);
+        var httpClient = KiotaClientFactory.Create(messageHandler, [option]);
+        _disposables.Add(httpClient);
 
         // When
-        var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/microsoft/kiota-dotnet");
+        var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost/repos/microsoft/kiota-dotnet");
         var response = await httpClient.SendAsync(request, TestContext.Current.CancellationToken);
 
         // Then
-        if(response.IsSuccessStatusCode)
-        {
-            Assert.NotEqual(Stream.Null, option.ResponseBody);
-            var jsonFromInspection = await JsonDocument.ParseAsync(option.ResponseBody, cancellationToken: TestContext.Current.CancellationToken);
-            var jsonFromContent = await JsonDocument.ParseAsync(
-                await response.Content.ReadAsStreamAsync(
+        Assert.True(response.IsSuccessStatusCode);
+        Assert.NotEqual(Stream.Null, option.ResponseBody);
+        var jsonFromInspection = await JsonDocument.ParseAsync(option.ResponseBody, cancellationToken: TestContext.Current.CancellationToken);
+        var jsonFromContent = await JsonDocument.ParseAsync(
+            await response.Content.ReadAsStreamAsync(
 #if NET5_0_OR_GREATER
-                    TestContext.Current.CancellationToken
+                TestContext.Current.CancellationToken
 #endif
-                ), cancellationToken: TestContext.Current.CancellationToken);
-            Assert.True(jsonFromInspection.RootElement.TryGetProperty("owner", out _));
-            Assert.True(jsonFromContent.RootElement.TryGetProperty("owner", out _));
-        }
-        else if((int)response.StatusCode is 429 or 403)
-        {
-            // We've been throttled according to the docs below. No need to fail for now.
-            // https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28#primary-rate-limit-for-unauthenticated-users
-            Assert.Fail("Request was throttled");
-        }
-        else
-        {
-            Assert.Fail("Unexpected response status code in BodyInspectionHandler test");
-        }
+            ), cancellationToken: TestContext.Current.CancellationToken);
+        Assert.True(jsonFromInspection.RootElement.TryGetProperty("owner", out _));
+        Assert.True(jsonFromContent.RootElement.TryGetProperty("owner", out _));
     }
 
     [Fact]
