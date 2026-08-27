@@ -44,7 +44,7 @@ jobs:
           normal --framework net472
       - name: Test for net10.0 and collect coverage
         run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity
-          normal --framework net10.0 -- --coverlet --coverlet-output-format
+          normal --framework net10.0 --results-directory TestResults --coverlet --coverlet-output-format
           opencover
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd # v4.37.7
