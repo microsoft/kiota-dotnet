@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Microsoft.Kiota.Abstractions.Authentication
 {
@@ -66,16 +67,8 @@ namespace Microsoft.Kiota.Abstractions.Authentication
             if(_allowedHosts.Count == 0 || _allowedHosts.Contains(uri.Host))
                 return true;
 
-            foreach(var allowedHost in _allowedHosts)
-            {
-                if(allowedHost.StartsWith(".", StringComparison.OrdinalIgnoreCase)
-                    && uri.Host.EndsWith(allowedHost, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return _allowedHosts.Any(x => x.StartsWith(".", StringComparison.OrdinalIgnoreCase)
+                    && uri.Host.EndsWith(x, StringComparison.OrdinalIgnoreCase));
         }
 
         private static void ValidateHosts(IEnumerable<string> hostsToValidate)
