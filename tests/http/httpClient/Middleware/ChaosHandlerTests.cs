@@ -87,7 +87,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             Assert.True(responses.ContainsKey(HttpStatusCode.GatewayTimeout));
         }
 
-        [Fact(Skip = "Test is flaky and needs investigation.")]
+        [Fact]
         public async Task PlannedChaosShouldReturnChaosWhenPlanned()
         {
             // Arrange
@@ -103,7 +103,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 
             var handler = new ChaosHandler(new ChaosHandlerOption
             {
-                PlannedChaosFactory = plannedChaos
+                PlannedChaosFactory = plannedChaos,
+                ChaosPercentLevel = 0
             })
             {
                 InnerHandler = new FakeSuccessHandler()
