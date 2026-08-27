@@ -125,7 +125,7 @@ public sealed class BodyInspectionHandlerTests : IDisposable
         _disposables.Add(httpClient);
 
         // When
-        var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost/repos/microsoft/kiota-dotnet");
+        using var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost/repos/microsoft/kiota-dotnet");
         var response = await httpClient.SendAsync(request, TestContext.Current.CancellationToken);
 
         // Then
