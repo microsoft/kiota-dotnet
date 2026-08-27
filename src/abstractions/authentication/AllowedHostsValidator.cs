@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Microsoft.Kiota.Abstractions.Authentication
 {
@@ -61,7 +62,14 @@ namespace Microsoft.Kiota.Abstractions.Authentication
         /// true - if the host is in the <see cref="AllowedHosts"/>. If <see cref="AllowedHosts"/> is empty, it will return true for all urls.
         /// false - if the <see cref="AllowedHosts"/> is not empty and the host is not in the list
         /// </returns>
-        public bool IsUrlHostValid(Uri uri) => _allowedHosts.Count == 0 || _allowedHosts.Contains(uri.Host);
+        public bool IsUrlHostValid(Uri uri)
+        {
+            if(_allowedHosts.Count == 0 || _allowedHosts.Contains(uri.Host))
+                return true;
+
+            return _allowedHosts.Any(x => x.StartsWith(".", StringComparison.OrdinalIgnoreCase)
+                    && uri.Host.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+        }
 
         private static void ValidateHosts(IEnumerable<string> hostsToValidate)
         {
