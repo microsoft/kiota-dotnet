@@ -108,7 +108,7 @@ extends:
                   net10.0
                 displayName: "Test projects in Microsoft.Kiota"
 
-              - task: EsrpCodeSigning@5
+              - task: EsrpCodeSigning@6
                 displayName: "ESRP DLL Strong Name"
                 inputs:
                   ConnectedServiceName: "Federated DevX ESRP Managed Identity Connection"
@@ -143,7 +143,7 @@ extends:
                   MaxRetryAttempts: 5
                   PendingAnalysisWaitTimeoutMinutes: 5
 
-              - task: EsrpCodeSigning@5
+              - task: EsrpCodeSigning@6
                 displayName: "ESRP DLL CodeSigning"
                 inputs:
                   ConnectedServiceName: "Federated DevX ESRP Managed Identity Connection"
@@ -207,7 +207,7 @@ extends:
                   BUILD_CONFIGURATION: $(BuildConfiguration)
                 displayName: Dotnet pack
 
-              - task: EsrpCodeSigning@5
+              - task: EsrpCodeSigning@6
                 displayName: "ESRP CodeSigning Nuget Packages"
                 inputs:
                   ConnectedServiceName: "Federated DevX ESRP Managed Identity Connection"
