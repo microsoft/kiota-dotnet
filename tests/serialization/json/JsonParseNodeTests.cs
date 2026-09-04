@@ -563,6 +563,26 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             Assert.Equal(new TimeSpan(1, 2, 3, 4), result);
         }
 
+        [Fact]
+        public void GetTimeSpanValue_ReturnsNullForEmptyStringWhenCustomConverterIsUsed()
+        {
+            // Arrange
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new JsonTimeSpanConverter() }
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+
+            using var jsonDocument = JsonDocument.Parse("\"\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
+
+            // Act
+            var result = parseNode.GetTimeSpanValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
         [Theory]
         [InlineData("42", 42)]
         [InlineData("\"42\"", null)]
