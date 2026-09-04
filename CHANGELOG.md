@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2](https://github.com/microsoft/kiota-dotnet/compare/v2.1.1...v2.1.2) (2026-09-04)
+
+
+### Bug Fixes
+
+* **serialization-json:** honor custom TimeSpan converters ([#795](https://github.com/microsoft/kiota-dotnet/issues/795)) ([e22c5ba](https://github.com/microsoft/kiota-dotnet/commit/e22c5ba48d34d2a0927d84a5a83f9d63926dedf1))
+* **serialization-json:** honor guid converters before fallback parsing ([#794](https://github.com/microsoft/kiota-dotnet/issues/794)) ([22cc1d3](https://github.com/microsoft/kiota-dotnet/commit/22cc1d30019d69f55d3282f34922d23dfdc2372b))
+
 ## [2.1.1](https://github.com/microsoft/kiota-dotnet/compare/v2.1.0...v2.1.1) (2026-09-04)
 
 
