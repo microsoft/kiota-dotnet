@@ -542,6 +542,47 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             Assert.Equal(56, result.Value.Second);
         }
 
+        [Fact]
+        public void GetTimeSpanValue_ReturnsTimeSpanWhenCustomConverterIsUsed()
+        {
+            // Arrange
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new JsonTimeSpanConverter() }
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+
+            using var jsonDocument = JsonDocument.Parse("\"1|02|03|04\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
+
+            // Act
+            var result = parseNode.GetTimeSpanValue();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(new TimeSpan(1, 2, 3, 4), result);
+        }
+
+        [Fact]
+        public void GetTimeSpanValue_ReturnsNullForEmptyStringWhenCustomConverterIsUsed()
+        {
+            // Arrange
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new JsonTimeSpanConverter() }
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+
+            using var jsonDocument = JsonDocument.Parse("\"\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
+
+            // Act
+            var result = parseNode.GetTimeSpanValue();
+
+            // Assert
+            Assert.Null(result);
+        }
+
         [Theory]
         [InlineData("42", 42)]
         [InlineData("\"42\"", null)]
@@ -942,6 +983,28 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             Assert.Equal((sbyte)-1, result[0]);
             Assert.Equal((sbyte)0, result[1]);
             Assert.Equal((sbyte)1, result[2]);
+        }
+
+        [Fact]
+        public void GetCollectionOfPrimitiveValues_ReturnsTimeSpanCollectionWhenCustomConverterIsUsed()
+        {
+            // Arrange
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new JsonTimeSpanConverter() }
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+
+            using var jsonDocument = JsonDocument.Parse("[\"1|02|03|04\", \"2|03|04|05\"]");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
+
+            // Act
+            var result = parseNode.GetCollectionOfPrimitiveValues<TimeSpan?>().ToArray();
+
+            // Assert
+            Assert.Equal(2, result.Length);
+            Assert.Equal(new TimeSpan(1, 2, 3, 4), result[0]);
+            Assert.Equal(new TimeSpan(2, 3, 4, 5), result[1]);
         }
     }
 }
