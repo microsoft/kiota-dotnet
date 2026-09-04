@@ -205,6 +205,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
 
         [InlineData(HttpStatusCode.Redirect)]
         [InlineData(HttpStatusCode.MovedPermanently)]
+        [InlineData(HttpStatusCode.NotModified)]
         [Theory]
         public async Task SendMethodDoesNotThrowOn3XXWithNoLocationAsync(HttpStatusCode httpStatusCode)
         {
@@ -270,6 +271,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         [InlineData(HttpStatusCode.Accepted)]
         [InlineData(HttpStatusCode.NonAuthoritativeInformation)]
         [InlineData(HttpStatusCode.NoContent)]
+        [InlineData(HttpStatusCode.NotModified)]
         [Theory]
         public async Task SendStreamReturnsNullForNoContent(HttpStatusCode statusCode)
         {
@@ -292,14 +294,40 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
 
             Assert.Null(response);
         }
+        [Fact]
+        public async Task SendStreamDisposesNotModifiedResponse()
+        {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var content = new DisposableContent(new byte[] { 1, 2, 3 });
+            var client = new HttpClient(mockHandler.Object);
+            mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.NotModified,
+                Content = content,
+            });
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "https://example.com"
+            };
+
+            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
+
+            Assert.Null(response);
+            Assert.True(content.IsDisposed);
+        }
         [InlineData(HttpStatusCode.OK)]
         [InlineData(HttpStatusCode.Created)]
         [InlineData(HttpStatusCode.Accepted)]
         [InlineData(HttpStatusCode.NonAuthoritativeInformation)]
         [InlineData(HttpStatusCode.NoContent)]
         [InlineData(HttpStatusCode.PartialContent)]
+        [InlineData(HttpStatusCode.NotModified)]
         [Theory]
-        public async Task SendSNoContentDoesntFailOnOtherStatusCodes(HttpStatusCode statusCode)
+        public async Task SendNoContentDoesntFailOnOtherStatusCodes(HttpStatusCode statusCode)
         {
             var mockHandler = new Mock<HttpMessageHandler>();
             var client = new HttpClient(mockHandler.Object);
@@ -324,6 +352,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         [InlineData(HttpStatusCode.NonAuthoritativeInformation)]
         [InlineData(HttpStatusCode.NoContent)]
         [InlineData(HttpStatusCode.ResetContent)]
+        [InlineData(HttpStatusCode.NotModified)]
         [Theory]
         public async Task SendReturnsNullOnNoContent(HttpStatusCode statusCode)
         {
@@ -353,6 +382,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         [InlineData(HttpStatusCode.NonAuthoritativeInformation)]
         [InlineData(HttpStatusCode.NoContent)]
         [InlineData(HttpStatusCode.ResetContent)]
+        [InlineData(HttpStatusCode.NotModified)]
         [Theory]
         public async Task SendReturnsNullOnNoContentWithContentHeaderPresent(HttpStatusCode statusCode)
         {
@@ -1207,6 +1237,21 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             Assert.NotNull(adapter2);
             Assert.NotNull(adapter1.SerializationWriterFactory);
             Assert.NotNull(adapter2.SerializationWriterFactory);
+        }
+
+        private sealed class DisposableContent : ByteArrayContent
+        {
+            public DisposableContent(byte[] content) : base(content)
+            {
+            }
+
+            public bool IsDisposed { get; private set; }
+
+            protected override void Dispose(bool disposing)
+            {
+                IsDisposed = disposing;
+                base.Dispose(disposing);
+            }
         }
     }
 
