@@ -224,6 +224,28 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         }
 
         [Fact]
+        public void ParseGuidUsesConverterForStandardGuidStrings()
+        {
+            // Arrange
+            var id = Guid.NewGuid();
+            var convertedId = Guid.NewGuid();
+            var json = $"{{\"id\": \"{id:D}\"}}";
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new JsonGuidPrecedenceConverter(id, convertedId) }
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+            using var jsonDocument = JsonDocument.Parse(json);
+            var rootParseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
+
+            // Act
+            var entity = rootParseNode.GetObjectValue(_ => new ConverterTestEntity());
+
+            // Assert
+            Assert.Equal(convertedId, entity.Id);
+        }
+
+        [Fact]
         public void ParseGuidWithoutConverter()
         {
             // Arrange
@@ -540,6 +562,27 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             Assert.Equal(12, result.Value.Hour);
             Assert.Equal(34, result.Value.Minute);
             Assert.Equal(56, result.Value.Second);
+        }
+
+        [Fact]
+        public void GetTimeSpanValue_ReturnsTimeSpanWhenCustomConverterIsUsed()
+        {
+            // Arrange
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new JsonTimeSpanConverter() }
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+
+            using var jsonDocument = JsonDocument.Parse("\"1|02|03|04\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
+
+            // Act
+            var result = parseNode.GetTimeSpanValue();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(new TimeSpan(1, 2, 3, 4), result);
         }
 
         [Theory]
@@ -942,6 +985,28 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             Assert.Equal((sbyte)-1, result[0]);
             Assert.Equal((sbyte)0, result[1]);
             Assert.Equal((sbyte)1, result[2]);
+        }
+
+        [Fact]
+        public void GetCollectionOfPrimitiveValues_ReturnsTimeSpanCollectionWhenCustomConverterIsUsed()
+        {
+            // Arrange
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new JsonTimeSpanConverter() }
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+
+            using var jsonDocument = JsonDocument.Parse("[\"1|02|03|04\", \"2|03|04|05\"]");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
+
+            // Act
+            var result = parseNode.GetCollectionOfPrimitiveValues<TimeSpan?>().ToArray();
+
+            // Assert
+            Assert.Equal(2, result.Length);
+            Assert.Equal(new TimeSpan(1, 2, 3, 4), result[0]);
+            Assert.Equal(new TimeSpan(2, 3, 4, 5), result[1]);
         }
     }
 }
