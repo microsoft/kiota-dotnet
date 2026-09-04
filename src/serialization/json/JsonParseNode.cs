@@ -29,6 +29,7 @@ namespace Microsoft.Kiota.Serialization.Json
     /// </summary>
     public class JsonParseNode : IParseNode
     {
+        private static readonly Type DefaultGuidConverterType = KiotaJsonSerializationContext.Default.Guid!.Converter.GetType();
         private readonly JsonElement _jsonNode;
         private readonly KiotaJsonSerializationContext _jsonSerializerContext;
 
@@ -324,16 +325,15 @@ namespace Microsoft.Kiota.Serialization.Json
             if(jsonElement.ValueKind != JsonValueKind.String)
                 return null;
 
-            if(string.IsNullOrEmpty(jsonElement.GetString()))
-                return null;
-
-            if(TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.Guid, out var convertedGuid))
+            if(HasCustomGuidConverter() && TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.Guid, out var convertedGuid))
                 return convertedGuid;
 
             return jsonElement.TryGetGuid(out var guid)
                 ? guid
                 : null;
         }
+
+        private bool HasCustomGuidConverter() => _jsonSerializerContext.Guid?.Converter.GetType() != DefaultGuidConverterType;
 
         private DateTimeOffset? GetDateTimeOffsetValue(JsonElement jsonElement)
         {
@@ -352,8 +352,14 @@ namespace Microsoft.Kiota.Serialization.Json
             return null;
         }
 
-        private static TimeSpan? GetTimeSpanValue(JsonElement jsonElement)
+        private TimeSpan? GetTimeSpanValue(JsonElement jsonElement)
         {
+            if(jsonElement.ValueKind != JsonValueKind.String)
+                return null;
+
+            if(TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.TimeSpan, out var timeSpan))
+                return timeSpan;
+
             var jsonString = jsonElement.GetString();
             if(string.IsNullOrEmpty(jsonString))
                 return null;
