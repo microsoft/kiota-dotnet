@@ -374,7 +374,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 try
                 {
                     await ThrowIfFailedResponseAsync(response, errorMapping, span, cancellationToken).ConfigureAwait(false);
-                    if(shouldReturnNull(response)) return default;
+                    if(shouldReturnNull(response))
+                    {
+                        if(isStreamResponse)
+                            await DrainAsync(response, cancellationToken).ConfigureAwait(false);
+                        return default;
+                    }
                     if(isStreamResponse)
                     {
 #if NET5_0_OR_GREATER
