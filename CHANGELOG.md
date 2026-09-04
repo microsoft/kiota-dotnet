@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1](https://github.com/microsoft/kiota-dotnet/compare/v2.1.0...v2.1.1) (2026-09-04)
+
+
+### Bug Fixes
+
+* **http:** handle not modified responses ([#787](https://github.com/microsoft/kiota-dotnet/issues/787)) ([82e3190](https://github.com/microsoft/kiota-dotnet/commit/82e319072b45132bd9d3a3fe94a1f01953192ea6))
+
 ## [2.1.0](https://github.com/microsoft/kiota-dotnet/compare/v2.0.2...v2.1.0) (2026-08-27)
 
 
