@@ -83,7 +83,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             var retryResponse = new HttpResponseMessage(HttpStatusCode.OK);
             _testHttpMessageHandler.SetHttpResponse(retryResponse);
             // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
             // Assert
             Assert.Same(response, retryResponse);
             Assert.NotNull(response.RequestMessage);
@@ -103,7 +103,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             var response2 = new HttpResponseMessage(HttpStatusCode.OK);
             this._testHttpMessageHandler.SetHttpResponse(retryResponse, response2);
             // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
             // Assert
             Assert.Same(response, response2);
             Assert.NotSame(response.RequestMessage, httpRequestMessage);
@@ -130,7 +130,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             var response2 = new HttpResponseMessage(HttpStatusCode.OK);
             this._testHttpMessageHandler.SetHttpResponse(retryResponse, response2);
             // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
             // Assert
             Assert.Same(response, response2);
             Assert.NotSame(response.RequestMessage, httpRequestMessage);
@@ -160,7 +160,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             var response2 = new HttpResponseMessage(HttpStatusCode.OK);
             this._testHttpMessageHandler.SetHttpResponse(retryResponse, response2);
             // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
             // Assert
             Assert.NotEqual(response, response2);
             Assert.Same(response, retryResponse);
@@ -187,7 +187,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             var response2 = new HttpResponseMessage(HttpStatusCode.OK);
             this._testHttpMessageHandler.SetHttpResponse(retryResponse, response2);
             // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
             // Assert
             Assert.NotEqual(response, response2);
             Assert.Same(response.RequestMessage, httpRequestMessage);
@@ -217,7 +217,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             // Act
             try
             {
-                await invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                await invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
             }
             catch(Exception exception)
             {
@@ -299,7 +299,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             _retryHandler.RetryOption.RetriesTimeLimit = TimeSpan.FromSeconds(10);
             this._testHttpMessageHandler.SetHttpResponse(retryResponse);
             // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
             // Assert
             Assert.Same(response, retryResponse);
         }
@@ -320,7 +320,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             var response2 = new HttpResponseMessage(HttpStatusCode.OK);
             this._testHttpMessageHandler.SetHttpResponse(retryResponse, response2);
             // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
             // Assert
             Assert.Same(response, response2);
             Assert.NotNull(response.RequestMessage);
@@ -349,7 +349,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             var response2 = new HttpResponseMessage(HttpStatusCode.OK);
             this._testHttpMessageHandler.SetHttpResponse(retryResponse, response2);
             // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
             // Assert
             Assert.Same(response, response2);
             Assert.NotNull(response.RequestMessage);
@@ -367,7 +367,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         public async Task ShouldRetryBasedOnCustomShouldRetryDelegate(int expectedMaxRetry, HttpStatusCode expectedStatusCode, bool isExceptionExpected)
         {
             // Arrange
-            var request = new HttpRequestMessage();
+            var request = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo");
             Queue<HttpResponseMessage> httpResponseQueue = new(new HttpResponseMessage[]
             {
                 new(HttpStatusCode.BadGateway) { RequestMessage = request },
@@ -379,7 +379,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>(MockBehavior.Loose);
             mockHttpMessageHandler.Protected()
-                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>())
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
                 .Returns(() =>
                     {
                         HttpResponseMessage response;
@@ -410,7 +410,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             // Act
             try
             {
-                var response = await httpMessageInvoker.SendAsync(request, new CancellationToken());
+                var response = await httpMessageInvoker.SendAsync(request, TestContext.Current.CancellationToken);
 
                 Assert.False(isExceptionExpected);
                 Assert.Equal(expectedStatusCode, response.StatusCode);
@@ -427,7 +427,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             }
 
             // Assert
-            mockHttpMessageHandler.Protected().Verify<Task<HttpResponseMessage>>("SendAsync", Times.Exactly(1 + expectedMaxRetry), ItExpr.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>());
+            mockHttpMessageHandler.Protected().Verify<Task<HttpResponseMessage>>("SendAsync", Times.Exactly(1 + expectedMaxRetry), ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>());
         }
 
         [Theory]
@@ -448,7 +448,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             this._testHttpMessageHandler.SetHttpResponse(retryResponse, response2);
             _retryHandler.RetryOption.ShouldRetry = (_, _, _) => false;
             // Act
-            var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
             // Assert
             Assert.NotEqual(response, response2);
             Assert.Same(response, retryResponse);
@@ -464,7 +464,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             Message = message;
             await Task.Run(async () =>
             {
-                await RetryHandler.DelayAsync(response, count, delay, out _, new CancellationToken());
+                await RetryHandler.DelayAsync(response, count, delay, out _, TestContext.Current.CancellationToken);
                 Message += " Work " + count;
             });
         }

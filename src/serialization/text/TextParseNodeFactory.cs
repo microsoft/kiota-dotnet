@@ -24,7 +24,11 @@ public class TextParseNodeFactory : IParseNodeFactory
         _ = content ?? throw new ArgumentNullException(nameof(content));
 
         using var reader = new StreamReader(content);
+#if NET7_0_OR_GREATER
+        var stringContent = await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+#else
         var stringContent = await reader.ReadToEndAsync().ConfigureAwait(false);
+#endif
         return new TextParseNode(stringContent);
     }
 }

@@ -74,7 +74,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             HttpResponseMessage httpResponse = new HttpResponseMessage(HttpStatusCode.OK);
             this._testHttpMessageHandler.SetHttpResponse(httpResponse);// set the mock response
             // Act
-            HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
             // Assert
             Assert.NotNull(response.RequestMessage);
             Assert.True(response.RequestMessage.Headers.Contains("Authorization"));
@@ -93,7 +93,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             this._testHttpMessageHandler.SetHttpResponse(httpResponse);// set the mock response
 
             // Act
-            HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(response.RequestMessage);
@@ -113,7 +113,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             this._testHttpMessageHandler.SetHttpResponse(httpResponse);// set the mock response
 
             // Act
-            HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(response.RequestMessage);
@@ -133,7 +133,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             this._testHttpMessageHandler.SetHttpResponse(httpResponse, new HttpResponseMessage(HttpStatusCode.OK));// set the mock response
 
             // Act
-            HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(response.RequestMessage);
@@ -160,7 +160,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             this._testHttpMessageHandler.SetHttpResponse(httpResponse, new HttpResponseMessage(HttpStatusCode.OK));// set the mock response
 
             // Act
-            HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
