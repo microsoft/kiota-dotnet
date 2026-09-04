@@ -111,17 +111,18 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             };
 
             // Act
+            using var invoker = new HttpMessageInvoker(handler);
             var request1 = new HttpRequestMessage
             {
                 RequestUri = new Uri("http://example.org/success")
             };
-            var response1 = await new HttpMessageInvoker(handler).SendAsync(request1, TestContext.Current.CancellationToken);
+            var response1 = await invoker.SendAsync(request1, TestContext.Current.CancellationToken);
 
             var request2 = new HttpRequestMessage
             {
                 RequestUri = new Uri("http://example.org/fail")
             };
-            var response2 = await new HttpMessageInvoker(handler).SendAsync(request2, TestContext.Current.CancellationToken);
+            var response2 = await invoker.SendAsync(request2, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
