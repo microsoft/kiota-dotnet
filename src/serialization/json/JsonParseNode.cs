@@ -324,13 +324,15 @@ namespace Microsoft.Kiota.Serialization.Json
             if(jsonElement.ValueKind != JsonValueKind.String)
                 return null;
 
-            if(jsonElement.TryGetGuid(out var guid))
-                return guid;
-
             if(string.IsNullOrEmpty(jsonElement.GetString()))
                 return null;
 
-            return jsonElement.Deserialize(_jsonSerializerContext.Guid);
+            if(TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.Guid, out var convertedGuid))
+                return convertedGuid;
+
+            return jsonElement.TryGetGuid(out var guid)
+                ? guid
+                : null;
         }
 
         private DateTimeOffset? GetDateTimeOffsetValue(JsonElement jsonElement)
