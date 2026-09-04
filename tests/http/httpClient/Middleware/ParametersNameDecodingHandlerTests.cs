@@ -47,7 +47,7 @@ public class ParametersDecodingHandlerTests
         Assert.NotNull(requestMessage);
 
         // Act
-        await _invoker.SendAsync(requestMessage, new CancellationToken());
+        await _invoker.SendAsync(requestMessage, TestContext.Current.CancellationToken);
 
         // Assert the request stays the same
         Assert.Equal(result, requestMessage.RequestUri!.ToString());
@@ -87,7 +87,7 @@ public class ParametersDecodingHandlerTests
         Assert.NotNull(requestMessage);
 
         // Act
-        await _invoker.SendAsync(requestMessage, new CancellationToken());
+        await _invoker.SendAsync(requestMessage, TestContext.Current.CancellationToken);
 
         // Assert the request stays the same
         Assert.Equal(result, requestMessage.RequestUri!.ToString());

@@ -103,7 +103,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
 
             while(retryCount < retryOption.MaxRetry)
             {
-                exceptions.Add(await GetInnerExceptionAsync(response).ConfigureAwait(false));
+                exceptions.Add(await GetInnerExceptionAsync(response, cancellationToken).ConfigureAwait(false));
                 using var retryActivity = activitySource?.StartActivity($"{nameof(RetryHandler)}_{nameof(SendAsync)} - attempt {retryCount}");
                 retryActivity?.SetTag(HttpClientRequestAdapter.RetryCountAttributeName, retryCount);
                 retryActivity?.SetTag("http.response.status_code", response.StatusCode);
@@ -149,7 +149,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 }
             }
 
-            exceptions.Add(await GetInnerExceptionAsync(response).ConfigureAwait(false));
+            exceptions.Add(await GetInnerExceptionAsync(response, cancellationToken).ConfigureAwait(false));
 
             throw new AggregateException($"Too many retries performed. More than {retryCount} retries encountered while sending the request.", exceptions);
         }
@@ -217,7 +217,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
             return Math.Pow(2, retryCount) * delay;
         }
 
-        private static async Task<Exception> GetInnerExceptionAsync(HttpResponseMessage response)
+        private static async Task<Exception> GetInnerExceptionAsync(HttpResponseMessage response, CancellationToken cancellationToken)
         {
             string? errorMessage = null;
 
@@ -225,7 +225,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
             // before retry attempt and before the TooManyRetries ServiceException.
             if(response.Content != null)
             {
+#if NET5_0_OR_GREATER
+                errorMessage = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+#else
                 errorMessage = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+#endif
             }
 
             var headersDictionary = new Dictionary<string, IEnumerable<string>>();
