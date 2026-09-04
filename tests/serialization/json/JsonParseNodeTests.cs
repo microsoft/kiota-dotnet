@@ -523,6 +523,48 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         }
 
         [Fact]
+        public void GetDateTimeOffsetValue_UsesCustomConverterForTimezoneLessValue()
+        {
+            // Arrange
+            var converter = new UtcDateTimeOffsetConverter();
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { converter }
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+
+            using var jsonDocument = JsonDocument.Parse("\"2024-07-31T12:34:56\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
+
+            // Act
+            var result = parseNode.GetDateTimeOffsetValue();
+
+            // Assert
+            Assert.True(converter.WasRead);
+            Assert.Equal(new DateTimeOffset(2024, 7, 31, 12, 34, 56, TimeSpan.Zero), result);
+        }
+
+        [Fact]
+        public void GetDateTimeOffsetValue_FallsBackWhenCustomConverterCannotParse()
+        {
+            // Arrange
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new UtcDateTimeOffsetConverter() }
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+
+            using var jsonDocument = JsonDocument.Parse("\"2024-07-31T12:34:56Z\"");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
+
+            // Act
+            var result = parseNode.GetDateTimeOffsetValue();
+
+            // Assert
+            Assert.Equal(new DateTimeOffset(2024, 7, 31, 12, 34, 56, TimeSpan.Zero), result);
+        }
+
+        [Fact]
         public void GetDateTimeOffsetValue_ReturnCorrectDateTimeOffset()
         {
             // Arrange
@@ -1005,6 +1047,26 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             Assert.Equal(2, result.Length);
             Assert.Equal(new TimeSpan(1, 2, 3, 4), result[0]);
             Assert.Equal(new TimeSpan(2, 3, 4, 5), result[1]);
+        }
+
+        private sealed class UtcDateTimeOffsetConverter : JsonConverter<DateTimeOffset>
+        {
+            public bool WasRead { get; private set; }
+
+            public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                WasRead = true;
+                var value = reader.GetString()!;
+                if(value.EndsWith("Z", StringComparison.Ordinal))
+                    throw new JsonException();
+
+                return new DateTimeOffset(DateTime.SpecifyKind(
+                    DateTime.ParseExact(value, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture),
+                    DateTimeKind.Utc));
+            }
+
+            public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options)
+                => throw new NotImplementedException();
         }
     }
 }

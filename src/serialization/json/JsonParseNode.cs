@@ -338,11 +338,11 @@ namespace Microsoft.Kiota.Serialization.Json
             if(jsonElement.ValueKind != JsonValueKind.String)
                 return null;
 
-            if(jsonElement.TryGetDateTimeOffset(out var dateTimeOffset))
-                return dateTimeOffset;
-
             if(TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.DateTimeOffset, out var convertedDateTimeOffset))
                 return convertedDateTimeOffset;
+
+            if(jsonElement.TryGetDateTimeOffset(out var dateTimeOffset))
+                return dateTimeOffset;
 
             if(DateTimeOffset.TryParse(jsonElement.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dto))
                 return dto;
