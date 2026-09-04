@@ -43,15 +43,15 @@ jobs:
           /p:UseSharedCompilation=false
       - name: Test for net472
         run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity
-          normal --framework net472
+          normal --framework net472 --report-gh
       - name: Test for net10.0 and collect coverage
         run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity
-          normal --framework net10.0 --results-directory TestResults --coverlet --coverlet-output-format
-          opencover
+          normal --framework net10.0 --results-directory=./TestResults --coverlet --coverlet-output-format
+          cobertura --report-gh
       - name: Install report generator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
       - name: Generate coverage report
-        run: reportgenerator "-reports:TestResults/coverage.opencover.*.xml" "-targetdir:.\reports\coverage" "-reporttypes:Html;MarkdownSummaryGithub;Cobertura"
+        run: reportgenerator "-reports:TestResults/coverage.cobertura.*.xml" "-targetdir:.\reports\coverage" "-reporttypes:Html;MarkdownSummaryGithub;Cobertura"
       - name: Add coverage to job summary
         run: Get-Content .\reports\coverage\SummaryGithub.md >> $env:GITHUB_STEP_SUMMARY
       - name: Upload coverage report

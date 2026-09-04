@@ -9,12 +9,12 @@ updates:
     labels:
       - dependencies
     groups:
-      xunit:
+      testing-dependencies:
         patterns:
-          - xunit*
-      coverlet:
-        patterns:
-          - coverlet*
+          - coverlet.*
+          - Microsoft.NET.Test.Sdk
+          - Microsoft.Testing.*
+          - xunit.*
     cooldown:
       default-days: 7
   - package-ecosystem: github-actions
