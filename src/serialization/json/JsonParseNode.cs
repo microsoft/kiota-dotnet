@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -29,7 +28,7 @@ namespace Microsoft.Kiota.Serialization.Json
     /// </summary>
     public class JsonParseNode : IParseNode
     {
-        private static readonly Type DefaultGuidConverterType = KiotaJsonSerializationContext.Default.Guid!.Converter.GetType();
+        private static readonly JsonConverter DefaultGuidConverter = KiotaJsonSerializationContext.Default.Guid!.Converter;
         private readonly JsonElement _jsonNode;
         private readonly KiotaJsonSerializationContext _jsonSerializerContext;
 
@@ -333,7 +332,8 @@ namespace Microsoft.Kiota.Serialization.Json
                 : null;
         }
 
-        private bool HasCustomGuidConverter() => _jsonSerializerContext.Guid?.Converter.GetType() != DefaultGuidConverterType;
+        private bool HasCustomGuidConverter() =>
+            _jsonSerializerContext.Guid is { Converter: var converter } && !ReferenceEquals(converter, DefaultGuidConverter);
 
         private DateTimeOffset? GetDateTimeOffsetValue(JsonElement jsonElement)
         {
