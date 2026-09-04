@@ -28,7 +28,7 @@ namespace Microsoft.Kiota.Serialization.Json
     /// </summary>
     public class JsonParseNode : IParseNode
     {
-        private static readonly JsonConverter DefaultGuidConverter = KiotaJsonSerializationContext.Default.Guid!.Converter;
+        private static readonly JsonConverter DefaultGuidConverter = KiotaJsonSerializationContext.Default.Guid.Converter;
         private readonly JsonElement _jsonNode;
         private readonly KiotaJsonSerializationContext _jsonSerializerContext;
 
