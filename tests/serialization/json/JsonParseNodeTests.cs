@@ -548,9 +548,10 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         public void GetDateTimeOffsetValue_FallsBackWhenCustomConverterCannotParse()
         {
             // Arrange
+            var converter = new UtcDateTimeOffsetConverter();
             var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
             {
-                Converters = { new UtcDateTimeOffsetConverter() }
+                Converters = { converter }
             };
             var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
 
@@ -561,6 +562,7 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             var result = parseNode.GetDateTimeOffsetValue();
 
             // Assert
+            Assert.True(converter.WasRead);
             Assert.Equal(new DateTimeOffset(2024, 7, 31, 12, 34, 56, TimeSpan.Zero), result);
         }
 
