@@ -352,14 +352,8 @@ namespace Microsoft.Kiota.Serialization.Json
             return null;
         }
 
-        private TimeSpan? GetTimeSpanValue(JsonElement jsonElement)
+        private static TimeSpan? GetTimeSpanValue(JsonElement jsonElement)
         {
-            if(jsonElement.ValueKind != JsonValueKind.String)
-                return null;
-
-            if(TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.TimeSpan, out var timeSpan))
-                return timeSpan;
-
             var jsonString = jsonElement.GetString();
             if(string.IsNullOrEmpty(jsonString))
                 return null;
