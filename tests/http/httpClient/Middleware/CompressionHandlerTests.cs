@@ -49,7 +49,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             HttpResponseMessage httpResponse = new HttpResponseMessage(HttpStatusCode.OK);
             this._testHttpMessageHandler.SetHttpResponse(httpResponse);// set the mock response
             // Act
-            HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            HttpResponseMessage response = await this._invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
             // Assert
             Assert.Same(httpRequestMessage, response.RequestMessage);
             Assert.NotNull(response.RequestMessage);
@@ -71,7 +71,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             httpResponse.Content.Headers.ContentEncoding.Add(CompressionHandler.GZip);
             this._testHttpMessageHandler.SetHttpResponse(httpResponse);// set the mock response
             // Act
-            HttpResponseMessage decompressedResponse = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            HttpResponseMessage decompressedResponse = await this._invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
             string responseContentString = await decompressedResponse.Content.ReadAsStringAsync(
 #if NET5_0_OR_GREATER
                 TestContext.Current.CancellationToken
@@ -95,7 +95,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             };
             this._testHttpMessageHandler.SetHttpResponse(httpResponse);// set the mock response
             // Act
-            HttpResponseMessage compressedResponse = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            HttpResponseMessage compressedResponse = await this._invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
             string responseContentString = await compressedResponse.Content.ReadAsStringAsync(
 #if NET5_0_OR_GREATER
                 TestContext.Current.CancellationToken
@@ -128,7 +128,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 
             this._testHttpMessageHandler.SetHttpResponse(httpResponse);// set the mock response
             // Arrange
-            HttpResponseMessage compressedResponse = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
+            HttpResponseMessage compressedResponse = await this._invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
             string decompressedResponseString = await compressedResponse.Content.ReadAsStringAsync(
 #if NET5_0_OR_GREATER
                 TestContext.Current.CancellationToken
