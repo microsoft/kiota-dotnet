@@ -205,6 +205,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
 
         [InlineData(HttpStatusCode.Redirect)]
         [InlineData(HttpStatusCode.MovedPermanently)]
+        [InlineData(HttpStatusCode.NotModified)]
         [Theory]
         public async Task SendMethodDoesNotThrowOn3XXWithNoLocationAsync(HttpStatusCode httpStatusCode)
         {
@@ -270,6 +271,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         [InlineData(HttpStatusCode.Accepted)]
         [InlineData(HttpStatusCode.NonAuthoritativeInformation)]
         [InlineData(HttpStatusCode.NoContent)]
+        [InlineData(HttpStatusCode.NotModified)]
         [Theory]
         public async Task SendStreamReturnsNullForNoContent(HttpStatusCode statusCode)
         {
@@ -298,6 +300,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         [InlineData(HttpStatusCode.NonAuthoritativeInformation)]
         [InlineData(HttpStatusCode.NoContent)]
         [InlineData(HttpStatusCode.PartialContent)]
+        [InlineData(HttpStatusCode.NotModified)]
         [Theory]
         public async Task SendSNoContentDoesntFailOnOtherStatusCodes(HttpStatusCode statusCode)
         {
@@ -324,6 +327,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         [InlineData(HttpStatusCode.NonAuthoritativeInformation)]
         [InlineData(HttpStatusCode.NoContent)]
         [InlineData(HttpStatusCode.ResetContent)]
+        [InlineData(HttpStatusCode.NotModified)]
         [Theory]
         public async Task SendReturnsNullOnNoContent(HttpStatusCode statusCode)
         {
@@ -353,6 +357,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         [InlineData(HttpStatusCode.NonAuthoritativeInformation)]
         [InlineData(HttpStatusCode.NoContent)]
         [InlineData(HttpStatusCode.ResetContent)]
+        [InlineData(HttpStatusCode.NotModified)]
         [Theory]
         public async Task SendReturnsNullOnNoContentWithContentHeaderPresent(HttpStatusCode statusCode)
         {
