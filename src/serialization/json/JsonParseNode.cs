@@ -29,6 +29,7 @@ namespace Microsoft.Kiota.Serialization.Json
     /// </summary>
     public class JsonParseNode : IParseNode
     {
+        private static readonly JsonConverter DefaultDateTimeOffsetConverter = KiotaJsonSerializationContext.Default.DateTimeOffset.Converter;
         private readonly JsonElement _jsonNode;
         private readonly KiotaJsonSerializationContext _jsonSerializerContext;
 
@@ -338,7 +339,7 @@ namespace Microsoft.Kiota.Serialization.Json
             if(jsonElement.ValueKind != JsonValueKind.String)
                 return null;
 
-            if(TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.DateTimeOffset, out var convertedDateTimeOffset))
+            if(HasCustomDateTimeOffsetConverter() && TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.DateTimeOffset, out var convertedDateTimeOffset))
                 return convertedDateTimeOffset;
 
             if(jsonElement.TryGetDateTimeOffset(out var dateTimeOffset))
@@ -349,6 +350,9 @@ namespace Microsoft.Kiota.Serialization.Json
 
             return null;
         }
+
+        private bool HasCustomDateTimeOffsetConverter() =>
+            _jsonSerializerContext.DateTimeOffset is { Converter: var converter } && !ReferenceEquals(converter, DefaultDateTimeOffsetConverter);
 
         private TimeSpan? GetTimeSpanValue(JsonElement jsonElement)
         {
