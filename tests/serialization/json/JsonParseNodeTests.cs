@@ -224,6 +224,28 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         }
 
         [Fact]
+        public void ParseGuidUsesConverterForStandardGuidStrings()
+        {
+            // Arrange
+            var id = Guid.NewGuid();
+            var convertedId = Guid.NewGuid();
+            var json = $"{{\"id\": \"{id:D}\"}}";
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new JsonGuidPrecedenceConverter(id, convertedId) }
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+            using var jsonDocument = JsonDocument.Parse(json);
+            var rootParseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
+
+            // Act
+            var entity = rootParseNode.GetObjectValue(_ => new ConverterTestEntity());
+
+            // Assert
+            Assert.Equal(convertedId, entity.Id);
+        }
+
+        [Fact]
         public void ParseGuidWithoutConverter()
         {
             // Arrange

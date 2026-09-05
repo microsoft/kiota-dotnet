@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -30,6 +29,7 @@ namespace Microsoft.Kiota.Serialization.Json
     public class JsonParseNode : IParseNode
     {
         private static readonly JsonConverter DefaultDateTimeOffsetConverter = KiotaJsonSerializationContext.Default.DateTimeOffset.Converter;
+        private static readonly JsonConverter DefaultGuidConverter = KiotaJsonSerializationContext.Default.Guid.Converter;
         private readonly JsonElement _jsonNode;
         private readonly KiotaJsonSerializationContext _jsonSerializerContext;
 
@@ -325,14 +325,16 @@ namespace Microsoft.Kiota.Serialization.Json
             if(jsonElement.ValueKind != JsonValueKind.String)
                 return null;
 
-            if(jsonElement.TryGetGuid(out var guid))
-                return guid;
+            if(HasCustomGuidConverter() && TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.Guid, out var convertedGuid))
+                return convertedGuid;
 
-            if(string.IsNullOrEmpty(jsonElement.GetString()))
-                return null;
-
-            return jsonElement.Deserialize(_jsonSerializerContext.Guid);
+            return jsonElement.TryGetGuid(out var guid)
+                ? guid
+                : null;
         }
+
+        private bool HasCustomGuidConverter() =>
+            _jsonSerializerContext.Guid is { Converter: var converter } && !ReferenceEquals(converter, DefaultGuidConverter);
 
         private DateTimeOffset? GetDateTimeOffsetValue(JsonElement jsonElement)
         {
