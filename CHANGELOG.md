@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.3](https://github.com/microsoft/kiota-dotnet/compare/v2.1.2...v2.1.3) (2026-09-16)
+
+
+### Bug Fixes
+
+* **http:** validate retry option lower bounds ([b0c8412](https://github.com/microsoft/kiota-dotnet/commit/b0c84123c5a397e90360aac1f07540c8d5216aca))
+
 ## [2.1.2](https://github.com/microsoft/kiota-dotnet/compare/v2.1.1...v2.1.2) (2026-09-08)
 
 
