@@ -305,10 +305,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             retryResponse.Headers.TryAddWithoutValidation(RetryAfter, (-1).ToString());
 
             // Act
-            await RetryHandler.DelayAsync(retryResponse, 1, 0, out var delayInSeconds, TestContext.Current.CancellationToken);
+            await RetryHandler.DelayAsync(retryResponse, 1, 1, out var delayInSeconds, TestContext.Current.CancellationToken);
 
             // Assert
-            Assert.Equal(0, delayInSeconds);
+            Assert.Equal(2, delayInSeconds);
         }
 
         [Theory]
