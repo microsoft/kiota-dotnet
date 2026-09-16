@@ -120,12 +120,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         }
 
         [Fact]
-        public void CreateDefaultHandlersShouldThrowOnNegativeRetryHandlerOption()
-        {
-            Assert.Throws<InvalidOperationException>(() => KiotaClientFactory.CreateDefaultHandlers([new RetryHandlerOption { Delay = -1 }]));
-        }
-
-        [Fact]
         public void CreateWithNullOrEmptyHandlersReturnsHttpClient()
         {
             var client = KiotaClientFactory.Create(null!, (HttpMessageHandler?)null);

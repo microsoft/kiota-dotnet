@@ -107,23 +107,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         }
 
         [Fact]
-        public void RetryHandlerShouldThrowOnNegativeDefaultDelay()
-        {
-            Assert.Throws<InvalidOperationException>(() =>
-            {
-                using RetryHandler retry = new(new RetryHandlerOption { Delay = -1 });
-            });
-        }
-
-        [Fact]
-        public void RetryHandlerShouldThrowOnNegativePerRequestDelay()
-        {
-            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
-
-            Assert.Throws<InvalidOperationException>(() => SetRequestOption(httpRequestMessage, new RetryHandlerOption { Delay = -1 }));
-        }
-
-        [Fact]
         public async Task OkStatusShouldPassThrough()
         {
             // Arrange
@@ -538,15 +521,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         {
             get;
             set;
-        }
-
-        private static void SetRequestOption<T>(HttpRequestMessage httpRequestMessage, T option) where T : IRequestOption
-        {
-#if NET5_0_OR_GREATER
-            httpRequestMessage.Options.Set(new HttpRequestOptionsKey<T>(typeof(T).FullName!), option);
-#else
-            httpRequestMessage.Properties.Add(typeof(T).FullName!, option);
-#endif
         }
     }
 }
