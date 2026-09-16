@@ -187,7 +187,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 // the delay could be in the form of a seconds or a http date. See https://httpwg.org/specs/rfc7231.html#header.retry-after
                 if(int.TryParse(retryAfter, out int delaySeconds))
                 {
-                    delayInSeconds = delaySeconds;
+                    delayInSeconds = delaySeconds >= 0 ? delaySeconds : CalculateExponentialDelay(retryCount, delay);
                 }
                 else if(DateTime.TryParseExact(retryAfter, CultureInfo.InvariantCulture.DateTimeFormat.RFC1123Pattern, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateTime))
                 {

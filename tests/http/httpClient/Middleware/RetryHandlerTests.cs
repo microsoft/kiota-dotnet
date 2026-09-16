@@ -76,6 +76,37 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         }
 
         [Fact]
+        public void RetryHandlerOptionShouldThrowOnNegativeDelay()
+        {
+            Assert.Throws<InvalidOperationException>(() => new RetryHandlerOption { Delay = -1 });
+        }
+
+        [Fact]
+        public void RetryHandlerOptionShouldThrowOnNegativeMaxRetry()
+        {
+            Assert.Throws<InvalidOperationException>(() => new RetryHandlerOption { MaxRetry = -1 });
+        }
+
+        [Fact]
+        public void RetryHandlerOptionShouldThrowOnNegativeRetriesTimeLimit()
+        {
+            Assert.Throws<InvalidOperationException>(() => new RetryHandlerOption { RetriesTimeLimit = TimeSpan.FromSeconds(-1) });
+        }
+
+        [Fact]
+        public void RetryHandlerOptionShouldAllowZeroMaxRetryAndRetriesTimeLimit()
+        {
+            var retryHandlerOption = new RetryHandlerOption
+            {
+                MaxRetry = 0,
+                RetriesTimeLimit = TimeSpan.Zero
+            };
+
+            Assert.Equal(0, retryHandlerOption.MaxRetry);
+            Assert.Equal(TimeSpan.Zero, retryHandlerOption.RetriesTimeLimit);
+        }
+
+        [Fact]
         public async Task OkStatusShouldPassThrough()
         {
             // Arrange
@@ -244,6 +275,23 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             await DelayTestWithMessage(retryResponse, 1, "Init");
             // Assert
             Assert.Equal("Init Work 1", Message);
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.GatewayTimeout)]  // 504
+        [InlineData(HttpStatusCode.ServiceUnavailable)]  // 503
+        [InlineData((HttpStatusCode)429)] // 429
+        public async Task ShouldFallbackToExponentialBackOffForNegativeRetryAfterHeaderWithSeconds(HttpStatusCode statusCode)
+        {
+            // Arrange
+            using var retryResponse = new HttpResponseMessage(statusCode);
+            retryResponse.Headers.TryAddWithoutValidation(RetryAfter, (-1).ToString());
+
+            // Act
+            await RetryHandler.DelayAsync(retryResponse, 1, 1, out var delayInSeconds, TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(2, delayInSeconds);
         }
 
         [Theory]
