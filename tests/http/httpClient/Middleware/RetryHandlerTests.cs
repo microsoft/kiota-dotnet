@@ -301,7 +301,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         public async Task ShouldFallbackToExponentialBackOffForNegativeRetryAfterHeaderWithSeconds(HttpStatusCode statusCode)
         {
             // Arrange
-            var retryResponse = new HttpResponseMessage(statusCode);
+            using var retryResponse = new HttpResponseMessage(statusCode);
             retryResponse.Headers.TryAddWithoutValidation(RetryAfter, (-1).ToString());
 
             // Act
