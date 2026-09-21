@@ -212,5 +212,26 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Extensions
             // Assert
             Assert.True(response, "Unexpected content type");
         }
+        [Fact]
+        public async Task IsBufferedReturnsFalseForQueryWithStreamedContent()
+        {
+            // Arrange
+            byte[] data = new byte[] { 1, 2, 3, 4, 5 };
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.QUERY,
+                URI = new Uri("http://localhost"),
+                Content = new MemoryStream(data)
+            };
+            var originalRequest = await requestAdapter.ConvertToNativeRequestAsync<HttpRequestMessage>(requestInfo, TestContext.Current.CancellationToken);
+            Assert.NotNull(originalRequest);
+            Assert.NotNull(originalRequest.Content);
+            originalRequest.Content.Headers.ContentLength = -1;
+
+            // Act
+            var response = originalRequest.IsBuffered();
+            // Assert
+            Assert.False(response, "Unexpected content type");
+        }
     }
 }
