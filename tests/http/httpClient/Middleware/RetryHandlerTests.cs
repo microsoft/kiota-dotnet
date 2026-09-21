@@ -232,6 +232,57 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData(HttpStatusCode.GatewayTimeout)]  // 504
         [InlineData(HttpStatusCode.ServiceUnavailable)]  // 503
         [InlineData((HttpStatusCode)429)] // 429
+        public async Task ShouldRetryWithQueryBufferedContent(HttpStatusCode statusCode)
+        {
+            // Arrange
+            var httpRequestMessage = new HttpRequestMessage(new HttpMethod("QUERY"), "http://example.org/foo")
+            {
+                Content = new StringContent("Hello World")
+            };
+            var retryResponse = new HttpResponseMessage(statusCode);
+            var response2 = new HttpResponseMessage(HttpStatusCode.OK);
+            this._testHttpMessageHandler.SetHttpResponse(retryResponse, response2);
+            // Act
+            var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
+            // Assert
+            Assert.Same(response, response2);
+            Assert.NotSame(response.RequestMessage, httpRequestMessage);
+            Assert.NotNull(response.RequestMessage);
+            Assert.Equal(httpRequestMessage.Method, response.RequestMessage.Method);
+            Assert.NotNull(response.RequestMessage.Content);
+            Assert.Equal("Hello World", await response.RequestMessage.Content.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                TestContext.Current.CancellationToken
+#endif
+            ));
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.GatewayTimeout)]  // 504
+        [InlineData(HttpStatusCode.ServiceUnavailable)]  // 503
+        [InlineData((HttpStatusCode)429)] // 429
+        public async Task ShouldNotRetryWithQueryStreaming(HttpStatusCode statusCode)
+        {
+            // Arrange
+            var httpRequestMessage = new HttpRequestMessage(new HttpMethod("QUERY"), "http://example.org/foo")
+            {
+                Content = new StringContent("Test Content")
+            };
+            httpRequestMessage.Content.Headers.ContentLength = -1;
+            var retryResponse = new HttpResponseMessage(statusCode);
+            var response2 = new HttpResponseMessage(HttpStatusCode.OK);
+            this._testHttpMessageHandler.SetHttpResponse(retryResponse, response2);
+            // Act
+            var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
+            // Assert
+            Assert.Same(response, retryResponse);
+            Assert.Same(response.RequestMessage, httpRequestMessage);
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.GatewayTimeout)]  // 504
+        [InlineData(HttpStatusCode.ServiceUnavailable)]  // 503
+        [InlineData((HttpStatusCode)429)] // 429
         public async Task ExceedMaxRetryShouldReturn(HttpStatusCode statusCode)
         {
             // Arrange
