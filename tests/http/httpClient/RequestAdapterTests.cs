@@ -442,6 +442,102 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             Assert.NotNull(response);
         }
         [Fact]
+        public async Task ParseNodeFactoryExceptionsPropagateUnchangedByDefault()
+        {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(() => new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent("<html><body>oops</body></html>", Encoding.UTF8, "text/html")
+            });
+            // uses the default ParseNodeFactoryRegistry, which has no factory registered for text/html
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client);
+            Assert.False(adapter.WrapResponseParsingExceptions);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "https://example.com"
+            };
+
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken));
+
+            Assert.Contains("does not have a factory registered", exception.Message);
+        }
+        [Fact]
+        public async Task WrapsParseNodeFactoryExceptionsInApiExceptionWhenEnabled()
+        {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            const string bodyContent = "<html><body>Internal Server Error</body></html>";
+            mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(() =>
+            {
+                var responseMessage = new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(bodyContent, Encoding.UTF8, "text/html")
+                };
+                responseMessage.Headers.Add("request-id", "guid-value");
+                return responseMessage;
+            });
+            // uses the default ParseNodeFactoryRegistry, which has no factory registered for text/html
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client)
+            {
+                WrapResponseParsingExceptions = true
+            };
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "https://example.com"
+            };
+
+            var exception = await Assert.ThrowsAsync<ApiException>(() => adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken));
+
+            Assert.Equal((int)HttpStatusCode.OK, exception.ResponseStatusCode);
+            Assert.True(exception.ResponseHeaders.ContainsKey("request-id"));
+            Assert.Equal(bodyContent, exception.ResponseBodyContent);
+            Assert.IsType<InvalidOperationException>(exception.InnerException);
+            Assert.Contains("text/html", exception.Message);
+        }
+        [Fact]
+        public async Task WrapResponseParsingExceptionsDoesNotAffectSuccessfulParsing()
+        {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            using var mockContent = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Test")));
+            mockContent.Headers.ContentType = new("application/json");
+            mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = mockContent,
+            });
+            var mockParseNode = new Mock<IParseNode>();
+            mockParseNode.Setup(x => x.GetObjectValue(It.IsAny<ParsableFactory<MockEntity>>()))
+            .Returns(new MockEntity());
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
+            mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(mockParseNode.Object);
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client, parseNodeFactory: mockParseNodeFactory.Object)
+            {
+                WrapResponseParsingExceptions = true
+            };
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "https://example.com"
+            };
+
+            var response = await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
+
+            Assert.NotNull(response);
+        }
+        [Fact]
         public async Task RetriesOnCAEResponse()
         {
             var mockHandler = new Mock<HttpMessageHandler>();

@@ -1,1 +1,3 @@
 #nullable enable
+Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter.WrapResponseParsingExceptions.get -> bool
+Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter.WrapResponseParsingExceptions.set -> void
