@@ -471,7 +471,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         {
             var mockHandler = new Mock<HttpMessageHandler>();
             var client = new HttpClient(mockHandler.Object);
-            const string bodyContent = "<html><body>Internal Server Error</body></html>";
             mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(() =>
@@ -479,7 +478,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 var responseMessage = new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(bodyContent, Encoding.UTF8, "text/html")
+                    Content = new StringContent("<html><body>Internal Server Error</body></html>", Encoding.UTF8, "text/html")
                 };
                 responseMessage.Headers.Add("request-id", "guid-value");
                 return responseMessage;
@@ -499,7 +498,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
 
             Assert.Equal((int)HttpStatusCode.OK, exception.ResponseStatusCode);
             Assert.True(exception.ResponseHeaders.ContainsKey("request-id"));
-            Assert.Equal(bodyContent, exception.ResponseBodyContent);
             Assert.IsType<InvalidOperationException>(exception.InnerException);
             Assert.Contains("text/html", exception.Message);
         }

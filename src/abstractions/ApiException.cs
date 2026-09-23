@@ -34,10 +34,4 @@ public class ApiException : Exception
     /// The HTTP response headers.
     /// </summary>
     public IDictionary<string, IEnumerable<string>> ResponseHeaders { get; set; } = new Dictionary<string, IEnumerable<string>>(StringComparer.OrdinalIgnoreCase);
-
-    /// <summary>
-    /// The raw HTTP response body content, when available. This is populated on a best-effort basis
-    /// (for example, when response parsing itself failed) and may be truncated for very large payloads.
-    /// </summary>
-    public string? ResponseBodyContent { get; set; }
 }

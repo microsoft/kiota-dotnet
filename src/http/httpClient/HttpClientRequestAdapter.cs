@@ -111,15 +111,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <summary>
         /// Gets or sets a value indicating whether failures encountered while resolving or invoking the parse node factory
         /// for a response (e.g. an unregistered content type, or a serializer bug) should be wrapped in an <see cref="ApiException"/>
-        /// exposing the response status code, headers, and body. Defaults to <c>false</c>, in which case the original exception
+        /// exposing the response status code and headers. Defaults to <c>false</c>, in which case the original exception
         /// propagates unchanged, preserving pre-existing behavior for callers that catch the raw exception type.
+        /// Combine with <see cref="Middleware.Options.BodyInspectionHandlerOption"/> if the response body itself also needs
+        /// to be inspected.
         /// </summary>
         public bool WrapResponseParsingExceptions { get; set; }
-        /// <summary>
-        /// The maximum number of characters of the response body to include on an <see cref="ApiException"/> thrown when
-        /// <see cref="WrapResponseParsingExceptions"/> is enabled and response parsing fails.
-        /// </summary>
-        private const int MaxResponseBodyContentLengthForExceptions = 10 * 1024;
         private static readonly char[] charactersToDecodeForUriTemplate = ['$', '.', '-', '~'];
         private static readonly Regex queryParametersCleanupRegex = new(@"\{\?[^\}]+}", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Singleline, TimeSpan.FromMilliseconds(100));
         private Activity? startTracingSpan(RequestInformation requestInfo, string methodName)
@@ -639,44 +636,24 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             }
             catch(Exception ex) when (ex is not ApiException && ex is not OperationCanceledException)
             {
-                throw await CreateApiExceptionForParseNodeFailureAsync(response, responseContentType!, ex, cancellationToken).ConfigureAwait(false);
+                throw CreateApiExceptionForParseNodeFailure(response, responseContentType!, ex);
             }
         }
         /// <summary>
         /// Builds an <see cref="ApiException"/> wrapping a failure encountered while resolving or invoking the parse node
-        /// factory, carrying the response status code, headers, and body (best effort) alongside the original exception.
+        /// factory, carrying the response status code and headers alongside the original exception. Use
+        /// <see cref="Middleware.Options.BodyInspectionHandlerOption"/> if the response body itself needs to be inspected.
         /// </summary>
-        private static async Task<ApiException> CreateApiExceptionForParseNodeFailureAsync(HttpResponseMessage response, string responseContentType, Exception innerException, CancellationToken cancellationToken)
+        private static ApiException CreateApiExceptionForParseNodeFailure(HttpResponseMessage response, string responseContentType, Exception innerException)
         {
             var responseHeadersDictionary = new Dictionary<string, IEnumerable<string>>(StringComparer.OrdinalIgnoreCase);
             foreach(var header in response.Headers)
                 responseHeadersDictionary[header.Key] = header.Value;
 
-            string? responseBodyContent = null;
-            try
-            {
-                if(response.Content is not null)
-                {
-#if NET5_0_OR_GREATER
-                    responseBodyContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-#else
-                    responseBodyContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-#endif
-                    if(responseBodyContent.Length > MaxResponseBodyContentLengthForExceptions)
-                        responseBodyContent = responseBodyContent.Substring(0, MaxResponseBodyContentLengthForExceptions) + "...(truncated)";
-                }
-            }
-            catch
-            {
-                // Best effort only: the body might no longer be readable (e.g. a non-seekable stream already
-                // partially consumed by the failing parse node factory).
-            }
-
             return new ApiException($"The response could not be deserialized. Content-Type '{responseContentType}' may not be supported, or the registered parse node factory failed while processing the response.", innerException)
             {
                 ResponseStatusCode = (int)response.StatusCode,
-                ResponseHeaders = responseHeadersDictionary,
-                ResponseBodyContent = responseBodyContent
+                ResponseHeaders = responseHeadersDictionary
             };
         }
         private const string ClaimsKey = "claims";

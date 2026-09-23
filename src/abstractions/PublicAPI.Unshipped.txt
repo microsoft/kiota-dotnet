@@ -1,3 +1,1 @@
 #nullable enable
-Microsoft.Kiota.Abstractions.ApiException.ResponseBodyContent.get -> string?
-Microsoft.Kiota.Abstractions.ApiException.ResponseBodyContent.set -> void
