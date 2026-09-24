@@ -108,15 +108,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             get => baseUrl;
             set => this.baseUrl = value?.TrimEnd('/');
         }
-        /// <summary>
-        /// Gets or sets a value indicating whether failures encountered while resolving or invoking the parse node factory
-        /// for a response (e.g. an unregistered content type, or a serializer bug) should be wrapped in an <see cref="ApiException"/>
-        /// exposing the response status code and headers. Defaults to <c>false</c>, in which case the original exception
-        /// propagates unchanged, preserving pre-existing behavior for callers that catch the raw exception type.
-        /// Combine with <see cref="Middleware.Options.BodyInspectionHandlerOption"/> if the response body itself also needs
-        /// to be inspected.
-        /// </summary>
-        public bool WrapResponseParsingExceptions { get; set; }
         private static readonly char[] charactersToDecodeForUriTemplate = ['$', '.', '-', '~'];
         private static readonly Regex queryParametersCleanupRegex = new(@"\{\?[^\}]+}", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Singleline, TimeSpan.FromMilliseconds(100));
         private Activity? startTracingSpan(RequestInformation requestInfo, string methodName)
@@ -628,8 +619,6 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
 #endif
             if(contentStream == Stream.Null || (contentStream.CanSeek && contentStream.Length == 0))
                 return null;// ensure a useful stream is passed to the factory
-            if(!WrapResponseParsingExceptions)
-                return await pNodeFactory.GetRootParseNodeAsync(responseContentType!, contentStream, cancellationToken).ConfigureAwait(false);
             try
             {
                 return await pNodeFactory.GetRootParseNodeAsync(responseContentType!, contentStream, cancellationToken).ConfigureAwait(false);

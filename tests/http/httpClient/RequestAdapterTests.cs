@@ -442,32 +442,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             Assert.NotNull(response);
         }
         [Fact]
-        public async Task ParseNodeFactoryExceptionsPropagateUnchangedByDefault()
-        {
-            var mockHandler = new Mock<HttpMessageHandler>();
-            var client = new HttpClient(mockHandler.Object);
-            mockHandler.Protected()
-            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
-            .ReturnsAsync(() => new HttpResponseMessage
-            {
-                StatusCode = HttpStatusCode.OK,
-                Content = new StringContent("<html><body>oops</body></html>", Encoding.UTF8, "text/html")
-            });
-            // uses the default ParseNodeFactoryRegistry, which has no factory registered for text/html
-            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client);
-            Assert.False(adapter.WrapResponseParsingExceptions);
-            var requestInfo = new RequestInformation
-            {
-                HttpMethod = Method.GET,
-                UrlTemplate = "https://example.com"
-            };
-
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken));
-
-            Assert.Contains("does not have a factory registered", exception.Message);
-        }
-        [Fact]
-        public async Task WrapsParseNodeFactoryExceptionsInApiExceptionWhenEnabled()
+        public async Task WrapsParseNodeFactoryExceptionsInApiException()
         {
             var mockHandler = new Mock<HttpMessageHandler>();
             var client = new HttpClient(mockHandler.Object);
@@ -484,10 +459,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
                 return responseMessage;
             });
             // uses the default ParseNodeFactoryRegistry, which has no factory registered for text/html
-            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client)
-            {
-                WrapResponseParsingExceptions = true
-            };
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client);
             var requestInfo = new RequestInformation
             {
                 HttpMethod = Method.GET,
@@ -502,7 +474,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             Assert.Contains("text/html", exception.Message);
         }
         [Fact]
-        public async Task WrapResponseParsingExceptionsDoesNotAffectSuccessfulParsing()
+        public async Task ParseNodeFactoryWrappingDoesNotAffectSuccessfulParsing()
         {
             var mockHandler = new Mock<HttpMessageHandler>();
             var client = new HttpClient(mockHandler.Object);
@@ -521,10 +493,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             var mockParseNodeFactory = new Mock<IParseNodeFactory>();
             mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(mockParseNode.Object);
-            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client, parseNodeFactory: mockParseNodeFactory.Object)
-            {
-                WrapResponseParsingExceptions = true
-            };
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client, parseNodeFactory: mockParseNodeFactory.Object);
             var requestInfo = new RequestInformation
             {
                 HttpMethod = Method.GET,
