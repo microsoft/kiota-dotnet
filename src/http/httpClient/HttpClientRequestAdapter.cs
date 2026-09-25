@@ -619,8 +619,31 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
 #endif
             if(contentStream == Stream.Null || (contentStream.CanSeek && contentStream.Length == 0))
                 return null;// ensure a useful stream is passed to the factory
-            var rootNode = await pNodeFactory.GetRootParseNodeAsync(responseContentType!, contentStream, cancellationToken).ConfigureAwait(false);
-            return rootNode;
+            try
+            {
+                return await pNodeFactory.GetRootParseNodeAsync(responseContentType!, contentStream, cancellationToken).ConfigureAwait(false);
+            }
+            catch(Exception ex) when (ex is not ApiException && ex is not OperationCanceledException)
+            {
+                throw CreateApiExceptionForParseNodeFailure(response, responseContentType!, ex);
+            }
+        }
+        /// <summary>
+        /// Builds an <see cref="ApiException"/> wrapping a failure encountered while resolving or invoking the parse node
+        /// factory, carrying the response status code and headers alongside the original exception. Use
+        /// <see cref="Middleware.Options.BodyInspectionHandlerOption"/> if the response body itself needs to be inspected.
+        /// </summary>
+        private static ApiException CreateApiExceptionForParseNodeFailure(HttpResponseMessage response, string responseContentType, Exception innerException)
+        {
+            var responseHeadersDictionary = new Dictionary<string, IEnumerable<string>>(StringComparer.OrdinalIgnoreCase);
+            foreach(var header in response.Headers)
+                responseHeadersDictionary[header.Key] = header.Value;
+
+            return new ApiException($"The response could not be deserialized. Content-Type '{responseContentType}' may not be supported, or the registered parse node factory failed while processing the response.", innerException)
+            {
+                ResponseStatusCode = (int)response.StatusCode,
+                ResponseHeaders = responseHeadersDictionary
+            };
         }
         private const string ClaimsKey = "claims";
         private const string BearerAuthenticationScheme = "Bearer";
