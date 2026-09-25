@@ -197,6 +197,54 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [InlineData(HttpStatusCode.Found)]  // 302
         [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
         [InlineData((HttpStatusCode)308)] // 308
+        public async Task ShouldRedirectQuerySameMethodAndContent(HttpStatusCode statusCode)
+        {
+            using(var httpRequestMessage = new HttpRequestMessage(new HttpMethod("QUERY"), "http://example.org/foo"))
+            {
+                // Arrange
+                httpRequestMessage.Content = new StringContent("Hello World");
+
+                var redirectResponse = new HttpResponseMessage(statusCode);
+                redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
+                // Assert
+                Assert.Equal(httpRequestMessage.Method, response.RequestMessage?.Method);
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.NotNull(response.RequestMessage?.Content);
+                Assert.Equal("Hello World", await response.RequestMessage.Content.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                  TestContext.Current.CancellationToken
+#endif
+                ));
+            }
+        }
+
+        [Fact]
+        public async Task ShouldRedirectQueryToGetOnSeeOther()
+        {
+            using(var httpRequestMessage = new HttpRequestMessage(new HttpMethod("QUERY"), "http://example.org/foo"))
+            {
+                // Arrange
+                httpRequestMessage.Content = new StringContent("Hello World");
+
+                var redirectResponse = new HttpResponseMessage(HttpStatusCode.SeeOther);
+                redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
+                // Assert
+                Assert.Equal(HttpMethod.Get, response.RequestMessage?.Method);
+                Assert.Null(response.RequestMessage?.Content);
+            }
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
+        [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentHostShouldRemoveAuthHeader(HttpStatusCode statusCode)
         {
             using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo"))
