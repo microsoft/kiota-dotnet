@@ -623,7 +623,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             {
                 return await pNodeFactory.GetRootParseNodeAsync(responseContentType!, contentStream, cancellationToken).ConfigureAwait(false);
             }
-            catch(Exception ex) when (ex is not ApiException && ex is not OperationCanceledException)
+            catch(Exception ex) when(ex is not ApiException && ex is not OperationCanceledException)
             {
                 throw CreateApiExceptionForParseNodeFailure(response, responseContentType!, ex);
             }
