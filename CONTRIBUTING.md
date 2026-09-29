@@ -27,6 +27,9 @@ The best way to get started with a contribution is to start a dialog with the ow
 ## Submit pull requests for bug fixes and features
 
 Feel free to submit a pull request with a linked issue against the __main__ branch.  The main branch will be updated frequently.
+
+Do not update the changelog as part of a pull request. The changelog is generated automatically during the release process.
+
 ## Commit message format
 
 To support our automated release process, pull requests are required to follow the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/)
