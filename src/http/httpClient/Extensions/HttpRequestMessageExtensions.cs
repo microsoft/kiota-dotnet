@@ -101,7 +101,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Extensions
         {
             HttpContent? requestContent = httpRequestMessage.Content;
 
-            if((httpRequestMessage.Method == HttpMethod.Put || httpRequestMessage.Method == HttpMethod.Post || httpRequestMessage.Method.Method.Equals("PATCH", StringComparison.OrdinalIgnoreCase))
+            if((httpRequestMessage.Method == HttpMethod.Put || httpRequestMessage.Method == HttpMethod.Post || httpRequestMessage.Method.Method.Equals("PATCH", StringComparison.OrdinalIgnoreCase) || httpRequestMessage.Method.Method.Equals("QUERY", StringComparison.OrdinalIgnoreCase))
                && requestContent != null && (requestContent.Headers.ContentLength == null || (int)requestContent.Headers.ContentLength == -1))
             {
                 return false;
