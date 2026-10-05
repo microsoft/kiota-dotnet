@@ -16,7 +16,7 @@
     <PackageVersion Include="System.Net.Http.WinHttpHandler" Version="[10.0,)" />
     <PackageVersion Include="System.Text.Json" Version="[8.0.5,)" />
     <!-- Test packages -->
-    <PackageVersion Include="coverlet.MTP" Version="10.0.1" />
+    <PackageVersion Include="coverlet.MTP" Version="10.1.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.12" />
     <PackageVersion Include="Microsoft.Testing.Extensions.AzureDevOpsReport" Version="2.4.1" />
