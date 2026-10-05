@@ -144,14 +144,16 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [Theory]
         [InlineData(HttpStatusCode.MovedPermanently)]  // 301
         [InlineData(HttpStatusCode.Found)]  // 302
-        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
-        [InlineData((HttpStatusCode)308)] // 308 not available in netstandard
-        public async Task ShouldRedirectSameMethodAndContent(HttpStatusCode statusCode)
+        [InlineData(HttpStatusCode.SeeOther)]  // 303
+        public async Task PostRedirectShouldChangeToGetAndDropContent(HttpStatusCode statusCode)
         {
             using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
             {
                 // Arrange
                 httpRequestMessage.Content = new StringContent("Hello World");
+                httpRequestMessage.Content.Headers.Add("X-Content-Header", "content-value");
+                httpRequestMessage.Headers.TransferEncodingChunked = true;
+                httpRequestMessage.Headers.Add("X-Request-Header", "request-value");
 
                 var redirectResponse = new HttpResponseMessage(statusCode);
                 redirectResponse.Headers.Location = new Uri("http://example.org/bar");
@@ -159,7 +161,33 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 // Act
                 var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert
-                Assert.Equal(response.RequestMessage?.Method, httpRequestMessage.Method);
+                Assert.Equal(HttpMethod.Get, response.RequestMessage?.Method);
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.Null(response.RequestMessage?.Content);
+                Assert.False(response.RequestMessage?.Headers.TransferEncodingChunked);
+                Assert.True(response.RequestMessage?.Headers.Contains("X-Request-Header"));
+            }
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308 not available in netstandard
+        public async Task RedirectShouldPreserveMethodContentAndBodyHeaders(HttpStatusCode statusCode)
+        {
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            {
+                // Arrange
+                httpRequestMessage.Content = new StringContent("Hello World");
+                httpRequestMessage.Content.Headers.Add("X-Content-Header", "content-value");
+                httpRequestMessage.Headers.TransferEncodingChunked = true;
+
+                var redirectResponse = new HttpResponseMessage(statusCode);
+                redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                // Assert
+                Assert.Equal(HttpMethod.Post, response.RequestMessage?.Method);
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.NotNull(response.RequestMessage?.Content);
                 Assert.Equal("Hello World", await response.RequestMessage.Content.ReadAsStringAsync(
@@ -167,17 +195,22 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                   TestContext.Current.CancellationToken
 #endif
                 ));
+                Assert.True(response.RequestMessage.Content.Headers.Contains("X-Content-Header"));
+                Assert.True(response.RequestMessage.Headers.TransferEncodingChunked);
             }
         }
 
-        [Fact]
-        public async Task ShouldRedirectChangeMethodAndContent()
+        [Theory]
+        [InlineData("GET")]
+        [InlineData("HEAD")]
+        public async Task SeeOtherShouldPreserveGetAndHeadMethodAndContent(string method)
         {
-
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            using(var httpRequestMessage = new HttpRequestMessage(new HttpMethod(method), "http://example.org/foo"))
             {
                 // Arrange
                 httpRequestMessage.Content = new StringContent("Hello World");
+                httpRequestMessage.Content.Headers.Add("X-Content-Header", "content-value");
+                httpRequestMessage.Headers.TransferEncodingChunked = true;
 
                 var redirectResponse = new HttpResponseMessage(HttpStatusCode.SeeOther);
                 redirectResponse.Headers.Location = new Uri("http://example.org/bar");
@@ -185,16 +218,23 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 // Act
                 var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert
-                Assert.NotEqual(response.RequestMessage?.Method, httpRequestMessage.Method);
-                Assert.Equal(response.RequestMessage?.Method, HttpMethod.Get);
+                Assert.Equal(httpRequestMessage.Method, response.RequestMessage?.Method);
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
-                Assert.Null(response.RequestMessage?.Content);
+                Assert.NotNull(response.RequestMessage?.Content);
+                Assert.Equal("Hello World", await response.RequestMessage.Content.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                  TestContext.Current.CancellationToken
+#endif
+                ));
+                Assert.True(response.RequestMessage.Content.Headers.Contains("X-Content-Header"));
+                Assert.True(response.RequestMessage.Headers.TransferEncodingChunked);
             }
         }
 
         [Theory]
         [InlineData(HttpStatusCode.MovedPermanently)]  // 301
         [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.SeeOther)]  // 303
         [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentHostShouldRemoveAuthHeader(HttpStatusCode statusCode)
