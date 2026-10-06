@@ -101,11 +101,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                         }
                         var newRequest = await originalRequest.CloneAsync(cancellationToken).ConfigureAwait(false);
 
-                        // status code == 303: change request method from post to get and content to be null
-                        if(response.StatusCode == HttpStatusCode.SeeOther)
+                        if(RequestRequiresForceGet(response.StatusCode, newRequest.Method))
                         {
-                            newRequest.Content = null;
                             newRequest.Method = HttpMethod.Get;
+                            newRequest.Content = null;
+                            if(newRequest.Headers.TransferEncodingChunked == true)
+                                newRequest.Headers.TransferEncodingChunked = false;
                         }
 
                         // Set newRequestUri from response
@@ -176,6 +177,16 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 HttpStatusCode.SeeOther => true,
                 HttpStatusCode.TemporaryRedirect => true,
                 (HttpStatusCode)308 => true,
+                _ => false
+            };
+        }
+
+        private static bool RequestRequiresForceGet(HttpStatusCode statusCode, HttpMethod requestMethod)
+        {
+            return statusCode switch
+            {
+                HttpStatusCode.MovedPermanently or HttpStatusCode.Found => requestMethod == HttpMethod.Post,
+                HttpStatusCode.SeeOther => requestMethod != HttpMethod.Get && requestMethod != HttpMethod.Head,
                 _ => false
             };
         }
