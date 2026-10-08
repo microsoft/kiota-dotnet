@@ -55,7 +55,7 @@ jobs:
       - name: Add coverage to job summary
         run: Get-Content .\reports\coverage\SummaryGithub.md >> $env:GITHUB_STEP_SUMMARY
       - name: Upload coverage report
-        uses: actions/upload-code-coverage@d8e329117199404bba6fc81efe8093dc7c015e34 # v1.4.2
+        uses: actions/upload-code-coverage@2b21a77928be8d5168c2b9581a67f2adbebacc52 # v1.4.4
         if: github.event_name != 'merge_group' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') || (github.event_name != 'pull_request' && github.ref_name == github.event.repository.default_branch))
         with:
           file: .\reports\coverage\Cobertura.xml
