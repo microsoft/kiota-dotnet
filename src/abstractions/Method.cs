@@ -44,6 +44,10 @@ namespace Microsoft.Kiota.Abstractions
         /// <summary>
         ///     The HTTP TRACE method.
         /// </summary>
-        TRACE
+        TRACE,
+        /// <summary>
+        ///     The HTTP QUERY method.
+        /// </summary>
+        QUERY
     }
 }
