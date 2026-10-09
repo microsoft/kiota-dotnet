@@ -17,6 +17,7 @@ pr: none
 variables:
   buildPlatform: "Any CPU"
   buildConfiguration: "Release"
+  NuGetOrganizationName: "kiota"
 
 resources:
   repositories:
@@ -270,14 +271,8 @@ extends:
               runOnce:
                 deploy:
                   pool:
-                    vmImage: ubuntu-latest
+                    vmImage: windows-latest
                   steps:
-                    # Install the nuget tool.
-                    - task: NuGetToolInstaller@1
-                      displayName: "Use NuGet >=6.11.0"
-                      inputs:
-                        versionSpec: ">=6.11.0"
-                        checkLatest: true
                     - task: PowerShell@2
                       displayName: "Extract release information to pipeline"
                       inputs:
@@ -285,14 +280,35 @@ extends:
                         filePath: $(Pipeline.Workspace)\scripts\GetNugetPackageVersion.ps1
                         pwsh: true
                         arguments: "-packageDirPath \"$(Pipeline.Workspace)/\""
-                    - task: 1ES.PublishNuget@1
-                      displayName: "Push Nuget for Kiota libraries"
+                    - task: CopyFiles@2
+                      displayName: "Stage NuGet packages for ESRP release"
                       inputs:
-                        command: push
-                        packagesToPush: "$(Pipeline.Workspace)/Microsoft.Kiota.*.nupkg"
-                        packageParentPath: "$(Pipeline.Workspace)"
-                        nuGetFeedType: external
-                        publishFeedCredentials: "Kiota Nuget Connection"
+                        SourceFolder: "$(Pipeline.Workspace)"
+                        Contents: |
+                          Microsoft.Kiota.*.nupkg
+                          Microsoft.Kiota.*.snupkg
+                        TargetFolder: '$(Pipeline.Workspace)\nuget-packages\$(NuGetOrganizationName)'
+                        CleanTargetFolder: true
+                    - task: EsrpRelease@14
+                      displayName: "ESRP Release - NuGet"
+                      inputs:
+                        connectedservicename: "Federated DevX ESRP Managed Identity Connection"
+                        usemanagedidentity: false
+                        keyvaultname: "akv-prod-eastus"
+                        authcertname: "ReferenceLibraryPrivateCert"
+                        signcertname: "ReferencePackagePublisherCertificate"
+                        clientid: "65035b7f-7357-4f29-bf25-c5ee5c3949f8"
+                        intent: "packagedistribution"
+                        contenttype: "NuGet"
+                        organizationname: "$(NuGetOrganizationName)"
+                        contentsource: "Folder"
+                        folderlocation: '$(Pipeline.Workspace)\nuget-packages\$(NuGetOrganizationName)'
+                        waitforreleasecompletion: true
+                        owners: "christiano@microsoft.com,ramsess@microsoft.com,gavinbarron@microsoft.com,jingjingjia@microsoft.com,peombwa@microsoft.com,treicys@microsoft.com"
+                        approvers: "christiano@microsoft.com,ramsess@microsoft.com,gavinbarron@microsoft.com,jingjingjia@microsoft.com,peombwa@microsoft.com,treicys@microsoft.com"
+                        serviceendpointurl: "https://api.esrp.microsoft.com/"
+                        mainpublisher: "ESRPRELPACMAN"
+                        domaintenantid: "cdc5aeea-15c5-4db6-b079-fcadd2505dc2"
                     - task: GitHubRelease@1
                       displayName: "GitHub release (create)"
                       inputs:
