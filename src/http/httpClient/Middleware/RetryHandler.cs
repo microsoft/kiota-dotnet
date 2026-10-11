@@ -189,11 +189,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 {
                     delayInSeconds = delaySeconds >= 0 ? delaySeconds : CalculateExponentialDelay(retryCount, delay);
                 }
-                else if(DateTime.TryParseExact(retryAfter, CultureInfo.InvariantCulture.DateTimeFormat.RFC1123Pattern, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateTime))
+                else if(DateTimeOffset.TryParseExact(retryAfter, CultureInfo.InvariantCulture.DateTimeFormat.RFC1123Pattern, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset dateTime))
                 {
-                    var timeSpan = dateTime - DateTime.Now;
+                    var timeSpan = dateTime - DateTimeOffset.UtcNow;
                     // ensure the delay is a positive span otherwise use the exponential back-off
-                    delayInSeconds = timeSpan.Seconds > 0 ? timeSpan.Seconds : CalculateExponentialDelay(retryCount, delay);
+                    delayInSeconds = timeSpan.TotalSeconds > 0 ? timeSpan.TotalSeconds : CalculateExponentialDelay(retryCount, delay);
                 }
             }
             else
