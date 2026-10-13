@@ -71,7 +71,6 @@ public class ParametersNameDecodingHandler : DelegatingHandler
         }
     }
     private static readonly char[] EntriesSeparator = ['&'];
-    private static readonly char[] ParameterSeparator = ['='];
 
     internal static string? DecodeUriEncodedString(string? original, char[] charactersToDecode)
     {
@@ -89,19 +88,12 @@ public class ParametersNameDecodingHandler : DelegatingHandler
             }
         }
 
-        var encodedParameterValues = new List<string>();
-        var parts = original.TrimStart('?').Split(EntriesSeparator, StringSplitOptions.RemoveEmptyEntries);
-        foreach(var part in parts)
+        var parts = original.Split(EntriesSeparator, StringSplitOptions.None);
+        for(var i = 0; i < parts.Length; i++)
         {
-            var parameter = part.Split(ParameterSeparator, StringSplitOptions.RemoveEmptyEntries)[0];
-            if(parameter.Contains("%")) // only pull out params with `%` (encoded)
-            {
-                encodedParameterValues.Add(parameter);
-            }
-        }
-
-        foreach(var parameter in encodedParameterValues)
-        {
+            var part = parts[i];
+            var separatorIndex = part.IndexOf('=');
+            var parameter = separatorIndex < 0 ? part : part.Substring(0, separatorIndex);
             var updatedParameterName = parameter;
             foreach(var symbolToReplace in symbolsToReplace)
             {
@@ -110,9 +102,9 @@ public class ParametersNameDecodingHandler : DelegatingHandler
                     updatedParameterName = updatedParameterName.Replace(symbolToReplace.Item1, symbolToReplace.Item2);
                 }
             }
-            original = original.Replace(parameter, updatedParameterName);
+            parts[i] = separatorIndex < 0 ? updatedParameterName : updatedParameterName + part.Substring(separatorIndex);
         }
 
-        return original;
+        return string.Join("&", parts);
     }
 }
