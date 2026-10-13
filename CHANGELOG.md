@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.5](https://github.com/microsoft/kiota-dotnet/compare/v2.1.4...v2.1.5) (2026-10-13)
+
+
+### Bug Fixes
+
+* **http:** honor total UTC delay for Retry-After dates ([#822](https://github.com/microsoft/kiota-dotnet/issues/822)) ([512cddf](https://github.com/microsoft/kiota-dotnet/commit/512cddfaf57f24477041bd1a71ea008f3dfb1b8e))
+
 ## [2.1.4](https://github.com/microsoft/kiota-dotnet/compare/v2.1.3...v2.1.4) (2026-10-06)
 
 
