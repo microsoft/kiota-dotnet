@@ -302,7 +302,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         {
             // Arrange
             var retryResponse = new HttpResponseMessage(statusCode);
-            var futureTime = DateTime.Now + TimeSpan.FromSeconds(3);// 3 seconds from now
+            var futureTime = DateTime.UtcNow + TimeSpan.FromSeconds(3);// 3 seconds from now
             var futureTimeString = futureTime.ToString(CultureInfo.InvariantCulture.DateTimeFormat.RFC1123Pattern, CultureInfo.InvariantCulture);
             Assert.Contains("GMT", futureTimeString); // http date always end in GMT according to the spec
             Assert.True(retryResponse.Headers.TryAddWithoutValidation(RetryAfter, futureTimeString));
@@ -310,6 +310,54 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             await DelayTestWithMessage(retryResponse, 1, "Init");
             // Assert
             Assert.Equal("Init Work 1", Message);
+        }
+
+        [Theory]
+        [InlineData(30)]
+        [InlineData(90)]
+        [InlineData(150)]
+        [InlineData(3600)]
+        [InlineData(86400)]
+        public void ShouldUseTotalSecondsForRetryAfterHttpDate(int secondsFromNow)
+        {
+            // Arrange
+            using var retryResponse = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
+            var futureTime = DateTimeOffset.UtcNow.AddSeconds(secondsFromNow);
+            // HTTP dates have whole-second precision.
+            futureTime = futureTime.AddTicks(-(futureTime.Ticks % TimeSpan.TicksPerSecond));
+            retryResponse.Headers.TryAddWithoutValidation(RetryAfter, futureTime.ToString("R", CultureInfo.InvariantCulture));
+
+            // Act: a cancelled token lets us inspect the calculated delay without waiting.
+            var before = DateTimeOffset.UtcNow;
+            var delayTask = RetryHandler.DelayAsync(retryResponse, 0, 1, out var delayInSeconds, new CancellationToken(true));
+            var after = DateTimeOffset.UtcNow;
+
+            // Assert
+            // TimeSpan.FromSeconds rounds to milliseconds on .NET Framework.
+            const double roundingTolerance = 0.001;
+            Assert.InRange(delayInSeconds,
+                Math.Min((futureTime - after).TotalSeconds, RetryHandlerOption.MaxDelay) - roundingTolerance,
+                Math.Min((futureTime - before).TotalSeconds, RetryHandlerOption.MaxDelay) + roundingTolerance);
+            Assert.True(delayTask.IsCanceled);
+        }
+
+        [Theory]
+        [InlineData(30)]
+        [InlineData(90)]
+        [InlineData(3600)]
+        public void ShouldFallbackToExponentialBackOffForPastRetryAfterHttpDate(int secondsAgo)
+        {
+            // Arrange
+            using var retryResponse = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
+            var pastTime = DateTimeOffset.UtcNow.AddSeconds(-secondsAgo);
+            retryResponse.Headers.TryAddWithoutValidation(RetryAfter, pastTime.ToString("R", CultureInfo.InvariantCulture));
+
+            // Act
+            var delayTask = RetryHandler.DelayAsync(retryResponse, 2, 1, out var delayInSeconds, new CancellationToken(true));
+
+            // Assert
+            Assert.Equal(4, delayInSeconds);
+            Assert.True(delayTask.IsCanceled);
         }
 
         [Theory]
@@ -390,7 +438,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 Content = new StringContent("Hello World")
             };
             var retryResponse = new HttpResponseMessage(statusCode);
-            var futureTime = DateTime.Now + TimeSpan.FromSeconds(5);// 5 seconds from now
+            var futureTime = DateTime.UtcNow + TimeSpan.FromSeconds(5);// 5 seconds from now
             var futureTimeString = futureTime.ToString(CultureInfo.InvariantCulture.DateTimeFormat.RFC1123Pattern);
             retryResponse.Headers.TryAddWithoutValidation(RetryAfter, futureTimeString);
             Assert.Contains("GMT", futureTimeString); // http date always end in GMT according to the spec
