@@ -30,6 +30,14 @@ Feel free to submit a pull request with a linked issue against the __main__ bran
 
 Do not update the changelog as part of a pull request. The changelog is generated automatically during the release process.
 
+## Package publishing
+
+The [release pipeline](.azure-pipelines/ci-build.yml) builds and signs the packages, then publishes through ESRP only after a successful build of a `v*` tag and approval in the `nuget-org` environment.
+All eight packages listed above have [kiota](https://www.nuget.org/profiles/kiota) and [Microsoft](https://www.nuget.org/profiles/Microsoft) as owners on NuGet.org; ESRP publishing uses `kiota` as `NuGetOrganizationName`.
+The Windows deployment job stages only top-level `Microsoft.Kiota.*.nupkg` and `Microsoft.Kiota.*.snupkg` files from the downloaded release artifact in `$(Pipeline.Workspace)\nuget-packages\$(NuGetOrganizationName)`, cleaning that dedicated folder to exclude stale packages and release scripts.
+It reuses the build's federated ESRP service connection and certificates, and waits for publication to complete before updating the GitHub release assets.
+The ESRP release task and service connection must be authorized for the pipeline, and the publisher must be configured for the `kiota` NuGet owner.
+
 ## Commit message format
 
 To support our automated release process, pull requests are required to follow the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/)
