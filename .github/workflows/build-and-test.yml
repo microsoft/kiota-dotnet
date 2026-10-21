@@ -6,10 +6,14 @@ on:
     branches: [ "main", "dev", "feature/*" ]
   pull_request:
     branches: [ "main", "dev" ]
+  merge_group:
+    branches: [ "main", "dev" ]
 
 permissions:
   contents: read #those permissions are required to run the codeql analysis
   actions: read
+  code-quality: write
+  pull-requests: read
   security-events: write
 
 jobs:
@@ -18,16 +22,16 @@ jobs:
     env:
       solutionName: Microsoft.Kiota.slnx
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup .NET 8 and 10
-        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: |
             8.x
             10.x
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4.37.0
+        uses: github/codeql-action/init@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
         with:
           languages: csharp
       - name: Restore dependencies
@@ -39,10 +43,23 @@ jobs:
           /p:UseSharedCompilation=false
       - name: Test for net472
         run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity
-          normal --framework net472
+          normal --framework net472 --report-gh
       - name: Test for net10.0 and collect coverage
         run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity
-          normal --framework net10.0 -- --coverlet --coverlet-output-format
-          opencover
+          normal --framework net10.0 --results-directory=./TestResults --coverlet --coverlet-output-format
+          cobertura --report-gh
+      - name: Install report generator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+      - name: Generate coverage report
+        run: reportgenerator "-reports:TestResults/coverage.cobertura.*.xml" "-targetdir:.\reports\coverage" "-reporttypes:Html;MarkdownSummaryGithub;Cobertura"
+      - name: Add coverage to job summary
+        run: Get-Content .\reports\coverage\SummaryGithub.md >> $env:GITHUB_STEP_SUMMARY
+      - name: Upload coverage report
+        uses: actions/upload-code-coverage@2b21a77928be8d5168c2b9581a67f2adbebacc52 # v1.4.4
+        if: github.event_name != 'merge_group' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') || (github.event_name != 'pull_request' && github.ref_name == github.event.repository.default_branch))
+        with:
+          file: .\reports\coverage\Cobertura.xml
+          language: CSharp
+          label: code-coverage/dotnet
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4.37.0
+        uses: github/codeql-action/analyze@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3

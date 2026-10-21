@@ -42,7 +42,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             Assert.Empty(requestMessage.Headers);
 
             // Act
-            var response = await _invoker.SendAsync(requestMessage, new CancellationToken());
+            var response = await _invoker.SendAsync(requestMessage, TestContext.Current.CancellationToken);
 
             // Assert the request stays the same
             Assert.Empty(response.RequestMessage?.Headers!);
@@ -75,7 +75,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             Assert.Empty(requestMessage.Headers);
 
             // Act
-            var response = await _invoker.SendAsync(requestMessage, new CancellationToken());
+            var response = await _invoker.SendAsync(requestMessage, TestContext.Current.CancellationToken);
 
             // Assert the request was enriched as expected
             Assert.NotEmpty(response.RequestMessage?.Headers!);
@@ -116,7 +116,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             Assert.Empty(requestMessage.Headers);
 
             // Act
-            var response = await invoker.SendAsync(requestMessage, new CancellationToken());
+            var response = await invoker.SendAsync(requestMessage, TestContext.Current.CancellationToken);
 
             // Assert the request was enriched as expected
             Assert.NotEmpty(response.RequestMessage?.Headers!);

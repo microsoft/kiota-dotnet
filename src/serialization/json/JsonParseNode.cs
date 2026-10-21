@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -29,6 +28,8 @@ namespace Microsoft.Kiota.Serialization.Json
     /// </summary>
     public class JsonParseNode : IParseNode
     {
+        private static readonly JsonConverter DefaultDateTimeOffsetConverter = KiotaJsonSerializationContext.Default.DateTimeOffset.Converter;
+        private static readonly JsonConverter DefaultGuidConverter = KiotaJsonSerializationContext.Default.Guid.Converter;
         private readonly JsonElement _jsonNode;
         private readonly KiotaJsonSerializationContext _jsonSerializerContext;
 
@@ -324,25 +325,27 @@ namespace Microsoft.Kiota.Serialization.Json
             if(jsonElement.ValueKind != JsonValueKind.String)
                 return null;
 
-            if(jsonElement.TryGetGuid(out var guid))
-                return guid;
+            if(HasCustomGuidConverter() && TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.Guid, out var convertedGuid))
+                return convertedGuid;
 
-            if(string.IsNullOrEmpty(jsonElement.GetString()))
-                return null;
-
-            return jsonElement.Deserialize(_jsonSerializerContext.Guid);
+            return jsonElement.TryGetGuid(out var guid)
+                ? guid
+                : null;
         }
+
+        private bool HasCustomGuidConverter() =>
+            _jsonSerializerContext.Guid is { Converter: var converter } && !ReferenceEquals(converter, DefaultGuidConverter);
 
         private DateTimeOffset? GetDateTimeOffsetValue(JsonElement jsonElement)
         {
             if(jsonElement.ValueKind != JsonValueKind.String)
                 return null;
 
+            if(HasCustomDateTimeOffsetConverter() && TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.DateTimeOffset, out var convertedDateTimeOffset))
+                return convertedDateTimeOffset;
+
             if(jsonElement.TryGetDateTimeOffset(out var dateTimeOffset))
                 return dateTimeOffset;
-
-            if(TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.DateTimeOffset, out var convertedDateTimeOffset))
-                return convertedDateTimeOffset;
 
             if(DateTimeOffset.TryParse(jsonElement.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dto))
                 return dto;
@@ -350,14 +353,22 @@ namespace Microsoft.Kiota.Serialization.Json
             return null;
         }
 
-        private static TimeSpan? GetTimeSpanValue(JsonElement jsonElement)
+        private bool HasCustomDateTimeOffsetConverter() =>
+            _jsonSerializerContext.DateTimeOffset is { Converter: var converter } && !ReferenceEquals(converter, DefaultDateTimeOffsetConverter);
+
+        private TimeSpan? GetTimeSpanValue(JsonElement jsonElement)
         {
-            var jsonString = jsonElement.GetString();
-            if(string.IsNullOrEmpty(jsonString))
+            if(jsonElement.ValueKind != JsonValueKind.String)
                 return null;
 
+            if(jsonElement.ValueEquals(ReadOnlySpan<byte>.Empty))
+                return null;
+
+            if(TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.TimeSpan, out var convertedTimeSpan))
+                return convertedTimeSpan;
+
             // Parse an ISO8601 duration.http://en.wikipedia.org/wiki/ISO_8601#Durations to a TimeSpan
-            return XmlConvert.ToTimeSpan(jsonString);
+            return XmlConvert.ToTimeSpan(jsonElement.GetString()!);
         }
 
         private Date? GetDateValue(JsonElement jsonElement)

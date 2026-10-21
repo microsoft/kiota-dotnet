@@ -5,6 +5,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.5](https://github.com/microsoft/kiota-dotnet/compare/v2.1.4...v2.1.5) (2026-10-13)
+
+
+### Bug Fixes
+
+* **http:** honor total UTC delay for Retry-After dates ([#822](https://github.com/microsoft/kiota-dotnet/issues/822)) ([512cddf](https://github.com/microsoft/kiota-dotnet/commit/512cddfaf57f24477041bd1a71ea008f3dfb1b8e))
+
+## [2.1.4](https://github.com/microsoft/kiota-dotnet/compare/v2.1.3...v2.1.4) (2026-10-06)
+
+
+### Bug Fixes
+
+* Fixing redirect 301 handling ([#817](https://github.com/microsoft/kiota-dotnet/issues/817)) ([c3f090b](https://github.com/microsoft/kiota-dotnet/commit/c3f090b582c509665555a0db5ab9edce9c797269))
+
+## [2.1.3](https://github.com/microsoft/kiota-dotnet/compare/v2.1.2...v2.1.3) (2026-09-28)
+
+
+### Bug Fixes
+
+* **http:** validate retry option lower bounds ([b0c8412](https://github.com/microsoft/kiota-dotnet/commit/b0c84123c5a397e90360aac1f07540c8d5216aca))
+* **http:** wrap response parsing failures in ApiException with status code, headers, and body ([#808](https://github.com/microsoft/kiota-dotnet/issues/808)) ([0e75f2c](https://github.com/microsoft/kiota-dotnet/commit/0e75f2c1c11cb469c28a029ed2330d0265f6a3cf))
+
+## [2.1.2](https://github.com/microsoft/kiota-dotnet/compare/v2.1.1...v2.1.2) (2026-09-08)
+
+
+### Bug Fixes
+
+* **serialization-json:** honor custom TimeSpan converters ([#795](https://github.com/microsoft/kiota-dotnet/issues/795)) ([e22c5ba](https://github.com/microsoft/kiota-dotnet/commit/e22c5ba48d34d2a0927d84a5a83f9d63926dedf1))
+* **serialization-json:** honor DateTimeOffset converters ([802e20a](https://github.com/microsoft/kiota-dotnet/commit/802e20af426dbe7fb7629b750a2c1e3713c8647c))
+* **serialization-json:** honor guid converters before fallback parsing ([#794](https://github.com/microsoft/kiota-dotnet/issues/794)) ([22cc1d3](https://github.com/microsoft/kiota-dotnet/commit/22cc1d30019d69f55d3282f34922d23dfdc2372b))
+
+## [2.1.1](https://github.com/microsoft/kiota-dotnet/compare/v2.1.0...v2.1.1) (2026-09-04)
+
+
+### Bug Fixes
+
+* **http:** handle not modified responses ([#787](https://github.com/microsoft/kiota-dotnet/issues/787)) ([82e3190](https://github.com/microsoft/kiota-dotnet/commit/82e319072b45132bd9d3a3fe94a1f01953192ea6))
+
+## [2.1.0](https://github.com/microsoft/kiota-dotnet/compare/v2.0.2...v2.1.0) (2026-08-27)
+
+
+### Features
+
+* adds support for wildcard host validation ([#779](https://github.com/microsoft/kiota-dotnet/issues/779)) ([6a6130e](https://github.com/microsoft/kiota-dotnet/commit/6a6130e5ab977e4771a8777feb35786a31e16e83))
+
 ## [2.0.2](https://github.com/microsoft/kiota-dotnet/compare/v2.0.1...v2.0.2) (2026-07-16)
 
 

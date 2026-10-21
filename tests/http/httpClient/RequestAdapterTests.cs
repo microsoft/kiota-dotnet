@@ -205,6 +205,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
 
         [InlineData(HttpStatusCode.Redirect)]
         [InlineData(HttpStatusCode.MovedPermanently)]
+        [InlineData(HttpStatusCode.NotModified)]
         [Theory]
         public async Task SendMethodDoesNotThrowOn3XXWithNoLocationAsync(HttpStatusCode httpStatusCode)
         {
@@ -270,6 +271,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         [InlineData(HttpStatusCode.Accepted)]
         [InlineData(HttpStatusCode.NonAuthoritativeInformation)]
         [InlineData(HttpStatusCode.NoContent)]
+        [InlineData(HttpStatusCode.NotModified)]
         [Theory]
         public async Task SendStreamReturnsNullForNoContent(HttpStatusCode statusCode)
         {
@@ -292,14 +294,40 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
 
             Assert.Null(response);
         }
+        [Fact]
+        public async Task SendStreamDisposesNotModifiedResponse()
+        {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var content = new DisposableContent(new byte[] { 1, 2, 3 });
+            var client = new HttpClient(mockHandler.Object);
+            mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.NotModified,
+                Content = content,
+            });
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "https://example.com"
+            };
+
+            var response = await adapter.SendPrimitiveAsync<Stream>(requestInfo, cancellationToken: TestContext.Current.CancellationToken);
+
+            Assert.Null(response);
+            Assert.True(content.IsDisposed);
+        }
         [InlineData(HttpStatusCode.OK)]
         [InlineData(HttpStatusCode.Created)]
         [InlineData(HttpStatusCode.Accepted)]
         [InlineData(HttpStatusCode.NonAuthoritativeInformation)]
         [InlineData(HttpStatusCode.NoContent)]
         [InlineData(HttpStatusCode.PartialContent)]
+        [InlineData(HttpStatusCode.NotModified)]
         [Theory]
-        public async Task SendSNoContentDoesntFailOnOtherStatusCodes(HttpStatusCode statusCode)
+        public async Task SendNoContentDoesntFailOnOtherStatusCodes(HttpStatusCode statusCode)
         {
             var mockHandler = new Mock<HttpMessageHandler>();
             var client = new HttpClient(mockHandler.Object);
@@ -324,6 +352,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         [InlineData(HttpStatusCode.NonAuthoritativeInformation)]
         [InlineData(HttpStatusCode.NoContent)]
         [InlineData(HttpStatusCode.ResetContent)]
+        [InlineData(HttpStatusCode.NotModified)]
         [Theory]
         public async Task SendReturnsNullOnNoContent(HttpStatusCode statusCode)
         {
@@ -353,6 +382,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         [InlineData(HttpStatusCode.NonAuthoritativeInformation)]
         [InlineData(HttpStatusCode.NoContent)]
         [InlineData(HttpStatusCode.ResetContent)]
+        [InlineData(HttpStatusCode.NotModified)]
         [Theory]
         public async Task SendReturnsNullOnNoContentWithContentHeaderPresent(HttpStatusCode statusCode)
         {
@@ -392,6 +422,69 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             .ReturnsAsync(new HttpResponseMessage
             {
                 StatusCode = statusCode,
+                Content = mockContent,
+            });
+            var mockParseNode = new Mock<IParseNode>();
+            mockParseNode.Setup(x => x.GetObjectValue(It.IsAny<ParsableFactory<MockEntity>>()))
+            .Returns(new MockEntity());
+            var mockParseNodeFactory = new Mock<IParseNodeFactory>();
+            mockParseNodeFactory.Setup(x => x.GetRootParseNodeAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(mockParseNode.Object);
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client, parseNodeFactory: mockParseNodeFactory.Object);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "https://example.com"
+            };
+
+            var response = await adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken);
+
+            Assert.NotNull(response);
+        }
+        [Fact]
+        public async Task WrapsParseNodeFactoryExceptionsInApiException()
+        {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(() =>
+            {
+                var responseMessage = new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("<html><body>Internal Server Error</body></html>", Encoding.UTF8, "text/html")
+                };
+                responseMessage.Headers.Add("request-id", "guid-value");
+                return responseMessage;
+            });
+            // uses the default ParseNodeFactoryRegistry, which has no factory registered for text/html
+            var adapter = new HttpClientRequestAdapter(_authenticationProvider, httpClient: client);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "https://example.com"
+            };
+
+            var exception = await Assert.ThrowsAsync<ApiException>(() => adapter.SendAsync<MockEntity>(requestInfo, MockEntity.Factory, cancellationToken: TestContext.Current.CancellationToken));
+
+            Assert.Equal((int)HttpStatusCode.OK, exception.ResponseStatusCode);
+            Assert.True(exception.ResponseHeaders.ContainsKey("request-id"));
+            Assert.IsType<InvalidOperationException>(exception.InnerException);
+            Assert.Contains("text/html", exception.Message);
+        }
+        [Fact]
+        public async Task ParseNodeFactoryWrappingDoesNotAffectSuccessfulParsing()
+        {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            var client = new HttpClient(mockHandler.Object);
+            using var mockContent = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Test")));
+            mockContent.Headers.ContentType = new("application/json");
+            mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
                 Content = mockContent,
             });
             var mockParseNode = new Mock<IParseNode>();
@@ -1207,6 +1300,21 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             Assert.NotNull(adapter2);
             Assert.NotNull(adapter1.SerializationWriterFactory);
             Assert.NotNull(adapter2.SerializationWriterFactory);
+        }
+
+        private sealed class DisposableContent : ByteArrayContent
+        {
+            public DisposableContent(byte[] content) : base(content)
+            {
+            }
+
+            public bool IsDisposed { get; private set; }
+
+            protected override void Dispose(bool disposing)
+            {
+                IsDisposed = disposing;
+                base.Dispose(disposing);
+            }
         }
     }
 

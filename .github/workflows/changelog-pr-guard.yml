@@ -1,0 +1,60 @@
+name: Changelog PR Guard
+
+on:
+  pull_request_target:
+    branches: [ "main" ]
+    types: [ opened, synchronize, reopened, ready_for_review ]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  check-changelog:
+    if: github.event.pull_request.user.login != 'release-please-token-provider[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for changelog changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          changed_changelog_files="$(
+            gh api --paginate "repos/${REPOSITORY}/pulls/${PR_NUMBER}/files" \
+              --jq '.[] | select(.filename | test("(^|/)CHANGELOG\\.md$"; "i")) | .filename'
+          )"
+
+          if [ -z "${changed_changelog_files}" ]; then
+            echo "No changelog changes found."
+            exit 0
+          fi
+
+          comment_body="$(cat <<'EOF'
+          <!-- changelog-pr-guard -->
+          The changelog is automatically generated through conventional commits, so this change must be reverted.
+          EOF
+          )"
+
+          existing_comment_id="$(
+            gh api --paginate "repos/${REPOSITORY}/issues/${PR_NUMBER}/comments" \
+              --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | contains("<!-- changelog-pr-guard -->"))) | .id' \
+              | head -n 1
+          )"
+
+          if [ -n "${existing_comment_id}" ]; then
+            gh api \
+              --method PATCH \
+              "repos/${REPOSITORY}/issues/comments/${existing_comment_id}" \
+              --field body="${comment_body}" > /dev/null
+          else
+            gh api \
+              --method POST \
+              "repos/${REPOSITORY}/issues/${PR_NUMBER}/comments" \
+              --field body="${comment_body}" > /dev/null
+          fi
+
+          echo "Changelog changes must be reverted:"
+          echo "${changed_changelog_files}"
+          exit 1

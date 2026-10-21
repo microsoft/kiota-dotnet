@@ -134,7 +134,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 var redirectResponse = new HttpResponseMessage(HttpStatusCode.OK);
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse); // sets the mock response
                 // Act
-                var response = await this._invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                var response = await this._invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Same(response.RequestMessage, httpRequestMessage);
@@ -144,14 +144,42 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         [Theory]
         [InlineData(HttpStatusCode.MovedPermanently)]  // 301
         [InlineData(HttpStatusCode.Found)]  // 302
-        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
-        [InlineData((HttpStatusCode)308)] // 308 not available in netstandard
-        public async Task ShouldRedirectSameMethodAndContent(HttpStatusCode statusCode)
+        [InlineData(HttpStatusCode.SeeOther)]  // 303
+        public async Task PostRedirectShouldChangeToGetAndDropContent(HttpStatusCode statusCode)
         {
             using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
             {
                 // Arrange
                 httpRequestMessage.Content = new StringContent("Hello World");
+                httpRequestMessage.Content.Headers.Add("X-Content-Header", "content-value");
+                httpRequestMessage.Headers.TransferEncodingChunked = true;
+                httpRequestMessage.Headers.Add("X-Request-Header", "request-value");
+
+                var redirectResponse = new HttpResponseMessage(statusCode);
+                redirectResponse.Headers.Location = new Uri("http://example.org/bar");
+                this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
+                // Act
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
+                // Assert
+                Assert.Equal(HttpMethod.Get, response.RequestMessage?.Method);
+                Assert.NotSame(response.RequestMessage, httpRequestMessage);
+                Assert.Null(response.RequestMessage?.Content);
+                Assert.False(response.RequestMessage?.Headers.TransferEncodingChunked);
+                Assert.True(response.RequestMessage?.Headers.Contains("X-Request-Header"));
+            }
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308 not available in netstandard
+        public async Task RedirectShouldPreserveMethodContentAndBodyHeaders(HttpStatusCode statusCode)
+        {
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            {
+                // Arrange
+                httpRequestMessage.Content = new StringContent("Hello World");
+                httpRequestMessage.Content.Headers.Add("X-Content-Header", "content-value");
+                httpRequestMessage.Headers.TransferEncodingChunked = true;
 
                 var redirectResponse = new HttpResponseMessage(statusCode);
                 redirectResponse.Headers.Location = new Uri("http://example.org/bar");
@@ -159,7 +187,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 // Act
                 var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
                 // Assert
-                Assert.Equal(response.RequestMessage?.Method, httpRequestMessage.Method);
+                Assert.Equal(HttpMethod.Post, response.RequestMessage?.Method);
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.NotNull(response.RequestMessage?.Content);
                 Assert.Equal("Hello World", await response.RequestMessage.Content.ReadAsStringAsync(
@@ -167,34 +195,46 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                   TestContext.Current.CancellationToken
 #endif
                 ));
+                Assert.True(response.RequestMessage.Content.Headers.Contains("X-Content-Header"));
+                Assert.True(response.RequestMessage.Headers.TransferEncodingChunked);
             }
         }
 
-        [Fact]
-        public async Task ShouldRedirectChangeMethodAndContent()
+        [Theory]
+        [InlineData("GET")]
+        [InlineData("HEAD")]
+        public async Task SeeOtherShouldPreserveGetAndHeadMethodAndContent(string method)
         {
-
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            using(var httpRequestMessage = new HttpRequestMessage(new HttpMethod(method), "http://example.org/foo"))
             {
                 // Arrange
                 httpRequestMessage.Content = new StringContent("Hello World");
+                httpRequestMessage.Content.Headers.Add("X-Content-Header", "content-value");
+                httpRequestMessage.Headers.TransferEncodingChunked = true;
 
                 var redirectResponse = new HttpResponseMessage(HttpStatusCode.SeeOther);
                 redirectResponse.Headers.Location = new Uri("http://example.org/bar");
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
-                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert
-                Assert.NotEqual(response.RequestMessage?.Method, httpRequestMessage.Method);
-                Assert.Equal(response.RequestMessage?.Method, HttpMethod.Get);
+                Assert.Equal(httpRequestMessage.Method, response.RequestMessage?.Method);
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
-                Assert.Null(response.RequestMessage?.Content);
+                Assert.NotNull(response.RequestMessage?.Content);
+                Assert.Equal("Hello World", await response.RequestMessage.Content.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                  TestContext.Current.CancellationToken
+#endif
+                ));
+                Assert.True(response.RequestMessage.Content.Headers.Contains("X-Content-Header"));
+                Assert.True(response.RequestMessage.Headers.TransferEncodingChunked);
             }
         }
 
         [Theory]
         [InlineData(HttpStatusCode.MovedPermanently)]  // 301
         [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.SeeOther)]  // 303
         [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
         [InlineData((HttpStatusCode)308)] // 308
         public async Task RedirectWithDifferentHostShouldRemoveAuthHeader(HttpStatusCode statusCode)
@@ -207,7 +247,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 redirectResponse.Headers.Location = new Uri("http://example.net/bar");
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
-                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.NotSame(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
@@ -231,7 +271,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 redirectResponse.Headers.Location = new Uri("http://example.org/bar");
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
-                var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => this._invoker.SendAsync(httpRequestMessage, CancellationToken.None));
+                var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => this._invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken));
                 // Assert
                 Assert.Contains("Redirects with changing schemes not allowed by default", exception.Message);
                 Assert.Equal("Scheme changed from https to http.", exception.InnerException?.Message);
@@ -255,7 +295,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 this._redirectHandler.RedirectOption.AllowRedirectOnSchemeChange = true;// Enable redirects on scheme change
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
-                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.NotSame(response.RequestMessage?.RequestUri?.Scheme, httpRequestMessage.RequestUri?.Scheme);
@@ -274,7 +314,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 redirectResponse.Headers.Location = new Uri("http://example.org/bar");
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
-                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
@@ -297,7 +337,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 redirectResponse.Headers.Location = new Uri("http://example.org:9090/bar");
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
-                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
@@ -321,7 +361,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 redirectResponse.Headers.Location = new Uri("http://example.org:9090/bar");
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
-                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
@@ -341,7 +381,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 redirectResponse.Headers.Location = new Uri("http://example.org:8080/bar");
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
-                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
@@ -359,7 +399,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 redirectResponse.Headers.Location = new Uri("/bar", UriKind.Relative);
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
-                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.Equal("http://example.org/bar", response.RequestMessage?.RequestUri?.AbsoluteUri);
@@ -379,7 +419,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 this._testHttpMessageHandler.SetHttpResponse(response1, response2);// sets the mock response
                 // Act
                 var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => this._invoker.SendAsync(
-                   httpRequestMessage, CancellationToken.None));
+                   httpRequestMessage, TestContext.Current.CancellationToken));
                 // Assert
                 Assert.Equal("Too many redirects performed", exception.Message);
                 Assert.Equal("Max redirects exceeded. Redirect count : 5", exception.InnerException?.Message);
@@ -402,7 +442,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 redirectResponse.Headers.Location = new Uri("http://example.net/bar");
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
-                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert - ProxyAuthorization is removed when no proxy is configured
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.NotSame(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
@@ -425,7 +465,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 redirectResponse.Headers.Location = new Uri("http://example.net/bar");
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
-                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.NotSame(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
@@ -475,7 +515,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
 
             // Act
-            var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+            var response = await invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
 
             // Assert - Custom headers should be removed, but non-sensitive should remain
             Assert.NotSame(response.RequestMessage, httpRequestMessage);
@@ -522,7 +562,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
 
             // Act
-            var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+            var response = await invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
 
             // Assert - Custom headers should be removed on scheme change
             Assert.NotSame(response.RequestMessage, httpRequestMessage);
@@ -562,7 +602,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
 
             // Act
-            var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+            var response = await invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
 
             // Assert - Custom headers should be kept when host and scheme are the same
             Assert.NotSame(response.RequestMessage, httpRequestMessage);
@@ -592,7 +632,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
 
             // Act
-            var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+            var response = await invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
 
             // Assert - Default behavior should remove Authorization on host change
             Assert.Null(response.RequestMessage?.Headers.Authorization);
@@ -645,7 +685,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
 
             // Act
-            var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+            var response = await invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
 
             // Assert - X-Api-Key should be kept because proxy is active
             Assert.NotSame(response.RequestMessage, httpRequestMessage);
@@ -669,7 +709,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 this._redirectHandler.RedirectOption.AllowRedirectOnSchemeChange = true;// Enable redirects on scheme change
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
-                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert - ProxyAuthorization is removed when no proxy is configured
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.NotSame(response.RequestMessage?.RequestUri?.Scheme, httpRequestMessage.RequestUri?.Scheme);
@@ -693,7 +733,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 this._redirectHandler.RedirectOption.AllowRedirectOnSchemeChange = true;// Enable redirects on scheme change
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
-                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.NotSame(response.RequestMessage?.RequestUri?.Scheme, httpRequestMessage.RequestUri?.Scheme);
@@ -712,7 +752,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 redirectResponse.Headers.Location = new Uri("http://example.org/bar");
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
-                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert - ProxyAuthorization is removed when no proxy is configured
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
@@ -731,7 +771,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                 redirectResponse.Headers.Location = new Uri("http://example.org/bar");
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
-                var response = await _invoker.SendAsync(httpRequestMessage, new CancellationToken());
+                var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
                 Assert.Equal(response.RequestMessage?.RequestUri?.Host, httpRequestMessage.RequestUri?.Host);
@@ -768,7 +808,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
 
             // Act
-            var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+            var response = await invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
 
             // Assert - ProxyAuthorization should be removed because internal.local is bypassed
             Assert.NotSame(response.RequestMessage, httpRequestMessage);
@@ -803,7 +843,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
 
             // Act
-            var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+            var response = await invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
 
             // Assert - ProxyAuthorization should be kept because example.org requires proxy
             Assert.NotSame(response.RequestMessage, httpRequestMessage);
@@ -833,7 +873,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
 
             // Act
-            var response = await invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+            var response = await invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
 
             // Assert - ProxyAuthorization should be removed when no proxy is configured
             Assert.NotSame(response.RequestMessage, httpRequestMessage);
@@ -855,7 +895,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-                () => this._invoker.SendAsync(httpRequestMessage, CancellationToken.None));
+                () => this._invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken));
             Assert.Contains("Unable to perform redirect as Location Header is not set in response", exception.Message);
             Assert.Contains(statusCode.ToString(), exception.InnerException?.Message);
         }
@@ -875,7 +915,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             this._testHttpMessageHandler.SetHttpResponse(redirectResponse);
 
             // Act
-            var response = await this._invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+            var response = await this._invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
 
             // Assert - response is returned as-is without following the redirect
             Assert.Equal(statusCode, response.StatusCode);
@@ -897,7 +937,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             this._testHttpMessageHandler.SetHttpResponse(redirectResponse);
 
             // Act
-            var response = await this._invoker.SendAsync(httpRequestMessage, CancellationToken.None);
+            var response = await this._invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
 
             // Assert - response is returned as-is without following the redirect
             Assert.Equal(statusCode, response.StatusCode);

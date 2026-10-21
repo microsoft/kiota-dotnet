@@ -61,11 +61,12 @@ public class AuthenticationTests
     [InlineData("https://test.microsoft.com", false)]// Fail
     [InlineData("https://grAph.MicrosofT.com", true)] // PASS since we don't care about case
     [InlineData("https://developer.microsoft.com", false)] // Failed
+    [InlineData("https://abc.123.graphql.fabric.microsoft.com/path", true)] // PASS since suffix is allowed
     public void AllowedHostValidatorValidatesUrls(string urlToTest, bool expectedResult)
     {
         // Test through the constructor
         // Arrange
-        var allowList = new[] { "graph.microsoft.com", "graph.microsoft.us" };
+        var allowList = new[] { "graph.microsoft.com", "graph.microsoft.us", ".fabric.microsoft.com" };
         var validator = new AllowedHostsValidator(allowList);
 
         // Act 
@@ -75,6 +76,7 @@ public class AuthenticationTests
         Assert.Equal(expectedResult, validationResult);
         Assert.Contains(allowList[0], validator.AllowedHosts);
         Assert.Contains(allowList[1], validator.AllowedHosts);
+        Assert.Contains(allowList[2], validator.AllowedHosts);
 
 
         // Test through the setter
@@ -91,6 +93,33 @@ public class AuthenticationTests
         Assert.Equal(emptyValidatorResult, validationResult);
         Assert.Contains(allowList[0], emptyValidator.AllowedHosts);
         Assert.Contains(allowList[1], emptyValidator.AllowedHosts);
+        Assert.Contains(allowList[2], emptyValidator.AllowedHosts);
+    }
+
+    [Theory]
+    [InlineData("https://abc.123.graphql.fabric.microsoft.com/path", true)]
+    [InlineData("https://fabric.microsoft.com/path", false)]
+    [InlineData("https://ABC.z2c.graphql.fabric.microsoft.com/path", true)]
+    public void AllowedHostValidatorValidatesSuffixBasedHosts(string urlToTest, bool expectedResult)
+    {
+        var validator = new AllowedHostsValidator(new[] { ".Fabric.Microsoft.COM" });
+
+        var validationResult = validator.IsUrlHostValid(new Uri(urlToTest));
+
+        Assert.Equal(expectedResult, validationResult);
+    }
+
+    [Fact]
+    public void AllowedHostValidatorAllowsSuffixBasedHostsThroughSetter()
+    {
+        var validator = new AllowedHostsValidator(new[] { "example.com" })
+        {
+            AllowedHosts = new[] { ".fabric.microsoft.com" },
+        };
+
+        var validationResult = validator.IsUrlHostValid(new Uri("https://abc.123.graphql.fabric.microsoft.com/path"));
+
+        Assert.True(validationResult);
     }
 
 

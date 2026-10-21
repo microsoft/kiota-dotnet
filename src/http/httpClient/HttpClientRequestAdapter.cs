@@ -374,7 +374,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                 try
                 {
                     await ThrowIfFailedResponseAsync(response, errorMapping, span, cancellationToken).ConfigureAwait(false);
-                    if(shouldReturnNull(response)) return default;
+                    if(shouldReturnNull(response))
+                    {
+                        if(isStreamResponse)
+                            await DrainAsync(response, cancellationToken).ConfigureAwait(false);
+                        return default;
+                    }
                     if(isStreamResponse)
                     {
 #if NET5_0_OR_GREATER
@@ -535,7 +540,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         }
         private static bool shouldReturnNull(HttpResponseMessage response)
         {
-            return response.StatusCode == HttpStatusCode.NoContent
+            return response.StatusCode is HttpStatusCode.NoContent or HttpStatusCode.NotModified
                    || response.Content == null
                    || response.Content.GetType().Name.Equals("EmptyContent", StringComparison.OrdinalIgnoreCase);// In NET 5 and above, Content is never null but represented by the internal class EmptyContent
                                                                                                                  // which MAY return instances of EmptyReadStream on reading(which is not seekable thus we can't read/get the length)
@@ -552,7 +557,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         private async Task ThrowIfFailedResponseAsync(HttpResponseMessage response, Dictionary<string, ParsableFactory<IParsable>>? errorMapping, Activity? activityForAttributes, CancellationToken cancellationToken)
         {
             using var span = activitySource?.StartActivity(nameof(ThrowIfFailedResponseAsync));
-            if(response.IsSuccessStatusCode || response.StatusCode is HttpStatusCode.Moved or HttpStatusCode.MovedPermanently or HttpStatusCode.Found or HttpStatusCode.Redirect) return;
+            if(response.IsSuccessStatusCode || response.StatusCode is HttpStatusCode.Moved or HttpStatusCode.MovedPermanently or HttpStatusCode.Found or HttpStatusCode.Redirect or HttpStatusCode.NotModified) return;
 
             activityForAttributes?.SetStatus(ActivityStatusCode.Error, "received_error_response");
 
@@ -614,8 +619,31 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
 #endif
             if(contentStream == Stream.Null || (contentStream.CanSeek && contentStream.Length == 0))
                 return null;// ensure a useful stream is passed to the factory
-            var rootNode = await pNodeFactory.GetRootParseNodeAsync(responseContentType!, contentStream, cancellationToken).ConfigureAwait(false);
-            return rootNode;
+            try
+            {
+                return await pNodeFactory.GetRootParseNodeAsync(responseContentType!, contentStream, cancellationToken).ConfigureAwait(false);
+            }
+            catch(Exception ex) when(ex is not ApiException && ex is not OperationCanceledException)
+            {
+                throw CreateApiExceptionForParseNodeFailure(response, responseContentType!, ex);
+            }
+        }
+        /// <summary>
+        /// Builds an <see cref="ApiException"/> wrapping a failure encountered while resolving or invoking the parse node
+        /// factory, carrying the response status code and headers alongside the original exception. Use
+        /// <see cref="Middleware.Options.BodyInspectionHandlerOption"/> if the response body itself needs to be inspected.
+        /// </summary>
+        private static ApiException CreateApiExceptionForParseNodeFailure(HttpResponseMessage response, string responseContentType, Exception innerException)
+        {
+            var responseHeadersDictionary = new Dictionary<string, IEnumerable<string>>(StringComparer.OrdinalIgnoreCase);
+            foreach(var header in response.Headers)
+                responseHeadersDictionary[header.Key] = header.Value;
+
+            return new ApiException($"The response could not be deserialized. Content-Type '{responseContentType}' may not be supported, or the registered parse node factory failed while processing the response.", innerException)
+            {
+                ResponseStatusCode = (int)response.StatusCode,
+                ResponseHeaders = responseHeadersDictionary
+            };
         }
         private const string ClaimsKey = "claims";
         private const string BearerAuthenticationScheme = "Bearer";

@@ -20,6 +20,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
         internal const int MaxDelay = 180;
         private int _maxRetry = DefaultMaxRetry;
         private int _delay = DefaultDelay;
+        private TimeSpan _retriesTimeLimit = TimeSpan.Zero;
 
         /// <summary>
         /// The waiting time in seconds before retrying a request with a maximum value of 180 seconds. This defaults to 3 seconds.
@@ -32,6 +33,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
             }
             set
             {
+                if(value < 0)
+                {
+                    throw new InvalidOperationException($"Minimum value for {nameof(Delay)} property exceeded ");
+                }
+
                 if(value > MaxDelay)
                 {
                     throw new InvalidOperationException($"Maximum value for {nameof(MaxDelay)} property exceeded ");
@@ -52,6 +58,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
             }
             set
             {
+                if(value < 0)
+                {
+                    throw new InvalidOperationException($"Minimum value for {nameof(MaxRetry)} property exceeded ");
+                }
+
                 if(value > MaxMaxRetry)
                 {
                     throw new InvalidOperationException($"Maximum value for {nameof(MaxMaxRetry)} property exceeded ");
@@ -63,7 +74,22 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
         /// <summary>
         /// The maximum time allowed for request retries.
         /// </summary>
-        public TimeSpan RetriesTimeLimit { get; set; } = TimeSpan.Zero;
+        public TimeSpan RetriesTimeLimit
+        {
+            get
+            {
+                return _retriesTimeLimit;
+            }
+            set
+            {
+                if(value < TimeSpan.Zero)
+                {
+                    throw new InvalidOperationException($"Minimum value for {nameof(RetriesTimeLimit)} property exceeded ");
+                }
+
+                _retriesTimeLimit = value;
+            }
+        }
 
         /// <summary>
         /// A delegate that's called to determine whether a request should be retried or not.

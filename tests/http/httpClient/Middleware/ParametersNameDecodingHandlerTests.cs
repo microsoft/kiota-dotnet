@@ -33,6 +33,10 @@ public class ParametersDecodingHandlerTests
     [InlineData("http://localhost", "http://localhost/")]
     [InlineData("https://google.com/?q=1%2b2", "https://google.com/?q=1%2b2")]
     [InlineData("https://google.com/?q=M%26A", "https://google.com/?q=M%26A")]
+    [InlineData("https://example.com/?%24select=name&value=%24select", "https://example.com/?$select=name&value=%24select")]
+    [InlineData("https://example.com/?%24select=%24select&other=x%24selectx", "https://example.com/?$select=%24select&other=x%24selectx")]
+    [InlineData("https://example.com/?=%24select&%24select=name", "https://example.com/?=%24select&$select=name")]
+    [InlineData("https://example.com/?=&%24select=name&&", "https://example.com/?=&$select=name&&")]
     [Theory]
     public async Task DefaultParameterNameDecodingHandlerDecodesNames(string original, string result)
     {
@@ -47,7 +51,7 @@ public class ParametersDecodingHandlerTests
         Assert.NotNull(requestMessage);
 
         // Act
-        await _invoker.SendAsync(requestMessage, new CancellationToken());
+        await _invoker.SendAsync(requestMessage, TestContext.Current.CancellationToken);
 
         // Assert the request stays the same
         Assert.Equal(result, requestMessage.RequestUri!.ToString());
@@ -63,6 +67,8 @@ public class ParametersDecodingHandlerTests
     [InlineData("https://google.com/?q=M%26A", "https://google.com/?q=M%26A")]//Values are not decoded
     [InlineData("https://google.com/?q%2D1=M%26A", "https://google.com/?q-1=M%26A")]//Values are not decoded but params are
     [InlineData("https://google.com/?q%2D1&q=M%26A=M%26A", "https://google.com/?q-1&q=M%26A=M%26A")]//Values are not decoded but params are
+    [InlineData("https://example.com/?x%2By=first&value=x%2By", "https://example.com/?x+y=first&value=x%2By")]
+    [InlineData("https://example.com/?x%26y=first&value=x%26y", "https://example.com/?x&y=first&value=x%26y")]
     [Theory]
     public async Task DefaultParameterNameDecodingHandlerDecodesNamesWithMeaningFullUrlCharacters(string original, string result)
     {
@@ -87,7 +93,7 @@ public class ParametersDecodingHandlerTests
         Assert.NotNull(requestMessage);
 
         // Act
-        await _invoker.SendAsync(requestMessage, new CancellationToken());
+        await _invoker.SendAsync(requestMessage, TestContext.Current.CancellationToken);
 
         // Assert the request stays the same
         Assert.Equal(result, requestMessage.RequestUri!.ToString());
