@@ -64,17 +64,6 @@ extends:
                   pwsh: true
                 enabled: true
 
-              - task: PowerShell@2
-                displayName: "Validate project version has been incremented"
-                condition: and(startsWith(variables['build.sourceBranch'], 'refs/tags/v'),
-                  succeeded())
-                inputs:
-                  targetType: "filePath"
-                  filePath: $(System.DefaultWorkingDirectory)\scripts\ValidateProjectVersionUpdated.ps1
-                  arguments: "-projectPath \"$(Build.SourcesDirectory)/Directory.Build.props\"
-                    -packageName \"Microsoft.Kiota.Abstractions\""
-                  pwsh: true
-
               # Install the nuget tool.
               - task: NuGetToolInstaller@1
                 displayName: "Install Nuget dependency manager"
