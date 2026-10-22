@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.ExceptionServices;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
@@ -1091,6 +1092,61 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
 
             public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options)
                 => throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void ParseTimeSpanDoesNotThrowFirstChanceExceptionsForIso8601DurationWithDefaultContext()
+        {
+            // Arrange
+            const string json = "\"PT0.026S\"";
+            using var jsonDocument = JsonDocument.Parse(json);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            var firstChanceExceptionCount = 0;
+            void OnFirstChanceException(object? sender, FirstChanceExceptionEventArgs e)
+            {
+                if(e.Exception is JsonException or FormatException)
+                {
+                    firstChanceExceptionCount++;
+                }
+            }
+
+            AppDomain.CurrentDomain.FirstChanceException += OnFirstChanceException;
+            try
+            {
+                // Act
+                var timeSpan = parseNode.GetTimeSpanValue();
+
+                // Assert
+                Assert.Equal(TimeSpan.FromMilliseconds(26), timeSpan);
+                Assert.Equal(0, firstChanceExceptionCount);
+            }
+            finally
+            {
+                AppDomain.CurrentDomain.FirstChanceException -= OnFirstChanceException;
+            }
+        }
+
+        [Fact]
+        public void ParseTimeSpanUsesConverterWhenCustomConverterIsRegistered()
+        {
+            // Arrange
+            var source = TimeSpan.FromHours(1);
+            var replacement = TimeSpan.FromHours(2);
+            var json = $"{\"workDuration\": \"{source}\"}";
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new JsonTimeSpanPrecedenceConverter(source, replacement) }
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+            using var jsonDocument = JsonDocument.Parse(json);
+            var rootParseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
+
+            // Act
+            var entity = rootParseNode.GetObjectValue(_ => new TestEntity());
+
+            // Assert
+            Assert.Equal(replacement, entity.WorkDuration);
         }
     }
 }
