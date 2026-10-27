@@ -371,8 +371,12 @@ namespace Microsoft.Kiota.Serialization.Json
             if(HasCustomTimeSpanConverter() && TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.TimeSpan, out var convertedTimeSpan))
                 return convertedTimeSpan;
 
+            var jsonString = jsonElement.GetString()!;
+            if(TimeSpan.TryParseExact(jsonString, "c", CultureInfo.InvariantCulture, out var constantTimeSpan))
+                return constantTimeSpan;
+
             // Parse an ISO8601 duration.http://en.wikipedia.org/wiki/ISO_8601#Durations to a TimeSpan
-            return XmlConvert.ToTimeSpan(jsonElement.GetString()!);
+            return XmlConvert.ToTimeSpan(jsonString);
         }
 
         private Date? GetDateValue(JsonElement jsonElement)
