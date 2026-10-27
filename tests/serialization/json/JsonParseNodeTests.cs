@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
@@ -1091,6 +1091,84 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
 
             public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options)
                 => throw new NotImplementedException();
+        }
+
+        [Theory]
+        [InlineData("\"PT0.026S\"", 26)]
+        [InlineData("\"PT1H\"", 3600000)]
+        [InlineData("\"P1D\"", 86400000)]
+        public void ParseTimeSpanWithDefaultContextForIso8601Duration(string json, double expectedMilliseconds)
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse(json);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var timeSpan = parseNode.GetTimeSpanValue();
+
+            // Assert
+            Assert.Equal(TimeSpan.FromMilliseconds(expectedMilliseconds), timeSpan);
+        }
+
+        [Theory]
+        [InlineData("\"01:00:00\"", 0, 1, 0, 0)]
+        [InlineData("\"00:30:15\"", 0, 0, 30, 15)]
+        [InlineData("\"1.02:03:04.5000000\"", 1, 2, 3, 4)]
+        public void ParseTimeSpanWithDefaultContextForConstantFormat(string json, int days, int hours, int minutes, int seconds)
+        {
+            // Arrange
+            using var jsonDocument = JsonDocument.Parse(json);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement);
+
+            // Act
+            var timeSpan = parseNode.GetTimeSpanValue();
+
+            // Assert
+            Assert.NotNull(timeSpan);
+            Assert.Equal(days, timeSpan.Value.Days);
+            Assert.Equal(hours, timeSpan.Value.Hours);
+            Assert.Equal(minutes, timeSpan.Value.Minutes);
+            Assert.Equal(seconds, timeSpan.Value.Seconds);
+        }
+
+        [Fact]
+        public void ParseTimeSpanUsesConverterWhenCustomConverterIsRegistered()
+        {
+            // Arrange
+            var source = TimeSpan.FromHours(1);
+            var replacement = TimeSpan.FromHours(2);
+            var json = $"{{\"workDuration\": \"{source}\"}}";
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new JsonTimeSpanPrecedenceConverter(source, replacement) }
+            };
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+            using var jsonDocument = JsonDocument.Parse(json);
+            var rootParseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
+
+            // Act
+            var entity = rootParseNode.GetObjectValue(_ => new TestEntity());
+
+            // Assert
+            Assert.Equal(replacement, entity.WorkDuration);
+        }
+
+        [Fact]
+        public void ParseTimeSpanWithoutConverter()
+        {
+            // Arrange
+            var duration = TimeSpan.FromHours(1);
+            var json = $"{{\"workDuration\": \"{duration}\"}}";
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General);
+            var serializationContext = new KiotaJsonSerializationContext(serializerOptions);
+            using var jsonDocument = JsonDocument.Parse(json);
+            var rootParseNode = new JsonParseNode(jsonDocument.RootElement, serializationContext);
+
+            // Act
+            var entity = rootParseNode.GetObjectValue(_ => new TestEntity());
+
+            // Assert
+            Assert.Equal(duration, entity.WorkDuration);
         }
     }
 }

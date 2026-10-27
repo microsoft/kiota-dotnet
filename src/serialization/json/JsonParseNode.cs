@@ -30,6 +30,7 @@ namespace Microsoft.Kiota.Serialization.Json
     {
         private static readonly JsonConverter DefaultDateTimeOffsetConverter = KiotaJsonSerializationContext.Default.DateTimeOffset.Converter;
         private static readonly JsonConverter DefaultGuidConverter = KiotaJsonSerializationContext.Default.Guid.Converter;
+        private static readonly JsonConverter DefaultTimeSpanConverter = KiotaJsonSerializationContext.Default.TimeSpan.Converter;
         private readonly JsonElement _jsonNode;
         private readonly KiotaJsonSerializationContext _jsonSerializerContext;
 
@@ -356,6 +357,9 @@ namespace Microsoft.Kiota.Serialization.Json
         private bool HasCustomDateTimeOffsetConverter() =>
             _jsonSerializerContext.DateTimeOffset is { Converter: var converter } && !ReferenceEquals(converter, DefaultDateTimeOffsetConverter);
 
+        private bool HasCustomTimeSpanConverter() =>
+            _jsonSerializerContext.TimeSpan is { Converter: var converter } && !ReferenceEquals(converter, DefaultTimeSpanConverter);
+
         private TimeSpan? GetTimeSpanValue(JsonElement jsonElement)
         {
             if(jsonElement.ValueKind != JsonValueKind.String)
@@ -364,11 +368,15 @@ namespace Microsoft.Kiota.Serialization.Json
             if(jsonElement.ValueEquals(ReadOnlySpan<byte>.Empty))
                 return null;
 
-            if(TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.TimeSpan, out var convertedTimeSpan))
+            if(HasCustomTimeSpanConverter() && TryGetUsingTypeInfo(jsonElement, _jsonSerializerContext.TimeSpan, out var convertedTimeSpan))
                 return convertedTimeSpan;
 
+            var jsonString = jsonElement.GetString()!;
+            if(TimeSpan.TryParseExact(jsonString, "c", CultureInfo.InvariantCulture, out var constantTimeSpan))
+                return constantTimeSpan;
+
             // Parse an ISO8601 duration.http://en.wikipedia.org/wiki/ISO_8601#Durations to a TimeSpan
-            return XmlConvert.ToTimeSpan(jsonElement.GetString()!);
+            return XmlConvert.ToTimeSpan(jsonString);
         }
 
         private Date? GetDateValue(JsonElement jsonElement)
