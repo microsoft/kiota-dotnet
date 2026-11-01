@@ -1170,5 +1170,49 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
             // Assert
             Assert.Equal(duration, entity.WorkDuration);
         }
+
+        [Theory]
+        [InlineData("1", TestEnum.One)]
+        [InlineData("2", TestEnum.Two)]
+        [InlineData("3", TestEnum.One | TestEnum.Two)]
+        public void GetEnumValue_CanReadNumber(string json, TestEnum expected)
+        {
+            using var jsonDocument = JsonDocument.Parse(json);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, KiotaJsonSerializationContext.Default);
+            var result = parseNode.GetEnumValue<TestEnum>();
+            Assert.Equal(expected, result);
+        }
+
+        [Theory]
+        [InlineData("null")]
+        [InlineData("true")]
+        [InlineData("{}")]
+        public void GetEnumValue_ReturnsNull_ForNonStringNonNumber(string json)
+        {
+            using var jsonDocument = JsonDocument.Parse(json);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, KiotaJsonSerializationContext.Default);
+            var result = parseNode.GetEnumValue<TestEnum>();
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetCollectionOfEnumValues_CanReadNumbers()
+        {
+            using var jsonDocument = JsonDocument.Parse("[1, 2, 3]");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, KiotaJsonSerializationContext.Default);
+            var result = parseNode.GetCollectionOfEnumValues<TestEnum>()?.ToList();
+            Assert.NotNull(result);
+            Assert.Equal(new TestEnum?[] { TestEnum.One, TestEnum.Two, TestEnum.One | TestEnum.Two }, result);
+        }
+
+        [Fact]
+        public void GetCollectionOfPrimitiveValues_CanReadNumericEnums()
+        {
+            using var jsonDocument = JsonDocument.Parse("[1, 2]");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, KiotaJsonSerializationContext.Default);
+            var result = parseNode.GetCollectionOfPrimitiveValues<TestEnum>()?.ToList();
+            Assert.NotNull(result);
+            Assert.Equal(new[] { TestEnum.One, TestEnum.Two }, result);
+        }
     }
 }
