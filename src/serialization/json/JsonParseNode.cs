@@ -172,8 +172,7 @@ namespace Microsoft.Kiota.Serialization.Json
         public T? GetEnumValue<T>() where T : struct, Enum
 #endif
         {
-            var rawValue = _jsonNode.GetString();
-            return EnumHelpers.GetEnumValue<T>(rawValue!);
+            return GetEnumValue<T>(_jsonNode);
         }
 
         /// <summary>
@@ -274,6 +273,10 @@ namespace Microsoft.Kiota.Serialization.Json
                         yield return (T)(object)GetDateValue(collectionValue)!;
                     else if(genericType == TypeConstants.TimeType)
                         yield return (T)(object)GetTimeValue(collectionValue)!;
+                    else if(collectionValue.ValueKind == JsonValueKind.Number && (genericType.IsEnum || Nullable.GetUnderlyingType(genericType)?.IsEnum == true) && collectionValue.TryGetInt64(out var longVal))
+                    {
+                        yield return (T)EnumHelpers.GetEnumValue(genericType, longVal.ToString(CultureInfo.InvariantCulture))!;
+                    }
                     else if(GetStringValue(collectionValue) is { Length: > 0 } rawValue)
                     {
                         yield return (T)EnumHelpers.GetEnumValue(genericType, rawValue)!;
@@ -411,8 +414,16 @@ namespace Microsoft.Kiota.Serialization.Json
         private static T? GetEnumValue<T>(JsonElement jsonElement) where T : struct, Enum
 #endif
         {
-            var rawValue = jsonElement.GetString();
-            return EnumHelpers.GetEnumValue<T>(rawValue!);
+            if(jsonElement.ValueKind == JsonValueKind.Null || jsonElement.ValueKind == JsonValueKind.Undefined)
+                return null;
+            if(jsonElement.ValueKind == JsonValueKind.Number && jsonElement.TryGetInt64(out var longVal))
+                return EnumHelpers.GetEnumValue<T>(longVal.ToString(CultureInfo.InvariantCulture));
+            if(jsonElement.ValueKind == JsonValueKind.String)
+            {
+                var rawValue = jsonElement.GetString();
+                return EnumHelpers.GetEnumValue<T>(rawValue!);
+            }
+            return null;
         }
 
         /// <summary>
