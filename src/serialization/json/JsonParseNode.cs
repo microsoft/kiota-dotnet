@@ -273,9 +273,21 @@ namespace Microsoft.Kiota.Serialization.Json
                         yield return (T)(object)GetDateValue(collectionValue)!;
                     else if(genericType == TypeConstants.TimeType)
                         yield return (T)(object)GetTimeValue(collectionValue)!;
-                    else if(collectionValue.ValueKind == JsonValueKind.Number && (genericType.IsEnum || Nullable.GetUnderlyingType(genericType)?.IsEnum == true) && collectionValue.TryGetInt64(out var longVal))
+                    else if(collectionValue.ValueKind == JsonValueKind.Number && (genericType.IsEnum || Nullable.GetUnderlyingType(genericType)?.IsEnum == true))
                     {
-                        yield return (T)EnumHelpers.GetEnumValue(genericType, longVal.ToString(CultureInfo.InvariantCulture))!;
+                        var targetEnumType = Nullable.GetUnderlyingType(genericType) ?? genericType;
+                        if(TryGetNumericEnumValue(collectionValue, targetEnumType, out var numericVal))
+                        {
+                            yield return (T)numericVal!;
+                        }
+                        else if(Nullable.GetUnderlyingType(genericType) != null)
+                        {
+                            yield return default!;
+                        }
+                        else
+                        {
+                            yield return (T)(object)null!;
+                        }
                     }
                     else if(GetStringValue(collectionValue) is { Length: > 0 } rawValue)
                     {
@@ -416,14 +428,51 @@ namespace Microsoft.Kiota.Serialization.Json
         {
             if(jsonElement.ValueKind == JsonValueKind.Null || jsonElement.ValueKind == JsonValueKind.Undefined)
                 return null;
-            if(jsonElement.ValueKind == JsonValueKind.Number && jsonElement.TryGetInt64(out var longVal))
-                return EnumHelpers.GetEnumValue<T>(longVal.ToString(CultureInfo.InvariantCulture));
+            if(jsonElement.ValueKind == JsonValueKind.Number)
+            {
+                if(TryGetNumericEnumValue(jsonElement, typeof(T), out var numericVal))
+                    return (T)numericVal!;
+                return null;
+            }
             if(jsonElement.ValueKind == JsonValueKind.String)
             {
                 var rawValue = jsonElement.GetString();
                 return EnumHelpers.GetEnumValue<T>(rawValue!);
             }
             return null;
+        }
+
+#if NET5_0_OR_GREATER
+        private static bool TryGetNumericEnumValue(JsonElement jsonElement, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type enumType, out object? result)
+#else
+        private static bool TryGetNumericEnumValue(JsonElement jsonElement, Type enumType, out object? result)
+#endif
+        {
+            var underlyingType = Enum.GetUnderlyingType(enumType);
+            if(jsonElement.TryGetInt64(out var longVal))
+            {
+                try
+                {
+                    var converted = Convert.ChangeType(longVal, underlyingType, CultureInfo.InvariantCulture);
+                    result = Enum.ToObject(enumType, converted);
+                    return true;
+                }
+                catch(OverflowException) { }
+                catch(ArgumentException) { }
+            }
+            else if(jsonElement.TryGetUInt64(out var ulongVal))
+            {
+                try
+                {
+                    var converted = Convert.ChangeType(ulongVal, underlyingType, CultureInfo.InvariantCulture);
+                    result = Enum.ToObject(enumType, converted);
+                    return true;
+                }
+                catch(OverflowException) { }
+                catch(ArgumentException) { }
+            }
+            result = null;
+            return false;
         }
 
         /// <summary>
