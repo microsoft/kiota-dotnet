@@ -1172,6 +1172,8 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         }
 
         [Theory]
+        [InlineData("0", (TestEnum)0)]
+        [InlineData("-1", (TestEnum)(-1))]
         [InlineData("1", TestEnum.One)]
         [InlineData("2", TestEnum.Two)]
         [InlineData("3", TestEnum.One | TestEnum.Two)]
@@ -1187,7 +1189,9 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [InlineData("null")]
         [InlineData("true")]
         [InlineData("{}")]
-        public void GetEnumValue_ReturnsNull_ForNonStringNonNumber(string json)
+        [InlineData("2147483648")]
+        [InlineData("9223372036854775808")]
+        public void GetEnumValue_ReturnsNull_ForNonStringNonNumberOrOutOfRange(string json)
         {
             using var jsonDocument = JsonDocument.Parse(json);
             var parseNode = new JsonParseNode(jsonDocument.RootElement, KiotaJsonSerializationContext.Default);
@@ -1198,21 +1202,92 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         [Fact]
         public void GetCollectionOfEnumValues_CanReadNumbers()
         {
-            using var jsonDocument = JsonDocument.Parse("[1, 2, 3]");
+            using var jsonDocument = JsonDocument.Parse("[0, -1, 1, 2, 3]");
             var parseNode = new JsonParseNode(jsonDocument.RootElement, KiotaJsonSerializationContext.Default);
             var result = parseNode.GetCollectionOfEnumValues<TestEnum>()?.ToList();
             Assert.NotNull(result);
-            Assert.Equal(new TestEnum?[] { TestEnum.One, TestEnum.Two, TestEnum.One | TestEnum.Two }, result);
+            Assert.Equal(new TestEnum?[] { (TestEnum)0, (TestEnum)(-1), TestEnum.One, TestEnum.Two, TestEnum.One | TestEnum.Two }, result);
         }
 
         [Fact]
         public void GetCollectionOfPrimitiveValues_CanReadNumericEnums()
         {
-            using var jsonDocument = JsonDocument.Parse("[1, 2]");
+            using var jsonDocument = JsonDocument.Parse("[0, -1, 1, 2]");
             var parseNode = new JsonParseNode(jsonDocument.RootElement, KiotaJsonSerializationContext.Default);
             var result = parseNode.GetCollectionOfPrimitiveValues<TestEnum>()?.ToList();
             Assert.NotNull(result);
-            Assert.Equal(new[] { TestEnum.One, TestEnum.Two }, result);
+            Assert.Equal(new[] { (TestEnum)0, (TestEnum)(-1), TestEnum.One, TestEnum.Two }, result);
+        }
+
+        [Fact]
+        public void GetCollectionOfPrimitiveValues_CanReadNullableNumericEnumsWithZeroAndNegative()
+        {
+            using var jsonDocument = JsonDocument.Parse("[0, -1, 1, 2]");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, KiotaJsonSerializationContext.Default);
+            var result = parseNode.GetCollectionOfPrimitiveValues<TestEnum?>()?.ToList();
+            Assert.NotNull(result);
+            Assert.Equal(new TestEnum?[] { (TestEnum)0, (TestEnum)(-1), TestEnum.One, TestEnum.Two }, result);
+        }
+
+        [Fact]
+        public void GetCollectionOfPrimitiveValues_NullableEnum_PreservesNullForOutOfRange()
+        {
+            using var jsonDocument = JsonDocument.Parse("[9223372036854775808]");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, KiotaJsonSerializationContext.Default);
+            var result = parseNode.GetCollectionOfPrimitiveValues<TestEnum?>()?.ToList();
+            Assert.NotNull(result);
+            Assert.Equal(new TestEnum?[] { null }, result);
+        }
+
+        [Fact]
+        public void GetCollectionOfPrimitiveValues_NonNullableEnum_ThrowsForOutOfRange()
+        {
+            using var jsonDocument = JsonDocument.Parse("[9223372036854775808]");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, KiotaJsonSerializationContext.Default);
+            Assert.Throws<NullReferenceException>(() => parseNode.GetCollectionOfPrimitiveValues<TestEnum>()?.ToList());
+        }
+
+        [Theory]
+        [InlineData("9223372036854775808", TestULongEnum.High)]
+        [InlineData("\"9223372036854775808\"", TestULongEnum.High)]
+        [InlineData("1", TestULongEnum.One)]
+        [InlineData("0", TestULongEnum.None)]
+        public void GetEnumValue_ULongEnum_CanReadScalarNumberAndString(string json, TestULongEnum expected)
+        {
+            using var jsonDocument = JsonDocument.Parse(json);
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, KiotaJsonSerializationContext.Default);
+            var result = parseNode.GetEnumValue<TestULongEnum>();
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void GetCollectionOfEnumValues_ULongEnum_CanReadNumbers()
+        {
+            using var jsonDocument = JsonDocument.Parse("[0, 1, 9223372036854775808]");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, KiotaJsonSerializationContext.Default);
+            var result = parseNode.GetCollectionOfEnumValues<TestULongEnum>()?.ToList();
+            Assert.NotNull(result);
+            Assert.Equal(new TestULongEnum?[] { TestULongEnum.None, TestULongEnum.One, TestULongEnum.High }, result);
+        }
+
+        [Fact]
+        public void GetCollectionOfPrimitiveValues_ULongEnum_CanReadNumbers()
+        {
+            using var jsonDocument = JsonDocument.Parse("[0, 1, 9223372036854775808]");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, KiotaJsonSerializationContext.Default);
+            var result = parseNode.GetCollectionOfPrimitiveValues<TestULongEnum>()?.ToList();
+            Assert.NotNull(result);
+            Assert.Equal(new[] { TestULongEnum.None, TestULongEnum.One, TestULongEnum.High }, result);
+        }
+
+        [Fact]
+        public void GetCollectionOfPrimitiveValues_NullableULongEnum_CanReadNumbers()
+        {
+            using var jsonDocument = JsonDocument.Parse("[0, 1, 9223372036854775808]");
+            var parseNode = new JsonParseNode(jsonDocument.RootElement, KiotaJsonSerializationContext.Default);
+            var result = parseNode.GetCollectionOfPrimitiveValues<TestULongEnum?>()?.ToList();
+            Assert.NotNull(result);
+            Assert.Equal(new TestULongEnum?[] { TestULongEnum.None, TestULongEnum.One, TestULongEnum.High }, result);
         }
     }
 }
