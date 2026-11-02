@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------
 
@@ -36,6 +36,19 @@ namespace Microsoft.Kiota.Abstractions.Serialization
         /// Gets the value assigned to untyped node.
         /// </summary>
         /// <returns>The value assigned to untyped node.</returns>
-        public object? GetValue() => throw new NotImplementedException();
+        public object? GetValue() => this switch
+        {
+            UntypedString s => s.GetValue(),
+            UntypedBoolean b => b.GetValue(),
+            UntypedInteger i => i.GetValue(),
+            UntypedLong l => l.GetValue(),
+            UntypedFloat f => f.GetValue(),
+            UntypedDouble d => d.GetValue(),
+            UntypedDecimal m => m.GetValue(),
+            UntypedObject o => o.GetValue(),
+            UntypedArray a => a.GetValue(),
+            UntypedNull => null,
+            _ => null
+        };
     }
 }
