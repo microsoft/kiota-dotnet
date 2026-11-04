@@ -102,6 +102,25 @@ public class FormParseNodeTests
         Assert.NotNull(numberCollection);
         Assert.Equal(2, numberCollection.Count());
         Assert.Equal(true, numberCollection.First());
+        Assert.Equal(false, numberCollection.Last());
+    }
+
+    [Fact]
+    public void GetCollectionOfBooleanPrimitiveValuesWithInvalidEntriesFromForm()
+    {
+        string testFormData = "bools=true&" +
+                              "bools=invalid&" +
+                              "bools=null&" +
+                              "bools=false";
+        var formParseNode = new FormParseNode(testFormData);
+        var boolsNode = formParseNode.GetChildNode("bools");
+        var collection = boolsNode?.GetCollectionOfPrimitiveValues<bool?>()?.ToList();
+        Assert.NotNull(collection);
+        Assert.Equal(4, collection.Count);
+        Assert.True(collection[0]);
+        Assert.Null(collection[1]);
+        Assert.Null(collection[2]);
+        Assert.False(collection[3]);
     }
 
     [Fact]
