@@ -206,6 +206,27 @@ public class FormParseNodeTests
     }
 
     [Fact]
+    public void FormParseNode_GetByteArrayValue_UrlSafeAndUnpadded()
+    {
+        // Arrange & Act
+        var unpadded = new FormParseNode("dGV4dA").GetByteArrayValue();
+        var urlSafe = new FormParseNode("-_-_").GetByteArrayValue();
+
+        // Assert
+        Assert.Equal([0x74, 0x65, 0x78, 0x74], unpadded);
+        Assert.Equal([0xfb, 0xff, 0xbf], urlSafe);
+    }
+
+    [Fact]
+    public void FormParseNode_GetByteArrayValue_NullAndInvalid()
+    {
+        // Arrange & Act & Assert
+        Assert.Null(new FormParseNode("null").GetByteArrayValue());
+        Assert.Null(new FormParseNode("").GetByteArrayValue());
+        Assert.Null(new FormParseNode("!invalid-base64!").GetByteArrayValue());
+    }
+
+    [Fact]
     public void FormParseNode_GetByteValue()
     {
         // Arrange
@@ -259,6 +280,33 @@ public class FormParseNodeTests
 
         // Assert
         Assert.Equal(new TimeSpan(756, 4, 6, 8, 10), result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetTimeSpanValue_NullAndInvalid()
+    {
+        // Arrange & Act & Assert
+        Assert.Null(new FormParseNode("null").GetTimeSpanValue());
+        Assert.Null(new FormParseNode("").GetTimeSpanValue());
+        Assert.Null(new FormParseNode("invalid-duration").GetTimeSpanValue());
+    }
+
+    [Fact]
+    public void GetCollectionOfTimeSpanPrimitiveValuesWithInvalidEntriesFromForm()
+    {
+        string testFormData = "durations=PT1H&" +
+                              "durations=null&" +
+                              "durations=invalid&" +
+                              "durations=PT2H";
+        var formParseNode = new FormParseNode(testFormData);
+        var durationsNode = formParseNode.GetChildNode("durations");
+        var collection = durationsNode?.GetCollectionOfPrimitiveValues<TimeSpan?>()?.ToList();
+        Assert.NotNull(collection);
+        Assert.Equal(4, collection.Count);
+        Assert.Equal(TimeSpan.FromHours(1), collection[0]);
+        Assert.Null(collection[1]);
+        Assert.Null(collection[2]);
+        Assert.Equal(TimeSpan.FromHours(2), collection[3]);
     }
 
     [Fact]
