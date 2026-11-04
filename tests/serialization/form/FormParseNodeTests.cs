@@ -150,6 +150,30 @@ public class FormParseNodeTests
     }
 
     [Fact]
+    public void FormParseNode_GetBoolValue_False()
+    {
+        // Arrange
+        var text = "false";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetBoolValue();
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetBoolValue_ReturnsNullForInvalid()
+    {
+        // Arrange & Act & Assert
+        Assert.Null(new FormParseNode("invalid").GetBoolValue());
+        Assert.Null(new FormParseNode("null").GetBoolValue());
+        Assert.Null(new FormParseNode("").GetBoolValue());
+        Assert.Null(new FormParseNode("123").GetBoolValue());
+    }
+
+    [Fact]
     public void FormParseNode_GetByteArrayValue()
     {
         // Arrange
