@@ -66,7 +66,19 @@ public class FormParseNode : IParseNode
         if(string.IsNullOrEmpty(rawValue) || "null".Equals(rawValue, StringComparison.OrdinalIgnoreCase)) return null;
         try
         {
-            var sanitized = rawValue.Trim().Replace('-', '+').Replace('_', '/');
+            var sanitizedChars = new char[rawValue.Length];
+            var count = 0;
+            foreach(var c in rawValue)
+            {
+                if(char.IsWhiteSpace(c)) continue;
+                sanitizedChars[count++] = c switch
+                {
+                    '-' => '+',
+                    '_' => '/',
+                    _ => c
+                };
+            }
+            var sanitized = new string(sanitizedChars, 0, count);
             switch(sanitized.Length % 4)
             {
                 case 2: sanitized += "=="; break;
@@ -235,7 +247,7 @@ public class FormParseNode : IParseNode
             // Parse an ISO8601 duration.http://en.wikipedia.org/wiki/ISO_8601#Durations to a TimeSpan
             return XmlConvert.ToTimeSpan(rawString);
         }
-        catch(FormatException)
+        catch(Exception ex) when(ex is FormatException or OverflowException)
         {
             return null;
         }
@@ -266,7 +278,7 @@ public class FormParseNode : IParseNode
             // Parse an ISO8601 duration.http://en.wikipedia.org/wiki/ISO_8601#Durations to a TimeSpan
             return XmlConvert.ToTimeSpan(value);
         }
-        catch(FormatException)
+        catch(Exception ex) when(ex is FormatException or OverflowException)
         {
             return null;
         }
