@@ -58,7 +58,7 @@ public class FormParseNode : IParseNode
     /// <inheritdoc/>
     public Action<IParsable>? OnAfterAssignFieldValues { get; set; }
     /// <inheritdoc/>
-    public bool? GetBoolValue() => bool.TryParse(DecodedValue, out var result) && result;
+    public bool? GetBoolValue() => bool.TryParse(DecodedValue, out var result) ? result : null;
     /// <inheritdoc/>
     public byte[]? GetByteArrayValue()
     {
