@@ -63,8 +63,21 @@ public class FormParseNode : IParseNode
     public byte[]? GetByteArrayValue()
     {
         var rawValue = DecodedValue;
-        if(string.IsNullOrEmpty(rawValue)) return null;
-        return Convert.FromBase64String(rawValue);
+        if(string.IsNullOrEmpty(rawValue) || "null".Equals(rawValue, StringComparison.OrdinalIgnoreCase)) return null;
+        try
+        {
+            var sanitized = rawValue.Trim().Replace('-', '+').Replace('_', '/');
+            switch(sanitized.Length % 4)
+            {
+                case 2: sanitized += "=="; break;
+                case 3: sanitized += "="; break;
+            }
+            return Convert.FromBase64String(sanitized);
+        }
+        catch(FormatException)
+        {
+            return null;
+        }
     }
     /// <inheritdoc/>
     public byte? GetByteValue() => byte.TryParse(DecodedValue, out var result) ? result : null;
@@ -214,11 +227,18 @@ public class FormParseNode : IParseNode
     public TimeSpan? GetTimeSpanValue()
     {
         var rawString = DecodedValue;
-        if(string.IsNullOrEmpty(rawString))
+        if(string.IsNullOrEmpty(rawString) || "null".Equals(rawString, StringComparison.OrdinalIgnoreCase))
             return null;
 
-        // Parse an ISO8601 duration.http://en.wikipedia.org/wiki/ISO_8601#Durations to a TimeSpan
-        return XmlConvert.ToTimeSpan(rawString);
+        try
+        {
+            // Parse an ISO8601 duration.http://en.wikipedia.org/wiki/ISO_8601#Durations to a TimeSpan
+            return XmlConvert.ToTimeSpan(rawString);
+        }
+        catch(FormatException)
+        {
+            return null;
+        }
     }
 
     /// <inheritdoc/>
@@ -238,11 +258,18 @@ public class FormParseNode : IParseNode
     private static Time? GetTimeValue(string value) => DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? new Time(result) : null;
     private static TimeSpan? GetTimeSpanValue(string value)
     {
-        if(string.IsNullOrEmpty(value))
+        if(string.IsNullOrEmpty(value) || "null".Equals(value, StringComparison.OrdinalIgnoreCase))
             return null;
 
-        // Parse an ISO8601 duration.http://en.wikipedia.org/wiki/ISO_8601#Durations to a TimeSpan
-        return XmlConvert.ToTimeSpan(value);
+        try
+        {
+            // Parse an ISO8601 duration.http://en.wikipedia.org/wiki/ISO_8601#Durations to a TimeSpan
+            return XmlConvert.ToTimeSpan(value);
+        }
+        catch(FormatException)
+        {
+            return null;
+        }
     }
 
     /// <inheritdoc/>
