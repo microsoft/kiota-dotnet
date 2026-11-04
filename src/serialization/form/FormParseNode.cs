@@ -224,7 +224,7 @@ public class FormParseNode : IParseNode
     /// <inheritdoc/>
     public Time? GetTimeValue() => DateTime.TryParse(DecodedValue, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? new Time(result) : null;
 
-    private static bool? GetBoolValue(string value) => bool.TryParse(value, out var result) && result;
+    private static bool? GetBoolValue(string value) => bool.TryParse(value, out var result) ? result : null;
     private static byte? GetByteValue(string value) => byte.TryParse(value, out var result) ? result : null;
     private static sbyte? GetSbyteValue(string value) => sbyte.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     private static int? GetIntValue(string value) => int.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
