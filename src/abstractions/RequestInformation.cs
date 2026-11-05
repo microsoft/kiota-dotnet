@@ -469,6 +469,9 @@ namespace Microsoft.Kiota.Abstractions
                 case double d:
                     writer.WriteDoubleValue(null, d);
                     break;
+                case decimal dec:
+                    writer.WriteDecimalValue(null, dec);
+                    break;
                 case Guid g:
                     writer.WriteGuidValue(null, g);
                     break;
