@@ -856,6 +856,23 @@ namespace Microsoft.Kiota.Abstractions.Tests
             Assert.Contains("hashIds=55331110-6817-4a9b-83b2-57617e3e08e5", url);
         }
 
+        [Fact]
+        public void SetsDateTimeOffsetAndEnumInListQueryParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?enums*,dates*}"
+            };
+
+            requestInfo.QueryParameters.Add("enums", new List<TestEnum> { TestEnum.First, TestEnum.Second });
+            requestInfo.QueryParameters.Add("dates", new List<DateTimeOffset> { new DateTimeOffset(2023, 10, 26, 8, 30, 0, TimeSpan.Zero) });
+
+            var url = requestInfo.URI.OriginalString;
+            Assert.Contains("enums=Value_1&enums=Value_2", url);
+            Assert.Contains("dates=2023-10-26T08%3A30%3A00.0000000%2B00%3A00", url);
+        }
+
 
         [Fact]
         public void DoesNotExpandSecondLayerArrays()
