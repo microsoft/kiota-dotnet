@@ -836,6 +836,26 @@ namespace Microsoft.Kiota.Abstractions.Tests
             Assert.Equal("http://localhost/me?items=55331110-6817-4a9b-83b2-57617e3e08e5,482dff4f-63d6-47f4-a88b-5caec03180d4", requestInfo.URI.OriginalString);
         }
 
+        [Fact]
+        public void SetsGuidValuesInListAndHashSetQueryParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?listIds*,hashIds}"
+            };
+
+            var g1 = Guid.Parse("55331110-6817-4A9B-83B2-57617E3E08E5");
+            var g2 = Guid.Parse("482DFF4F-63D6-47F4-A88B-5CAEC03180D4");
+
+            requestInfo.QueryParameters.Add("listIds", new List<Guid> { g1, g2 });
+            requestInfo.QueryParameters.Add("hashIds", new HashSet<Guid> { g1 });
+
+            var url = requestInfo.URI.OriginalString;
+            Assert.Contains("listIds=55331110-6817-4a9b-83b2-57617e3e08e5&listIds=482dff4f-63d6-47f4-a88b-5caec03180d4", url);
+            Assert.Contains("hashIds=55331110-6817-4a9b-83b2-57617e3e08e5", url);
+        }
+
 
         [Fact]
         public void DoesNotExpandSecondLayerArrays()
