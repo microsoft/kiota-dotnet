@@ -477,6 +477,25 @@ namespace Microsoft.Kiota.Abstractions.Tests
             serializationWriterMock.Verify(x => x.WriteCollectionOfPrimitiveValues(It.IsAny<string>(), It.IsAny<IEnumerable<string>>()), Times.Never);
         }
         [Fact]
+        public void SetsDecimalScalarContent()
+        {
+            var requestAdapterMock = new Mock<IRequestAdapter>();
+            var serializationWriterMock = new Mock<ISerializationWriter>();
+            var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
+            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(serializationWriterMock.Object);
+            requestAdapterMock.SetupGet(x => x.SerializationWriterFactory).Returns(serializationWriterFactoryMock.Object);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.POST,
+                UrlTemplate = "{+baseurl}/users{?%24count}"
+            };
+
+            requestInfo.SetContentFromScalar(requestAdapterMock.Object, "application/json", 123.45m);
+
+            serializationWriterMock.Verify(x => x.WriteDecimalValue(null, 123.45m), Times.Once);
+            serializationWriterMock.Verify(x => x.WriteCollectionOfPrimitiveValues(It.IsAny<string>(), It.IsAny<IEnumerable<decimal>>()), Times.Never);
+        }
+        [Fact]
         public void SetsEnumContent()
         {
             var requestAdapterMock = new Mock<IRequestAdapter>();
