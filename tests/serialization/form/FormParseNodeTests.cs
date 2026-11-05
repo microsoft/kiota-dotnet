@@ -218,6 +218,17 @@ public class FormParseNodeTests
     }
 
     [Fact]
+    public void FormParseNode_GetByteArrayValue_WithPaddedBase64()
+    {
+        // Arrange & Act & Assert
+        Assert.Equal([0x61], new FormParseNode("YQ==").GetByteArrayValue());
+        Assert.Equal([0x61, 0x62], new FormParseNode("YWI=").GetByteArrayValue());
+        Assert.Equal([0x61, 0x62, 0x63], new FormParseNode("YWJj").GetByteArrayValue());
+        Assert.Equal([0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64],
+            new FormParseNode("SGVsbG8gV29ybGQ=").GetByteArrayValue());
+    }
+
+    [Fact]
     public void FormParseNode_GetByteArrayValue_NullAndInvalid()
     {
         // Arrange & Act & Assert
