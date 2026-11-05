@@ -221,11 +221,14 @@ public class FormParseNodeTests
     public void FormParseNode_GetByteArrayValue_NullAndInvalid()
     {
         // Arrange & Act & Assert
+        // Null or empty tokens return null
         Assert.Null(new FormParseNode("null").GetByteArrayValue());
         Assert.Null(new FormParseNode("").GetByteArrayValue());
+
+        // Malformed or non-standard Base64 payloads return null upon FormatException
         Assert.Null(new FormParseNode("!invalid-base64!").GetByteArrayValue());
-        Assert.Null(new FormParseNode("dGV4dA").GetByteArrayValue());
-        Assert.Null(new FormParseNode("-_-_").GetByteArrayValue());
+        Assert.Null(new FormParseNode("dGV4dA").GetByteArrayValue()); // Unpadded Base64
+        Assert.Null(new FormParseNode("-_-_").GetByteArrayValue()); // URL-safe characters (- and _)
     }
 
     [Fact]
