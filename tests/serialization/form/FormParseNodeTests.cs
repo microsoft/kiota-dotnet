@@ -206,29 +206,15 @@ public class FormParseNodeTests
     }
 
     [Fact]
-    public void FormParseNode_GetByteArrayValue_UrlSafeAndUnpadded()
-    {
-        // Arrange & Act
-        var unpadded = new FormParseNode("dGV4dA").GetByteArrayValue();
-        var urlSafe = new FormParseNode("-_-_").GetByteArrayValue();
-
-        // Assert
-        Assert.Equal([0x74, 0x65, 0x78, 0x74], unpadded);
-        Assert.Equal([0xfb, 0xff, 0xbf], urlSafe);
-    }
-
-    [Fact]
     public void FormParseNode_GetByteArrayValue_WithEmbeddedWhitespace()
     {
         // Arrange & Act
         var urlEncodedSpaces = new FormParseNode("dG%20%20V4dA%3D%3D").GetByteArrayValue();
         var embeddedWhitespace = new FormParseNode("dG \t\r\nV4dA==").GetByteArrayValue();
-        var unpaddedWhitespace = new FormParseNode("dG  V4dA").GetByteArrayValue();
 
         // Assert
         Assert.Equal([0x74, 0x65, 0x78, 0x74], urlEncodedSpaces);
         Assert.Equal([0x74, 0x65, 0x78, 0x74], embeddedWhitespace);
-        Assert.Equal([0x74, 0x65, 0x78, 0x74], unpaddedWhitespace);
     }
 
     [Fact]
@@ -238,6 +224,8 @@ public class FormParseNodeTests
         Assert.Null(new FormParseNode("null").GetByteArrayValue());
         Assert.Null(new FormParseNode("").GetByteArrayValue());
         Assert.Null(new FormParseNode("!invalid-base64!").GetByteArrayValue());
+        Assert.Null(new FormParseNode("dGV4dA").GetByteArrayValue());
+        Assert.Null(new FormParseNode("-_-_").GetByteArrayValue());
     }
 
     [Fact]

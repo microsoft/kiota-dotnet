@@ -66,25 +66,7 @@ public class FormParseNode : IParseNode
         if(string.IsNullOrEmpty(rawValue) || "null".Equals(rawValue, StringComparison.OrdinalIgnoreCase)) return null;
         try
         {
-            var sanitizedChars = new char[rawValue.Length];
-            var count = 0;
-            foreach(var c in rawValue)
-            {
-                if(char.IsWhiteSpace(c)) continue;
-                sanitizedChars[count++] = c switch
-                {
-                    '-' => '+',
-                    '_' => '/',
-                    _ => c
-                };
-            }
-            var sanitized = new string(sanitizedChars, 0, count);
-            switch(sanitized.Length % 4)
-            {
-                case 2: sanitized += "=="; break;
-                case 3: sanitized += "="; break;
-            }
-            return Convert.FromBase64String(sanitized);
+            return Convert.FromBase64String(rawValue);
         }
         catch(FormatException)
         {
