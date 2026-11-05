@@ -873,6 +873,23 @@ namespace Microsoft.Kiota.Abstractions.Tests
             Assert.Contains("dates=2023-10-26T08%3A30%3A00.0000000%2B00%3A00", url);
         }
 
+        [Fact]
+        public void SetsListValuesInPathParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/users/{ids}"
+            };
+
+            var g1 = Guid.Parse("55331110-6817-4A9B-83B2-57617E3E08E5");
+            var g2 = Guid.Parse("482DFF4F-63D6-47F4-A88B-5CAEC03180D4");
+            requestInfo.PathParameters.Add("ids", new List<Guid> { g1, g2 });
+
+            var url = requestInfo.URI.OriginalString;
+            Assert.Equal("http://localhost/users/55331110-6817-4a9b-83b2-57617e3e08e5,482dff4f-63d6-47f4-a88b-5caec03180d4", url);
+        }
+
 
         [Fact]
         public void DoesNotExpandSecondLayerArrays()
