@@ -114,6 +114,7 @@ namespace Microsoft.Kiota.Abstractions
         private static object GetSanitizedValues(object value) => value switch
         {
             Array array => ExpandArray(array),
+            IEnumerable enumerable and not string and not IDictionary => ExpandEnumerable(enumerable),
             _ => GetSanitizedValue(value),
         };
 
@@ -200,6 +201,16 @@ namespace Microsoft.Kiota.Abstractions
                 passedArray[i] = GetSanitizedValue(collection.GetValue(i)!);
             }
             return passedArray;
+        }
+
+        private static object[] ExpandEnumerable(IEnumerable collection)
+        {
+            var list = collection is ICollection col ? new List<object>(col.Count) : new List<object>();
+            foreach(var item in collection)
+            {
+                list.Add(item is not null ? GetSanitizedValue(item) : null!);
+            }
+            return list.ToArray();
         }
 
         private static object ReplaceEnumValueByStringRepresentation(object source)
