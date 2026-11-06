@@ -477,6 +477,25 @@ namespace Microsoft.Kiota.Abstractions.Tests
             serializationWriterMock.Verify(x => x.WriteCollectionOfPrimitiveValues(It.IsAny<string>(), It.IsAny<IEnumerable<string>>()), Times.Never);
         }
         [Fact]
+        public void SetsDecimalScalarContent()
+        {
+            var requestAdapterMock = new Mock<IRequestAdapter>();
+            var serializationWriterMock = new Mock<ISerializationWriter>();
+            var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
+            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(serializationWriterMock.Object);
+            requestAdapterMock.SetupGet(x => x.SerializationWriterFactory).Returns(serializationWriterFactoryMock.Object);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.POST,
+                UrlTemplate = "{+baseurl}/users{?%24count}"
+            };
+
+            requestInfo.SetContentFromScalar(requestAdapterMock.Object, "application/json", 123.45m);
+
+            serializationWriterMock.Verify(x => x.WriteDecimalValue(null, 123.45m), Times.Once);
+            serializationWriterMock.Verify(x => x.WriteCollectionOfPrimitiveValues(It.IsAny<string>(), It.IsAny<IEnumerable<decimal>>()), Times.Never);
+        }
+        [Fact]
         public void SetsEnumContent()
         {
             var requestAdapterMock = new Mock<IRequestAdapter>();
@@ -815,6 +834,60 @@ namespace Microsoft.Kiota.Abstractions.Tests
 
             // Assert
             Assert.Equal("http://localhost/me?items=55331110-6817-4a9b-83b2-57617e3e08e5,482dff4f-63d6-47f4-a88b-5caec03180d4", requestInfo.URI.OriginalString);
+        }
+
+        [Fact]
+        public void SetsGuidValuesInListAndHashSetQueryParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?listIds*,hashIds}"
+            };
+
+            var g1 = Guid.Parse("55331110-6817-4A9B-83B2-57617E3E08E5");
+            var g2 = Guid.Parse("482DFF4F-63D6-47F4-A88B-5CAEC03180D4");
+
+            requestInfo.QueryParameters.Add("listIds", new List<Guid> { g1, g2 });
+            requestInfo.QueryParameters.Add("hashIds", new HashSet<Guid> { g1 });
+
+            var url = requestInfo.URI.OriginalString;
+            Assert.Contains("listIds=55331110-6817-4a9b-83b2-57617e3e08e5&listIds=482dff4f-63d6-47f4-a88b-5caec03180d4", url);
+            Assert.Contains("hashIds=55331110-6817-4a9b-83b2-57617e3e08e5", url);
+        }
+
+        [Fact]
+        public void SetsDateTimeOffsetAndEnumInListQueryParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?enums*,dates*}"
+            };
+
+            requestInfo.QueryParameters.Add("enums", new List<TestEnum> { TestEnum.First, TestEnum.Second });
+            requestInfo.QueryParameters.Add("dates", new List<DateTimeOffset> { new DateTimeOffset(2023, 10, 26, 8, 30, 0, TimeSpan.Zero) });
+
+            var url = requestInfo.URI.OriginalString;
+            Assert.Contains("enums=Value_1&enums=Value_2", url);
+            Assert.Contains("dates=2023-10-26T08%3A30%3A00.0000000%2B00%3A00", url);
+        }
+
+        [Fact]
+        public void SetsListValuesInPathParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/users/{ids}"
+            };
+
+            var g1 = Guid.Parse("55331110-6817-4A9B-83B2-57617E3E08E5");
+            var g2 = Guid.Parse("482DFF4F-63D6-47F4-A88B-5CAEC03180D4");
+            requestInfo.PathParameters.Add("ids", new List<Guid> { g1, g2 });
+
+            var url = requestInfo.URI.OriginalString;
+            Assert.Equal("http://localhost/users/55331110-6817-4a9b-83b2-57617e3e08e5,482dff4f-63d6-47f4-a88b-5caec03180d4", url);
         }
 
 

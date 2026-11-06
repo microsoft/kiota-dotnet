@@ -111,9 +111,15 @@ namespace Microsoft.Kiota.Abstractions
             }
         }
 
+        /// <summary>
+        /// Sanitizes parameter values, expanding array and enumerable collections so individual elements are formatted appropriately for URI template expansion.
+        /// </summary>
+        /// <param name="value">The parameter value or collection to sanitize.</param>
+        /// <returns>The sanitized value or expanded array of sanitized elements.</returns>
         private static object GetSanitizedValues(object value) => value switch
         {
             Array array => ExpandArray(array),
+            IEnumerable enumerable and not string and not IDictionary => ExpandEnumerable(enumerable),
             _ => GetSanitizedValue(value),
         };
 
@@ -192,6 +198,11 @@ namespace Microsoft.Kiota.Abstractions
             }
         }
 
+        /// <summary>
+        /// Expands an array by sanitizing each element.
+        /// </summary>
+        /// <param name="collection">The array to expand.</param>
+        /// <returns>An array of sanitized values.</returns>
         private static object[] ExpandArray(Array collection)
         {
             var passedArray = new object[collection.Length];
@@ -200,6 +211,21 @@ namespace Microsoft.Kiota.Abstractions
                 passedArray[i] = GetSanitizedValue(collection.GetValue(i)!);
             }
             return passedArray;
+        }
+
+        /// <summary>
+        /// Expands an enumerable collection by sanitizing each element.
+        /// </summary>
+        /// <param name="collection">The enumerable collection to expand.</param>
+        /// <returns>An array of sanitized values.</returns>
+        private static object[] ExpandEnumerable(IEnumerable collection)
+        {
+            var list = collection is ICollection col ? new List<object>(col.Count) : new List<object>();
+            foreach(var item in collection)
+            {
+                list.Add(item is not null ? GetSanitizedValue(item) : null!);
+            }
+            return list.ToArray();
         }
 
         private static object ReplaceEnumValueByStringRepresentation(object source)
@@ -468,6 +494,9 @@ namespace Microsoft.Kiota.Abstractions
                     break;
                 case double d:
                     writer.WriteDoubleValue(null, d);
+                    break;
+                case decimal dec:
+                    writer.WriteDecimalValue(null, dec);
                     break;
                 case Guid g:
                     writer.WriteGuidValue(null, g);
