@@ -1,1 +1,2 @@
 #nullable enable
+Microsoft.Kiota.Abstractions.Method.QUERY = 9 -> Microsoft.Kiota.Abstractions.Method
