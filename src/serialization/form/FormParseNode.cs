@@ -58,13 +58,24 @@ public class FormParseNode : IParseNode
     /// <inheritdoc/>
     public Action<IParsable>? OnAfterAssignFieldValues { get; set; }
     /// <inheritdoc/>
-    public bool? GetBoolValue() => bool.TryParse(DecodedValue, out var result) && result;
+    public bool? GetBoolValue() => bool.TryParse(DecodedValue, out var result) ? result : null;
     /// <inheritdoc/>
+    /// <remarks>
+    /// Parses standard RFC 4648 Base64 payloads using <see cref="Convert.FromBase64String(string)"/>.
+    /// Malformed or non-standard Base64 inputs safely return <c>null</c>.
+    /// </remarks>
     public byte[]? GetByteArrayValue()
     {
         var rawValue = DecodedValue;
         if(string.IsNullOrEmpty(rawValue)) return null;
-        return Convert.FromBase64String(rawValue);
+        try
+        {
+            return Convert.FromBase64String(rawValue);
+        }
+        catch(FormatException)
+        {
+            return null;
+        }
     }
     /// <inheritdoc/>
     public byte? GetByteValue() => byte.TryParse(DecodedValue, out var result) ? result : null;
@@ -211,20 +222,12 @@ public class FormParseNode : IParseNode
     public string GetStringValue() => DecodedValue;
 
     /// <inheritdoc/>
-    public TimeSpan? GetTimeSpanValue()
-    {
-        var rawString = DecodedValue;
-        if(string.IsNullOrEmpty(rawString))
-            return null;
-
-        // Parse an ISO8601 duration.http://en.wikipedia.org/wiki/ISO_8601#Durations to a TimeSpan
-        return XmlConvert.ToTimeSpan(rawString);
-    }
+    public TimeSpan? GetTimeSpanValue() => GetTimeSpanValue(DecodedValue);
 
     /// <inheritdoc/>
     public Time? GetTimeValue() => DateTime.TryParse(DecodedValue, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? new Time(result) : null;
 
-    private static bool? GetBoolValue(string value) => bool.TryParse(value, out var result) && result;
+    private static bool? GetBoolValue(string value) => bool.TryParse(value, out var result) ? result : null;
     private static byte? GetByteValue(string value) => byte.TryParse(value, out var result) ? result : null;
     private static sbyte? GetSbyteValue(string value) => sbyte.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     private static int? GetIntValue(string value) => int.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
@@ -238,11 +241,18 @@ public class FormParseNode : IParseNode
     private static Time? GetTimeValue(string value) => DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? new Time(result) : null;
     private static TimeSpan? GetTimeSpanValue(string value)
     {
-        if(string.IsNullOrEmpty(value))
+        if(string.IsNullOrEmpty(value) || "null".Equals(value, StringComparison.OrdinalIgnoreCase))
             return null;
 
-        // Parse an ISO8601 duration.http://en.wikipedia.org/wiki/ISO_8601#Durations to a TimeSpan
-        return XmlConvert.ToTimeSpan(value);
+        try
+        {
+            // Parse an ISO8601 duration.http://en.wikipedia.org/wiki/ISO_8601#Durations to a TimeSpan
+            return XmlConvert.ToTimeSpan(value);
+        }
+        catch(Exception ex) when(ex is FormatException or OverflowException)
+        {
+            return null;
+        }
     }
 
     /// <inheritdoc/>

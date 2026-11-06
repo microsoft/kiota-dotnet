@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+using System.Globalization;
+using System.IO;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Serialization.Form.Tests.Mocks;
 
@@ -102,6 +103,25 @@ public class FormParseNodeTests
         Assert.NotNull(numberCollection);
         Assert.Equal(2, numberCollection.Count());
         Assert.Equal(true, numberCollection.First());
+        Assert.Equal(false, numberCollection.Last());
+    }
+
+    [Fact]
+    public void GetCollectionOfBooleanPrimitiveValuesWithInvalidEntriesFromForm()
+    {
+        string testFormData = "bools=true&" +
+                              "bools=invalid&" +
+                              "bools=null&" +
+                              "bools=false";
+        var formParseNode = new FormParseNode(testFormData);
+        var boolsNode = formParseNode.GetChildNode("bools");
+        var collection = boolsNode?.GetCollectionOfPrimitiveValues<bool?>()?.ToList();
+        Assert.NotNull(collection);
+        Assert.Equal(4, collection.Count);
+        Assert.True(collection[0]);
+        Assert.Null(collection[1]);
+        Assert.Null(collection[2]);
+        Assert.False(collection[3]);
     }
 
     [Fact]
@@ -150,6 +170,30 @@ public class FormParseNodeTests
     }
 
     [Fact]
+    public void FormParseNode_GetBoolValue_False()
+    {
+        // Arrange
+        var text = "false";
+        var parseNode = new FormParseNode(text);
+
+        // Act
+        var result = parseNode.GetBoolValue();
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetBoolValue_ReturnsNullForInvalid()
+    {
+        // Arrange & Act & Assert
+        Assert.Null(new FormParseNode("invalid").GetBoolValue());
+        Assert.Null(new FormParseNode("null").GetBoolValue());
+        Assert.Null(new FormParseNode("").GetBoolValue());
+        Assert.Null(new FormParseNode("123").GetBoolValue());
+    }
+
+    [Fact]
     public void FormParseNode_GetByteArrayValue()
     {
         // Arrange
@@ -160,6 +204,68 @@ public class FormParseNodeTests
         var result = parseNode.GetByteArrayValue();
         // Assert
         Assert.Equal([0x74, 0x65, 0x78, 0x74], result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetByteArrayValue_WithEmbeddedWhitespace()
+    {
+        // Arrange & Act
+        var urlEncodedSpaces = new FormParseNode("dG%20%20V4dA%3D%3D").GetByteArrayValue();
+        var embeddedWhitespace = new FormParseNode("dG \t\r\nV4dA==").GetByteArrayValue();
+
+        // Assert
+        Assert.Equal([0x74, 0x65, 0x78, 0x74], urlEncodedSpaces);
+        Assert.Equal([0x74, 0x65, 0x78, 0x74], embeddedWhitespace);
+    }
+
+    [Fact]
+    public void FormParseNode_GetByteArrayValue_WithPaddedBase64()
+    {
+        // Arrange & Act & Assert
+        Assert.Equal([0x61], new FormParseNode("YQ==").GetByteArrayValue());
+        Assert.Equal([0x61, 0x62], new FormParseNode("YWI=").GetByteArrayValue());
+        Assert.Equal([0x61, 0x62, 0x63], new FormParseNode("YWJj").GetByteArrayValue());
+        Assert.Equal([0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64],
+            new FormParseNode("SGVsbG8gV29ybGQ=").GetByteArrayValue());
+    }
+
+    [Fact]
+    public void FormParseNode_GetByteArrayValue_EmptyAndInvalid()
+    {
+        // Arrange & Act & Assert
+        // Empty token returns null
+        Assert.Null(new FormParseNode("").GetByteArrayValue());
+
+        // Malformed or non-standard Base64 payloads return null upon FormatException
+        Assert.Null(new FormParseNode("!invalid-base64!").GetByteArrayValue());
+        Assert.Null(new FormParseNode("dGV4dA").GetByteArrayValue()); // Unpadded Base64
+        Assert.Null(new FormParseNode("-_-_").GetByteArrayValue()); // URL-safe characters (- and _)
+    }
+
+    [Fact]
+    public void FormParseNode_GetByteArrayValue_DecodesValidBase64MatchingNullString()
+    {
+        // Arrange: "null" is valid RFC 4648 Base64 for the 3-byte payload [0x9E, 0xE9, 0x65]
+        byte[] expected = [0x9E, 0xE9, 0x65];
+        using var writer = new FormSerializationWriter();
+        writer.WriteByteArrayValue("data", expected);
+        using var stream = writer.GetSerializedContent();
+        using var reader = new StreamReader(stream);
+        var content = reader.ReadToEnd();
+        Assert.Equal("data=null", content);
+
+        // Act
+        var node = new FormParseNode(content);
+        var result = node.GetChildNode("data")?.GetByteArrayValue();
+
+        // Assert: round-trip successfully decodes the byte payload
+        Assert.NotNull(result);
+        Assert.Equal(expected, result);
+
+        // Direct node decode
+        var directResult = new FormParseNode("null").GetByteArrayValue();
+        Assert.NotNull(directResult);
+        Assert.Equal(expected, directResult);
     }
 
     [Fact]
@@ -216,6 +322,36 @@ public class FormParseNodeTests
 
         // Assert
         Assert.Equal(new TimeSpan(756, 4, 6, 8, 10), result);
+    }
+
+    [Fact]
+    public void FormParseNode_GetTimeSpanValue_NullAndInvalid()
+    {
+        // Arrange & Act & Assert
+        Assert.Null(new FormParseNode("null").GetTimeSpanValue());
+        Assert.Null(new FormParseNode("").GetTimeSpanValue());
+        Assert.Null(new FormParseNode("invalid-duration").GetTimeSpanValue());
+        Assert.Null(new FormParseNode("P10675200D").GetTimeSpanValue());
+    }
+
+    [Fact]
+    public void GetCollectionOfTimeSpanPrimitiveValuesWithInvalidEntriesFromForm()
+    {
+        string testFormData = "durations=PT1H&" +
+                              "durations=null&" +
+                              "durations=invalid&" +
+                              "durations=P10675200D&" +
+                              "durations=PT2H";
+        var formParseNode = new FormParseNode(testFormData);
+        var durationsNode = formParseNode.GetChildNode("durations");
+        var collection = durationsNode?.GetCollectionOfPrimitiveValues<TimeSpan?>()?.ToList();
+        Assert.NotNull(collection);
+        Assert.Equal(5, collection.Count);
+        Assert.Equal(TimeSpan.FromHours(1), collection[0]);
+        Assert.Null(collection[1]);
+        Assert.Null(collection[2]);
+        Assert.Null(collection[3]);
+        Assert.Equal(TimeSpan.FromHours(2), collection[4]);
     }
 
     [Fact]
