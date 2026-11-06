@@ -67,7 +67,7 @@ public class FormParseNode : IParseNode
     public byte[]? GetByteArrayValue()
     {
         var rawValue = DecodedValue;
-        if(string.IsNullOrEmpty(rawValue) || "null".Equals(rawValue, StringComparison.OrdinalIgnoreCase)) return null;
+        if(string.IsNullOrEmpty(rawValue)) return null;
         try
         {
             return Convert.FromBase64String(rawValue);

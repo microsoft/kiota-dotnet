@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.IO;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Serialization.Form.Tests.Mocks;
 
@@ -229,17 +230,42 @@ public class FormParseNodeTests
     }
 
     [Fact]
-    public void FormParseNode_GetByteArrayValue_NullAndInvalid()
+    public void FormParseNode_GetByteArrayValue_EmptyAndInvalid()
     {
         // Arrange & Act & Assert
-        // Null or empty tokens return null
-        Assert.Null(new FormParseNode("null").GetByteArrayValue());
+        // Empty token returns null
         Assert.Null(new FormParseNode("").GetByteArrayValue());
 
         // Malformed or non-standard Base64 payloads return null upon FormatException
         Assert.Null(new FormParseNode("!invalid-base64!").GetByteArrayValue());
         Assert.Null(new FormParseNode("dGV4dA").GetByteArrayValue()); // Unpadded Base64
         Assert.Null(new FormParseNode("-_-_").GetByteArrayValue()); // URL-safe characters (- and _)
+    }
+
+    [Fact]
+    public void FormParseNode_GetByteArrayValue_DecodesValidBase64MatchingNullString()
+    {
+        // Arrange: "null" is valid RFC 4648 Base64 for the 3-byte payload [0x9E, 0xE9, 0x65]
+        byte[] expected = [0x9E, 0xE9, 0x65];
+        using var writer = new FormSerializationWriter();
+        writer.WriteByteArrayValue("data", expected);
+        using var stream = writer.GetSerializedContent();
+        using var reader = new StreamReader(stream);
+        var content = reader.ReadToEnd();
+        Assert.Equal("data=null", content);
+
+        // Act
+        var node = new FormParseNode(content);
+        var result = node.GetChildNode("data")?.GetByteArrayValue();
+
+        // Assert: round-trip successfully decodes the byte payload
+        Assert.NotNull(result);
+        Assert.Equal(expected, result);
+
+        // Direct node decode
+        var directResult = new FormParseNode("null").GetByteArrayValue();
+        Assert.NotNull(directResult);
+        Assert.Equal(expected, directResult);
     }
 
     [Fact]
