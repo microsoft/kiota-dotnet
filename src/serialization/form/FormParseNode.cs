@@ -222,22 +222,7 @@ public class FormParseNode : IParseNode
     public string GetStringValue() => DecodedValue;
 
     /// <inheritdoc/>
-    public TimeSpan? GetTimeSpanValue()
-    {
-        var rawString = DecodedValue;
-        if(string.IsNullOrEmpty(rawString) || "null".Equals(rawString, StringComparison.OrdinalIgnoreCase))
-            return null;
-
-        try
-        {
-            // Parse an ISO8601 duration.http://en.wikipedia.org/wiki/ISO_8601#Durations to a TimeSpan
-            return XmlConvert.ToTimeSpan(rawString);
-        }
-        catch(Exception ex) when(ex is FormatException or OverflowException)
-        {
-            return null;
-        }
-    }
+    public TimeSpan? GetTimeSpanValue() => GetTimeSpanValue(DecodedValue);
 
     /// <inheritdoc/>
     public Time? GetTimeValue() => DateTime.TryParse(DecodedValue, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? new Time(result) : null;
