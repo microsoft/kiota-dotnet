@@ -82,10 +82,20 @@ public class TextParseNode : IParseNode
     /// <inheritdoc />
     public TimeSpan? GetTimeSpanValue()
     {
-        if(string.IsNullOrEmpty(Text)) return null;
+        if(string.IsNullOrEmpty(Text) || "null".Equals(Text, StringComparison.OrdinalIgnoreCase))
+            return null;
+
         if(TimeSpan.TryParseExact(Text, "c", CultureInfo.InvariantCulture, out var constantTimeSpan))
             return constantTimeSpan;
-        return XmlConvert.ToTimeSpan(Text);
+
+        try
+        {
+            return XmlConvert.ToTimeSpan(Text);
+        }
+        catch(Exception ex) when(ex is FormatException or OverflowException)
+        {
+            return null;
+        }
     }
     /// <inheritdoc />
     public Time? GetTimeValue() => DateTime.TryParse(Text, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? new Time(result) : null;
