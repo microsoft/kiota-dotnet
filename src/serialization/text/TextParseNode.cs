@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
@@ -32,7 +32,18 @@ public class TextParseNode : IParseNode
     /// <inheritdoc />
     public bool? GetBoolValue() => bool.TryParse(Text, out var result) ? result : null;
     /// <inheritdoc />
-    public byte[]? GetByteArrayValue() => string.IsNullOrEmpty(Text) ? null : Convert.FromBase64String(Text);
+    public byte[]? GetByteArrayValue()
+    {
+        if(string.IsNullOrEmpty(Text)) return null;
+        try
+        {
+            return Convert.FromBase64String(Text);
+        }
+        catch(FormatException)
+        {
+            return null;
+        }
+    }
     /// <inheritdoc />
     public byte? GetByteValue() => byte.TryParse(Text, out var result) ? result : null;
     /// <inheritdoc />
