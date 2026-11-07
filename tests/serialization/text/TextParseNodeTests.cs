@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Threading;
 using Microsoft.Kiota.Abstractions;
@@ -69,6 +69,31 @@ namespace Microsoft.Kiota.Serialization.Text.Tests
             var result = parseNode.GetByteArrayValue();
 
             Assert.Equal(new byte[] { 0x74, 0x65, 0x78, 0x74 }, result);
+        }
+
+        [Theory]
+        [InlineData("not-a-valid-base64-string!")]
+        [InlineData("???")]
+        [InlineData("abc")]
+        public void TextParseNode_GetByteArrayValue_ReturnsNullOnInvalidBase64(string invalidBase64)
+        {
+            var parseNode = new TextParseNode(invalidBase64);
+
+            var result = parseNode.GetByteArrayValue();
+
+            Assert.Null(result);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        public void TextParseNode_GetByteArrayValue_ReturnsNullOnNullOrEmpty(string? emptyInput)
+        {
+            var parseNode = new TextParseNode(emptyInput);
+
+            var result = parseNode.GetByteArrayValue();
+
+            Assert.Null(result);
         }
 
         [Fact]
