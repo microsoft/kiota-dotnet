@@ -153,6 +153,23 @@ namespace Microsoft.Kiota.Serialization.Text.Tests
             Assert.Equal(new TimeSpan(days, hours, minutes, seconds, milliseconds), result);
         }
 
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("null")]
+        [InlineData("NULL")]
+        [InlineData("not-a-timespan")]
+        [InlineData("P10675200D")]
+        [InlineData("PT100000000000000000000H")]
+        public void TextParseNode_GetTimeSpanValue_ReturnsNullOnInvalidOrOverflowDuration(string? invalidDuration)
+        {
+            var parseNode = new TextParseNode(invalidDuration);
+
+            var result = parseNode.GetTimeSpanValue();
+
+            Assert.Null(result);
+        }
+
         [Fact]
         public void TextParseNode_GetTimeValue()
         {
