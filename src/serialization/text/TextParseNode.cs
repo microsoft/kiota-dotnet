@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
@@ -31,8 +31,22 @@ public class TextParseNode : IParseNode
     public Action<IParsable>? OnAfterAssignFieldValues { get; set; }
     /// <inheritdoc />
     public bool? GetBoolValue() => bool.TryParse(Text, out var result) ? result : null;
-    /// <inheritdoc />
-    public byte[]? GetByteArrayValue() => string.IsNullOrEmpty(Text) ? null : Convert.FromBase64String(Text);
+    /// <summary>
+    /// Gets the byte array value of the node, or <see langword="null"/> if the value is empty or not a valid Base64 string.
+    /// </summary>
+    /// <returns>The byte array value, or <see langword="null"/>.</returns>
+    public byte[]? GetByteArrayValue()
+    {
+        if(string.IsNullOrEmpty(Text)) return null;
+        try
+        {
+            return Convert.FromBase64String(Text);
+        }
+        catch(FormatException)
+        {
+            return null;
+        }
+    }
     /// <inheritdoc />
     public byte? GetByteValue() => byte.TryParse(Text, out var result) ? result : null;
     /// <inheritdoc />
@@ -68,8 +82,27 @@ public class TextParseNode : IParseNode
     public sbyte? GetSbyteValue() => sbyte.TryParse(Text, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;
     /// <inheritdoc />
     public string? GetStringValue() => Text;
-    /// <inheritdoc />
-    public TimeSpan? GetTimeSpanValue() => string.IsNullOrEmpty(Text) ? null : XmlConvert.ToTimeSpan(Text);
+    /// <summary>
+    /// Gets the <see cref="TimeSpan"/> value of the node, supporting ISO 8601 duration and constant formats, or <see langword="null"/> if the value is invalid or out of range.
+    /// </summary>
+    /// <returns>The <see cref="TimeSpan"/> value, or <see langword="null"/>.</returns>
+    public TimeSpan? GetTimeSpanValue()
+    {
+        if(string.IsNullOrEmpty(Text) || "null".Equals(Text, StringComparison.OrdinalIgnoreCase))
+            return null;
+
+        if(TimeSpan.TryParseExact(Text, "c", CultureInfo.InvariantCulture, out var constantTimeSpan))
+            return constantTimeSpan;
+
+        try
+        {
+            return XmlConvert.ToTimeSpan(Text);
+        }
+        catch(Exception ex) when(ex is FormatException or OverflowException)
+        {
+            return null;
+        }
+    }
     /// <inheritdoc />
     public Time? GetTimeValue() => DateTime.TryParse(Text, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result) ? new Time(result) : null;
     /// <inheritdoc />
