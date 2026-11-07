@@ -140,6 +140,19 @@ namespace Microsoft.Kiota.Serialization.Text.Tests
             Assert.Equal(new TimeSpan(756, 4, 6, 8, 10), result);
         }
 
+        [Theory]
+        [InlineData("01:02:03", 0, 1, 2, 3, 0)]
+        [InlineData("1.02:03:04", 1, 2, 3, 4, 0)]
+        [InlineData("00:00:00.5000000", 0, 0, 0, 0, 500)]
+        public void TextParseNode_GetTimeSpanValue_ParsesConstantTimeSpanFormat(string text, int days, int hours, int minutes, int seconds, int milliseconds)
+        {
+            var parseNode = new TextParseNode(text);
+
+            var result = parseNode.GetTimeSpanValue();
+
+            Assert.Equal(new TimeSpan(days, hours, minutes, seconds, milliseconds), result);
+        }
+
         [Fact]
         public void TextParseNode_GetTimeValue()
         {
