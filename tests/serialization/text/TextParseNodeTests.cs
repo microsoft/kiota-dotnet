@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Threading;
 using Microsoft.Kiota.Abstractions;
@@ -71,6 +71,31 @@ namespace Microsoft.Kiota.Serialization.Text.Tests
             Assert.Equal(new byte[] { 0x74, 0x65, 0x78, 0x74 }, result);
         }
 
+        [Theory]
+        [InlineData("not-a-valid-base64-string!")]
+        [InlineData("???")]
+        [InlineData("abc")]
+        public void TextParseNode_GetByteArrayValue_ReturnsNullOnInvalidBase64(string invalidBase64)
+        {
+            var parseNode = new TextParseNode(invalidBase64);
+
+            var result = parseNode.GetByteArrayValue();
+
+            Assert.Null(result);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        public void TextParseNode_GetByteArrayValue_ReturnsNullOnNullOrEmpty(string? emptyInput)
+        {
+            var parseNode = new TextParseNode(emptyInput);
+
+            var result = parseNode.GetByteArrayValue();
+
+            Assert.Null(result);
+        }
+
         [Fact]
         public void TextParseNode_GetByteValue()
         {
@@ -113,6 +138,36 @@ namespace Microsoft.Kiota.Serialization.Text.Tests
             var result = parseNode.GetTimeSpanValue();
 
             Assert.Equal(new TimeSpan(756, 4, 6, 8, 10), result);
+        }
+
+        [Theory]
+        [InlineData("01:02:03", 0, 1, 2, 3, 0)]
+        [InlineData("1.02:03:04", 1, 2, 3, 4, 0)]
+        [InlineData("00:00:00.5000000", 0, 0, 0, 0, 500)]
+        public void TextParseNode_GetTimeSpanValue_ParsesConstantTimeSpanFormat(string text, int days, int hours, int minutes, int seconds, int milliseconds)
+        {
+            var parseNode = new TextParseNode(text);
+
+            var result = parseNode.GetTimeSpanValue();
+
+            Assert.Equal(new TimeSpan(days, hours, minutes, seconds, milliseconds), result);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("null")]
+        [InlineData("NULL")]
+        [InlineData("not-a-timespan")]
+        [InlineData("P10675200D")]
+        [InlineData("PT100000000000000000000H")]
+        public void TextParseNode_GetTimeSpanValue_ReturnsNullOnInvalidOrOverflowDuration(string? invalidDuration)
+        {
+            var parseNode = new TextParseNode(invalidDuration);
+
+            var result = parseNode.GetTimeSpanValue();
+
+            Assert.Null(result);
         }
 
         [Fact]
