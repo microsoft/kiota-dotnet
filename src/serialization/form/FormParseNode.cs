@@ -61,8 +61,9 @@ public class FormParseNode : IParseNode
     public bool? GetBoolValue() => bool.TryParse(DecodedValue, out var result) ? result : null;
     /// <inheritdoc/>
     /// <remarks>
-    /// Parses standard RFC 4648 Base64 payloads using <see cref="Convert.FromBase64String(string)"/>.
-    /// Malformed or non-standard Base64 inputs safely return <c>null</c>.
+    /// Parses padded Base64 payloads using <see cref="Convert.FromBase64String(string)"/>.
+    /// Embedded and surrounding whitespace characters are ignored, and padding is required.
+    /// Unpadded, malformed, or non-Base64 inputs safely return <c>null</c>.
     /// </remarks>
     public byte[]? GetByteArrayValue()
     {
