@@ -88,7 +88,7 @@ public class TextParseNode : IParseNode
     /// <returns>The <see cref="TimeSpan"/> value, or <see langword="null"/>.</returns>
     public TimeSpan? GetTimeSpanValue()
     {
-        if(string.IsNullOrEmpty(Text) || "null".Equals(Text, StringComparison.OrdinalIgnoreCase))
+        if(string.IsNullOrEmpty(Text))
             return null;
 
         if(TimeSpan.TryParseExact(Text, "c", CultureInfo.InvariantCulture, out var constantTimeSpan))
@@ -98,7 +98,11 @@ public class TextParseNode : IParseNode
         {
             return XmlConvert.ToTimeSpan(Text);
         }
-        catch(Exception ex) when(ex is FormatException or OverflowException)
+        catch(FormatException)
+        {
+            return null;
+        }
+        catch(OverflowException)
         {
             return null;
         }
