@@ -83,15 +83,16 @@ namespace Microsoft.Kiota.Abstractions
         {
             if(registry != SerializationWriterFactoryRegistry.DefaultInstance)
                 EnableBackingStoreForSerializationRegistry(SerializationWriterFactoryRegistry.DefaultInstance);
-            var keysToUpdate = registry
-                .ContentTypeAssociatedFactories
-                .Where(static x => x.Value is not (BackingStoreSerializationWriterProxyFactory or SerializationWriterFactoryRegistry))
-                .Select(static x => x.Key)
-                .ToArray();
-
-            foreach(var key in keysToUpdate)
+            foreach(var key in registry.ContentTypeAssociatedFactories.Keys)
             {
-                registry.ContentTypeAssociatedFactories[key] = new BackingStoreSerializationWriterProxyFactory(registry.ContentTypeAssociatedFactories[key]);
+                while(registry.ContentTypeAssociatedFactories.TryGetValue(key, out var currentFactory))
+                {
+                    if(currentFactory is (BackingStoreSerializationWriterProxyFactory or SerializationWriterFactoryRegistry))
+                        break;
+                    var wrapped = new BackingStoreSerializationWriterProxyFactory(currentFactory);
+                    if(registry.ContentTypeAssociatedFactories.TryUpdate(key, wrapped, currentFactory))
+                        break;
+                }
             }
             return registry;
         }
