@@ -69,13 +69,10 @@ namespace Microsoft.Kiota.Abstractions
                 EnableBackingStoreForParseNodeRegistry(ParseNodeFactoryRegistry.DefaultInstance);
             foreach(var key in registry.ContentTypeAssociatedFactories.Keys)
             {
-                while(registry.ContentTypeAssociatedFactories.TryGetValue(key, out var currentFactory))
+                if(registry.ContentTypeAssociatedFactories.TryGetValue(key, out var currentFactory) &&
+                    currentFactory is not (BackingStoreParseNodeFactory or ParseNodeFactoryRegistry))
                 {
-                    if(currentFactory is (BackingStoreParseNodeFactory or ParseNodeFactoryRegistry))
-                        break;
-                    var wrapped = new BackingStoreParseNodeFactory(currentFactory);
-                    if(registry.ContentTypeAssociatedFactories.TryUpdate(key, wrapped, currentFactory))
-                        break;
+                    registry.ContentTypeAssociatedFactories.TryUpdate(key, new BackingStoreParseNodeFactory(currentFactory), currentFactory);
                 }
             }
             return registry;
@@ -87,13 +84,10 @@ namespace Microsoft.Kiota.Abstractions
                 EnableBackingStoreForSerializationRegistry(SerializationWriterFactoryRegistry.DefaultInstance);
             foreach(var key in registry.ContentTypeAssociatedFactories.Keys)
             {
-                while(registry.ContentTypeAssociatedFactories.TryGetValue(key, out var currentFactory))
+                if(registry.ContentTypeAssociatedFactories.TryGetValue(key, out var currentFactory) &&
+                    currentFactory is not (BackingStoreSerializationWriterProxyFactory or SerializationWriterFactoryRegistry))
                 {
-                    if(currentFactory is (BackingStoreSerializationWriterProxyFactory or SerializationWriterFactoryRegistry))
-                        break;
-                    var wrapped = new BackingStoreSerializationWriterProxyFactory(currentFactory);
-                    if(registry.ContentTypeAssociatedFactories.TryUpdate(key, wrapped, currentFactory))
-                        break;
+                    registry.ContentTypeAssociatedFactories.TryUpdate(key, new BackingStoreSerializationWriterProxyFactory(currentFactory), currentFactory);
                 }
             }
             return registry;
