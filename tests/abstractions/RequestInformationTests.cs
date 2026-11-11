@@ -837,6 +837,41 @@ namespace Microsoft.Kiota.Abstractions.Tests
         }
 
         [Fact]
+        public void SetsTimeSpanValuesInQueryParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?duration}"
+            };
+
+            var ts = TimeSpan.FromHours(1).Add(TimeSpan.FromMinutes(30));
+            requestInfo.QueryParameters.Add("duration", ts);
+
+            Assert.Equal("http://localhost/me?duration=PT1H30M", requestInfo.URI.OriginalString);
+        }
+
+        [Fact]
+        public void SetsTimeSpanCollectionInQueryParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?durations*,listDurations}"
+            };
+
+            var ts1 = TimeSpan.FromMinutes(5);
+            var ts2 = TimeSpan.FromSeconds(30);
+
+            requestInfo.QueryParameters.Add("durations", new[] { ts1, ts2 });
+            requestInfo.QueryParameters.Add("listDurations", new List<TimeSpan> { ts1, ts2 });
+
+            var url = requestInfo.URI.OriginalString;
+            Assert.Contains("durations=PT5M&durations=PT30S", url);
+            Assert.Contains("listDurations=PT5M,PT30S", url);
+        }
+
+        [Fact]
         public void SetsGuidValuesInListAndHashSetQueryParameters()
         {
             var requestInfo = new RequestInformation
