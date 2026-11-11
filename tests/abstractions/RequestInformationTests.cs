@@ -496,6 +496,26 @@ namespace Microsoft.Kiota.Abstractions.Tests
             serializationWriterMock.Verify(x => x.WriteCollectionOfPrimitiveValues(It.IsAny<string>(), It.IsAny<IEnumerable<decimal>>()), Times.Never);
         }
         [Fact]
+        public void SetsDateTimeScalarContent()
+        {
+            var requestAdapterMock = new Mock<IRequestAdapter>();
+            var serializationWriterMock = new Mock<ISerializationWriter>();
+            var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
+            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(serializationWriterMock.Object);
+            requestAdapterMock.SetupGet(x => x.SerializationWriterFactory).Returns(serializationWriterFactoryMock.Object);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.POST,
+                UrlTemplate = "{+baseurl}/events"
+            };
+
+            var testDateTime = new DateTime(2026, 11, 11, 12, 0, 0, DateTimeKind.Utc);
+            requestInfo.SetContentFromScalar(requestAdapterMock.Object, "application/json", testDateTime);
+
+            serializationWriterMock.Verify(x => x.WriteDateTimeOffsetValue(null, new DateTimeOffset(testDateTime)), Times.Once);
+            serializationWriterMock.Verify(x => x.WriteCollectionOfPrimitiveValues(It.IsAny<string>(), It.IsAny<IEnumerable<DateTime>>()), Times.Never);
+        }
+        [Fact]
         public void SetsEnumContent()
         {
             var requestAdapterMock = new Mock<IRequestAdapter>();
