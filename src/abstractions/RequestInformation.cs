@@ -506,6 +506,9 @@ namespace Microsoft.Kiota.Abstractions
                 case DateTimeOffset dto:
                     writer.WriteDateTimeOffsetValue(null, dto);
                     break;
+                case DateTime dt:
+                    writer.WriteDateTimeOffsetValue(null, new DateTimeOffset(dt));
+                    break;
                 case TimeSpan timeSpan:
                     writer.WriteTimeSpanValue(null, timeSpan);
                     break;
