@@ -185,5 +185,35 @@ namespace Microsoft.Kiota.Abstractions.Tests
             Assert.IsType<BackingStoreParseNodeFactory>(factory);
 
         }
+
+        [Fact]
+        public async Task EnableBackingStoreForParseNodeFactoryConcurrentlyDoesNotDoubleWrap()
+        {
+            var concreteFieldInfo = typeof(ParseNodeProxyFactory)
+                .GetField("_concrete", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            for(var round = 0; round < 50; round++)
+            {
+                var registry = new ParseNodeFactoryRegistry();
+                var mockParseNodeFactory = new Mock<IParseNodeFactory>();
+                registry.ContentTypeAssociatedFactories.TryAdd(StreamContentType, mockParseNodeFactory.Object);
+
+                using var start = new ManualResetEventSlim();
+                var workers = Enumerable.Range(0, 8)
+                    .Select(_ => Task.Factory.StartNew(() =>
+                    {
+                        start.Wait();
+                        ApiClientBuilder.EnableBackingStoreForParseNodeFactory(registry);
+                    }, TaskCreationOptions.LongRunning))
+                    .ToArray();
+
+                start.Set();
+                await Task.WhenAll(workers);
+
+                var factory = registry.ContentTypeAssociatedFactories[StreamContentType];
+                Assert.IsType<BackingStoreParseNodeFactory>(factory);
+                Assert.Equal(mockParseNodeFactory.Object, concreteFieldInfo!.GetValue(factory));
+            }
+        }
     }
 }
