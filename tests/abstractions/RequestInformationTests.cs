@@ -960,6 +960,29 @@ namespace Microsoft.Kiota.Abstractions.Tests
             Assert.Equal("http://localhost/appointments/PT45M/slots", requestInfo.URI.OriginalString);
         }
 
+        [Fact]
+        public void ExpandsMixedTimeSpanAndDateTimeParametersInUriTemplate()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/schedules/{scheduleDate}/slots{?window,createdBefore}"
+            };
+
+            var scheduleDate = new DateTime(2026, 12, 25, 0, 0, 0, DateTimeKind.Utc);
+            var window = TimeSpan.FromHours(2);
+            var createdBefore = new DateTime(2026, 12, 24, 18, 30, 0, DateTimeKind.Utc);
+
+            requestInfo.PathParameters.Add("scheduleDate", scheduleDate);
+            requestInfo.QueryParameters.Add("window", window);
+            requestInfo.QueryParameters.Add("createdBefore", createdBefore);
+
+            var url = requestInfo.URI.OriginalString;
+            Assert.Contains("http://localhost/schedules/2026-12-25T00%3A00%3A00.0000000Z/slots", url);
+            Assert.Contains("window=PT2H", url);
+            Assert.Contains("createdBefore=2026-12-24T18%3A30%3A00.0000000Z", url);
+        }
+
 
         [Fact]
         public void DoesNotExpandSecondLayerArrays()
