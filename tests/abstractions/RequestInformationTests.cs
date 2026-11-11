@@ -925,6 +925,21 @@ namespace Microsoft.Kiota.Abstractions.Tests
             Assert.Equal("http://localhost/users/55331110-6817-4a9b-83b2-57617e3e08e5,482dff4f-63d6-47f4-a88b-5caec03180d4", url);
         }
 
+        [Fact]
+        public void SetsTimeSpanValuesInPathParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/appointments/{duration}/slots"
+            };
+
+            var duration = TimeSpan.FromMinutes(45);
+            requestInfo.PathParameters.Add("duration", duration);
+
+            Assert.Equal("http://localhost/appointments/PT45M/slots", requestInfo.URI.OriginalString);
+        }
+
 
         [Fact]
         public void DoesNotExpandSecondLayerArrays()
