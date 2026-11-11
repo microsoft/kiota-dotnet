@@ -1,3 +1,6 @@
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Kiota.Abstractions.Serialization;
 using Microsoft.Kiota.Abstractions.Store;
 using Moq;
@@ -43,6 +46,36 @@ namespace Microsoft.Kiota.Abstractions.Tests
             // Assert the type has changed due to backing store enabling for the default instance as well.
             Assert.IsType<BackingStoreSerializationWriterProxyFactory>(serializationFactoryRegistry.ContentTypeAssociatedFactories[StreamContentType]);
             Assert.IsType<BackingStoreSerializationWriterProxyFactory>(SerializationWriterFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[StreamContentType]);
+        }
+
+        [Fact]
+        public async Task EnableBackingStoreForSerializationWriterFactoryConcurrentlyDoesNotDoubleWrap()
+        {
+            var proxiedFieldInfo = typeof(SerializationWriterProxyFactory)
+                .GetField("ProxiedSerializationWriterFactory", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            for(var round = 0; round < 50; round++)
+            {
+                var registry = new SerializationWriterFactoryRegistry();
+                var mockWriterFactory = new Mock<ISerializationWriterFactory>();
+                registry.ContentTypeAssociatedFactories.TryAdd(StreamContentType, mockWriterFactory.Object);
+
+                using var start = new ManualResetEventSlim();
+                var workers = Enumerable.Range(0, 8)
+                    .Select(_ => Task.Factory.StartNew(() =>
+                    {
+                        start.Wait();
+                        ApiClientBuilder.EnableBackingStoreForSerializationWriterFactory(registry);
+                    }, TaskCreationOptions.LongRunning))
+                    .ToArray();
+
+                start.Set();
+                await Task.WhenAll(workers);
+
+                var factory = registry.ContentTypeAssociatedFactories[StreamContentType];
+                Assert.IsType<BackingStoreSerializationWriterProxyFactory>(factory);
+                Assert.Equal(mockWriterFactory.Object, proxiedFieldInfo!.GetValue(factory));
+            }
         }
 
         [Fact]
