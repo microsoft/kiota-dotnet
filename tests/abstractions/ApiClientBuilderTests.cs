@@ -252,5 +252,44 @@ namespace Microsoft.Kiota.Abstractions.Tests
 
             mockWriter.Verify(w => w.WriteNullValue("city"), Times.Once());
         }
+
+        [Fact]
+        public async Task ConcurrentEnableBackingStoreOnDefaultInstanceIsIdempotent()
+        {
+            var testContentType = "application/x-test-singleton";
+            var mockWriter = new Mock<ISerializationWriterFactory>();
+            var mockParseNode = new Mock<IParseNodeFactory>();
+            SerializationWriterFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories.TryAdd(testContentType, mockWriter.Object);
+            ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories.TryAdd(testContentType, mockParseNode.Object);
+
+            using var start = new ManualResetEventSlim();
+            var workers = Enumerable.Range(0, 8)
+                .Select(_ => Task.Factory.StartNew(() =>
+                {
+                    start.Wait();
+                    var writerRegistry = new SerializationWriterFactoryRegistry();
+                    var parseRegistry = new ParseNodeFactoryRegistry();
+                    ApiClientBuilder.EnableBackingStoreForSerializationWriterFactory(writerRegistry);
+                    ApiClientBuilder.EnableBackingStoreForParseNodeFactory(parseRegistry);
+                }, TaskCreationOptions.LongRunning))
+                .ToArray();
+
+            start.Set();
+            await Task.WhenAll(workers);
+
+            var defaultWriterFactory = SerializationWriterFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[testContentType];
+            var defaultParseNodeFactory = ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[testContentType];
+
+            Assert.IsType<BackingStoreSerializationWriterProxyFactory>(defaultWriterFactory);
+            Assert.IsType<BackingStoreParseNodeFactory>(defaultParseNodeFactory);
+
+            var proxiedWriterField = typeof(SerializationWriterProxyFactory)
+                .GetField("ProxiedSerializationWriterFactory", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var concreteParseNodeField = typeof(ParseNodeProxyFactory)
+                .GetField("_concrete", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            Assert.Equal(mockWriter.Object, proxiedWriterField!.GetValue(defaultWriterFactory));
+            Assert.Equal(mockParseNode.Object, concreteParseNodeField!.GetValue(defaultParseNodeFactory));
+        }
     }
 }
