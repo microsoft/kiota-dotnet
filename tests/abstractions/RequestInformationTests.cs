@@ -496,6 +496,26 @@ namespace Microsoft.Kiota.Abstractions.Tests
             serializationWriterMock.Verify(x => x.WriteCollectionOfPrimitiveValues(It.IsAny<string>(), It.IsAny<IEnumerable<decimal>>()), Times.Never);
         }
         [Fact]
+        public void SetsDateTimeScalarContent()
+        {
+            var requestAdapterMock = new Mock<IRequestAdapter>();
+            var serializationWriterMock = new Mock<ISerializationWriter>();
+            var serializationWriterFactoryMock = new Mock<ISerializationWriterFactory>();
+            serializationWriterFactoryMock.Setup(x => x.GetSerializationWriter(It.IsAny<string>())).Returns(serializationWriterMock.Object);
+            requestAdapterMock.SetupGet(x => x.SerializationWriterFactory).Returns(serializationWriterFactoryMock.Object);
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.POST,
+                UrlTemplate = "{+baseurl}/events"
+            };
+
+            var testDateTime = new DateTime(2026, 11, 11, 12, 0, 0, DateTimeKind.Utc);
+            requestInfo.SetContentFromScalar(requestAdapterMock.Object, "application/json", testDateTime);
+
+            serializationWriterMock.Verify(x => x.WriteDateTimeOffsetValue(null, new DateTimeOffset(testDateTime)), Times.Once);
+            serializationWriterMock.Verify(x => x.WriteCollectionOfPrimitiveValues(It.IsAny<string>(), It.IsAny<IEnumerable<DateTime>>()), Times.Never);
+        }
+        [Fact]
         public void SetsEnumContent()
         {
             var requestAdapterMock = new Mock<IRequestAdapter>();
@@ -837,6 +857,41 @@ namespace Microsoft.Kiota.Abstractions.Tests
         }
 
         [Fact]
+        public void SetsTimeSpanValuesInQueryParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?duration}"
+            };
+
+            var ts = TimeSpan.FromHours(1).Add(TimeSpan.FromMinutes(30));
+            requestInfo.QueryParameters.Add("duration", ts);
+
+            Assert.Equal("http://localhost/me?duration=PT1H30M", requestInfo.URI.OriginalString);
+        }
+
+        [Fact]
+        public void SetsTimeSpanCollectionInQueryParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/me{?durations*,listDurations}"
+            };
+
+            var ts1 = TimeSpan.FromMinutes(5);
+            var ts2 = TimeSpan.FromSeconds(30);
+
+            requestInfo.QueryParameters.Add("durations", new[] { ts1, ts2 });
+            requestInfo.QueryParameters.Add("listDurations", new List<TimeSpan> { ts1, ts2 });
+
+            var url = requestInfo.URI.OriginalString;
+            Assert.Contains("durations=PT5M&durations=PT30S", url);
+            Assert.Contains("listDurations=PT5M,PT30S", url);
+        }
+
+        [Fact]
         public void SetsGuidValuesInListAndHashSetQueryParameters()
         {
             var requestInfo = new RequestInformation
@@ -888,6 +943,44 @@ namespace Microsoft.Kiota.Abstractions.Tests
 
             var url = requestInfo.URI.OriginalString;
             Assert.Equal("http://localhost/users/55331110-6817-4a9b-83b2-57617e3e08e5,482dff4f-63d6-47f4-a88b-5caec03180d4", url);
+        }
+
+        [Fact]
+        public void SetsTimeSpanValuesInPathParameters()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/appointments/{duration}/slots"
+            };
+
+            var duration = TimeSpan.FromMinutes(45);
+            requestInfo.PathParameters.Add("duration", duration);
+
+            Assert.Equal("http://localhost/appointments/PT45M/slots", requestInfo.URI.OriginalString);
+        }
+
+        [Fact]
+        public void ExpandsMixedTimeSpanAndDateTimeParametersInUriTemplate()
+        {
+            var requestInfo = new RequestInformation
+            {
+                HttpMethod = Method.GET,
+                UrlTemplate = "http://localhost/schedules/{scheduleDate}/slots{?window,createdBefore}"
+            };
+
+            var scheduleDate = new DateTime(2026, 12, 25, 0, 0, 0, DateTimeKind.Utc);
+            var window = TimeSpan.FromHours(2);
+            var createdBefore = new DateTime(2026, 12, 24, 18, 30, 0, DateTimeKind.Utc);
+
+            requestInfo.PathParameters.Add("scheduleDate", scheduleDate);
+            requestInfo.QueryParameters.Add("window", window);
+            requestInfo.QueryParameters.Add("createdBefore", createdBefore);
+
+            var url = requestInfo.URI.OriginalString;
+            Assert.Contains("http://localhost/schedules/2026-12-25T00%3A00%3A00.0000000Z/slots", url);
+            Assert.Contains("window=PT2H", url);
+            Assert.Contains("createdBefore=2026-12-24T18%3A30%3A00.0000000Z", url);
         }
 
 
