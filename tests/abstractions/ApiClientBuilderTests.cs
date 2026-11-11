@@ -215,5 +215,42 @@ namespace Microsoft.Kiota.Abstractions.Tests
                 Assert.Equal(mockParseNodeFactory.Object, concreteFieldInfo!.GetValue(factory));
             }
         }
+
+        [Fact]
+        public async Task ConcurrentEnableBackingStoreWritesNullPropertyOnlyOnce()
+        {
+            var mockWriter = new Mock<ISerializationWriter>();
+            mockWriter.SetupAllProperties();
+            var mockWriterFactory = new Mock<ISerializationWriterFactory>();
+            mockWriterFactory.Setup(x => x.GetSerializationWriter(StreamContentType)).Returns(mockWriter.Object);
+
+            var registry = new SerializationWriterFactoryRegistry();
+            registry.ContentTypeAssociatedFactories.TryAdd(StreamContentType, mockWriterFactory.Object);
+
+            using var start = new ManualResetEventSlim();
+            var workers = Enumerable.Range(0, 8)
+                .Select(_ => Task.Factory.StartNew(() =>
+                {
+                    start.Wait();
+                    ApiClientBuilder.EnableBackingStoreForSerializationWriterFactory(registry);
+                }, TaskCreationOptions.LongRunning))
+                .ToArray();
+
+            start.Set();
+            await Task.WhenAll(workers);
+
+            var backingStore = BackingStoreFactorySingleton.Instance.CreateBackingStore();
+            backingStore.InitializationCompleted = true;
+            backingStore.Set("city", (string?)null);
+
+            var mockBackedModel = new Mock<IBackedModel>();
+            mockBackedModel.As<IParsable>();
+            mockBackedModel.SetupGet(m => m.BackingStore).Returns(backingStore);
+
+            using var writer = registry.GetSerializationWriter(StreamContentType);
+            writer.OnStartObjectSerialization?.Invoke((IParsable)mockBackedModel.Object, mockWriter.Object);
+
+            mockWriter.Verify(w => w.WriteNullValue("city"), Times.Once());
+        }
     }
 }
