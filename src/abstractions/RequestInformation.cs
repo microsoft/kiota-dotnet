@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Xml;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
 
@@ -140,6 +141,7 @@ namespace Microsoft.Kiota.Abstractions
             Guid guid => guid.ToString("D"),// Default of 32 digits separated by hyphens
             Date date => date.ToString(), //Default to string format of the custom date object
             Time time => time.ToString(), //Default to string format of the custom time object
+            TimeSpan timeSpan => XmlConvert.ToString(timeSpan),// Default to ISO 8601 duration for timespans in the url.
             _ => ReplaceEnumValueByStringRepresentation(value),//return object as is as the ToString method is good enough.
         };
 
