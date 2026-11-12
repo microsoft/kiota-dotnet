@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -343,5 +344,42 @@ public class AzureIdentityAuthenticationProviderTests
         var authProviderException = Assert.Throws<ArgumentNullException>(() =>
             new AzureIdentityAuthenticationProvider(mockTokenCredential.Object, true, null!));
         Assert.Equal("tokenRequestContextFactory", authProviderException.ParamName);
+    }
+
+    [Fact]
+    public async Task TokenRequestContextFactoryUpdatesActivityScopesTagAndForwardsCancellationToken()
+    {
+        using var cts = new CancellationTokenSource();
+        CancellationToken capturedToken = default;
+        string? capturedScopesTag = null;
+
+        using var listener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == new ObservabilityOptions().TracerInstrumentationName,
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+            ActivityStopped = activity =>
+            {
+                if(activity.OperationName == nameof(AzureIdentityAccessTokenProvider.GetAuthorizationTokenAsync))
+                    capturedScopesTag = activity.GetTagItem("com.microsoft.kiota.authentication.scopes") as string;
+            }
+        };
+        ActivitySource.AddActivityListener(listener);
+
+        var mockTokenCredential = new Mock<TokenCredential>();
+        mockTokenCredential
+            .Setup(c => c.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>()))
+            .Callback<TokenRequestContext, CancellationToken>((_, token) => capturedToken = token)
+            .Returns(new ValueTask<AccessToken>(new AccessToken("token", DateTimeOffset.UtcNow)));
+
+        var provider = new AzureIdentityAccessTokenProvider(
+            mockTokenCredential.Object,
+            true,
+            (_, _, defaultCtx) => new TokenRequestContext(new[] { "Sites.Read.All" }, isCaeEnabled: defaultCtx.IsCaeEnabled),
+            "User.Read");
+
+        await provider.GetAuthorizationTokenAsync(new Uri("https://graph.microsoft.com/v1.0/sites"), null, cts.Token);
+
+        Assert.Equal(cts.Token, capturedToken);
+        Assert.Equal("Sites.Read.All", capturedScopesTag);
     }
 }
