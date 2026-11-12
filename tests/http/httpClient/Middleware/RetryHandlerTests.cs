@@ -607,9 +607,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         }
 
         [Fact]
-        public void RetryNonIdempotentRequestsOnlyWhenUnprocessedShouldDefaultToFalse()
+        public void RetryUnprocessedMutationsOnlyShouldDefaultToFalse()
         {
-            Assert.False(new RetryHandlerOption().RetryNonIdempotentRequestsOnlyWhenUnprocessed);
+            Assert.False(new RetryHandlerOption().RetryUnprocessedMutationsOnly);
         }
 
         [Theory]
@@ -640,7 +640,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             var option = new RetryHandlerOption
             {
                 Delay = 0,
-                RetryNonIdempotentRequestsOnlyWhenUnprocessed = true,
+                RetryUnprocessedMutationsOnly = true,
                 // Accept server errors so that only the new option can stop the retry.
                 ShouldRetry = (_, _, response) => (int)response.StatusCode >= 500 || (int)response.StatusCode == 429
             };
@@ -663,7 +663,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         {
             // Arrange
             var sent = new List<HttpRequestMessage>();
-            var option = new RetryHandlerOption { Delay = 0, RetryNonIdempotentRequestsOnlyWhenUnprocessed = true };
+            var option = new RetryHandlerOption { Delay = 0, RetryUnprocessedMutationsOnly = true };
             var invoker = CreateInvoker(option, sent, statusCode, HttpStatusCode.OK);
             // Act
             var response = await invoker.SendAsync(CreateBufferedRequest(method), TestContext.Current.CancellationToken);
@@ -681,7 +681,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         {
             // Arrange
             var sent = new List<HttpRequestMessage>();
-            var option = new RetryHandlerOption { Delay = 0, RetryNonIdempotentRequestsOnlyWhenUnprocessed = true };
+            var option = new RetryHandlerOption { Delay = 0, RetryUnprocessedMutationsOnly = true };
             var invoker = CreateInvoker(option, sent, HttpStatusCode.GatewayTimeout, HttpStatusCode.OK);
             // Act
             var response = await invoker.SendAsync(CreateBufferedRequest(method), TestContext.Current.CancellationToken);
@@ -695,7 +695,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         {
             // Arrange
             var sent = new List<HttpRequestMessage>();
-            var option = new RetryHandlerOption { Delay = 0, RetryNonIdempotentRequestsOnlyWhenUnprocessed = true };
+            var option = new RetryHandlerOption { Delay = 0, RetryUnprocessedMutationsOnly = true };
             var invoker = CreateInvoker(option, sent, HttpStatusCode.ServiceUnavailable, HttpStatusCode.GatewayTimeout, HttpStatusCode.OK);
             // Act
             var response = await invoker.SendAsync(CreateBufferedRequest("POST"), TestContext.Current.CancellationToken);
@@ -705,13 +705,13 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         }
 
         [Fact]
-        public async Task ShouldHonorRetryNonIdempotentRequestsOnlyWhenUnprocessedFromRequestOption()
+        public async Task ShouldHonorRetryUnprocessedMutationsOnlyFromRequestOption()
         {
             // Arrange
             var sent = new List<HttpRequestMessage>();
             var invoker = CreateInvoker(new RetryHandlerOption { Delay = 0 }, sent, HttpStatusCode.GatewayTimeout, HttpStatusCode.OK);
             var request = CreateBufferedRequest("POST");
-            var requestOption = new RetryHandlerOption { Delay = 0, RetryNonIdempotentRequestsOnlyWhenUnprocessed = true };
+            var requestOption = new RetryHandlerOption { Delay = 0, RetryUnprocessedMutationsOnly = true };
 #if NET5_0_OR_GREATER
             request.Options.Set(new HttpRequestOptionsKey<RetryHandlerOption>(typeof(RetryHandlerOption).FullName!), requestOption);
 #else
@@ -728,7 +728,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         public async Task ShouldRetryRedirectedGetWhenEnabled()
         {
             // Arrange: a POST that a redirect turned into a GET, which then got a 504
-            var option = new RetryHandlerOption { Delay = 0, RetryNonIdempotentRequestsOnlyWhenUnprocessed = true };
+            var option = new RetryHandlerOption { Delay = 0, RetryUnprocessedMutationsOnly = true };
             var sent = new List<HttpRequestMessage>();
             var responses = new Queue<HttpStatusCode>(new[] { HttpStatusCode.GatewayTimeout, HttpStatusCode.OK });
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);

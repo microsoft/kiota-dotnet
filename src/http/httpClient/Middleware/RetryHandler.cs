@@ -174,7 +174,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
             // server already acted on it. Check the method of the request that will be resent, which
             // differs from the original when a redirect changed a POST to a GET.
             var resentMethod = response.RequestMessage?.Method ?? request.Method;
-            if(retryOption.RetryNonIdempotentRequestsOnlyWhenUnprocessed && IsNonIdempotent(resentMethod))
+            if(retryOption.RetryUnprocessedMutationsOnly && IsNonIdempotent(resentMethod))
             {
                 return response.StatusCode == (HttpStatusCode)429 || response.StatusCode == HttpStatusCode.ServiceUnavailable;
             }

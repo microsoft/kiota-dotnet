@@ -101,9 +101,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
         /// This relies on the common service convention, followed by Microsoft Graph, that a 429 or 503 response means the server didn't process the request.
         /// HTTP doesn't guarantee this, so a service that returns 429 or 503 after acting on a request can still see it repeated.
         /// The method checked is that of the request being resent, so a POST that a redirect changed to a GET is retried like a GET.
-        /// Other methods aren't affected.
+        /// PUT and DELETE also change state, but they're idempotent, so they aren't affected, and neither are other methods.
         /// </remarks>
-        public bool RetryNonIdempotentRequestsOnlyWhenUnprocessed { get; set; }
+        public bool RetryUnprocessedMutationsOnly { get; set; }
 
         /// <summary>
         /// A delegate that's called to determine whether a request should be retried or not.
