@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using Azure.Core;
 using Microsoft.Kiota.Abstractions.Authentication;
@@ -23,6 +24,17 @@ public class AzureIdentityAuthenticationProvider : BaseBearerTokenAuthentication
     /// <param name="observabilityOptions">The observability options to use for the authentication provider.</param>
     public AzureIdentityAuthenticationProvider(TokenCredential credential, string[]? allowedHosts = null, ObservabilityOptions? observabilityOptions = null, bool isCaeEnabled = true, params string[] scopes)
         : base(new AzureIdentityAccessTokenProvider(credential, allowedHosts, observabilityOptions, isCaeEnabled, scopes))
+    {
+    }
+    /// <summary>
+    /// The <see cref="AzureIdentityAuthenticationProvider"/> constructor
+    /// </summary>
+    /// <param name="credential">The credential implementation to use to obtain the access token.</param>
+    /// <param name="isCaeEnabled">Whether to enable Conditional Access Evaluation (CAE) for the token request.</param>
+    /// <param name="tokenRequestContextFactory">A callback to customize the <see cref="TokenRequestContext"/> before requesting a token.</param>
+    /// <param name="scopes">The scopes to request the access token for.</param>
+    public AzureIdentityAuthenticationProvider(TokenCredential credential, bool isCaeEnabled, Func<Uri, Dictionary<string, object>?, TokenRequestContext, TokenRequestContext> tokenRequestContextFactory, params string[] scopes)
+        : base(new AzureIdentityAccessTokenProvider(credential, isCaeEnabled, tokenRequestContextFactory, scopes))
     {
     }
     /// <summary>
