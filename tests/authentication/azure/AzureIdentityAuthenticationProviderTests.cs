@@ -197,4 +197,44 @@ public class AzureIdentityAuthenticationProviderTests
         Assert.Equal("contoso-tenant", capturedContext!.Value.TenantId);
         Assert.Equal(new[] { "Mail.Read" }, capturedContext.Value.Scopes);
     }
+
+    [Fact]
+    public async Task TokenRequestContextFactoryReceivesDecodedClaimsDefaultScopesAndIsCaeEnabled()
+    {
+        TokenRequestContext? capturedDefault = null;
+        TokenRequestContext? capturedFinal = null;
+        var mockTokenCredential = new Mock<TokenCredential>();
+        mockTokenCredential
+            .Setup(c => c.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>()))
+            .Callback<TokenRequestContext, CancellationToken>((ctx, _) => capturedFinal = ctx)
+            .Returns(new ValueTask<AccessToken>(new AccessToken("token", DateTimeOffset.UtcNow)));
+
+        var provider = new AzureIdentityAccessTokenProvider(
+            mockTokenCredential.Object,
+            false,
+            (_, _, defaultCtx) =>
+            {
+                capturedDefault = defaultCtx;
+                return new TokenRequestContext(defaultCtx.Scopes, claims: defaultCtx.Claims, tenantId: "t-cae", isCaeEnabled: defaultCtx.IsCaeEnabled);
+            });
+
+        var authContext = new Dictionary<string, object>
+        {
+            { "claims", "eyJhY2Nlc3NfdG9rZW4iOnsibmJmIjp7ImVzc2VudGlhbCI6dHJ1ZX19fQ==" }
+        };
+
+        await provider.GetAuthorizationTokenAsync(
+            new Uri("https://graph.microsoft.com/v1.0/users"),
+            authContext,
+            TestContext.Current.CancellationToken);
+
+        Assert.NotNull(capturedDefault);
+        Assert.Equal(new[] { "https://graph.microsoft.com/.default" }, capturedDefault!.Value.Scopes);
+        Assert.Equal("{\"access_token\":{\"nbf\":{\"essential\":true}}}", capturedDefault.Value.Claims);
+        Assert.False(capturedDefault.Value.IsCaeEnabled);
+        Assert.NotNull(capturedFinal);
+        Assert.Equal("t-cae", capturedFinal!.Value.TenantId);
+        Assert.Equal("{\"access_token\":{\"nbf\":{\"essential\":true}}}", capturedFinal.Value.Claims);
+        Assert.False(capturedFinal.Value.IsCaeEnabled);
+    }
 }
