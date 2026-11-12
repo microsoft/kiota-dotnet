@@ -160,4 +160,41 @@ public class AzureIdentityAuthenticationProviderTests
         Assert.Equal("tenant-123", capturedContext!.Value.TenantId);
         Assert.Equal(new[] { "User.Read" }, capturedContext.Value.Scopes);
     }
+
+    [Fact]
+    public async Task AuthenticationProviderForwardsTokenRequestContextFactoryOnAuthenticateRequestAsync()
+    {
+        TokenRequestContext? capturedContext = null;
+        var mockTokenCredential = new Mock<TokenCredential>();
+        mockTokenCredential
+            .Setup(c => c.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>()))
+            .Callback<TokenRequestContext, CancellationToken>((ctx, _) => capturedContext = ctx)
+            .Returns(new ValueTask<AccessToken>(new AccessToken("auth-provider-token", DateTimeOffset.UtcNow)));
+
+        var authProvider = new AzureIdentityAuthenticationProvider(
+            mockTokenCredential.Object,
+            true,
+            (_, authCtx, defaultCtx) =>
+            {
+                var tenantId = authCtx != null && authCtx.TryGetValue("tenantId", out var t) ? t as string : null;
+                return new TokenRequestContext(defaultCtx.Scopes, claims: defaultCtx.Claims, tenantId: tenantId, isCaeEnabled: defaultCtx.IsCaeEnabled);
+            },
+            "Mail.Read");
+
+        var request = new RequestInformation
+        {
+            HttpMethod = Method.GET,
+            URI = new Uri("https://graph.microsoft.com/v1.0/me/messages")
+        };
+
+        await authProvider.AuthenticateRequestAsync(
+            request,
+            new Dictionary<string, object> { { "tenantId", "contoso-tenant" } },
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal("Bearer auth-provider-token", request.Headers["Authorization"].First());
+        Assert.NotNull(capturedContext);
+        Assert.Equal("contoso-tenant", capturedContext!.Value.TenantId);
+        Assert.Equal(new[] { "Mail.Read" }, capturedContext.Value.Scopes);
+    }
 }
