@@ -301,4 +301,33 @@ public class AzureIdentityAuthenticationProviderTests
         Assert.NotNull(capturedContext);
         Assert.Equal(new[] { "Directory.ReadWrite.All" }, capturedContext!.Value.Scopes);
     }
+
+    [Fact]
+    public async Task TokenRequestContextFactoryIsNotInvokedWhenUrlValidationFails()
+    {
+        var factoryCalled = false;
+        var mockTokenCredential = new Mock<TokenCredential>();
+        var provider = new AzureIdentityAccessTokenProvider(
+            mockTokenCredential.Object,
+            true,
+            (_, _, defaultCtx) =>
+            {
+                factoryCalled = true;
+                return defaultCtx;
+            });
+        provider.AllowedHostsValidator.AllowedHosts = new[] { "graph.microsoft.com" };
+
+        var disallowedHostToken = await provider.GetAuthorizationTokenAsync(
+            new Uri("https://contoso.example.com/v1.0/me"),
+            null,
+            TestContext.Current.CancellationToken);
+
+        Assert.Empty(disallowedHostToken);
+        Assert.False(factoryCalled);
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            provider.GetAuthorizationTokenAsync(new Uri("http://graph.microsoft.com/v1.0/me"), null, TestContext.Current.CancellationToken));
+        Assert.False(factoryCalled);
+        mockTokenCredential.Verify(c => c.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
 }
