@@ -92,6 +92,17 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
         }
 
         /// <summary>
+        /// Whether POST and PATCH requests are retried after a response that doesn't show the server left them unprocessed. This defaults to true.
+        /// </summary>
+        /// <remarks>
+        /// POST and PATCH aren't idempotent, so resending one the server already processed can repeat its side effect, such as sending an email twice.
+        /// A 429 or 503 response indicates the server didn't process the request, but a 504 or other server error can arrive after it did.
+        /// When this is false, POST and PATCH requests are retried only after a 429 or 503 response, and any other response that <see cref="ShouldRetry"/> accepts is returned to the caller.
+        /// Other methods aren't affected.
+        /// </remarks>
+        public bool RetryNonIdempotentRequestsWhenOutcomeUnknown { get; set; } = true;
+
+        /// <summary>
         /// A delegate that's called to determine whether a request should be retried or not.
         /// The delegate method should accept a delay time in seconds of, number of retry attempts and <see cref="HttpResponseMessage"/> as its parameters and return a <see cref="bool"/>.
         /// This defaults to a function that returns true for 503, 504, and 429 status codes and false otherwise.

@@ -73,7 +73,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
                 // Check whether retries are permitted and that the MaxRetry value is a non - negative, non - zero value
-                if(request.IsBuffered() && retryOption.MaxRetry > 0 && retryOption.ShouldRetry(retryOption.Delay, 0, response))
+                if(retryOption.MaxRetry > 0 && ShouldRetryRequest(request, retryOption, 0, response))
                 {
                     response = await SendRetryAsync(response, retryOption, cancellationToken, activitySource).ConfigureAwait(false);
                 }
@@ -143,7 +143,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 // Call base.SendAsync to send the request
                 response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
-                if(!(request.IsBuffered() && retryOption.ShouldRetry(retryOption.Delay, retryCount, response)))
+                if(!ShouldRetryRequest(request, retryOption, retryCount, response))
                 {
                     return response;
                 }
@@ -152,6 +152,41 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
             exceptions.Add(await GetInnerExceptionAsync(response, cancellationToken).ConfigureAwait(false));
 
             throw new AggregateException($"Too many retries performed. More than {retryCount} retries encountered while sending the request.", exceptions);
+        }
+
+        /// <summary>
+        /// Determines whether a request can be sent again after the given response.
+        /// </summary>
+        /// <param name="request">The <see cref="HttpRequestMessage"/> that was sent.</param>
+        /// <param name="retryOption">The <see cref="RetryHandlerOption"/> for the retry.</param>
+        /// <param name="retryCount">The number of retries performed so far.</param>
+        /// <param name="response">The <see cref="HttpResponseMessage"/> returned for the request.</param>
+        /// <returns>true if the request should be retried; otherwise, false.</returns>
+        private static bool ShouldRetryRequest(HttpRequestMessage request, RetryHandlerOption retryOption, int retryCount, HttpResponseMessage response)
+        {
+            if(!request.IsBuffered() || !retryOption.ShouldRetry(retryOption.Delay, retryCount, response))
+            {
+                return false;
+            }
+
+            // A 429 or 503 means the server didn't process the request, so resending it is safe
+            // for any method. Any other status may arrive after the server already acted on it.
+            if(!retryOption.RetryNonIdempotentRequestsWhenOutcomeUnknown && IsNonIdempotent(request.Method))
+            {
+                return response.StatusCode == (HttpStatusCode)429 || response.StatusCode == HttpStatusCode.ServiceUnavailable;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Checks whether an HTTP method isn't idempotent, so that repeating a request can repeat its effect.
+        /// </summary>
+        /// <param name="method">The <see cref="HttpMethod"/> to check.</param>
+        /// <returns>true for POST and PATCH; otherwise, false.</returns>
+        private static bool IsNonIdempotent(HttpMethod method)
+        {
+            return method == HttpMethod.Post || method.Method.Equals("PATCH", StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
