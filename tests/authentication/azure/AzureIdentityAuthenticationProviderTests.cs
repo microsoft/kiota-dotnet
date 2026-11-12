@@ -237,4 +237,35 @@ public class AzureIdentityAuthenticationProviderTests
         Assert.Equal("{\"access_token\":{\"nbf\":{\"essential\":true}}}", capturedFinal.Value.Claims);
         Assert.False(capturedFinal.Value.IsCaeEnabled);
     }
+
+    [Fact]
+    public async Task TokenRequestContextFactorySetsProofOfPossessionProperties()
+    {
+        TokenRequestContext? capturedContext = null;
+        var mockTokenCredential = new Mock<TokenCredential>();
+        mockTokenCredential
+            .Setup(c => c.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>()))
+            .Callback<TokenRequestContext, CancellationToken>((ctx, _) => capturedContext = ctx)
+            .Returns(new ValueTask<AccessToken>(new AccessToken("pop-token", DateTimeOffset.UtcNow)));
+
+        var provider = new AzureIdentityAccessTokenProvider(
+            mockTokenCredential.Object,
+            true,
+            (_, authCtx, defaultCtx) => new TokenRequestContext(
+                defaultCtx.Scopes,
+                claims: defaultCtx.Claims,
+                isCaeEnabled: defaultCtx.IsCaeEnabled,
+                isProofOfPossessionEnabled: true,
+                proofOfPossessionNonce: authCtx?["nonce"] as string));
+
+        var token = await provider.GetAuthorizationTokenAsync(
+            new Uri("https://graph.microsoft.com/v1.0/me"),
+            new Dictionary<string, object> { { "nonce", "sample-pop-nonce" } },
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal("pop-token", token);
+        Assert.NotNull(capturedContext);
+        Assert.True(capturedContext!.Value.IsProofOfPossessionEnabled);
+        Assert.Equal("sample-pop-nonce", capturedContext.Value.ProofOfPossessionNonce);
+    }
 }
