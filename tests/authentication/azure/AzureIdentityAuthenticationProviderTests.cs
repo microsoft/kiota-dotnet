@@ -17,7 +17,7 @@ public class AzureIdentityAuthenticationProviderTests
     public void ConstructorThrowsArgumentNullExceptionOnNullTokenCredential()
     {
         // Arrange
-        var exception = Assert.Throws<ArgumentNullException>(() => new AzureIdentityAccessTokenProvider(null!, null));
+        var exception = Assert.Throws<ArgumentNullException>(() => new AzureIdentityAccessTokenProvider(null!, (AzureIdentityAccessTokenProviderOptions?)null));
 
         // Assert
         Assert.Equal("credential", exception.ParamName);
@@ -33,7 +33,7 @@ public class AzureIdentityAuthenticationProviderTests
         var uri = new Uri(url);
         var mockTokenCredential = new Mock<TokenCredential>();
         mockTokenCredential.Setup(credential => credential.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>())).Returns(new ValueTask<AccessToken>(new AccessToken(expectedToken, DateTimeOffset.Now)));
-        var azureIdentityAuthenticationProvider = new AzureIdentityAccessTokenProvider(mockTokenCredential.Object);
+        var azureIdentityAuthenticationProvider = new AzureIdentityAccessTokenProvider(mockTokenCredential.Object, (AzureIdentityAccessTokenProviderOptions?)null);
 
         // Act
         var token = await azureIdentityAuthenticationProvider.GetAuthorizationTokenAsync(uri, cancellationToken: TestContext.Current.CancellationToken);
@@ -53,7 +53,7 @@ public class AzureIdentityAuthenticationProviderTests
         // Arrange
         var mockTokenCredential = new Mock<TokenCredential>();
         mockTokenCredential.Setup(credential => credential.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>())).Returns(new ValueTask<AccessToken>(new AccessToken(expectedToken, DateTimeOffset.Now)));
-        var azureIdentityAuthenticationProvider = new AzureIdentityAuthenticationProvider(mockTokenCredential.Object, scopes: "User.Read");
+        var azureIdentityAuthenticationProvider = new AzureIdentityAuthenticationProvider(mockTokenCredential.Object, (AzureIdentityAccessTokenProviderOptions?)null, "User.Read");
         var testRequest = new RequestInformation()
         {
             HttpMethod = Method.GET,
@@ -83,7 +83,7 @@ public class AzureIdentityAuthenticationProviderTests
         // Arrange
         var mockTokenCredential = new Mock<TokenCredential>();
         mockTokenCredential.Setup(credential => credential.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>())).Returns(new ValueTask<AccessToken>(new AccessToken(string.Empty, DateTimeOffset.Now)));
-        var azureIdentityAuthenticationProvider = new AzureIdentityAccessTokenProvider(mockTokenCredential.Object);
+        var azureIdentityAuthenticationProvider = new AzureIdentityAccessTokenProvider(mockTokenCredential.Object, (AzureIdentityAccessTokenProviderOptions?)null);
 
         var nonHttpsUrl = "http://graph.microsoft.com";
 
@@ -102,7 +102,7 @@ public class AzureIdentityAuthenticationProviderTests
         // Arrange
         var mockTokenCredential = new Mock<TokenCredential>();
         mockTokenCredential.Setup(credential => credential.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>())).Returns(new ValueTask<AccessToken>(new AccessToken(string.Empty, DateTimeOffset.Now)));
-        var azureIdentityAuthenticationProvider = new AzureIdentityAccessTokenProvider(mockTokenCredential.Object);
+        var azureIdentityAuthenticationProvider = new AzureIdentityAccessTokenProvider(mockTokenCredential.Object, (AzureIdentityAccessTokenProviderOptions?)null);
 
         // Assert
         var token = await azureIdentityAuthenticationProvider.GetAuthorizationTokenAsync(new Uri(nonHttpsUrl), cancellationToken: TestContext.Current.CancellationToken);
@@ -118,7 +118,7 @@ public class AzureIdentityAuthenticationProviderTests
                                 Assert.NotNull(context.Claims);
                                 return new ValueTask<AccessToken>(new AccessToken(string.Empty, DateTimeOffset.Now));
                             });
-        var azureIdentityAuthenticationProvider = new AzureIdentityAuthenticationProvider(mockTokenCredential.Object, scopes: "User.Read");
+        var azureIdentityAuthenticationProvider = new AzureIdentityAuthenticationProvider(mockTokenCredential.Object, (AzureIdentityAccessTokenProviderOptions?)null, "User.Read");
         var testRequest = new RequestInformation()
         {
             HttpMethod = Method.GET,
@@ -143,11 +143,14 @@ public class AzureIdentityAuthenticationProviderTests
 
         var provider = new AzureIdentityAccessTokenProvider(
             mockTokenCredential.Object,
-            true,
-            (_, authCtx, defaultCtx) =>
+            new AzureIdentityAccessTokenProviderOptions
             {
-                var tenantId = authCtx != null && authCtx.TryGetValue("tenantId", out var t) ? t as string : null;
-                return new TokenRequestContext(defaultCtx.Scopes, claims: defaultCtx.Claims, tenantId: tenantId, isCaeEnabled: defaultCtx.IsCaeEnabled);
+                IsCaeEnabled = true,
+                TokenRequestContextFactory = (_, authCtx, defaultCtx) =>
+                {
+                    var tenantId = authCtx != null && authCtx.TryGetValue("tenantId", out var t) ? t as string : null;
+                    return new TokenRequestContext(defaultCtx.Scopes, claims: defaultCtx.Claims, tenantId: tenantId, isCaeEnabled: defaultCtx.IsCaeEnabled);
+                }
             },
             "User.Read");
 
@@ -174,11 +177,14 @@ public class AzureIdentityAuthenticationProviderTests
 
         var authProvider = new AzureIdentityAuthenticationProvider(
             mockTokenCredential.Object,
-            true,
-            (_, authCtx, defaultCtx) =>
+            new AzureIdentityAccessTokenProviderOptions
             {
-                var tenantId = authCtx != null && authCtx.TryGetValue("tenantId", out var t) ? t as string : null;
-                return new TokenRequestContext(defaultCtx.Scopes, claims: defaultCtx.Claims, tenantId: tenantId, isCaeEnabled: defaultCtx.IsCaeEnabled);
+                IsCaeEnabled = true,
+                TokenRequestContextFactory = (_, authCtx, defaultCtx) =>
+                {
+                    var tenantId = authCtx != null && authCtx.TryGetValue("tenantId", out var t) ? t as string : null;
+                    return new TokenRequestContext(defaultCtx.Scopes, claims: defaultCtx.Claims, tenantId: tenantId, isCaeEnabled: defaultCtx.IsCaeEnabled);
+                }
             },
             "Mail.Read");
 
@@ -212,11 +218,14 @@ public class AzureIdentityAuthenticationProviderTests
 
         var provider = new AzureIdentityAccessTokenProvider(
             mockTokenCredential.Object,
-            false,
-            (_, _, defaultCtx) =>
+            new AzureIdentityAccessTokenProviderOptions
             {
-                capturedDefault = defaultCtx;
-                return new TokenRequestContext(defaultCtx.Scopes, claims: defaultCtx.Claims, tenantId: "t-cae", isCaeEnabled: defaultCtx.IsCaeEnabled);
+                IsCaeEnabled = false,
+                TokenRequestContextFactory = (_, _, defaultCtx) =>
+                {
+                    capturedDefault = defaultCtx;
+                    return new TokenRequestContext(defaultCtx.Scopes, claims: defaultCtx.Claims, tenantId: "t-cae", isCaeEnabled: defaultCtx.IsCaeEnabled);
+                }
             });
 
         var authContext = new Dictionary<string, object>
@@ -251,13 +260,16 @@ public class AzureIdentityAuthenticationProviderTests
 
         var provider = new AzureIdentityAccessTokenProvider(
             mockTokenCredential.Object,
-            true,
-            (_, authCtx, defaultCtx) => new TokenRequestContext(
-                defaultCtx.Scopes,
-                claims: defaultCtx.Claims,
-                isCaeEnabled: defaultCtx.IsCaeEnabled,
-                isProofOfPossessionEnabled: true,
-                proofOfPossessionNonce: authCtx?["nonce"] as string));
+            new AzureIdentityAccessTokenProviderOptions
+            {
+                IsCaeEnabled = true,
+                TokenRequestContextFactory = (_, authCtx, defaultCtx) => new TokenRequestContext(
+                    defaultCtx.Scopes,
+                    claims: defaultCtx.Claims,
+                    isCaeEnabled: defaultCtx.IsCaeEnabled,
+                    isProofOfPossessionEnabled: true,
+                    proofOfPossessionNonce: authCtx?["nonce"] as string)
+            });
 
         var token = await provider.GetAuthorizationTokenAsync(
             new Uri("https://graph.microsoft.com/v1.0/me"),
@@ -283,14 +295,17 @@ public class AzureIdentityAuthenticationProviderTests
 
         var provider = new AzureIdentityAccessTokenProvider(
             mockTokenCredential.Object,
-            true,
-            (uri, _, defaultCtx) =>
+            new AzureIdentityAccessTokenProviderOptions
             {
-                capturedUri = uri;
-                var overrideScopes = uri.AbsolutePath.StartsWith("/admin", StringComparison.OrdinalIgnoreCase)
-                    ? new[] { "Directory.ReadWrite.All" }
-                    : defaultCtx.Scopes;
-                return new TokenRequestContext(overrideScopes, claims: defaultCtx.Claims, isCaeEnabled: defaultCtx.IsCaeEnabled);
+                IsCaeEnabled = true,
+                TokenRequestContextFactory = (uri, _, defaultCtx) =>
+                {
+                    capturedUri = uri;
+                    var overrideScopes = uri.AbsolutePath.StartsWith("/admin", StringComparison.OrdinalIgnoreCase)
+                        ? new[] { "Directory.ReadWrite.All" }
+                        : defaultCtx.Scopes;
+                    return new TokenRequestContext(overrideScopes, claims: defaultCtx.Claims, isCaeEnabled: defaultCtx.IsCaeEnabled);
+                }
             },
             "User.Read");
 
@@ -310,13 +325,16 @@ public class AzureIdentityAuthenticationProviderTests
         var mockTokenCredential = new Mock<TokenCredential>();
         var provider = new AzureIdentityAccessTokenProvider(
             mockTokenCredential.Object,
-            true,
-            (_, _, defaultCtx) =>
+            new AzureIdentityAccessTokenProviderOptions
             {
-                factoryCalled = true;
-                return defaultCtx;
+                AllowedHosts = new[] { "graph.microsoft.com" },
+                IsCaeEnabled = true,
+                TokenRequestContextFactory = (_, _, defaultCtx) =>
+                {
+                    factoryCalled = true;
+                    return defaultCtx;
+                }
             });
-        provider.AllowedHostsValidator.AllowedHosts = new[] { "graph.microsoft.com" };
 
         var disallowedHostToken = await provider.GetAuthorizationTokenAsync(
             new Uri("https://contoso.example.com/v1.0/me"),
@@ -333,17 +351,15 @@ public class AzureIdentityAuthenticationProviderTests
     }
 
     [Fact]
-    public void ConstructorsThrowArgumentNullExceptionWhenTokenRequestContextFactoryIsNull()
+    public void ConstructorsThrowArgumentNullExceptionOnNullTokenCredentialWithOptions()
     {
-        var mockTokenCredential = new Mock<TokenCredential>();
-
         var tokenProviderException = Assert.Throws<ArgumentNullException>(() =>
-            new AzureIdentityAccessTokenProvider(mockTokenCredential.Object, true, null!));
-        Assert.Equal("tokenRequestContextFactory", tokenProviderException.ParamName);
+            new AzureIdentityAccessTokenProvider(null!, new AzureIdentityAccessTokenProviderOptions()));
+        Assert.Equal("credential", tokenProviderException.ParamName);
 
         var authProviderException = Assert.Throws<ArgumentNullException>(() =>
-            new AzureIdentityAuthenticationProvider(mockTokenCredential.Object, true, null!));
-        Assert.Equal("tokenRequestContextFactory", authProviderException.ParamName);
+            new AzureIdentityAuthenticationProvider(null!, new AzureIdentityAccessTokenProviderOptions()));
+        Assert.Equal("credential", authProviderException.ParamName);
     }
 
     [Fact]
@@ -373,13 +389,79 @@ public class AzureIdentityAuthenticationProviderTests
 
         var provider = new AzureIdentityAccessTokenProvider(
             mockTokenCredential.Object,
-            true,
-            (_, _, defaultCtx) => new TokenRequestContext(new[] { "Sites.Read.All" }, isCaeEnabled: defaultCtx.IsCaeEnabled),
+            new AzureIdentityAccessTokenProviderOptions
+            {
+                IsCaeEnabled = true,
+                TokenRequestContextFactory = (_, _, defaultCtx) => new TokenRequestContext(new[] { "Sites.Read.All" }, isCaeEnabled: defaultCtx.IsCaeEnabled)
+            },
             "User.Read");
 
         await provider.GetAuthorizationTokenAsync(new Uri("https://graph.microsoft.com/v1.0/sites"), null, cts.Token);
 
         Assert.Equal(cts.Token, capturedToken);
         Assert.Equal("Sites.Read.All", capturedScopesTag);
+    }
+
+    [Fact]
+    public async Task DeprecatedConstructorsMaintainBackwardsCompatibility()
+    {
+#pragma warning disable CS0618
+        var mockTokenCredential = new Mock<TokenCredential>();
+        mockTokenCredential
+            .Setup(c => c.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>()))
+            .Returns(new ValueTask<AccessToken>(new AccessToken("compat-token", DateTimeOffset.UtcNow)));
+
+        // Test deprecated AzureIdentityAccessTokenProvider constructors
+        var tokenProviderWithCae = new AzureIdentityAccessTokenProvider(
+            mockTokenCredential.Object,
+            new[] { "graph.microsoft.com" },
+            new ObservabilityOptions(),
+            true,
+            "User.Read");
+        Assert.NotNull(tokenProviderWithCae);
+        var token1 = await tokenProviderWithCae.GetAuthorizationTokenAsync(new Uri("https://graph.microsoft.com/v1.0/me"), cancellationToken: TestContext.Current.CancellationToken);
+        Assert.Equal("compat-token", token1);
+
+        var tokenProviderLegacy = new AzureIdentityAccessTokenProvider(
+            mockTokenCredential.Object,
+            new[] { "graph.microsoft.com" },
+            new ObservabilityOptions(),
+            "User.Read");
+        Assert.NotNull(tokenProviderLegacy);
+
+        // Test deprecated AzureIdentityAuthenticationProvider constructors
+        var authProviderWithCae = new AzureIdentityAuthenticationProvider(
+            mockTokenCredential.Object,
+            new[] { "graph.microsoft.com" },
+            new ObservabilityOptions(),
+            true,
+            "User.Read");
+        Assert.NotNull(authProviderWithCae);
+
+        var request = new RequestInformation
+        {
+            HttpMethod = Method.GET,
+            URI = new Uri("https://graph.microsoft.com/v1.0/me")
+        };
+        await authProviderWithCae.AuthenticateRequestAsync(request, cancellationToken: TestContext.Current.CancellationToken);
+        Assert.Equal("Bearer compat-token", request.Headers["Authorization"].First());
+
+        var authProviderLegacy = new AzureIdentityAuthenticationProvider(
+            mockTokenCredential.Object,
+            new[] { "graph.microsoft.com" },
+            new ObservabilityOptions(),
+            "User.Read");
+        Assert.NotNull(authProviderLegacy);
+#pragma warning restore CS0618
+    }
+
+    [Fact]
+    public void AzureIdentityAccessTokenProviderOptionsDefaultsAreExpected()
+    {
+        var options = new AzureIdentityAccessTokenProviderOptions();
+        Assert.Null(options.AllowedHosts);
+        Assert.Null(options.ObservabilityOptions);
+        Assert.True(options.IsCaeEnabled);
+        Assert.Null(options.TokenRequestContextFactory);
     }
 }

@@ -33,39 +33,22 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
     /// The <see cref="AzureIdentityAccessTokenProvider"/> constructor
     /// </summary>
     /// <param name="credential">The credential implementation to use to obtain the access token.</param>
-    /// <param name="allowedHosts">The list of allowed hosts for which to request access tokens.</param>
+    /// <param name="options">The options to use for the access token provider.</param>
     /// <param name="scopes">The scopes to request the access token for.</param>
-    /// <param name="observabilityOptions">The observability options to use for the authentication provider.</param>
-    /// <param name="isCaeEnabled">Whether to enable Conditional Access Evaluation (CAE) for the token request.</param>
-    public AzureIdentityAccessTokenProvider(TokenCredential credential, string[]? allowedHosts = null, ObservabilityOptions? observabilityOptions = null, bool isCaeEnabled = true, params string[] scopes)
-        : this(credential, allowedHosts, observabilityOptions, isCaeEnabled, null, scopes)
-    {
-    }
-    /// <summary>
-    /// The <see cref="AzureIdentityAccessTokenProvider"/> constructor
-    /// </summary>
-    /// <param name="credential">The credential implementation to use to obtain the access token.</param>
-    /// <param name="isCaeEnabled">Whether to enable Conditional Access Evaluation (CAE) for the token request.</param>
-    /// <param name="tokenRequestContextFactory">A callback to customize the <see cref="TokenRequestContext"/> before requesting a token.</param>
-    /// <param name="scopes">The scopes to request the access token for.</param>
-    public AzureIdentityAccessTokenProvider(TokenCredential credential, bool isCaeEnabled, Func<Uri, Dictionary<string, object>?, TokenRequestContext, TokenRequestContext> tokenRequestContextFactory, params string[] scopes)
-        : this(credential, null, null, isCaeEnabled, tokenRequestContextFactory ?? throw new ArgumentNullException(nameof(tokenRequestContextFactory)), scopes)
-    {
-    }
-    private AzureIdentityAccessTokenProvider(TokenCredential credential, string[]? allowedHosts, ObservabilityOptions? observabilityOptions, bool isCaeEnabled, Func<Uri, Dictionary<string, object>?, TokenRequestContext, TokenRequestContext>? tokenRequestContextFactory, params string[] scopes)
+    public AzureIdentityAccessTokenProvider(TokenCredential credential, AzureIdentityAccessTokenProviderOptions? options, params string[] scopes)
     {
         _credential = credential ?? throw new ArgumentNullException(nameof(credential));
 
-        AllowedHostsValidator = new AllowedHostsValidator(allowedHosts);
+        AllowedHostsValidator = new AllowedHostsValidator(options?.AllowedHosts);
 
         if(scopes == null)
             _scopes = new();
         else
             _scopes = new(scopes, StringComparer.OrdinalIgnoreCase);
 
-        _activitySource = new((observabilityOptions ?? new()).TracerInstrumentationName);
-        _isCaeEnabled = isCaeEnabled;
-        _tokenRequestContextFactory = tokenRequestContextFactory;
+        _activitySource = new((options?.ObservabilityOptions ?? new()).TracerInstrumentationName);
+        _isCaeEnabled = options?.IsCaeEnabled ?? true;
+        _tokenRequestContextFactory = options?.TokenRequestContextFactory;
     }
     /// <summary>
     /// The <see cref="AzureIdentityAccessTokenProvider"/> constructor
@@ -74,7 +57,20 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
     /// <param name="allowedHosts">The list of allowed hosts for which to request access tokens.</param>
     /// <param name="scopes">The scopes to request the access token for.</param>
     /// <param name="observabilityOptions">The observability options to use for the authentication provider.</param>
-    [Obsolete("This constructor is obsolete and will be removed in a future version. Use the constructor that takes an isCaeEnabled parameter instead.")]
+    /// <param name="isCaeEnabled">Whether to enable Conditional Access Evaluation (CAE) for the token request.</param>
+    [Obsolete("This constructor is obsolete and will be removed in a future version. Use the constructor that takes AzureIdentityAccessTokenProviderOptions instead.")]
+    public AzureIdentityAccessTokenProvider(TokenCredential credential, string[]? allowedHosts = null, ObservabilityOptions? observabilityOptions = null, bool isCaeEnabled = true, params string[] scopes)
+        : this(credential, new AzureIdentityAccessTokenProviderOptions { AllowedHosts = allowedHosts, ObservabilityOptions = observabilityOptions, IsCaeEnabled = isCaeEnabled }, scopes)
+    {
+    }
+    /// <summary>
+    /// The <see cref="AzureIdentityAccessTokenProvider"/> constructor
+    /// </summary>
+    /// <param name="credential">The credential implementation to use to obtain the access token.</param>
+    /// <param name="allowedHosts">The list of allowed hosts for which to request access tokens.</param>
+    /// <param name="scopes">The scopes to request the access token for.</param>
+    /// <param name="observabilityOptions">The observability options to use for the authentication provider.</param>
+    [Obsolete("This constructor is obsolete and will be removed in a future version. Use the constructor that takes AzureIdentityAccessTokenProviderOptions instead.")]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public AzureIdentityAccessTokenProvider(TokenCredential credential, string[]? allowedHosts, ObservabilityOptions? observabilityOptions, params string[] scopes) :
     this(credential, allowedHosts, observabilityOptions, true, scopes)
