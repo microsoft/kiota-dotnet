@@ -330,4 +330,18 @@ public class AzureIdentityAuthenticationProviderTests
         Assert.False(factoryCalled);
         mockTokenCredential.Verify(c => c.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>()), Times.Never);
     }
+
+    [Fact]
+    public void ConstructorsThrowArgumentNullExceptionWhenTokenRequestContextFactoryIsNull()
+    {
+        var mockTokenCredential = new Mock<TokenCredential>();
+
+        var tokenProviderException = Assert.Throws<ArgumentNullException>(() =>
+            new AzureIdentityAccessTokenProvider(mockTokenCredential.Object, true, null!));
+        Assert.Equal("tokenRequestContextFactory", tokenProviderException.ParamName);
+
+        var authProviderException = Assert.Throws<ArgumentNullException>(() =>
+            new AzureIdentityAuthenticationProvider(mockTokenCredential.Object, true, null!));
+        Assert.Equal("tokenRequestContextFactory", authProviderException.ParamName);
+    }
 }
