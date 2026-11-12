@@ -1,1 +1,2 @@
 #nullable enable
+Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProvider.AzureIdentityAccessTokenProvider(Azure.Core.TokenCredential! credential, bool isCaeEnabled, System.Func<System.Uri!, System.Collections.Generic.Dictionary<string!, object!>?, Azure.Core.TokenRequestContext, Azure.Core.TokenRequestContext>! tokenRequestContextFactory, params string![]! scopes) -> void

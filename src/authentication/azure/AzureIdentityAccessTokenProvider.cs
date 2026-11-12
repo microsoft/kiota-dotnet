@@ -25,6 +25,7 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
     private readonly ActivitySource _activitySource;
     private readonly bool _isCaeEnabled;
     private readonly HashSet<string> _scopes;
+    private readonly Func<Uri, Dictionary<string, object>?, TokenRequestContext, TokenRequestContext>? _tokenRequestContextFactory;
     /// <inheritdoc />
     public AllowedHostsValidator AllowedHostsValidator { get; protected set; }
 
@@ -37,6 +38,21 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
     /// <param name="observabilityOptions">The observability options to use for the authentication provider.</param>
     /// <param name="isCaeEnabled">Whether to enable Conditional Access Evaluation (CAE) for the token request.</param>
     public AzureIdentityAccessTokenProvider(TokenCredential credential, string[]? allowedHosts = null, ObservabilityOptions? observabilityOptions = null, bool isCaeEnabled = true, params string[] scopes)
+        : this(credential, allowedHosts, observabilityOptions, isCaeEnabled, null, scopes)
+    {
+    }
+    /// <summary>
+    /// The <see cref="AzureIdentityAccessTokenProvider"/> constructor
+    /// </summary>
+    /// <param name="credential">The credential implementation to use to obtain the access token.</param>
+    /// <param name="isCaeEnabled">Whether to enable Conditional Access Evaluation (CAE) for the token request.</param>
+    /// <param name="tokenRequestContextFactory">A callback to customize the <see cref="TokenRequestContext"/> before requesting a token.</param>
+    /// <param name="scopes">The scopes to request the access token for.</param>
+    public AzureIdentityAccessTokenProvider(TokenCredential credential, bool isCaeEnabled, Func<Uri, Dictionary<string, object>?, TokenRequestContext, TokenRequestContext> tokenRequestContextFactory, params string[] scopes)
+        : this(credential, null, null, isCaeEnabled, tokenRequestContextFactory ?? throw new ArgumentNullException(nameof(tokenRequestContextFactory)), scopes)
+    {
+    }
+    private AzureIdentityAccessTokenProvider(TokenCredential credential, string[]? allowedHosts, ObservabilityOptions? observabilityOptions, bool isCaeEnabled, Func<Uri, Dictionary<string, object>?, TokenRequestContext, TokenRequestContext>? tokenRequestContextFactory, params string[] scopes)
     {
         _credential = credential ?? throw new ArgumentNullException(nameof(credential));
 
@@ -49,6 +65,7 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
 
         _activitySource = new((observabilityOptions ?? new()).TracerInstrumentationName);
         _isCaeEnabled = isCaeEnabled;
+        _tokenRequestContextFactory = tokenRequestContextFactory;
     }
     /// <summary>
     /// The <see cref="AzureIdentityAccessTokenProvider"/> constructor
@@ -112,9 +129,14 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
         }
         else
             scopes = [$"{uri.Scheme}://{uri.Host}/.default"];
-        span?.SetTag("com.microsoft.kiota.authentication.scopes", string.Join(",", scopes));
 
-        var result = await _credential.GetTokenAsync(new TokenRequestContext(scopes, claims: decodedClaim, isCaeEnabled: _isCaeEnabled), cancellationToken).ConfigureAwait(false);
+        var tokenRequestContext = new TokenRequestContext(scopes, claims: decodedClaim, isCaeEnabled: _isCaeEnabled);
+        if(_tokenRequestContextFactory != null)
+            tokenRequestContext = _tokenRequestContextFactory(uri, additionalAuthenticationContext, tokenRequestContext);
+
+        span?.SetTag("com.microsoft.kiota.authentication.scopes", string.Join(",", tokenRequestContext.Scopes));
+
+        var result = await _credential.GetTokenAsync(tokenRequestContext, cancellationToken).ConfigureAwait(false);
         return result.Token;
     }
 
