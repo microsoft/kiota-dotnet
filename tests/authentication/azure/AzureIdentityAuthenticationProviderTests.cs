@@ -268,4 +268,37 @@ public class AzureIdentityAuthenticationProviderTests
         Assert.True(capturedContext!.Value.IsProofOfPossessionEnabled);
         Assert.Equal("sample-pop-nonce", capturedContext.Value.ProofOfPossessionNonce);
     }
+
+    [Fact]
+    public async Task TokenRequestContextFactoryReceivesUriAndCanOverrideScopes()
+    {
+        Uri? capturedUri = null;
+        TokenRequestContext? capturedContext = null;
+        var mockTokenCredential = new Mock<TokenCredential>();
+        mockTokenCredential
+            .Setup(c => c.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>()))
+            .Callback<TokenRequestContext, CancellationToken>((ctx, _) => capturedContext = ctx)
+            .Returns(new ValueTask<AccessToken>(new AccessToken("scoped-token", DateTimeOffset.UtcNow)));
+
+        var provider = new AzureIdentityAccessTokenProvider(
+            mockTokenCredential.Object,
+            true,
+            (uri, _, defaultCtx) =>
+            {
+                capturedUri = uri;
+                var overrideScopes = uri.AbsolutePath.StartsWith("/admin", StringComparison.OrdinalIgnoreCase)
+                    ? new[] { "Directory.ReadWrite.All" }
+                    : defaultCtx.Scopes;
+                return new TokenRequestContext(overrideScopes, claims: defaultCtx.Claims, isCaeEnabled: defaultCtx.IsCaeEnabled);
+            },
+            "User.Read");
+
+        var targetUri = new Uri("https://graph.microsoft.com/admin/settings");
+        var token = await provider.GetAuthorizationTokenAsync(targetUri, null, TestContext.Current.CancellationToken);
+
+        Assert.Equal("scoped-token", token);
+        Assert.Equal(targetUri, capturedUri);
+        Assert.NotNull(capturedContext);
+        Assert.Equal(new[] { "Directory.ReadWrite.All" }, capturedContext!.Value.Scopes);
+    }
 }
