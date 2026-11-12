@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -127,5 +128,36 @@ public class AzureIdentityAuthenticationProviderTests
         // Act
         await azureIdentityAuthenticationProvider.AuthenticateRequestAsync(testRequest, new() { { "claims", "eyJhY2Nlc3NfdG9rZW4iOnsibmJmIjp7ImVzc2VudGlhbCI6dHJ1ZSwgInZhbHVlIjoiMTY1MjgxMzUwOCJ9fX0=" } }, TestContext.Current.CancellationToken);
         mockTokenCredential.Verify(x => x.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task TokenRequestContextFactorySetsTenantIdDynamically()
+    {
+        TokenRequestContext? capturedContext = null;
+        var mockTokenCredential = new Mock<TokenCredential>();
+        mockTokenCredential
+            .Setup(c => c.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>()))
+            .Callback<TokenRequestContext, CancellationToken>((ctx, _) => capturedContext = ctx)
+            .Returns(new ValueTask<AccessToken>(new AccessToken("tenant-token", DateTimeOffset.UtcNow)));
+
+        var provider = new AzureIdentityAccessTokenProvider(
+            mockTokenCredential.Object,
+            true,
+            (_, authCtx, defaultCtx) =>
+            {
+                var tenantId = authCtx != null && authCtx.TryGetValue("tenantId", out var t) ? t as string : null;
+                return new TokenRequestContext(defaultCtx.Scopes, claims: defaultCtx.Claims, tenantId: tenantId, isCaeEnabled: defaultCtx.IsCaeEnabled);
+            },
+            "User.Read");
+
+        var token = await provider.GetAuthorizationTokenAsync(
+            new Uri("https://graph.microsoft.com/v1.0/me"),
+            new Dictionary<string, object> { { "tenantId", "tenant-123" } },
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal("tenant-token", token);
+        Assert.NotNull(capturedContext);
+        Assert.Equal("tenant-123", capturedContext!.Value.TenantId);
+        Assert.Equal(new[] { "User.Read" }, capturedContext.Value.Scopes);
     }
 }
