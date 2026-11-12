@@ -724,6 +724,33 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             Assert.Single(sent);
         }
 
+        [Fact]
+        public async Task ShouldRetryRedirectedGetWhenNonIdempotentRetriesDisabled()
+        {
+            // Arrange: a POST that a redirect turned into a GET, which then got a 504
+            var option = new RetryHandlerOption { Delay = 0, RetryNonIdempotentRequestsWhenOutcomeUnknown = false };
+            var sent = new List<HttpRequestMessage>();
+            var responses = new Queue<HttpStatusCode>(new[] { HttpStatusCode.GatewayTimeout, HttpStatusCode.OK });
+            var mockHttpMessageHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .Returns((HttpRequestMessage request, CancellationToken _) =>
+                {
+                    sent.Add(request);
+                    var sentRequest = request.Method == HttpMethod.Post ? new HttpRequestMessage(HttpMethod.Get, "http://example.org/bar") : request;
+                    return Task.FromResult(new HttpResponseMessage(responses.Dequeue()) { RequestMessage = sentRequest });
+                });
+            var invoker = new HttpMessageInvoker(new RetryHandler(option) { InnerHandler = mockHttpMessageHandler.Object });
+
+            // Act
+            var response = await invoker.SendAsync(CreateBufferedRequest("POST"), TestContext.Current.CancellationToken);
+
+            // Assert: the GET is resent, not the POST
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(2, sent.Count);
+            Assert.Equal(HttpMethod.Get, sent[1].Method);
+        }
+
         private static HttpRequestMessage CreateBufferedRequest(string method)
         {
             return new HttpRequestMessage(new HttpMethod(method), "http://example.org/foo")

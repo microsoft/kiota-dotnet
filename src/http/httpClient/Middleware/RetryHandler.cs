@@ -169,9 +169,12 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 return false;
             }
 
-            // A 429 or 503 means the server didn't process the request, so resending it is safe
-            // for any method. Any other status may arrive after the server already acted on it.
-            if(!retryOption.RetryNonIdempotentRequestsWhenOutcomeUnknown && IsNonIdempotent(request.Method))
+            // By common service convention, a 429 or 503 means the server didn't process the request,
+            // so resending it is treated as safe for any method. Any other status may arrive after the
+            // server already acted on it. Check the method of the request that will be resent, which
+            // differs from the original when a redirect changed a POST to a GET.
+            var resentMethod = response.RequestMessage?.Method ?? request.Method;
+            if(!retryOption.RetryNonIdempotentRequestsWhenOutcomeUnknown && IsNonIdempotent(resentMethod))
             {
                 return response.StatusCode == (HttpStatusCode)429 || response.StatusCode == HttpStatusCode.ServiceUnavailable;
             }
