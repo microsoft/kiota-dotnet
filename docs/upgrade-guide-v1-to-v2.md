@@ -13,21 +13,21 @@ breaking-changes:
   - removed-method: MultipartBody.GetPartValue<T>(string)
   - removed-method: MultipartBody.RemovePart(string)
   - removed-method: ParseNodeFactoryRegistry.GetFactory<T>
-  - changed-target-frameworks: [net8.0, net10.0, netstandard2.0, netstandard2.1]
-  - removed-target-frameworks: [net5.0, net6.0]
+  - changed-target-frameworks: [net10.0, net11.0, netstandard2.0, netstandard2.1]
+  - removed-target-frameworks: [net5.0, net6.0, net8.0]
   - minimum-dependency: Microsoft.Extensions.DependencyInjection.Abstractions >= 8.0
   - minimum-dependency: System.Text.Json >= 8.0
 ---
 
 # Upgrade Guide: Kiota .NET Libraries v1.x to v2.x
 
-This guide covers the breaking changes introduced in version 2.0 of the Kiota .NET libraries and provides instructions for updating your code.
+This guide covers the breaking changes introduced in version 2.0 of the Kiota .NET libraries, the current 2.x target frameworks, and instructions for updating your code.
 
 ## Summary of Breaking Changes
 
 | Area | Change |
 |------|--------|
-| Target Frameworks | Dropped `net5.0`, `net6.0`; minimum is now `net8.0` |
+| Target Frameworks | Dropped `net5.0`, `net6.0`, `net8.0`; modern .NET targets are now `net10.0` and `net11.0` |
 | `IAsyncParseNodeFactory` | Merged into `IParseNodeFactory`; interface removed |
 | `IParseNodeFactory.GetRootParseNode` | Sync method removed; use `GetRootParseNodeAsync` |
 | `KiotaSerializer` / `KiotaJsonSerializer` | Sync `Deserialize` and `DeserializeCollection` methods removed |
@@ -38,14 +38,17 @@ This guide covers the breaking changes introduced in version 2.0 of the Kiota .N
 
 ## Target Framework Changes
 
-Version 2.x targets **netstandard2.0**, **netstandard2.1**, **net8.0**, and **net10.0**.
+The current version 2.x targets **netstandard2.0**, **netstandard2.1**, **net10.0**, and **net11.0**. The HTTP client library also retains **net462** and targets **net10.0-browser** and **net11.0-browser**.
+
+Building the repository requires the .NET 11 SDK. Earlier 2.x releases also targeted `net8.0`; that explicit target has now been removed.
 
 The following targets have been removed:
 
 - `net5.0`
 - `net6.0`
+- `net8.0`
 
-**Action required:** Update your project to target `net8.0` or later. If you are using `netstandard2.0` or `netstandard2.1`, no change is needed for the target framework itself, but you must ensure the minimum dependency versions listed below are satisfied.
+**Action required:** Update your project to target `net10.0` or `net11.0` to use the modern .NET assets. If you are using `netstandard2.0` or `netstandard2.1`, no change is needed for the target framework itself, but you must ensure the minimum dependency versions listed below are satisfied.
 
 ---
 
@@ -313,8 +316,8 @@ error CS0246: The type or namespace name 'GetFactory<T>' could not be found
 ### NETSDK1045 / NETSDK1005 — Target framework not supported
 
 ```
-error NETSDK1045: The current .NET SDK does not support targeting .NET 5.0 or .NET 6.0
+error NETSDK1045: The current .NET SDK does not support targeting .NET 11.0
 ```
 
-**Fix:** Update your project's `<TargetFramework>` to `net8.0` or later. See [Target Framework Changes](#target-framework-changes).
+**Fix:** Install the .NET 11 SDK to build this repository. Consumer projects should target `net10.0` or `net11.0` to use the modern .NET assets. See [Target Framework Changes](#target-framework-changes).
 

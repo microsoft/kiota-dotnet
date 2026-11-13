@@ -24,12 +24,12 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup .NET 8 and 10
+      - name: Setup .NET 10 and 11
         uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           dotnet-version: |
-            8.x
             10.x
+            11.x
       - name: Initialize CodeQL
         uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
         with:
@@ -44,6 +44,9 @@ jobs:
       - name: Test for net472
         run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity
           normal --framework net472 --report-gh
+      - name: Test for net11.0
+        run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity
+          normal --framework net11.0 --report-gh
       - name: Test for net10.0 and collect coverage
         run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity
           normal --framework net10.0 --results-directory=./TestResults --coverlet --coverlet-output-format
