@@ -1,3 +1,6 @@
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Kiota.Abstractions.Serialization;
 using Microsoft.Kiota.Abstractions.Store;
 using Moq;
@@ -43,6 +46,36 @@ namespace Microsoft.Kiota.Abstractions.Tests
             // Assert the type has changed due to backing store enabling for the default instance as well.
             Assert.IsType<BackingStoreSerializationWriterProxyFactory>(serializationFactoryRegistry.ContentTypeAssociatedFactories[StreamContentType]);
             Assert.IsType<BackingStoreSerializationWriterProxyFactory>(SerializationWriterFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[StreamContentType]);
+        }
+
+        [Fact]
+        public async Task EnableBackingStoreForSerializationWriterFactoryConcurrentlyDoesNotDoubleWrap()
+        {
+            var proxiedFieldInfo = typeof(SerializationWriterProxyFactory)
+                .GetField("ProxiedSerializationWriterFactory", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            for(var round = 0; round < 50; round++)
+            {
+                var registry = new SerializationWriterFactoryRegistry();
+                var mockWriterFactory = new Mock<ISerializationWriterFactory>();
+                registry.ContentTypeAssociatedFactories.TryAdd(StreamContentType, mockWriterFactory.Object);
+
+                using var start = new ManualResetEventSlim();
+                var workers = Enumerable.Range(0, 8)
+                    .Select(_ => Task.Factory.StartNew(() =>
+                    {
+                        start.Wait();
+                        ApiClientBuilder.EnableBackingStoreForSerializationWriterFactory(registry);
+                    }, TaskCreationOptions.LongRunning))
+                    .ToArray();
+
+                start.Set();
+                await Task.WhenAll(workers);
+
+                var factory = registry.ContentTypeAssociatedFactories[StreamContentType];
+                Assert.IsType<BackingStoreSerializationWriterProxyFactory>(factory);
+                Assert.Equal(mockWriterFactory.Object, proxiedFieldInfo!.GetValue(factory));
+            }
         }
 
         [Fact]
@@ -151,6 +184,112 @@ namespace Microsoft.Kiota.Abstractions.Tests
             var factory = ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[StreamContentType];
             Assert.IsType<BackingStoreParseNodeFactory>(factory);
 
+        }
+
+        [Fact]
+        public async Task EnableBackingStoreForParseNodeFactoryConcurrentlyDoesNotDoubleWrap()
+        {
+            var concreteFieldInfo = typeof(ParseNodeProxyFactory)
+                .GetField("_concrete", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            for(var round = 0; round < 50; round++)
+            {
+                var registry = new ParseNodeFactoryRegistry();
+                var mockParseNodeFactory = new Mock<IParseNodeFactory>();
+                registry.ContentTypeAssociatedFactories.TryAdd(StreamContentType, mockParseNodeFactory.Object);
+
+                using var start = new ManualResetEventSlim();
+                var workers = Enumerable.Range(0, 8)
+                    .Select(_ => Task.Factory.StartNew(() =>
+                    {
+                        start.Wait();
+                        ApiClientBuilder.EnableBackingStoreForParseNodeFactory(registry);
+                    }, TaskCreationOptions.LongRunning))
+                    .ToArray();
+
+                start.Set();
+                await Task.WhenAll(workers);
+
+                var factory = registry.ContentTypeAssociatedFactories[StreamContentType];
+                Assert.IsType<BackingStoreParseNodeFactory>(factory);
+                Assert.Equal(mockParseNodeFactory.Object, concreteFieldInfo!.GetValue(factory));
+            }
+        }
+
+        [Fact]
+        public async Task ConcurrentEnableBackingStoreWritesNullPropertyOnlyOnce()
+        {
+            var mockWriter = new Mock<ISerializationWriter>();
+            mockWriter.SetupAllProperties();
+            var mockWriterFactory = new Mock<ISerializationWriterFactory>();
+            mockWriterFactory.Setup(x => x.GetSerializationWriter(StreamContentType)).Returns(mockWriter.Object);
+
+            var registry = new SerializationWriterFactoryRegistry();
+            registry.ContentTypeAssociatedFactories.TryAdd(StreamContentType, mockWriterFactory.Object);
+
+            using var start = new ManualResetEventSlim();
+            var workers = Enumerable.Range(0, 8)
+                .Select(_ => Task.Factory.StartNew(() =>
+                {
+                    start.Wait();
+                    ApiClientBuilder.EnableBackingStoreForSerializationWriterFactory(registry);
+                }, TaskCreationOptions.LongRunning))
+                .ToArray();
+
+            start.Set();
+            await Task.WhenAll(workers);
+
+            var backingStore = BackingStoreFactorySingleton.Instance.CreateBackingStore();
+            backingStore.InitializationCompleted = true;
+            backingStore.Set("city", (string?)null);
+
+            var mockBackedModel = new Mock<IBackedModel>();
+            mockBackedModel.As<IParsable>();
+            mockBackedModel.SetupGet(m => m.BackingStore).Returns(backingStore);
+
+            using var writer = registry.GetSerializationWriter(StreamContentType);
+            writer.OnStartObjectSerialization?.Invoke((IParsable)mockBackedModel.Object, mockWriter.Object);
+
+            mockWriter.Verify(w => w.WriteNullValue("city"), Times.Once());
+        }
+
+        [Fact]
+        public async Task ConcurrentEnableBackingStoreOnDefaultInstanceIsIdempotent()
+        {
+            var testContentType = "application/x-test-singleton";
+            var mockWriter = new Mock<ISerializationWriterFactory>();
+            var mockParseNode = new Mock<IParseNodeFactory>();
+            SerializationWriterFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories.TryAdd(testContentType, mockWriter.Object);
+            ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories.TryAdd(testContentType, mockParseNode.Object);
+
+            using var start = new ManualResetEventSlim();
+            var workers = Enumerable.Range(0, 8)
+                .Select(_ => Task.Factory.StartNew(() =>
+                {
+                    start.Wait();
+                    var writerRegistry = new SerializationWriterFactoryRegistry();
+                    var parseRegistry = new ParseNodeFactoryRegistry();
+                    ApiClientBuilder.EnableBackingStoreForSerializationWriterFactory(writerRegistry);
+                    ApiClientBuilder.EnableBackingStoreForParseNodeFactory(parseRegistry);
+                }, TaskCreationOptions.LongRunning))
+                .ToArray();
+
+            start.Set();
+            await Task.WhenAll(workers);
+
+            var defaultWriterFactory = SerializationWriterFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[testContentType];
+            var defaultParseNodeFactory = ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories[testContentType];
+
+            Assert.IsType<BackingStoreSerializationWriterProxyFactory>(defaultWriterFactory);
+            Assert.IsType<BackingStoreParseNodeFactory>(defaultParseNodeFactory);
+
+            var proxiedWriterField = typeof(SerializationWriterProxyFactory)
+                .GetField("ProxiedSerializationWriterFactory", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var concreteParseNodeField = typeof(ParseNodeProxyFactory)
+                .GetField("_concrete", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            Assert.Equal(mockWriter.Object, proxiedWriterField!.GetValue(defaultWriterFactory));
+            Assert.Equal(mockParseNode.Object, concreteParseNodeField!.GetValue(defaultParseNodeFactory));
         }
     }
 }
