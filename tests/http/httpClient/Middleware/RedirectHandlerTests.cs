@@ -965,13 +965,14 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
                     : new Uri("http://proxy-a.example.com:8080")
             };
             var responses = new Queue<HttpResponseMessage>();
-            var toProxyB = new HttpResponseMessage(HttpStatusCode.Found);
+            using var toProxyB = new HttpResponseMessage(HttpStatusCode.Found);
             toProxyB.Headers.Location = new Uri("http://example.net/bar");
-            var backToProxyA = new HttpResponseMessage(HttpStatusCode.Found);
+            using var backToProxyA = new HttpResponseMessage(HttpStatusCode.Found);
             backToProxyA.Headers.Location = new Uri("http://example.org/baz");
+            using var okResponse = new HttpResponseMessage(HttpStatusCode.OK);
             responses.Enqueue(toProxyB);
             responses.Enqueue(backToProxyA);
-            responses.Enqueue(new HttpResponseMessage(HttpStatusCode.OK));
+            responses.Enqueue(okResponse);
             var mockHandler = new MockSequenceHandler(responses, request =>
             {
                 // the handler adds the credentials of proxy B on the request sent through it
