@@ -71,6 +71,20 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
         }
     }
 
+    /// <summary>
+    /// A mock DelegatingHandler that returns the queued responses in order.
+    /// </summary>
+    internal class MockSequenceHandler(Queue<HttpResponseMessage> responses, Action<HttpRequestMessage>? onRequest = null) : DelegatingHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            onRequest?.Invoke(request);
+            var response = responses.Dequeue();
+            response.RequestMessage = request;
+            return Task.FromResult(response);
+        }
+    }
+
     public sealed class RedirectHandlerTests : IDisposable
     {
         private readonly MockRedirectHandler _testHttpMessageHandler;
@@ -937,6 +951,50 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 
             // Assert - ProxyAuthorization belongs to proxy A and must not be sent to proxy B
             Assert.NotSame(response.RequestMessage, httpRequestMessage);
+            Assert.Null(response.RequestMessage?.Headers.ProxyAuthorization);
+        }
+
+        [Fact]
+        public async Task RedirectBackToPreviousProxyShouldRemoveProxyAuthHeaderOfIntermediateProxy()
+        {
+            // Arrange - example.org goes through proxy A, example.net goes through proxy B
+            var mockProxy = new MockWebProxy(new Uri("http://proxy-a.example.com:8080"))
+            {
+                ProxySelector = destination => destination.Host == "example.net"
+                    ? new Uri("http://proxy-b.example.com:8080")
+                    : new Uri("http://proxy-a.example.com:8080")
+            };
+            var responses = new Queue<HttpResponseMessage>();
+            var toProxyB = new HttpResponseMessage(HttpStatusCode.Found);
+            toProxyB.Headers.Location = new Uri("http://example.net/bar");
+            var backToProxyA = new HttpResponseMessage(HttpStatusCode.Found);
+            backToProxyA.Headers.Location = new Uri("http://example.org/baz");
+            responses.Enqueue(toProxyB);
+            responses.Enqueue(backToProxyA);
+            responses.Enqueue(new HttpResponseMessage(HttpStatusCode.OK));
+            var mockHandler = new MockSequenceHandler(responses, request =>
+            {
+                // the handler adds the credentials of proxy B on the request sent through it
+                if(request.RequestUri?.Host == "example.net")
+                    request.Headers.ProxyAuthorization = new AuthenticationHeaderValue("Basic", "proxy-b-creds");
+            })
+            {
+                InnerHandler = new HttpClientHandler { Proxy = mockProxy }
+            };
+            var redirectHandler = new RedirectHandler
+            {
+                InnerHandler = mockHandler
+            };
+
+            using var invoker = new HttpMessageInvoker(redirectHandler);
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
+            httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("Basic", "proxy-a-creds");
+
+            // Act
+            var response = await invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
+
+            // Assert - the credentials of proxy B must not be sent to proxy A
+            Assert.Equal(new Uri("http://example.org/baz"), response.RequestMessage?.RequestUri);
             Assert.Null(response.RequestMessage?.Headers.ProxyAuthorization);
         }
 
