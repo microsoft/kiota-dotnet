@@ -17,7 +17,7 @@ public class AzureIdentityAuthenticationProviderTests
     public void ConstructorThrowsArgumentNullExceptionOnNullTokenCredential()
     {
         // Arrange
-        var exception = Assert.Throws<ArgumentNullException>(() => new AzureIdentityAccessTokenProvider(null!, (AzureIdentityAccessTokenProviderOptions?)null));
+        var exception = Assert.Throws<ArgumentNullException>(() => new AzureIdentityAccessTokenProvider(null!, null));
 
         // Assert
         Assert.Equal("credential", exception.ParamName);
@@ -463,5 +463,22 @@ public class AzureIdentityAuthenticationProviderTests
         Assert.Null(options.ObservabilityOptions);
         Assert.True(options.IsCaeEnabled);
         Assert.Null(options.TokenRequestContextFactory);
+    }
+
+    [Fact]
+    public void UncastNullConstructorCallsAreNotAmbiguous()
+    {
+        var mockTokenCredential = new Mock<TokenCredential>();
+        var tokenProvider = new AzureIdentityAccessTokenProvider(mockTokenCredential.Object, null);
+        Assert.NotNull(tokenProvider);
+
+        var tokenProviderWithScopes = new AzureIdentityAccessTokenProvider(mockTokenCredential.Object, null, "User.Read");
+        Assert.NotNull(tokenProviderWithScopes);
+
+        var authProvider = new AzureIdentityAuthenticationProvider(mockTokenCredential.Object, null);
+        Assert.NotNull(authProvider);
+
+        var authProviderWithScopes = new AzureIdentityAuthenticationProvider(mockTokenCredential.Object, null, "User.Read");
+        Assert.NotNull(authProviderWithScopes);
     }
 }
