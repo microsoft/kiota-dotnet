@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0](https://github.com/microsoft/kiota-dotnet/compare/v2.1.6...v2.2.0) (2026-11-13)
+
+
+### Features
+
+* **http:** add option to skip retrying non-idempotent requests when the outcome is unknown ([#864](https://github.com/microsoft/kiota-dotnet/issues/864)) ([446a46b](https://github.com/microsoft/kiota-dotnet/commit/446a46b0f27d51a3b47d18244fb8ceea41ff67ea))
+
+
+### Bug Fixes
+
+* **abstractions:** prevent concurrent double-wrapping in ApiClientBuilder backing store enablement ([#862](https://github.com/microsoft/kiota-dotnet/issues/862)) ([efee54c](https://github.com/microsoft/kiota-dotnet/commit/efee54c5c88c4eaebf679d4225e17bd331f80028))
+* **abstractions:** sanitize enumerable collections and support decimal in RequestInformation ([#853](https://github.com/microsoft/kiota-dotnet/issues/853)) ([88a830d](https://github.com/microsoft/kiota-dotnet/commit/88a830d16d738e3dfcc87470b44a5c755806f605))
+* **abstractions:** sanitize TimeSpan URI parameters and support DateTime in RequestInformation scalar content ([#863](https://github.com/microsoft/kiota-dotnet/issues/863)) ([59907e8](https://github.com/microsoft/kiota-dotnet/commit/59907e847086a87f2ef59b334546935aa486bfae))
+* **serialization-form:** handle non-boolean and invalid primitives safely in FormParseNode ([#850](https://github.com/microsoft/kiota-dotnet/issues/850)) ([6d2e8a0](https://github.com/microsoft/kiota-dotnet/commit/6d2e8a072f0f1db8ce632c71c40a802a55b2e809))
+* **serialization-text:** defensive byte array and timespan parsing in TextParseNode ([#855](https://github.com/microsoft/kiota-dotnet/issues/855)) ([3833f1b](https://github.com/microsoft/kiota-dotnet/commit/3833f1b25cb5c943a7f2786432fd543f85477ad2))
+
 ## [2.1.6](https://github.com/microsoft/kiota-dotnet/compare/v2.1.5...v2.1.6) (2026-11-02)
 
 
