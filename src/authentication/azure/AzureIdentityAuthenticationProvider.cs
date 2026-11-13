@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using Azure.Core;
 using Microsoft.Kiota.Abstractions.Authentication;
@@ -17,12 +18,23 @@ public class AzureIdentityAuthenticationProvider : BaseBearerTokenAuthentication
     /// The <see cref="AzureIdentityAuthenticationProvider"/> constructor
     /// </summary>
     /// <param name="credential">The credential implementation to use to obtain the access token.</param>
+    /// <param name="options">The options to use for the access token provider.</param>
+    /// <param name="scopes">The scopes to request the access token for.</param>
+    public AzureIdentityAuthenticationProvider(TokenCredential credential, AzureIdentityAccessTokenProviderOptions? options, params string[] scopes)
+        : base(new AzureIdentityAccessTokenProvider(credential, options, scopes))
+    {
+    }
+    /// <summary>
+    /// The <see cref="AzureIdentityAuthenticationProvider"/> constructor
+    /// </summary>
+    /// <param name="credential">The credential implementation to use to obtain the access token.</param>
     /// <param name="allowedHosts">The list of allowed hosts for which to request access tokens.</param>
     /// <param name="scopes">The scopes to request the access token for.</param>
     /// <param name="isCaeEnabled">Whether to enable Conditional Access Evaluation (CAE) for the token request.</param>
     /// <param name="observabilityOptions">The observability options to use for the authentication provider.</param>
+    [Obsolete("This constructor is obsolete and will be removed in a future version. Use the constructor that takes AzureIdentityAccessTokenProviderOptions instead.")]
     public AzureIdentityAuthenticationProvider(TokenCredential credential, string[]? allowedHosts = null, ObservabilityOptions? observabilityOptions = null, bool isCaeEnabled = true, params string[] scopes)
-        : base(new AzureIdentityAccessTokenProvider(credential, allowedHosts, observabilityOptions, isCaeEnabled, scopes))
+        : this(credential, new AzureIdentityAccessTokenProviderOptions { AllowedHosts = allowedHosts, ObservabilityOptions = observabilityOptions, IsCaeEnabled = isCaeEnabled }, scopes)
     {
     }
     /// <summary>
@@ -32,7 +44,7 @@ public class AzureIdentityAuthenticationProvider : BaseBearerTokenAuthentication
     /// <param name="allowedHosts">The list of allowed hosts for which to request access tokens.</param>
     /// <param name="scopes">The scopes to request the access token for.</param>
     /// <param name="observabilityOptions">The observability options to use for the authentication provider.</param>
-    [Obsolete("This constructor is obsolete and will be removed in a future version. Use the constructor that takes an isCaeEnabled parameter instead.")]
+    [Obsolete("This constructor is obsolete and will be removed in a future version. Use the constructor that takes AzureIdentityAccessTokenProviderOptions instead.")]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public AzureIdentityAuthenticationProvider(TokenCredential credential, string[]? allowedHosts, ObservabilityOptions? observabilityOptions, params string[] scopes)
         : this(credential, allowedHosts, observabilityOptions, true, scopes)
