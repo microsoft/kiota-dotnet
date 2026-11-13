@@ -28,7 +28,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
 
         public ICredentials? Credentials { get; set; }
 
-        public Uri? GetProxy(Uri destination) => _proxyUri;
+        public Func<Uri, Uri>? ProxySelector { get; set; }
+
+        public Uri? GetProxy(Uri destination) => ProxySelector?.Invoke(destination) ?? _proxyUri;
 
         public bool IsBypassed(Uri host)
         {
@@ -896,6 +898,46 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             // Assert - ProxyAuthorization should be kept because example.org requires proxy
             Assert.NotSame(response.RequestMessage, httpRequestMessage);
             Assert.NotNull(response.RequestMessage?.Headers.ProxyAuthorization);
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.MovedPermanently)]  // 301
+        [InlineData(HttpStatusCode.Found)]  // 302
+        [InlineData(HttpStatusCode.TemporaryRedirect)]  // 307
+        [InlineData((HttpStatusCode)308)] // 308
+        public async Task RedirectToUrlWithDifferentProxyShouldRemoveProxyAuthHeader(HttpStatusCode statusCode)
+        {
+            // Arrange - example.org goes through proxy A, example.net goes through proxy B
+            var mockProxy = new MockWebProxy(new Uri("http://proxy-a.example.com:8080"))
+            {
+                ProxySelector = destination => destination.Host == "example.net"
+                    ? new Uri("http://proxy-b.example.com:8080")
+                    : new Uri("http://proxy-a.example.com:8080")
+            };
+            var httpClientHandler = new HttpClientHandler { Proxy = mockProxy };
+            var mockHandler = new MockDelegatingRedirectHandler
+            {
+                InnerHandler = httpClientHandler
+            };
+            var redirectHandler = new RedirectHandler
+            {
+                InnerHandler = mockHandler
+            };
+
+            using var invoker = new HttpMessageInvoker(redirectHandler);
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://example.org/foo");
+            httpRequestMessage.Headers.ProxyAuthorization = new AuthenticationHeaderValue("Basic", "creds");
+
+            var redirectResponse = new HttpResponseMessage(statusCode);
+            redirectResponse.Headers.Location = new Uri("http://example.net/bar");
+            mockHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));
+
+            // Act
+            var response = await invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
+
+            // Assert - ProxyAuthorization belongs to proxy A and must not be sent to proxy B
+            Assert.NotSame(response.RequestMessage, httpRequestMessage);
+            Assert.Null(response.RequestMessage?.Headers.ProxyAuthorization);
         }
 
         [Fact]
