@@ -606,6 +606,173 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             Assert.Equal(response.RequestMessage.Content.Headers.ContentLength, -1);
         }
 
+        [Fact]
+        public void RetryUnprocessedMutationsOnlyShouldDefaultToFalse()
+        {
+            Assert.False(new RetryHandlerOption().RetryUnprocessedMutationsOnly);
+        }
+
+        [Theory]
+        [InlineData("POST")]
+        [InlineData("PATCH")]
+        public async Task ShouldRetryNonIdempotentRequestOnGatewayTimeoutByDefault(string method)
+        {
+            // Arrange
+            var sent = new List<HttpRequestMessage>();
+            var invoker = CreateInvoker(new RetryHandlerOption { Delay = 0 }, sent, HttpStatusCode.GatewayTimeout, HttpStatusCode.OK);
+            // Act
+            var response = await invoker.SendAsync(CreateBufferedRequest(method), TestContext.Current.CancellationToken);
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(2, sent.Count);
+        }
+
+        [Theory]
+        [InlineData("POST", HttpStatusCode.GatewayTimeout)]
+        [InlineData("PATCH", HttpStatusCode.GatewayTimeout)]
+        [InlineData("post", HttpStatusCode.GatewayTimeout)]
+        [InlineData("POST", HttpStatusCode.BadGateway)]
+        [InlineData("POST", HttpStatusCode.InternalServerError)]
+        public async Task ShouldNotRetryNonIdempotentRequestWhenOutcomeUnknownAndEnabled(string method, HttpStatusCode statusCode)
+        {
+            // Arrange
+            var sent = new List<HttpRequestMessage>();
+            var option = new RetryHandlerOption
+            {
+                Delay = 0,
+                RetryUnprocessedMutationsOnly = true,
+                // Accept server errors so that only the new option can stop the retry.
+                ShouldRetry = (_, _, response) => (int)response.StatusCode >= 500 || (int)response.StatusCode == 429
+            };
+            var invoker = CreateInvoker(option, sent, statusCode, HttpStatusCode.OK);
+            var request = CreateBufferedRequest(method);
+            // Act
+            var response = await invoker.SendAsync(request, TestContext.Current.CancellationToken);
+            // Assert
+            Assert.Equal(statusCode, response.StatusCode);
+            Assert.Single(sent);
+            Assert.Same(request, response.RequestMessage);
+        }
+
+        [Theory]
+        [InlineData("POST", HttpStatusCode.ServiceUnavailable)]
+        [InlineData("POST", (HttpStatusCode)429)]
+        [InlineData("PATCH", HttpStatusCode.ServiceUnavailable)]
+        [InlineData("PATCH", (HttpStatusCode)429)]
+        public async Task ShouldRetryNonIdempotentRequestWhenNotProcessedAndEnabled(string method, HttpStatusCode statusCode)
+        {
+            // Arrange
+            var sent = new List<HttpRequestMessage>();
+            var option = new RetryHandlerOption { Delay = 0, RetryUnprocessedMutationsOnly = true };
+            var invoker = CreateInvoker(option, sent, statusCode, HttpStatusCode.OK);
+            // Act
+            var response = await invoker.SendAsync(CreateBufferedRequest(method), TestContext.Current.CancellationToken);
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(2, sent.Count);
+        }
+
+        [Theory]
+        [InlineData("GET")]
+        [InlineData("PUT")]
+        [InlineData("DELETE")]
+        [InlineData("QUERY")]
+        public async Task ShouldRetryIdempotentRequestOnGatewayTimeoutWhenEnabled(string method)
+        {
+            // Arrange
+            var sent = new List<HttpRequestMessage>();
+            var option = new RetryHandlerOption { Delay = 0, RetryUnprocessedMutationsOnly = true };
+            var invoker = CreateInvoker(option, sent, HttpStatusCode.GatewayTimeout, HttpStatusCode.OK);
+            // Act
+            var response = await invoker.SendAsync(CreateBufferedRequest(method), TestContext.Current.CancellationToken);
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(2, sent.Count);
+        }
+
+        [Fact]
+        public async Task ShouldStopRetryingNonIdempotentRequestWhenALaterResponseLeavesOutcomeUnknown()
+        {
+            // Arrange
+            var sent = new List<HttpRequestMessage>();
+            var option = new RetryHandlerOption { Delay = 0, RetryUnprocessedMutationsOnly = true };
+            var invoker = CreateInvoker(option, sent, HttpStatusCode.ServiceUnavailable, HttpStatusCode.GatewayTimeout, HttpStatusCode.OK);
+            // Act
+            var response = await invoker.SendAsync(CreateBufferedRequest("POST"), TestContext.Current.CancellationToken);
+            // Assert
+            Assert.Equal(HttpStatusCode.GatewayTimeout, response.StatusCode);
+            Assert.Equal(2, sent.Count);
+        }
+
+        [Fact]
+        public async Task ShouldHonorRetryUnprocessedMutationsOnlyFromRequestOption()
+        {
+            // Arrange
+            var sent = new List<HttpRequestMessage>();
+            var invoker = CreateInvoker(new RetryHandlerOption { Delay = 0 }, sent, HttpStatusCode.GatewayTimeout, HttpStatusCode.OK);
+            var request = CreateBufferedRequest("POST");
+            var requestOption = new RetryHandlerOption { Delay = 0, RetryUnprocessedMutationsOnly = true };
+#if NET5_0_OR_GREATER
+            request.Options.Set(new HttpRequestOptionsKey<RetryHandlerOption>(typeof(RetryHandlerOption).FullName!), requestOption);
+#else
+            request.Properties.Add(typeof(RetryHandlerOption).FullName!, requestOption);
+#endif
+            // Act
+            var response = await invoker.SendAsync(request, TestContext.Current.CancellationToken);
+            // Assert
+            Assert.Equal(HttpStatusCode.GatewayTimeout, response.StatusCode);
+            Assert.Single(sent);
+        }
+
+        [Fact]
+        public async Task ShouldRetryRedirectedGetWhenEnabled()
+        {
+            // Arrange: a POST that a redirect turned into a GET, which then got a 504
+            var option = new RetryHandlerOption { Delay = 0, RetryUnprocessedMutationsOnly = true };
+            var sent = new List<HttpRequestMessage>();
+            var responses = new Queue<HttpStatusCode>(new[] { HttpStatusCode.GatewayTimeout, HttpStatusCode.OK });
+            var mockHttpMessageHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .Returns((HttpRequestMessage request, CancellationToken _) =>
+                {
+                    sent.Add(request);
+                    var sentRequest = request.Method == HttpMethod.Post ? new HttpRequestMessage(HttpMethod.Get, "http://example.org/bar") : request;
+                    return Task.FromResult(new HttpResponseMessage(responses.Dequeue()) { RequestMessage = sentRequest });
+                });
+            var invoker = new HttpMessageInvoker(new RetryHandler(option) { InnerHandler = mockHttpMessageHandler.Object });
+
+            // Act
+            var response = await invoker.SendAsync(CreateBufferedRequest("POST"), TestContext.Current.CancellationToken);
+
+            // Assert: the GET is resent, not the POST
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(2, sent.Count);
+            Assert.Equal(HttpMethod.Get, sent[1].Method);
+        }
+
+        private static HttpRequestMessage CreateBufferedRequest(string method)
+        {
+            return new HttpRequestMessage(new HttpMethod(method), "http://example.org/foo")
+            {
+                Content = new StringContent("Hello World")
+            };
+        }
+
+        private static HttpMessageInvoker CreateInvoker(RetryHandlerOption option, List<HttpRequestMessage> sent, params HttpStatusCode[] statusCodes)
+        {
+            var responses = new Queue<HttpStatusCode>(statusCodes);
+            var mockHttpMessageHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .Returns((HttpRequestMessage request, CancellationToken _) =>
+                {
+                    sent.Add(request);
+                    return Task.FromResult(new HttpResponseMessage(responses.Dequeue()) { RequestMessage = request });
+                });
+            return new HttpMessageInvoker(new RetryHandler(option) { InnerHandler = mockHttpMessageHandler.Object });
+        }
+
         private async Task DelayTestWithMessage(HttpResponseMessage response, int count, string message, int delay = RetryHandlerOption.MaxDelay)
         {
             Message = message;
