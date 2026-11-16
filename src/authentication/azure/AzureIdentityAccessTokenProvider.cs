@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
     /// <param name="credential">The credential implementation to use to obtain the access token.</param>
     /// <param name="options">The options to use for the access token provider.</param>
     /// <param name="scopes">The scopes to request the access token for.</param>
-    public AzureIdentityAccessTokenProvider(TokenCredential credential, AzureIdentityAccessTokenProviderOptions options, params string[] scopes)
+    public AzureIdentityAccessTokenProvider(TokenCredential credential, AzureIdentityAccessTokenProviderOptions? options, params string[] scopes)
     {
         _credential = credential ?? throw new ArgumentNullException(nameof(credential));
         _options = options ?? new AzureIdentityAccessTokenProviderOptions();

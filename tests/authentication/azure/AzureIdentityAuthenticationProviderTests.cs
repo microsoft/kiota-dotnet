@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -486,11 +486,11 @@ public class AzureIdentityAuthenticationProviderTests
     public void ConstructorsHandleNullOptionsGracefullyByDefaulting()
     {
         var mockTokenCredential = new Mock<TokenCredential>();
-        var tokenProvider = new AzureIdentityAccessTokenProvider(mockTokenCredential.Object, (AzureIdentityAccessTokenProviderOptions)null!);
+        var tokenProvider = new AzureIdentityAccessTokenProvider(mockTokenCredential.Object, (AzureIdentityAccessTokenProviderOptions?)null);
         Assert.NotNull(tokenProvider);
         Assert.NotNull(tokenProvider.AllowedHostsValidator);
 
-        var authProvider = new AzureIdentityAuthenticationProvider(mockTokenCredential.Object, (AzureIdentityAccessTokenProviderOptions)null!);
+        var authProvider = new AzureIdentityAuthenticationProvider(mockTokenCredential.Object, (AzureIdentityAccessTokenProviderOptions?)null);
         Assert.NotNull(authProvider);
     }
 }

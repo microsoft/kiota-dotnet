@@ -1,5 +1,5 @@
 #nullable enable
-Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProvider.AzureIdentityAccessTokenProvider(Azure.Core.TokenCredential! credential, Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProviderOptions! options, params string![]! scopes) -> void
+Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProvider.AzureIdentityAccessTokenProvider(Azure.Core.TokenCredential! credential, Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProviderOptions? options, params string![]! scopes) -> void
 Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProviderOptions
 Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProviderOptions.AllowedHosts.get -> string![]?
 Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProviderOptions.AllowedHosts.set -> void
@@ -10,4 +10,4 @@ Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProviderOptions.Obs
 Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProviderOptions.ObservabilityOptions.set -> void
 Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProviderOptions.TokenRequestContextFactory.get -> System.Func<System.Uri!, System.Collections.Generic.Dictionary<string!, object!>?, Azure.Core.TokenRequestContext, Azure.Core.TokenRequestContext>?
 Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProviderOptions.TokenRequestContextFactory.set -> void
-Microsoft.Kiota.Authentication.Azure.AzureIdentityAuthenticationProvider.AzureIdentityAuthenticationProvider(Azure.Core.TokenCredential! credential, Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProviderOptions! options, params string![]! scopes) -> void
+Microsoft.Kiota.Authentication.Azure.AzureIdentityAuthenticationProvider.AzureIdentityAuthenticationProvider(Azure.Core.TokenCredential! credential, Microsoft.Kiota.Authentication.Azure.AzureIdentityAccessTokenProviderOptions? options, params string![]! scopes) -> void
