@@ -216,6 +216,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
             var handler = InnerHandler;
             while(handler != null)
             {
+#if NETFRAMEWORK
+                if(handler is WinHttpHandler winHttpHandler)
+                    return winHttpHandler.Proxy;
+#endif
 #if NET5_0_OR_GREATER
                 if (handler is SocketsHttpHandler socketsHandler)
                     return socketsHandler.Proxy;

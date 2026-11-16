@@ -41,9 +41,9 @@ jobs:
       - name: Build
         run: dotnet build ${{ env.solutionName }} --no-restore
           /p:UseSharedCompilation=false
-      - name: Test for net472
+      - name: Test for net481
         run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity
-          normal --framework net472 --report-gh
+          normal --framework net481 --report-gh
       - name: Test for net11.0 and collect coverage
         run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity
           normal --framework net11.0 --results-directory=./TestResults --coverlet --coverlet-output-format
