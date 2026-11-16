@@ -20,8 +20,8 @@ public class AzureIdentityAuthenticationProvider : BaseBearerTokenAuthentication
     /// <param name="credential">The credential implementation to use to obtain the access token.</param>
     /// <param name="options">The options to use for the access token provider.</param>
     /// <param name="scopes">The scopes to request the access token for.</param>
-    public AzureIdentityAuthenticationProvider(TokenCredential credential, AzureIdentityAccessTokenProviderOptions? options, params string[] scopes)
-        : base(new AzureIdentityAccessTokenProvider(credential, options, scopes))
+    public AzureIdentityAuthenticationProvider(TokenCredential credential, AzureIdentityAccessTokenProviderOptions options, params string[] scopes)
+        : base(new AzureIdentityAccessTokenProvider(credential, options ?? new AzureIdentityAccessTokenProviderOptions(), scopes))
     {
     }
     /// <summary>

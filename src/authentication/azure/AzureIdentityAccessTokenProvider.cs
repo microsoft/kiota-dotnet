@@ -22,10 +22,9 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
     private static readonly object BoxedFalse = false;
 
     private readonly TokenCredential _credential;
+    private readonly AzureIdentityAccessTokenProviderOptions _options;
     private readonly ActivitySource _activitySource;
-    private readonly bool _isCaeEnabled;
     private readonly HashSet<string> _scopes;
-    private readonly Func<Uri, Dictionary<string, object>?, TokenRequestContext, TokenRequestContext>? _tokenRequestContextFactory;
     /// <inheritdoc />
     public AllowedHostsValidator AllowedHostsValidator { get; protected set; }
 
@@ -35,20 +34,19 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
     /// <param name="credential">The credential implementation to use to obtain the access token.</param>
     /// <param name="options">The options to use for the access token provider.</param>
     /// <param name="scopes">The scopes to request the access token for.</param>
-    public AzureIdentityAccessTokenProvider(TokenCredential credential, AzureIdentityAccessTokenProviderOptions? options, params string[] scopes)
+    public AzureIdentityAccessTokenProvider(TokenCredential credential, AzureIdentityAccessTokenProviderOptions options, params string[] scopes)
     {
         _credential = credential ?? throw new ArgumentNullException(nameof(credential));
+        _options = options ?? new AzureIdentityAccessTokenProviderOptions();
 
-        AllowedHostsValidator = new AllowedHostsValidator(options?.AllowedHosts);
+        AllowedHostsValidator = new AllowedHostsValidator(_options.AllowedHosts);
 
         if(scopes == null)
             _scopes = new();
         else
             _scopes = new(scopes, StringComparer.OrdinalIgnoreCase);
 
-        _activitySource = new((options?.ObservabilityOptions ?? new()).TracerInstrumentationName);
-        _isCaeEnabled = options?.IsCaeEnabled ?? true;
-        _tokenRequestContextFactory = options?.TokenRequestContextFactory;
+        _activitySource = new((_options.ObservabilityOptions ?? new()).TracerInstrumentationName);
     }
     /// <summary>
     /// The <see cref="AzureIdentityAccessTokenProvider"/> constructor
@@ -126,9 +124,9 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
         else
             scopes = [$"{uri.Scheme}://{uri.Host}/.default"];
 
-        var tokenRequestContext = new TokenRequestContext(scopes, claims: decodedClaim, isCaeEnabled: _isCaeEnabled);
-        if(_tokenRequestContextFactory != null)
-            tokenRequestContext = _tokenRequestContextFactory(uri, additionalAuthenticationContext, tokenRequestContext);
+        var tokenRequestContext = new TokenRequestContext(scopes, claims: decodedClaim, isCaeEnabled: _options.IsCaeEnabled);
+        if(_options.TokenRequestContextFactory != null)
+            tokenRequestContext = _options.TokenRequestContextFactory(uri, additionalAuthenticationContext, tokenRequestContext);
 
         span?.SetTag("com.microsoft.kiota.authentication.scopes", string.Join(",", tokenRequestContext.Scopes));
 
