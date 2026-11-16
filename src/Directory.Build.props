@@ -1,7 +1,7 @@
 <Project>
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net10.0;net11.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net10.0;net11.0</TargetFrameworks>
   </PropertyGroup>
   <!-- Common project properties for PACKAGED projects TO BE RELEASED-->
   <PropertyGroup Condition="('$(IsTestProject)' != 'true') and ('$(IsAnalyzerProject)' != 'true')">
