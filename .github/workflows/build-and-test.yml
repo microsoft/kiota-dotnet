@@ -44,12 +44,9 @@ jobs:
       - name: Test for net472
         run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity
           normal --framework net472 --report-gh
-      - name: Test for net11.0
+      - name: Test for net11.0 and collect coverage
         run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity
-          normal --framework net11.0 --report-gh
-      - name: Test for net10.0 and collect coverage
-        run: dotnet test --solution ${{ env.solutionName }} --no-build --verbosity
-          normal --framework net10.0 --results-directory=./TestResults --coverlet --coverlet-output-format
+          normal --framework net11.0 --results-directory=./TestResults --coverlet --coverlet-output-format
           cobertura --report-gh
       - name: Install report generator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool

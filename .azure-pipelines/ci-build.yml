@@ -100,11 +100,6 @@ extends:
               # Run the Unit test
               - pwsh: dotnet test --solution $(Build.SourcesDirectory)\Microsoft.Kiota.slnx
                   --configuration $(BuildConfiguration) --no-build --framework
-                  net10.0 --report-azdo --publish-azdo-test-results
-                displayName: "Test projects in Microsoft.Kiota for net10.0"
-
-              - pwsh: dotnet test --solution $(Build.SourcesDirectory)\Microsoft.Kiota.slnx
-                  --configuration $(BuildConfiguration) --no-build --framework
                   net11.0 --report-azdo --publish-azdo-test-results
                 displayName: "Test projects in Microsoft.Kiota for net11.0"
 

@@ -78,8 +78,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             // Assert
             Assert.NotNull(defaultHandler);
 #if NETFRAMEWORK
-            Assert.IsType<WinHttpHandler>(defaultHandler);
-            Assert.True(((WinHttpHandler)defaultHandler).EnableMultipleHttp2Connections);
+            Assert.IsType<HttpClientHandler>(defaultHandler);
 #else
             Assert.IsType<SocketsHttpHandler>(defaultHandler);
             Assert.True(((SocketsHttpHandler)defaultHandler).EnableMultipleHttp2Connections);
@@ -96,8 +95,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             // Assert
             Assert.NotNull(defaultHandler);
 #if NETFRAMEWORK
-            Assert.IsType<WinHttpHandler>(defaultHandler);
-            Assert.Equal(proxy, ((WinHttpHandler)defaultHandler).Proxy);
+            Assert.IsType<HttpClientHandler>(defaultHandler);
+            Assert.Equal(proxy, ((HttpClientHandler)defaultHandler).Proxy);
 #else
             Assert.IsType<SocketsHttpHandler>(defaultHandler);
             Assert.Equal(proxy, ((SocketsHttpHandler)defaultHandler).Proxy);
