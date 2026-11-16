@@ -56,7 +56,8 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
         /// <summary>
         /// The default implementation for scrubbing sensitive headers during redirects.
         /// This method removes Authorization and Cookie headers when the host, scheme, or port changes,
-        /// and removes ProxyAuthorization headers when no proxy is configured or the proxy is bypassed for the new URI.
+        /// and removes ProxyAuthorization headers when no proxy is configured, the proxy is bypassed for the new URI,
+        /// or the new URI uses a different proxy than the original URI.
         /// </summary>
         /// <param name="newRequest">The HTTP request message to modify.</param>
         /// <param name="originalUri">The original request URI.</param>
@@ -77,9 +78,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
                 newRequest.Headers.Remove("Cookie");
             }
 
-            // Remove ProxyAuthorization if no proxy is configured or the URL is bypassed
-            var isProxyInactive = proxyResolver == null || proxyResolver(newUri) == null;
-            if(isProxyInactive)
+            // Remove ProxyAuthorization if no proxy is configured, the URL is bypassed, or the proxy changes
+            var newProxy = proxyResolver?.Invoke(newUri);
+            var isProxyInactive = newProxy == null;
+            var isDifferentProxy = !isProxyInactive && newProxy != proxyResolver!(originalUri);
+            if(isProxyInactive || isDifferentProxy)
             {
                 newRequest.Headers.ProxyAuthorization = null;
             }
