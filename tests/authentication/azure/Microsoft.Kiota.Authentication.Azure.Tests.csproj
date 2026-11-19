@@ -4,6 +4,7 @@
     <PackageReference Include="coverlet.MTP">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" VersionOverride="11.0.0" />
     <PackageReference Include="Microsoft.Testing.Platform" />
     <PackageReference Include="Microsoft.Testing.Extensions.AzureDevOpsReport" />
     <PackageReference Include="Microsoft.Testing.Extensions.GitHubActionsReport" />
