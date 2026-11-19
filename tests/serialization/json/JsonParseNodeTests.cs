@@ -770,17 +770,16 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         }
 
         [Theory]
-        [InlineData("13.37", 13.37)]
+        [InlineData("13.37", "13.37")]
         [InlineData("\"13.37\"", null)]
         [InlineData("\"not-a-number\"", null)]
         [InlineData("null", null)]
-        public void GetDecimalValue_CanReadNumber(string input, double? expectedDouble)
+        public void GetDecimalValue_CanReadNumber(string input, string? expectedDecimal)
         {
             // Arrange
-            var expectedValue = expectedDouble.HasValue
-                ? Convert.ToDecimal(expectedDouble)
-                : default(decimal?)
-            ; //13.37M is not supported as a constant expression in attributes
+            var expectedValue = expectedDecimal is not null
+                ? decimal.Parse(expectedDecimal, CultureInfo.InvariantCulture)
+                : default(decimal?);
 
             using var jsonDocument = JsonDocument.Parse(input);
             var parseNode = new JsonParseNode(jsonDocument.RootElement);
@@ -789,17 +788,16 @@ namespace Microsoft.Kiota.Serialization.Json.Tests
         }
 
         [Theory]
-        [InlineData("13.37", 13.37)]
+        [InlineData("13.37", "13.37")]
         [InlineData("null", null)]
         [InlineData("\"not-a-number\"", null, "The JSON value could not be converted to System.Decimal.")]
-        [InlineData("\"13.37\"", 13.37)]
-        public void GetDecimalValue_CanReadNumber_AsString(string input, double? expectedDouble, string? expectedExceptionMessage = null)
+        [InlineData("\"13.37\"", "13.37")]
+        public void GetDecimalValue_CanReadNumber_AsString(string input, string? expectedDecimal, string? expectedExceptionMessage = null)
         {
             // Arrange
-            var expected = expectedDouble.HasValue
-                ? Convert.ToDecimal(expectedDouble)
-                : default(decimal?)
-            ; //13.37M is not supported as a constant expression in attributes
+            var expected = expectedDecimal is not null
+                ? decimal.Parse(expectedDecimal, CultureInfo.InvariantCulture)
+                : default(decimal?);
 
             using var jsonDocument = JsonDocument.Parse(input);
             var parseNode = new JsonParseNode(jsonDocument.RootElement, ReadNumbersAsStringsContext);
