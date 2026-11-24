@@ -101,6 +101,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                         }
                         var newRequest = await originalRequest.CloneAsync(cancellationToken).ConfigureAwait(false);
 
+                        // The next hop gets its own retry budget and attempt header.
+                        newRequest.Headers.Remove(RetryHandler.RetryAttempt);
+
                         if(RequestRequiresForceGet(response.StatusCode, newRequest.Method))
                         {
                             newRequest.Method = HttpMethod.Get;

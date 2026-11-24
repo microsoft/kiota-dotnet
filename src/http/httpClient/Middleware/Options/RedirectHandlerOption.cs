@@ -69,10 +69,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
             var newUri = newRequest.RequestUri ?? throw new InvalidOperationException("The request URI cannot be null.");
 
             // Remove Authorization and Cookie headers if http request's scheme, host, or port changes
-            var isDifferentOrigin = !newUri.Host.Equals(originalUri.Host, StringComparison.OrdinalIgnoreCase) ||
-                !newUri.Scheme.Equals(originalUri.Scheme, StringComparison.OrdinalIgnoreCase) ||
-                newUri.Port != originalUri.Port;
-            if(isDifferentOrigin)
+            if(!HaveSameOrigin(originalUri, newUri))
             {
                 newRequest.Headers.Authorization = null;
                 newRequest.Headers.Remove("Cookie");
@@ -87,5 +84,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options
                 newRequest.Headers.ProxyAuthorization = null;
             }
         }
+
+        internal static bool HaveSameOrigin(Uri first, Uri second) =>
+            first.Host.Equals(second.Host, StringComparison.OrdinalIgnoreCase) &&
+            first.Scheme.Equals(second.Scheme, StringComparison.OrdinalIgnoreCase) &&
+            first.Port == second.Port;
     }
 }

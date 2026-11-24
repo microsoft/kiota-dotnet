@@ -22,7 +22,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
     public static class KiotaClientFactory
     {
         /// <summary>
-        /// Initializes the <see cref="HttpClient"/> with the default configuration and middlewares including a authentication middleware using the <see cref="IAuthenticationProvider"/> if provided.
+        /// Initializes the <see cref="HttpClient"/> with the default configuration and middleware, without authorization middleware.
         /// </summary>
         /// <param name="finalHandler">The final <see cref="HttpMessageHandler"/> in the http pipeline. Can be configured for proxies, auto-decompression and auto-redirects </param>
         /// <param name="optionsForHandlers">A array of <see cref="IRequestOption"/> objects passed to the default handlers.</param>
@@ -50,9 +50,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// <returns></returns>
         public static HttpClient Create(BaseBearerTokenAuthenticationProvider authenticationProvider, IRequestOption[]? optionsForHandlers = null, HttpMessageHandler? finalHandler = null)
         {
-            var defaultHandlersEnumerable = CreateDefaultHandlers(optionsForHandlers);
-            defaultHandlersEnumerable.Add(new AuthorizationHandler(authenticationProvider));
-            return Create(defaultHandlersEnumerable, finalHandler);
+            return Create(CreateDefaultHandlers(optionsForHandlers, new AuthorizationHandler(authenticationProvider)), finalHandler);
         }
 
         /// <summary>
@@ -60,6 +58,9 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
         /// </summary>
         /// <returns>A list of the default handlers used by the client.</returns>
         public static IList<DelegatingHandler> CreateDefaultHandlers(IRequestOption[]? optionsForHandlers = null)
+            => CreateDefaultHandlers(optionsForHandlers, null);
+
+        private static IList<DelegatingHandler> CreateDefaultHandlers(IRequestOption[]? optionsForHandlers, AuthorizationHandler? authorizationHandler)
         {
             optionsForHandlers ??= Array.Empty<IRequestOption>();
 
@@ -89,16 +90,19 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
                     bodyInspectionHandlerOption = bodyInspectionOption;
             }
 
-            return new List<DelegatingHandler>
+            var handlers = new List<DelegatingHandler>
             {
                 uriReplacementOption != null ? new UriReplacementHandler<UriReplacementHandlerOption>(uriReplacementOption) : new UriReplacementHandler<UriReplacementHandlerOption>(),
-                retryHandlerOption != null ? new RetryHandler(retryHandlerOption) : new RetryHandler(),
-                redirectHandlerOption != null ? new RedirectHandler(redirectHandlerOption) : new RedirectHandler(),
                 parametersNameDecodingOption != null ? new ParametersNameDecodingHandler(parametersNameDecodingOption) : new ParametersNameDecodingHandler(),
                 userAgentHandlerOption != null ? new UserAgentHandler(userAgentHandlerOption) : new UserAgentHandler(),
-                headersInspectionHandlerOption != null ? new HeadersInspectionHandler(headersInspectionHandlerOption) : new HeadersInspectionHandler(),
-                bodyInspectionHandlerOption != null ? new BodyInspectionHandler(bodyInspectionHandlerOption) : new BodyInspectionHandler(),
             };
+            if(authorizationHandler != null)
+                handlers.Add(authorizationHandler);
+            handlers.Add(redirectHandlerOption != null ? new RedirectHandler(redirectHandlerOption) : new RedirectHandler());
+            handlers.Add(retryHandlerOption != null ? new RetryHandler(retryHandlerOption) : new RetryHandler());
+            handlers.Add(headersInspectionHandlerOption != null ? new HeadersInspectionHandler(headersInspectionHandlerOption) : new HeadersInspectionHandler());
+            handlers.Add(bodyInspectionHandlerOption != null ? new BodyInspectionHandler(bodyInspectionHandlerOption) : new BodyInspectionHandler());
+            return handlers;
         }
 
         /// <summary>
@@ -112,10 +116,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             return new List<System.Type>
             {
                 typeof(UriReplacementHandler<UriReplacementHandlerOption>),
-                typeof(RetryHandler),
-                typeof(RedirectHandler),
                 typeof(ParametersNameDecodingHandler),
                 typeof(UserAgentHandler),
+                typeof(RedirectHandler),
+                typeof(RetryHandler),
                 typeof(HeadersInspectionHandler),
                 typeof(BodyInspectionHandler),
             };
@@ -131,10 +135,10 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             return new List<ActivatableType>()
             {
                 new(typeof(UriReplacementHandler<UriReplacementHandlerOption>)),
-                new(typeof(RetryHandler)),
-                new(typeof(RedirectHandler)),
                 new(typeof(ParametersNameDecodingHandler)),
                 new(typeof(UserAgentHandler)),
+                new(typeof(RedirectHandler)),
+                new(typeof(RetryHandler)),
                 new(typeof(HeadersInspectionHandler)),
                 new(typeof(BodyInspectionHandler)),
             };
@@ -230,7 +234,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary
             // If custom proxy is passed, the WindowsProxyUsePolicy will need updating
             // https://github.com/dotnet/runtime/blob/main/src/libraries/System.Net.Http.WinHttpHandler/src/System/Net/Http/WinHttpHandler.cs#L575
             var proxyPolicy = proxy != null ? WindowsProxyUsePolicy.UseCustomProxy : WindowsProxyUsePolicy.UseWinHttpProxy;
-            return new WinHttpHandler { Proxy = proxy, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate, WindowsProxyUsePolicy = proxyPolicy, SendTimeout = System.Threading.Timeout.InfiniteTimeSpan, ReceiveDataTimeout = System.Threading.Timeout.InfiniteTimeSpan, ReceiveHeadersTimeout = System.Threading.Timeout.InfiniteTimeSpan, EnableMultipleHttp2Connections = true };
+            return new WinHttpHandler { Proxy = proxy, AutomaticRedirection = false, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate, WindowsProxyUsePolicy = proxyPolicy, SendTimeout = System.Threading.Timeout.InfiniteTimeSpan, ReceiveDataTimeout = System.Threading.Timeout.InfiniteTimeSpan, ReceiveHeadersTimeout = System.Threading.Timeout.InfiniteTimeSpan, EnableMultipleHttp2Connections = true };
 #elif NET5_0_OR_GREATER && !BROWSER
             return new SocketsHttpHandler { Proxy = proxy, AllowAutoRedirect = false, EnableMultipleHttp2Connections = true, AutomaticDecompression = DecompressionMethods.All };
 #elif BROWSER

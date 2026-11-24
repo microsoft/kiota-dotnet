@@ -12,6 +12,10 @@ Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README
 dotnet add package Microsoft.Kiota.Http.HttpClientLibrary
 ```
 
+The default middleware runs in this outbound order: URL replacement, query parameter name decoding, User-Agent, redirect, retry, headers inspection, and body inspection. The default transport handles response decompression. Each redirect hop has its own retry budget, and inspection runs for each attempt immediately before the transport.
+
+For arbitrary HTTP requests, the `KiotaClientFactory.Create` overload that accepts a bearer token authentication provider adds authorization after User-Agent and before redirect. Generated clients authenticate in the request adapter and do not need that overload. The default redirect policy strips authorization when the origin changes, and a claims challenge from a different origin does not trigger authentication.
+
 ## Debugging
 
 If you are using Visual Studio Code as your IDE, the **launch.json** file already contains the configuration to build and test the library. Otherwise, you can open the **Microsoft.Kiota.Http.HttpClientLibrary.sln** with Visual Studio.

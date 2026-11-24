@@ -2,6 +2,7 @@
 #if !NET5_0_OR_GREATER
 using System.Net.Http;
 #endif
+using System.Net.Http.Headers;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
@@ -87,6 +88,17 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
         }
 
         [Fact]
+        public void GetDefaultHttpMessageHandlerLeavesRedirectsToMiddleware()
+        {
+            using var handler = KiotaClientFactory.GetDefaultHttpMessageHandler();
+#if NETFRAMEWORK
+            Assert.False(Assert.IsType<WinHttpHandler>(handler).AutomaticRedirection);
+#else
+            Assert.False(Assert.IsType<SocketsHttpHandler>(handler).AllowAutoRedirect);
+#endif
+        }
+
+        [Fact]
         public void GetDefaultHttpMessageHandlerSetsUpProxy()
         {
             // Arrange
@@ -117,6 +129,98 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests
             // Assert
             Assert.NotNull(retryHandler);
             Assert.Equal(retryHandlerOption, retryHandler.RetryOption);
+        }
+
+        [Fact]
+        public void DefaultHandlerListsUseTheSameOutboundOrder()
+        {
+            Type[] expected =
+            [
+                typeof(UriReplacementHandler<UriReplacementHandlerOption>),
+                typeof(ParametersNameDecodingHandler),
+                typeof(UserAgentHandler),
+                typeof(RedirectHandler),
+                typeof(RetryHandler),
+                typeof(HeadersInspectionHandler),
+                typeof(BodyInspectionHandler),
+            ];
+            Assert.Equal(expected, KiotaClientFactory.CreateDefaultHandlers().Select(handler => handler.GetType()));
+#pragma warning disable CS0618 // Verify the legacy type list is still consistent.
+            Assert.Equal(expected, KiotaClientFactory.GetDefaultHandlerTypes());
+#pragma warning restore CS0618
+            Assert.Equal(expected, KiotaClientFactory.GetDefaultHandlerActivatableTypes().Select(handler => handler.Type));
+        }
+
+        [Fact]
+        public async Task RedirectHopsHaveSeparateRetryBudgetsAndKeepTheServerProvidedQuery()
+        {
+            using var initialFailure = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
+            using var redirect = new HttpResponseMessage(HttpStatusCode.Found);
+            redirect.Headers.Location = new Uri("/second?%24select=id", UriKind.Relative);
+            using var redirectFailure = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
+            using var success = new HttpResponseMessage(HttpStatusCode.OK);
+            var transport = new ResponseSequenceHandler(initialFailure, redirect, redirectFailure, success);
+            using var client = KiotaClientFactory.Create(transport, [new RetryHandlerOption { MaxRetry = 1, Delay = 0 }]);
+
+            var response = await client.GetAsync("https://example.com/first?%24select=id", TestContext.Current.CancellationToken);
+
+            Assert.Same(success, response);
+            Assert.Equal(
+                new (string, string?)[]
+                {
+                    ("/first?$select=id", null),
+                    ("/first?$select=id", "1"),
+                    ("/second?%24select=id", null),
+                    ("/second?%24select=id", "1"),
+                },
+                transport.Requests.Select(request => (request.RequestUri!.PathAndQuery,
+                    request.Headers.TryGetValues("Retry-Attempt", out var values) ? Assert.Single(values) : null)));
+        }
+
+        [Theory]
+        [InlineData("https://example.com/second", true)]
+        [InlineData("https://other.example.com/second", false)]
+        [InlineData("https://example.com:8443/second", false)]
+        [InlineData("http://example.com/second", false)]
+        public async Task FactoryAuthorizationOnlyAnswersClaimsChallengesFromTheOriginalOrigin(string destination, bool sameOrigin)
+        {
+            var tokens = new Mock<IAccessTokenProvider>();
+            tokens.SetupGet(provider => provider.AllowedHostsValidator).Returns(
+                new AllowedHostsValidator(["example.com", "other.example.com"]));
+            tokens.SetupSequence(provider => provider.GetAuthorizationTokenAsync(
+                It.IsAny<Uri>(), It.IsAny<Dictionary<string, object>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync("initial-token").ReturnsAsync("claims-token");
+
+            using var redirect = new HttpResponseMessage(HttpStatusCode.Found);
+            redirect.Headers.Location = new Uri(destination);
+            using var challenge = new HttpResponseMessage(HttpStatusCode.Unauthorized);
+            challenge.Headers.WwwAuthenticate.Add(new AuthenticationHeaderValue("Bearer", "error=\"insufficient_claims\", claims=\"YQ==\""));
+            using var success = new HttpResponseMessage(HttpStatusCode.OK);
+            var transport = new ResponseSequenceHandler(redirect, challenge, success);
+            using var client = KiotaClientFactory.Create(new BaseBearerTokenAuthenticationProvider(tokens.Object),
+                [new RedirectHandlerOption { AllowRedirectOnSchemeChange = true }], transport);
+
+            var response = await client.GetAsync("https://example.com/first", TestContext.Current.CancellationToken);
+
+            Assert.Same(sameOrigin ? success : challenge, response);
+            string?[] expectedTokens = sameOrigin ? ["initial-token", "initial-token", "claims-token"] : ["initial-token", null];
+            Assert.Equal(expectedTokens, transport.Requests.Select(request => request.Headers.Authorization?.Parameter));
+            tokens.Verify(provider => provider.GetAuthorizationTokenAsync(
+                It.IsAny<Uri>(), It.IsAny<Dictionary<string, object>>(), It.IsAny<CancellationToken>()),
+                Times.Exactly(sameOrigin ? 2 : 1));
+        }
+
+        private sealed class ResponseSequenceHandler(params HttpResponseMessage[] responses) : HttpMessageHandler
+        {
+            public List<HttpRequestMessage> Requests { get; } = [];
+
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                var response = responses[Requests.Count];
+                Requests.Add(request);
+                response.RequestMessage = request;
+                return Task.FromResult(response);
+            }
         }
 
         [Fact]
