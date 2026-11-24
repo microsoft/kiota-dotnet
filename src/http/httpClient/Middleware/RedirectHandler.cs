@@ -69,17 +69,14 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 // check response status code and redirect handler option
                 if(ShouldRedirect(response, redirectOption))
                 {
-                    if(response.Headers.Location == null)
-                    {
-                        throw new InvalidOperationException(
-                            "Unable to perform redirect as Location Header is not set in response",
-                                    new Exception($"No header present in response with status code {response.StatusCode}"));
-                    }
-
                     var redirectCount = 0;
 
                     while(redirectCount < redirectOption.MaxRedirect)
                     {
+                        var location = response.Headers.Location ?? throw new InvalidOperationException(
+                            "Unable to perform redirect as Location Header is not set in response",
+                            new Exception($"No header present in response with status code {response.StatusCode}"));
+
                         using var redirectActivity = activitySource?.StartActivity($"{nameof(RedirectHandler)}_{nameof(SendAsync)} - redirect {redirectCount}");
                         redirectActivity?.SetTag("com.microsoft.kiota.handler.redirect.count", redirectCount);
                         redirectActivity?.SetTag("http.response.status_code", response.StatusCode);
@@ -95,7 +92,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
 
                         // general clone request with internal CloneAsync (see CloneAsync for details) extension method
                         var originalRequest = response.RequestMessage;
-                        if(originalRequest == null)
+                        if(originalRequest == null || originalRequest.RequestUri is not { } originalUri)
                         {
                             return response;// We can't clone the original request to replay it.
                         }
@@ -112,20 +109,11 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                                 newRequest.Headers.TransferEncodingChunked = false;
                         }
 
-                        // Set newRequestUri from response
-                        if(response.Headers.Location?.IsAbsoluteUri ?? false)
-                        {
-                            newRequest.RequestUri = response.Headers.Location;
-                        }
-                        else
-                        {
-                            var baseAddress = newRequest.RequestUri?.GetComponents(UriComponents.SchemeAndServer | UriComponents.KeepDelimiter, UriFormat.Unescaped);
-                            newRequest.RequestUri = new Uri(baseAddress + response.Headers.Location);
-                        }
+                        newRequest.RequestUri = location.IsAbsoluteUri ? location : new Uri(originalUri, location);
 
                         // Scrub sensitive headers before following the redirect
                         var proxyResolver = GetProxyResolver();
-                        redirectOption.ScrubSensitiveHeaders(newRequest, originalRequest.RequestUri!, proxyResolver);
+                        redirectOption.ScrubSensitiveHeaders(newRequest, originalUri, proxyResolver);
 
                         // If scheme has changed. Ensure that this has been opted in for security reasons
                         if(!newRequest.RequestUri.Scheme.Equals(request.RequestUri?.Scheme) && !redirectOption.AllowRedirectOnSchemeChange)
