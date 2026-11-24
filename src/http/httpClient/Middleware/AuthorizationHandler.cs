@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Http.HttpClientLibrary.Extensions;
+using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
 
 namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
 {
@@ -62,8 +63,14 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
                 }
                 Dictionary<string, object> additionalAuthenticationContext = new Dictionary<string, object>();
                 await AuthenticateRequestAsync(request, additionalAuthenticationContext, activity, cancellationToken).ConfigureAwait(false);
+                var originalUri = request.RequestUri;
                 var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
-                if(response.StatusCode != HttpStatusCode.Unauthorized || response.RequestMessage == null || !response.RequestMessage.IsBuffered())
+                // A redirect may have removed authorization. Do not let a challenge extend it to another origin.
+                if(response.StatusCode != HttpStatusCode.Unauthorized ||
+                    originalUri is not { IsAbsoluteUri: true } ||
+                    response.RequestMessage?.RequestUri is not { IsAbsoluteUri: true } challengedUri ||
+                    !RedirectHandlerOption.HaveSameOrigin(originalUri, challengedUri) ||
+                    !response.RequestMessage.IsBuffered())
                     return response;
                 // Attempt CAE claims challenge
                 var claims = ContinuousAccessEvaluation.GetClaims(response);

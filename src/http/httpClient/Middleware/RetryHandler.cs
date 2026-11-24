@@ -22,7 +22,7 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Middleware
     public class RetryHandler : DelegatingHandler
     {
         private const string RetryAfter = "Retry-After";
-        private const string RetryAttempt = "Retry-Attempt";
+        internal const string RetryAttempt = "Retry-Attempt";
 
         /// <summary>
         /// RetryOption property

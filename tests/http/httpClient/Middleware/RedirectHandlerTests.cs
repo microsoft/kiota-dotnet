@@ -454,19 +454,22 @@ namespace Microsoft.Kiota.Http.HttpClientLibrary.Tests.Middleware
             }
         }
 
-        [Fact]
-        public async Task RedirectWithRelativeUrlShouldKeepRequestHost()
+        [Theory]
+        [InlineData("/bar", "https://example.org/bar")]
+        [InlineData("?page=2", "https://example.org/folder/item?page=2")]
+        [InlineData("next?page=3", "https://example.org/folder/next?page=3")]
+        public async Task RedirectWithRelativeLocationShouldResolveAgainstRequestUri(string location, string expectedUri)
         {
-            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "http://example.org/foo"))
+            using(var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://example.org/folder/item?page=1"))
             {   // Arrange
                 var redirectResponse = new HttpResponseMessage(HttpStatusCode.Redirect);
-                redirectResponse.Headers.Location = new Uri("/bar", UriKind.Relative);
+                redirectResponse.Headers.Location = new Uri(location, UriKind.Relative);
                 this._testHttpMessageHandler.SetHttpResponse(redirectResponse, new HttpResponseMessage(HttpStatusCode.OK));// sets the mock response
                 // Act
                 var response = await _invoker.SendAsync(httpRequestMessage, TestContext.Current.CancellationToken);
                 // Assert
                 Assert.NotSame(response.RequestMessage, httpRequestMessage);
-                Assert.Equal("http://example.org/bar", response.RequestMessage?.RequestUri?.AbsoluteUri);
+                Assert.Equal(expectedUri, response.RequestMessage?.RequestUri?.AbsoluteUri);
             }
         }
 
