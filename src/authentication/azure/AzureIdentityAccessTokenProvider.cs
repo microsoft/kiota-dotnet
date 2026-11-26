@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------
 
@@ -22,8 +22,8 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
     private static readonly object BoxedFalse = false;
 
     private readonly TokenCredential _credential;
+    private readonly AzureIdentityAccessTokenProviderOptions _options;
     private readonly ActivitySource _activitySource;
-    private readonly bool _isCaeEnabled;
     private readonly HashSet<string> _scopes;
     /// <inheritdoc />
     public AllowedHostsValidator AllowedHostsValidator { get; protected set; }
@@ -32,23 +32,21 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
     /// The <see cref="AzureIdentityAccessTokenProvider"/> constructor
     /// </summary>
     /// <param name="credential">The credential implementation to use to obtain the access token.</param>
-    /// <param name="allowedHosts">The list of allowed hosts for which to request access tokens.</param>
+    /// <param name="options">The options to use for the access token provider.</param>
     /// <param name="scopes">The scopes to request the access token for.</param>
-    /// <param name="observabilityOptions">The observability options to use for the authentication provider.</param>
-    /// <param name="isCaeEnabled">Whether to enable Conditional Access Evaluation (CAE) for the token request.</param>
-    public AzureIdentityAccessTokenProvider(TokenCredential credential, string[]? allowedHosts = null, ObservabilityOptions? observabilityOptions = null, bool isCaeEnabled = true, params string[] scopes)
+    public AzureIdentityAccessTokenProvider(TokenCredential credential, AzureIdentityAccessTokenProviderOptions? options, params string[] scopes)
     {
         _credential = credential ?? throw new ArgumentNullException(nameof(credential));
+        _options = options ?? new AzureIdentityAccessTokenProviderOptions();
 
-        AllowedHostsValidator = new AllowedHostsValidator(allowedHosts);
+        AllowedHostsValidator = new AllowedHostsValidator(_options.AllowedHosts);
 
         if(scopes == null)
             _scopes = new();
         else
             _scopes = new(scopes, StringComparer.OrdinalIgnoreCase);
 
-        _activitySource = new((observabilityOptions ?? new()).TracerInstrumentationName);
-        _isCaeEnabled = isCaeEnabled;
+        _activitySource = new((_options.ObservabilityOptions ?? new()).TracerInstrumentationName);
     }
     /// <summary>
     /// The <see cref="AzureIdentityAccessTokenProvider"/> constructor
@@ -57,7 +55,20 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
     /// <param name="allowedHosts">The list of allowed hosts for which to request access tokens.</param>
     /// <param name="scopes">The scopes to request the access token for.</param>
     /// <param name="observabilityOptions">The observability options to use for the authentication provider.</param>
-    [Obsolete("This constructor is obsolete and will be removed in a future version. Use the constructor that takes an isCaeEnabled parameter instead.")]
+    /// <param name="isCaeEnabled">Whether to enable Conditional Access Evaluation (CAE) for the token request.</param>
+    [Obsolete("This constructor is obsolete and will be removed in a future version. Use the constructor that takes AzureIdentityAccessTokenProviderOptions instead.")]
+    public AzureIdentityAccessTokenProvider(TokenCredential credential, string[]? allowedHosts = null, ObservabilityOptions? observabilityOptions = null, bool isCaeEnabled = true, params string[] scopes)
+        : this(credential, new AzureIdentityAccessTokenProviderOptions { AllowedHosts = allowedHosts, ObservabilityOptions = observabilityOptions, IsCaeEnabled = isCaeEnabled }, scopes)
+    {
+    }
+    /// <summary>
+    /// The <see cref="AzureIdentityAccessTokenProvider"/> constructor
+    /// </summary>
+    /// <param name="credential">The credential implementation to use to obtain the access token.</param>
+    /// <param name="allowedHosts">The list of allowed hosts for which to request access tokens.</param>
+    /// <param name="scopes">The scopes to request the access token for.</param>
+    /// <param name="observabilityOptions">The observability options to use for the authentication provider.</param>
+    [Obsolete("This constructor is obsolete and will be removed in a future version. Use the constructor that takes AzureIdentityAccessTokenProviderOptions instead.")]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public AzureIdentityAccessTokenProvider(TokenCredential credential, string[]? allowedHosts, ObservabilityOptions? observabilityOptions, params string[] scopes) :
     this(credential, allowedHosts, observabilityOptions, true, scopes)
@@ -112,9 +123,14 @@ public class AzureIdentityAccessTokenProvider : IAccessTokenProvider, IDisposabl
         }
         else
             scopes = [$"{uri.Scheme}://{uri.Host}/.default"];
-        span?.SetTag("com.microsoft.kiota.authentication.scopes", string.Join(",", scopes));
 
-        var result = await _credential.GetTokenAsync(new TokenRequestContext(scopes, claims: decodedClaim, isCaeEnabled: _isCaeEnabled), cancellationToken).ConfigureAwait(false);
+        var tokenRequestContext = new TokenRequestContext(scopes, claims: decodedClaim, isCaeEnabled: _options.IsCaeEnabled);
+        if(_options.TokenRequestContextFactory != null)
+            tokenRequestContext = _options.TokenRequestContextFactory(uri, additionalAuthenticationContext, tokenRequestContext);
+
+        span?.SetTag("com.microsoft.kiota.authentication.scopes", string.Join(",", tokenRequestContext.Scopes));
+
+        var result = await _credential.GetTokenAsync(tokenRequestContext, cancellationToken).ConfigureAwait(false);
         return result.Token;
     }
 
