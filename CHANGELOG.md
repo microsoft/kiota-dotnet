@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.1](https://github.com/microsoft/kiota-dotnet/compare/v2.2.0...v2.2.1) (2026-11-26)
+
+
+### Bug Fixes
+
+* **http:** align default middleware order ([#884](https://github.com/microsoft/kiota-dotnet/issues/884)) ([43253d8](https://github.com/microsoft/kiota-dotnet/commit/43253d81cb3e367ccbd5870155e07ac6da5ceaee))
+
 ## [2.2.0](https://github.com/microsoft/kiota-dotnet/compare/v2.1.6...v2.2.0) (2026-11-16)
 
 
